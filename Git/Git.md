@@ -84,7 +84,9 @@
   - 查看当前工作区哪些文件已经`commit`了但是还未合并到远程Repository的分支下
   
   `$ git status`
-
+  
+  ![微信截图_20190712154521.png](https://i.loli.net/2019/07/12/5d283ab06bcd044382.png)
+  
 - 检查差异
     - 查看当前工作区与暂存区之间的差异
     `$ git diff`
