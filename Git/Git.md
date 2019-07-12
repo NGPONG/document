@@ -82,7 +82,6 @@
   - 查看当前工作区哪些文件被修改了但是还未`add`至暂存区
   - 查看当前工作区哪些文件已经`add`了但是还未`commit`到本机的Repository
   - 查看当前工作区哪些文件已经`commit`了但是还未合并到远程Repository的分支下
-  
   `$ git status`
   ![微信截图_20190712154521.png](https://i.loli.net/2019/07/12/5d283ab06bcd044382.png)
 - 检查差异
