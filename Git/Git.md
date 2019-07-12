@@ -55,8 +55,8 @@
   `$ git config --global credential.helper store/cache`
 
 ##### 4. 提交
-- 添加文件至本地暂存区中：
-<font size=2>ps:可以指定具体的文件名，也可以通过 `.` 来指定当前工作区下的所有文件都提交至暂存区中</font>
+- 添加文件至本地暂存区：
+<font size=2>**ps:可以指定具体的文件名，也可以通过 `.` 来指定当前工作区下的所有文件都提交至暂存区中**</font>
 `$ git add FileName/.`
-- 把暂存区的文件提交至本次Repository中
+- 把暂存区的文件提交至本机的Repository：
 `$ git commit -m "Commit Message"`
