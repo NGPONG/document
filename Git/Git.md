@@ -19,9 +19,17 @@
 
 <br/>
 
-## 关于Git的使用
+##### 4. Git的工作方式
 
-##### 1. 安装
+<br/>
+
+![bg2015120901.png](https://i.loli.net/2019/07/12/5d283cd23a90693337.png)
+
+<br/>
+
+## Git的使用方式
+
+##### 1. 如何安装Git
 在Windows系统上使用Git，可以直接从Git的官方网站[下载安装程序](https://git-scm.com/downloads)
 
 ##### 2. 使用前的初始化
@@ -56,8 +64,44 @@
 
 ##### 4. 提交
 - 添加文件至本地暂存区：
-<font size=2>**ps:可以指定具体的文件名，也可以通过 `.` 来指定当前工作区下的所有文件都提交至暂存区中**</font>
-`$ git add FileName/.`
-- 检查当前工作区与asd
+  - 可以指定具体的文件名，也可以通过 `.` 来指定当前工作区下的所有文件都提交至暂存区中
+
+  `$ git add FileName/.`
 - 把暂存区的文件提交至本机的Repository：
 `$ git commit -m "Commit Message"`
+
+##### 5. 复位
+- 复位工作区文件/暂存区/本机Reposttory至指定的版本
+  - `$ git reset --hard [commitId]`：复位工作区文件、暂存区数据和本机Repository的版本指针到本机Repository的最新版本或指定`commitId`的版本
+  - `$ git reset [commitId]`：复位暂存区数据和本机Repository的版本指针到本机Repository的最新版本或指定`commitId`的版本
+  - `$ git reset --keep [commitId]`：复位本机Respository的版本指针到本机Repository的最新版本或指定`commitId`的版本
+
+
+##### 6. 差异和检查
+- 检查当前工作区的状态
+  - 查看当前工作区哪些文件被修改了但是还未`add`至暂存区
+  - 查看当前工作区哪些文件已经`add`了但是还未`commit`到本机的Repository
+  - 查看当前工作区哪些文件已经`commit`了但是还未合并到远程Repository的分支下
+  
+  `$ git status`
+  ![微信截图_20190712154521.png](https://i.loli.net/2019/07/12/5d283ab06bcd044382.png)
+- 检查差异
+    - 查看当前工作区与暂存区之间的差异
+    `$ git diff`
+    - 查看暂存区与本机Repostiory之间的差异
+    `$ git diff --cached`
+    - 查看工作区与本机Repostiory最新`commit`的差异
+    `$ git diff HEAD`
+    - 查看工作区与本机Repostiory指定版本`commit`的差异
+    `$ git diff VersionId`
+- 显示版本日志
+    - `$ git log`：显示已经`commit`到本机Repostiory的完整版的日志格式
+    - `$ git log --pretty=oneline`：显示已经`commit`到本机Repostiory的简化版的日志格式
+- 显示历史命令记录
+`$ git reflog`
+
+##### 7. Git中的一些概念
+- 在Git中除了可以使用版本号来指定版本外，还可以通过一些特殊的符号来表示
+    - `HEAD`：表示最新的版本
+    - `HEAD^`：表示最新版本的上一个版本，如果想指定在最新版本之上的某个具体的版本，也可以通过多个`^`来实现，例如 `HEAD^`/`HEAD^^`/`HEAD^^^`
+    - `HEAD~num`：表示最新版本之上多少个版本，例如我想表示最新版本的上100个版本则为 `HEAD~100`
