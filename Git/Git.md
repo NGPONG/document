@@ -104,8 +104,15 @@
 - 把本地分支`BranchName`的内容推送到远程仓库上去
 `git push [RepositoryName] [BranchName]`
 ##### 7. 删除
+- 删除本地暂存区当中的指定文件并把删除结果映射至工作目录中：
+    - 执行的时候会优先先检查暂存区中是否包含此文件，如果此文件还未`add`至暂存区中则无法删除
+    - 在做完上面所说的检查后还会检查当前分支的信息，如果当前所删除的文件没有往当前分支上进行过任何`commit`则无法删除
+    
+    `$ git rm [FileName]`
+- 删除本地暂存区的所有文件：
+`git rm --cached -r .`
 - 删除本地暂存区的指定文件：
-`$ git rm [FileName]`
+`git rm --cached [FileName]`
 
 
 ##### 8. 复位
@@ -114,9 +121,12 @@
 - `$ git reset --keep [commitId]`：复位`HEAD`指针指向到到当前分支的`commitId`的版本
 
 ##### 9. 撤销
-- `$ git checkout [filename]`：把暂存区中的指定文件恢复到工作区中
-- `$ git checkout [.]`：把暂存区中的所有文件恢复到工作区中
-- `$ git checkout [commitId] [fileName/.]`：把本地分支指定版本的所有文件恢复至工作区和暂存区当中
+- 把暂存区中的指定文件恢复到工作区中
+`$ git checkout [filename]`
+- 把暂存区中的所有文件恢复到工作区中
+`$ git checkout [.]`
+- 把本地分支指定版本的所有文件恢复至工作区和暂存区当中
+`$ git checkout [commitId] [fileName/.]`
 
 ##### 10. 差异和检查
 - 检查当前工作区的状态
@@ -146,7 +156,7 @@ Git的差异检测是反向检测的，什么意思呢，比如说我们工作�
 - 显示历史命令记录
 `$ git reflog`
 - 显示分支合并记录
-    - `git log --graph`：显示完整版本的分支合并记录
+    - `$ git log --graph`：显示完整版本的分支合并记录
     - `$ git log --graph --pretty=oneline --abbrev-commit`：显示简化版本的分支合并记录
 
 ##### 11. Git中的一些概念
@@ -155,7 +165,11 @@ Git的差异检测是反向检测的，什么意思呢，比如说我们工作�
 - 工作区`Working Directory`：当前所操作Git的文件夹就是一个工作区
 - 版本库`Repository`：在工作区中有一个隐藏目录`.git`，在我们使用初始化操作`$ git init`的时候就会为我们构建这么一个目录，这个目录就是本机的一个Repository
 - 暂存区`index`：在版本库中有一个暂存区，用于暂存我们所`add`的数据，暂存区中的数据等待我们`commit`到当前分支上
-- `HEAD`：<span style="display:none">我们构建本机的`Repository`的时候，Git就自动地为我们在本机`Repository`中创建一条分支，这条分支上存储了该`Repository`的最新提交的文件，那么</span>每一次提交到当前分支上的修改都会为当前分支生成一个最新的、相对应的版本号记录，而指向当前分支所`commit`的版本的指针就叫做`HEAD`，我们可以通过`HEAD`关键字来表示当前分支上的版本信息
+- 分支`branch`：暂存区中所`commit`的数据就是提交至本机当前所操作的`branch`身上，我们可以为本机`Repository`构建多个`branch`，不同的`branch`间所操作的版本和代码互不影响，它们之间只同步在新建当前分支前所对应的之前的版本，在此之后的版本互相对应着自己的工作版本
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src = "https://i.loli.net/2019/07/23/5d3678d37bb2910714.png" width = "60%" height = "60%">
+<br/>
+- `HEAD`：<span style="display:none">我们构建本机的`Repository`的时候，Git就自动地为我们在本机`Repository`中创建一条分支，这条分支上存储了该`Repository`的最新提交的文件，那么</span>`HEAD`是一个指针，它指向了本机`Repository`所操作的`branch`，更具体的来说它是指向了当前`branch`上的版本号记录(<span style="color:red">每一次提交到当前分支上的修改都会为当前分支生成一个最新的、相对应的版本号记录</span>)，在`Git`中，我们可以通过`HEAD`关键字来表示当前分支上的版本信息
     - `HEAD`：表示当前分支的最新的版本
     - `HEAD^`：当前指针上一个版本，如果想表示其上一个版本可以通过关键字`^`来实现，当然我们可以指定多个`^`，例如：`HEAD^`/`HEAD^^`/`HEAD^^^`
     - `HEAD~num`：表示最新版本之上多少个版本，例如我想表示最新版本的上100个版本则为 `HEAD~100`
