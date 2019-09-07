@@ -38,8 +38,10 @@
 
 ##### 3. 基础配置
 - 设置提交人：
+
 `$ git config --global user.name "Your Name"`
 - 设置提交人的Email地址：
+
 `$ git config --global user.email "email@example.com"`
 - 设置Git使用SS代理http协议：
 `$ git config --global http.proxy http://127.0.0.1:1080`
