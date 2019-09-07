@@ -37,7 +37,7 @@
 `$ mkdir [Directory Name]`
 - 定位到当前文件夹：
 `$ cd [Directory Name]`
-- 初始化Git，构建Repository：
+- 初始化Git，构建本机的Repository：
 `$ git init`  
 
 ##### 3. 基础配置
@@ -60,18 +60,22 @@
   `$ git config --global credential.helper store/cache`
 
 ##### 4. 远程
-- 添加本地Repository相关联的远程Repository
-  - ShortName：远程仓库命名，可自定义，默认为`origin`，如果自定义命名则每次进行远程同步操作的时候都需要指定自己自定义的远程Repository的命名
-  - Url：远程Repository的地址
+- 添加Repository相关联的Remote
+  - ShortName：远程仓库命名，可自定义，默认为 `origin` ，如果自定义命名则每次进行远程同步操作的时候都需要指定自己自定义的Remote的命名
+  - Url：Remote的地址
 
   `$ git remote add [ShortName] [Url]`
-- 设置远程Repository的关联地址：
+- 设置Remote关联地址：
 `$ git remote set-url origin [Url]`
-- 把远程Repository克隆到本机上，下载一个项目和它的整个历史代码
+- 把Remote克隆到本机上，下载一个项目和它的整个历史代码
 `$ git clone [Url]`
+- 查看Repository所指定的Remote
+`git remote -v`
+- 查看指定ShortName的Remote的具体信息
+`git remote show [ShortName]`
 
 ##### 5. 分支
-- 查看本机Repository所存在的分支，和`HEAD`目前所指向的分支
+- 查看Repository所存在的分支，和 `HEAD` 目前所指向的分支
 `$ git branch`
 - 为当前Repository创建一个分支
 `$ git branch [branchName]`
@@ -79,14 +83,14 @@
 `$ git checkout [branchName]`
 - 创建并切换到该分支，为上面两个步骤的一种简写形式
 `$ git checkout -b [branchName]`
-- 合并指定分支所`commit`的内容到当前分支上
+- 合并指定分支所 `commit` 的内容到当前分支上
     - 在合并分支的过程当中，可能会遇到无法合并的问题，如下：
         ```
         Auto-merging readme.txt
         CONFLICT (content): Merge conflict in readme.txt
         Automatic merge failed; fix conflicts and then commit the result.
         ```
-    - 出现这种情况的原因是因为当前分支和所合并的分支出现了冲突合并的情况，这时候我们输入`$ git status`进行状态查看的时候可以看到所谓造成冲突的一些文件，Git会把合并失败的结果修改在文件内部，需要我们<span style="color:red;">手动的在文件中整合需要合并的内容</span>，然后在提交至暂存区、`commit`至本地分支上才能够和并成功
+    - 出现这种情况的原因是因为当前分支和所合并的分支出现了冲突合并的情况，这时候我们输入 `$ git status` 进行状态查看的时候可以看到所谓造成冲突的一些文件，Git会把合并失败的结果修改在文件内部，需要我们<span style="color:red;">手动的在文件中整合需要合并的内容</span>，然后在提交至暂存区、 `commit` 至本地分支上才能够和并成功
     
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git merge [branchName]`
 - 删除指定分支
@@ -99,14 +103,14 @@
   - 可以指定具体的文件名，也可以通过 `.` 来指定当前工作区下的所有文件都提交至暂存区中
 
   `$ git add [FileName/.]`
-- 把暂存区的文件提交至本机的Repository的`HEAD`所指向的分支上：
+- 把暂存区的文件提交至Repository的`HEAD`所指向的分支上：
 `$ git commit -m "Commit Message"`
-- 把本地分支`BranchName`的内容推送到远程仓库上去
+- 把本地分支 `BranchName` 的内容推送到远程仓库上去
 `git push [RepositoryName] [BranchName]`
 ##### 7. 删除
 - 删除本地暂存区当中的指定文件并把删除结果映射至工作目录中：
     - 执行的时候会优先先检查暂存区中是否包含此文件，如果此文件还未`add`至暂存区中则无法删除
-    - 在做完上面所说的检查后还会检查当前分支的信息，如果当前所删除的文件没有往当前分支上进行过任何`commit`则无法删除
+    - 在做完上面所说的检查后还会检查当前分支的信息，如果当前所删除的文件没有往当前分支上进行过任何 `commit` 则无法删除
     
     `$ git rm [FileName]`
 - 删除本地暂存区的所有文件：
@@ -116,7 +120,7 @@
 
 
 ##### 8. 复位
-- `$ git reset --hard [commitId]`：复位工作区文件、暂存区数据和`HEAD`指针指向到到当前分支的`commitId`的版本
+- `$ git reset --hard [commitId]`：复位工作区文件、暂存区数据和`HEAD`指针指向到到当前分支的 `commitId` 的版本
 - `$ git reset [commitId]`：复位暂存区数据和`HEAD`指针指向到到当前分支的`commitId`的版本
 - `$ git reset --keep [commitId]`：复位`HEAD`指针指向到到当前分支的`commitId`的版本
 
@@ -132,7 +136,7 @@
 - 检查当前工作区的状态
   - 查看当前工作区哪些文件被修改了但是还未`add`至暂存区
   - 查看当前工作区哪些文件已经`add`了但是还未`commit`到当前分支上
-  - 查看当前工作区哪些文件已经`commit`了但是还未合并到远程Repository的分支下
+  - 查看当前工作区哪些文件已经`commit`了但是还未合并到Remote的分支下
   
   `$ git status`
   
@@ -161,15 +165,16 @@ Git的差异检测是反向检测的，什么意思呢，比如说我们工作�
 
 ##### 11. Git中的一些概念
 > 7.1 本机Git工作区的构成
-![0.jpg](https://i.loli.net/2019/07/16/5d2d29ab60b4e44188.jpg)
-- 工作区`Working Directory`：当前所操作Git的文件夹就是一个工作区
-- 版本库`Repository`：在工作区中有一个隐藏目录`.git`，在我们使用初始化操作`$ git init`的时候就会为我们构建这么一个目录，这个目录就是本机的一个Repository
-- 暂存区`index`：在版本库中有一个暂存区，用于暂存我们所`add`的数据，暂存区中的数据等待我们`commit`到当前分支上
-- 分支`branch`：暂存区中所`commit`的数据就是提交至本机当前所操作的`branch`身上，我们可以为本机`Repository`构建多个`branch`，不同的`branch`间所操作的版本和代码互不影响，它们之间只同步在新建当前分支前所对应的之前的版本，在此之后的版本互相对应着自己的工作版本
+![bg2015120901.png](https://i.loli.net/2019/09/07/fqKXWDecx5mF2Sh.png)
+- 工作区 `Work Space` ：当前所操作Git的文件夹就是一个工作区
+- 版本库 `Repository` ：在工作区中有一个隐藏目录`.git`，在我们使用初始化操作 `$ git init` 的时候就会为我们构建这么一个目录，这个目录就是 <span style="color:red;font-weight:bold;">本机</span> 的一个仓库
+- 远程仓库 `Remote` ：Repository的最终指向则为远程仓库，Remote为Repository提供了 `pull` ，Repository为Remote提供了 `push` ，简而言之，远程仓库就是我们所同步并保存在 `GitHub` 上的代码仓库
+- 暂存区 `index` ：在版本库中有一个暂存区，用于暂存我们所 `add` 的数据，暂存区中的数据等待我们 `commit` 到当前分支上
+- 分支 `branch` ：暂存区中所 `commit` 的数据就是提交至本机当前所操作的branch身上，我们可以为Repository构建多个branch，不同的branch间所操作的版本和代码互不影响，它们之间只同步在新建当前分支前所对应的之前的版本，在此之后的版本互相对应着自己的工作版本
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src = "https://i.loli.net/2019/07/23/5d3678d37bb2910714.png" width = "60%" height = "60%">
 <br/>
-- `HEAD`：<span style="display:none">我们构建本机的`Repository`的时候，Git就自动地为我们在本机`Repository`中创建一条分支，这条分支上存储了该`Repository`的最新提交的文件，那么</span>`HEAD`是一个指针，它指向了本机`Repository`所操作的`branch`，更具体的来说它是指向了当前`branch`上的版本号记录(<span style="color:red">每一次提交到当前分支上的修改都会为当前分支生成一个最新的、相对应的版本号记录</span>)，在`Git`中，我们可以通过`HEAD`关键字来表示当前分支上的版本信息
+- `HEAD` ：HEAD是一个指针，它指向了Repository所操作的branch，更具体的来说它是指向了当前branch上的版本号记录(<span style="color:red">每一次提交到当前分支上的修改都会为当前分支生成一个最新的、相对应的版本号记录</span>)，在 `Git` 中，我们可以通过HEAD关键字来表示当前分支上的版本信息
     - `HEAD`：表示当前分支的最新的版本
-    - `HEAD^`：当前指针上一个版本，如果想表示其上一个版本可以通过关键字`^`来实现，当然我们可以指定多个`^`，例如：`HEAD^`/`HEAD^^`/`HEAD^^^`
+    - `HEAD^`：当前指针上一个版本，如果想表示其上一个版本可以通过关键字`^`来实现，当然我们可以指定多个 `^` ，例如：`HEAD^`/`HEAD^^`/`HEAD^^^`
     - `HEAD~num`：表示最新版本之上多少个版本，例如我想表示最新版本的上100个版本则为 `HEAD~100`
