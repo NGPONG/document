@@ -99,12 +99,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git checkout -b [branchName]`
 - 合并指定分支所 `commit` 的内容到当前分支上
     - 在合并分支的过程当中，可能会遇到无法合并的问题，如下：
+
         ```
         Auto-merging readme.txt
         CONFLICT (content): Merge conflict in readme.txt
         Automatic merge failed; fix conflicts and then commit the result.
         ```
-    - 出现这种情况的原因是因为当前分支和所合并的分支出现了冲突合并的情况，这时候我们输入 `$ git status` 进行状态查看的时候可以看到所谓造成冲突的一些文件，Git会把合并失败的结果修改在文件内部，需要我们<span style="color:red;">手动的在文件中整合需要合并的内容</span>，然后在提交至暂存区、 `commit` 至本地分支上才能够和并成功
+        出现这种情况的原因是因为当前分支和所合并的分支出现了冲突合并的情况，这时候我们输入 `$ git status` 进行状态查看的时候可以看到所谓造成冲突的一些文件，Git会把合并失败的结果修改在文件内部，需要我们<span style="color:red;">手动的在文件中整合需要合并的内容</span>，然后在提交至暂存区、 `commit` 至本地分支上才能够和并成功
     
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git merge [branchName]`
 - 删除指定分支
