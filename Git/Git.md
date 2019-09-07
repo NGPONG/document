@@ -214,8 +214,7 @@ Git的差异检测是反向检测的，什么意思呢，比如说我们工作�
 - 远程仓库 `Remote` ：Repository的最终指向则为远程仓库，Remote为Repository提供了 `pull` ，Repository为Remote提供了 `push` ，简而言之，远程仓库就是我们所同步并保存在 `GitHub` 上的代码仓库
 - 暂存区 `index` ：在版本库中有一个暂存区，用于暂存我们所 `add` 的数据，暂存区中的数据等待我们 `commit` 到当前分支上
 - 分支 `branch` ：暂存区中所 `commit` 的数据就是提交至本机当前所操作的branch身上，我们可以为Repository构建多个branch，不同的branch间所操作的版本和代码互不影响，它们之间只同步在新建当前分支前所对应的之前的版本，在此之后的版本互相对应着自己的工作版本
-<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src = "https://i.loli.net/2019/07/23/5d3678d37bb2910714.png" width = "60%" height = "60%">
+<img src = "https://i.loli.net/2019/07/23/5d3678d37bb2910714.png" width = "60%" height = "60%">
 <br/>
 
 - `HEAD` ：HEAD是一个指针，它指向了Repository所操作的branch，更具体的来说它是指向了当前branch上的版本号记录(<span style="color:red">每一次提交到当前分支上的修改都会为当前分支生成一个最新的、相对应的版本号记录</span>)，在 `Git` 中，我们可以通过HEAD关键字来表示当前分支上的版本信息
