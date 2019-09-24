@@ -87,8 +87,44 @@ Linq查询的数据源主要是分为了两种类型
     Console.ReadLine();
 ```
 
-
-
 #### 3. 延迟执行
+其实关于延迟执行的问题，如果探讨仔细后，我们就可以理解 `Linq to Object` 和 `Linq to Provider` 之间的异同和其核心运行模型了
 
-使用Linq查询后的结果我们可以称它为一个查询变量，但是更准确的说法是 `一个可迭代的对象` ，在 [迭代模式篇章](/c%23/2019年/8月6号/迭代器模式.md) 说到过，一个可迭代对象并就是所指向的数据序列的本身，我们需要对它进行迭代工作后才能完整的获取数据源，这其实也就认证了 `延迟执行` 这句话
+- 那么首先来是 `Linq to Object`：
+
+使用Linq查询后的结果我们可以称它为一个查询变量，但是更准确的说法是 `一个可迭代的对象` ，一个可迭代对象并非就是所指向的数据序列的本身，我们需要对它进行迭代工作（获取可迭代对象所包含的迭代器，并不断地调用其实现的 `MoveNext()` 函数和 `Current` 属性）后才能完整的获取数据源，以此来完成一次延迟执行的操作，当然，关于这点其实无可厚非，在 [迭代模式篇章](/c%23/2019年/8月6号/迭代器模式.md) 章节中其实对其已经分析的很清楚明朗，但是我们需要注意的是，<span style="color:red">以上这些步骤仅仅只是针对一个可迭代对象的</span>，而在Linq中，我们每一个查询步骤的背后，其实都返回了一个 可迭代对象，这里就拿Linq查询表达式来说，我们在 `where` 的时候其实是返回来一个 可迭代对象，在 `select` 又是返回了一个可迭代对象，需要补充的是，Linq 的核心设计模式是 <span style="color:red">碎片化的环路执行对象模型</span>，简而言之上一次(`where`)所返回的可迭代对象所包含的内容会同步到下一个需要操作(`select`)的模型中去，通过多个可迭代对象共同构成了一个核心运行模型，这才是 `Linq to Object` 延迟执行的原理所在
+
+![微信截图_20190924212318.png](https://i.loli.net/2019/09/24/z8N5cnV2Sy46fuE.png)
+
+- 其次就来讨论下 `Linq to Provider`：
+
+我们在前面说到，`System.Linq.Queryable` 针对于 `IQueryable<T>` 所提供的扩展方法是离不开 `System.Linq.Expressions` 表达式树的，每一个所库宗翰的链式查询方法中需要我们录入查询逻辑的 `Lambda表达式` 中总是会被一个表达式树所包裹着，其目的就是为了把当前所录入的查询逻辑 `Lambda表达式` 解析成一个表达式树，并保存起来，那么在下一次(`select`)调用的时候会同步到上一步(`where`)操作所解析出来的表达式树，并在此次操作完成之前把此次的表达式树又跟踪到刚刚所保存的上一次操作所解析出来的表达式树中，这些操作的最后其实都是保存在 `IQueryable` 中的属性 `Expression` 当中，其实我们可以想象到，在所有的查询表达式亦或是链式查询方法在解析完成的最后，`Expression` 属性所保存的表达式树的最终形态是多么的雄大，需要补充一点的是，`Linq to Provider` 同样享有着 <span style="color:red">碎片化的环路执行对象模型</span> 这一种模式
+
+其实我们可能还存在疑惑，这些表达式的解析和执行的工作都是交给谁来完成的呢？其实就是交由 `IQueryable` 当中的 `IQueryProvider` 类型的属性 `Provdier` 去完成的，`Provdier` 在前面为当前链式查询方法所录入的查询逻辑 `Lambda表达式` 进行解析，并把解析后的表达式树同步到 `IQueryable` 中的 `Expression` 属性当中，当我们真正的对 `Linq to Provider` 所返回的结果进行遍历的过程当中，`Provdier` 才会去执行 `Expression` 所保存下来的表达式树，换句话来说，前面所做的过程其实都是为一个表达式树所做铺垫，在其的基础上增添不同的点缀，在最终遍历的过程中才把这颗庞大的表达式树交由一个提供者去执行操作，`Linq to Provider` 就是以此来完成延迟执行的对象模型的
+```csharp
+    public interface IQueryable : IEnumerable
+    {
+        //获取实例的表达式树 
+        Expression Expression { get; }
+
+        //获取表达式树执行之后返回的类型
+        Type ElementType { get; }
+
+        //获取实例数据源对应的query provider
+        IQueryProvider Provider { get; }
+
+        // 通过 IQueryable 所包含的 Provider 去执行最终所保存下来的表达式树
+        public IEnumerator<T> GetEnumerator() 
+        {
+            return (Provider.Execute<T>(Expression) as IEnumerable<T>).GetEnumerator(); 
+        } 
+
+        // 通过 IQueryable 所包含的 Provider 去执行最终所保存下来的表达式树
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() 
+        { 
+            return (Provider.Execute(Expression) as IEnumerable).GetEnumerator(); 
+        }
+    }
+```
+
+![微信截图_20190924215933.png](https://i.loli.net/2019/09/24/qv8wgPA234VTn5G.png)
