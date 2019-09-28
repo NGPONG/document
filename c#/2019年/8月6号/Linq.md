@@ -135,6 +135,17 @@ Linq查询的数据源主要是分为了两种类型
 动态构建Linq查询的核心关键在于构建一个表达式树，我们在前面说到了Linq主要针对于两种类型，第一种是 `Linq to Object` 第二种是 `Linq to Provider` ，而关于 `Linq to Provider` 所接收的链式查询方法中所录入的Lambda表达式都会被 `System.Linq.Expressions` 所包裹着，具体来讲，Linq是不能够动态的，但是表达式树却能够，所以我们可以自然而然的使用 `IQueryable<T>`，并动态构建一个表达式树将他交由扩展自 `System.Linq.Querable` 的方法自行处理，那可能会有疑问了，关于操作 `IEnumerable` 的 `Linq to Object` 该怎么处理？ `Linq to Object` 的扩展方法的提供商可是 `System.Linq.Enumerable` 和上面所说的扩展自 Enumerable的链式查询方法本身是不被Express表达式树所包裹着的 `System.Linq.Querable` 的方法可是截然不同，其实在 `System.Linq.Enumerable` 为 `IEnumerable<T>` 所提供的扩展方法中还提供了一个 `AsQueryable()`，可以把调用当前方法的 `IEnumerable<T>` 类型的实例转换成 `IQueryable<T>` 类型，这样我们就可以动态构造表达式树，并进行动态的Linq查询了，详情请见 
 [.NET深入解析LINQ框架（三：LINQ优雅的前奏）](https://www.cnblogs.com/wangiqngpei557/archive/2012/12/04/2801181.html)
 
+#### 5. 一些其他的知识点
+- 数据源：
+
+我们通过Linq查询表达式中的 `from` 关键字所引入的就是一个数据源，<span style="color:red;">Linq中的所有操作，不管是筛选(`where`、`let`、……)的过程还是查询(`select`)的过程，都是围绕着数据源所进行的</span>
+
+一段Linq查询表达式中，我们是可以引入多个数据源的，需要注意的是，多次引入的数据源除了第一次引入(开头使用 `from` 表达式所引入的数据源)外，都需要一个父级数据源作为承载，并且当引入过后，子级数据源与父级数据源之间的关系是相互的，也就是说，当父级数据源所声明的范围变量经过了筛选，那么其改变也会映射至子级数据源当中，相对的子级数据源所映射的范围变量经过了筛选，那其改变也会映射至父级数据源当中去
+
+- 范围变量：
+
+
+
 <br/>
 
 ### Linq的实际应用
@@ -142,7 +153,9 @@ Linq查询的数据源主要是分为了两种类型
 ---
 
 #### 1. from
-`from` 是查询表达式的一个开头，更准确地说它是一个 `生成器` ，其目的在于引入一个为可迭代类型（数据序列 `Sequence`）的 `范围变量`。在这里需要解释一下 `范围变量` 这个名词，`范围变量` 顾名思义则是只作用于当前Linq查询中的一个变量，它可以是 <span style="color:red;">任意类型</span>
+`from` 是查询表达式的一个开头，更准确地说它是一个 `生成器` ，其目的在于引入一个可迭代类型（数据序列 `Sequence`）作为当前Linq表达式查询的数据源，并将其内部的元素声明为 `范围变量`
+
+在这里需要解释一下 `范围变量` 这个名词，`范围变量` 顾名思义则是只作用于当前Linq查询中的一个变量，它可以是 <span style="color:red;">任意类型</span>
 
 ![微信截图_20190926204230.png](https://i.loli.net/2019/09/26/t4WqPkrghajBfQ8.png)
 
@@ -168,3 +181,5 @@ Linq查询的数据源主要是分为了两种类型
                     where cTemp > 3
                     select cTemp;
 ```
+
+#### 4. 
