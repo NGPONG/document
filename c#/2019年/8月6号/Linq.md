@@ -70,9 +70,9 @@ Linq查询的数据源主要是分为了两种类型
 ```
 
 - 查询表达式：关于查询表达式需要讨论的问题比较多，<u>我们细分来看看</u>
+    - 查询表达式必须以 `from` 开头，且必须以 `select` 或 `group` 结尾，在第一个 `from` 与最后一个 `select` 或 `group` 之间，可以包含以下这些可选子句中的一个或多个： `where` 、 `orderby` 、 `join` 、 `let` 
     - 查询表达式是构建在 `CTS` 之上的一种由 `编辑器` 负责处理的语法，它本身是不属于托管语言的范畴的，换句话说它是承载在托管语言之上的一种语言，当我们对程序中编写了 `查询表达式` 后，是编辑器负责对查询表达式进行处理，而不是 `CLR` 负责对 Linq 进行处理，编辑器将 Linq 处理成框架所实现的基本接口集。简而言之，Linq 是语法糖层面的，它不是 `C#` 更不是 `CLR` 的基本内核的支持
     - 每一个查询表达式都有其所对应着的链式查询方法，在上面说到，Linq查询表达式 是构建在CTS上的一种语言，关于它的处理是交由编译器去完成的，也就是说当编译器在编译的过程当中，我们所书写的 Linq查询表达式 最终都会被编译器只能识别成其所对应的链式查询方法，举个例子，我们在 `where` 关键字在最终会被编译成 `where<T>` 的查询方法。另外补充一点，编译器在为查询表达式进行解析的过程当中还会分析当前所查询的数据源的类型，如果是 `Linq to Object` 类型的查询，编译器则最终所编译后的链式查询方法是由 `System.Linq.Enumerable` 所提供的，反之，如果是 `Linq to Provider` 类型的数据查询操作，编译器除了会把查询表达式编译成 `System.Linq.Queryable` 所扩展的链式查询方法外，还会调用数据源所实现自 `System.Linq.IQueryable` 的 `Provider` 函数，以提供为所录入的查询逻辑表达式的表达式树的解析工作，并在需要的时候来读取解析完成后的表达式树中的相关逻辑结构
-    - 查询表达式从 `from` 开始，以 `select` 或者 `group` 结束，在这两个表达式之间可以添加零个或者多个 `from` 、 `let` 、 `where` 、 `join`、 `orderby` 、……
 ```csharp
     List<int> list = new List<int>() { 1, 2, 3, 4, 5, 6, 7 };
 
@@ -155,8 +155,6 @@ var query_Exp = from c in customers
 ##### 5.3 范围变量：
 范围变量就是可以作用于当前Linq查询表达式中使用的一个查询变量，它可以是 <span style = "color:red">任意类型</span> ，我们在使用 `from` 关键字的时候，除了引入一个数据源到当前Linq查询表达式之外，还会把当前数据源中的元素的类型当成是该数据源所对应的范围变量，举个例子，所引入的数据源的类型为 `IEnumerable<int>` ，则其所对应的范围变量的类型则为 `int` 类型
 
--- 执行的顺序
-
 <br/>
 
 ### Linq的实际应用
@@ -165,8 +163,6 @@ var query_Exp = from c in customers
 
 #### 1. from
 `from` 是查询表达式的一个开头，更准确地说它是一个 `生成器` ，其目的在于引入一个可迭代类型（数据序列 `Sequence`）作为当前Linq表达式查询的数据源，并将其内部的元素声明为 `范围变量`
-
-在这里需要解释一下 `范围变量` 这个名词，`范围变量` 顾名思义则是只作用于当前Linq查询中的一个变量，它可以是 <span style="color:red;">任意类型</span>
 
 ![微信截图_20190926204230.png](https://i.loli.net/2019/09/26/t4WqPkrghajBfQ8.png)
 
@@ -184,7 +180,7 @@ var query_Exp = from c in customers
                         o.OrderID
                     };
 
-------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------
     
     // 把两个数据源做笛卡尔积
     char[] upperCase = { 'A', 'B', 'C' };
@@ -215,11 +211,65 @@ var query_Exp = from c in customers
 构造一个新的范围变量加入到此次查询的逻辑当中，当然我们可以选择性地使用这个新的范围变量
 
 ```csharp
-    // 把集合中的CustomerID都+1 并且查询出来
-    var query_Exp = from c in customers
-                    let cTemp = c.CustomerID + 1
-                    where cTemp > 3
-                    select cTemp;
+    // 把字符串集合中的句子都以空格分割出来，并都转换成小写打印出来
+    string[] strings = 
+    {
+        "A penny saved is a penny earned.",
+        "The early bird catches the worm.",
+        "The pen is mightier than the sword."
+    };
+
+    var query = from sentenct in strings
+                let words = sentenct.Split(' ')
+                from word in words
+                let wordProcess = word.ToLower()
+                select wordProcess;
 ```
 
-#### 5. 
+#### 5. orderby
+对范围变量进行排序
+
+```csharp
+    string str = "qwertyuiopasdfghjklzxcvbnm123456789";
+
+    // 为字符串中的每个字符进行倒序排序
+    var query_Exp = from s in str.ToCharArray()
+                    orderby s descending
+                    let sProcess = s.ToString().ToUpper()
+                    select sProcess;
+    var query_Fun = str.ToCharArray().Select(x => x.ToString().ToUpper()).OrderByDescending(x => x);
+
+    // 为字符串中的每个字符进行正序排序
+    var query_Exp = from s in str.ToCharArray()
+                    orderby s ascending
+                    let sProcess = s.ToString().ToUpper()
+                    select sProcess;
+    var query_Fun = str.ToCharArray().Select(x => x.ToString().ToUpper()).OrderBy(x => x);
+```
+
+#### 6. group
+使范围变量按照指定的键进行分组，所分组出来的数据可以当成是一个新的数据源 (以下示例通过 `into` 关键字把所分组出来的数据源构造成一个新的范围变量以便上下文的继续使用) ，具体来讲它是一个键值对集合，其有一个 `Key` 属性作为此组合所分组的依据，而另一个属性则包含着这个分组依据所存在的数据集合
+```csharp
+    // 把字符串集合都按照每个元素的首字母进行分组，筛选出分组结果大于2的元素，并且每个筛选结果元素的末尾要加上 分组成功 的样式
+    string[] words = { "apples", "blueberries", "oranges", "bananas", "apricots" };
+
+    var query_Exp = from w in words
+                    group w by w[0] into g
+                    where g.Count() > 1
+                    select (from gProc in g
+                            select gProc + $" 分组成功，这个是{g.Key.ToString()}组");
+
+    var query_Func = words.GroupBy(x => x[0])
+                          .Where(g => g.Count() > 1)
+                          .Select(x => x
+                          .Select(y => y + $"分组成功，这个是{x.Key.ToString()}组"));
+```
+
+#### 7. into
+为 `select`、`join` 或 `group by` 所投影出来的数据源继续引入到当前linq查询的上下文当中，并为其构造一个新的范围变量，简而言之，`into` 可以使 `select`、`join` 或 `group by` 操作的继续 <span style="color:red">延续</span>
+```csharp
+    var query_Exp = from c in customers
+                    select c into cContinue
+                    from o in cContinue.Orders
+                    select o.OrderID;
+```
