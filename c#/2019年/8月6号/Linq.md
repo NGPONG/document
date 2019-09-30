@@ -150,7 +150,7 @@ var query_Exp = from c in customers
                 select temp;
 ```
 
-##### 5.2 一段Linq查询表达式中所引入的多个查询数据源他们之间所形成的关系：
+##### 5.2 <span id = "一段Linq查询表达式中所引入的多个查询数据源他们之间所形成的关系">一段Linq查询表达式中所引入的多个查询数据源他们之间所形成的关系：</span>
 
 一段Linq查询表达式中，我们是可以通过多个 `from` 关键字来引入多种不同的数据源的，需要注意的是，我们通过 `from` 关键字所多次引入的不同的数据源，它们之间会形成一种相互的关系。具体来讲，如果多次引入的数据源之间并没有什么实际的连接关系，则它们之间则会互相做 `笛卡尔积` ，也就是 `SQLSERVER` 中的 `CROSS JOIN` 关键字的效果，而当所引入的数据源之间都有某个属性是有相对应的关系的时候，他们之间就会相互做一个 `INNER JOIN` 形式的连接，再次强调一点的是，不管是 `笛卡尔积` 也好还是 `INNER JOIN` ，<span style="color:red;">这种关系的成果是直接映射到当前Linq查询表达式中所有引入的数据源的改变的</span>，这是一种机制，具体可以参考 [复合from的用法](#复合from)
 
@@ -249,7 +249,7 @@ var query_Exp = from c in customers
     var query_Fun = str.ToCharArray().Select(x => x.ToString().ToUpper()).OrderBy(x => x);
 ```
 
-#### 6. group
+#### 6. <span id = "group">group</span>
 正如 [前面](#Linq查询表达式开头和结尾) 所说到，Lin请查询表达式是能够以 `Group` 关键字作为结尾的，所以我们在Linq查询表达式的逻辑是使用 `Group` 来处理逻辑的话，那么其下文就不能再继续编写其余的Linq查询表达式了，除非我们使用 `into` 来使当前查询做一个延续，需要注意的是，一旦我们使用了 `into` 关键字之后，所指定的范围变量就会覆盖掉之前所引用的数据源与查询变量了，我们可以理解为这是开始一次新的查询去进行，我们还需要注意一点的是这个分组出来的新的数据源中的成员，具体来讲其类型可以看成是一个键值对的集合，其中有一个 `Key` 属性作为此组合所分组的依据，而另一个属性则包含着这个分组依据所存在的数据集合
 ```csharp
     // 把字符串集合都按照每个元素的首字母进行分组，筛选出分组结果大于2的元素，并且每个筛选结果元素的末尾要加上 分组成功 的样式
@@ -277,3 +277,87 @@ var query_Exp = from c in customers
 ```
 
 #### 8. join
+`join` 关键字的用法主要有两种
+
+第一种用法则和前面所说到的 [复合from的用法](#复合from) 的概念类似，其标志是在 `join` 进行连接后不使用 `into` 关键字为连接后的数据进行分组汇总操作，该用法类似于 `SQLSERVER` 中的 `INNER JOIN` 关键字的用法，只会把所join的两个数据源之间相匹配的元素给找出来，需要注意的是，一旦使用了这种用法后，通过 `join` 连接的两个数据源中的元素的个数都会发生变化，举个例子，数据序列A的元素个数有5个，数据序列B的元素个数有三个，但是两个数据序列之间只有两个元素能够发生相互连接的关系，当我们使用了 `join` 连接两个数据源的时候，我们不管在最后 `select` 的是哪个范围变量所代表的数据源，其元素的个数都为两个，具体可以参考这一 [小节](#一段Linq查询表达式中所引入的多个查询数据源他们之间所形成的关系)
+
+```csharp
+    // 查询出顾客名称其所在的城市，还有这个顾客所下的订单的总金额还有这个订单所包含的商品
+    var query_Exp = from c in customers
+                    from o in c.Orders
+                    from d in o.Details
+                    join p in products on d.ProductID equals p.ProductID
+                    select new
+                    {
+                        Name = c.Name,
+                        City = c.City,
+                        Money = d.Quantity * d.UnitPrice,
+                        ProductName = p.ProductName
+                    };
+
+
+    var query_Exp2 = from r in
+                        from c in customers
+                        from o in c.Orders
+                        from d in o.Details
+                        select new { Name = c.Name, City = c.City, Money = d.Quantity * d.UnitPrice, ProductID = d.ProductID }
+                     join t in
+                        from p in products
+                        select p
+                     on r.ProductID equals t.ProductID
+                     select new { Name = r.Name, City = r.City, Money = r.Money, ProductName = t.ProductName };
+
+
+    var query_Fun = customers.SelectMany(c => c.Orders, (c, o) => new { Name = c.Name, City = c.City, Details = o.Details })
+                             .SelectMany(oc => oc.Details, (oc, details) => new { Name = oc.Name, City = oc.City, Money = details.Quantity * details.UnitPrice, ProductID = details.ProductID })
+                             .Join(products, ocd => ocd.ProductID, p => p.ProductID, (ocd, p) => new { Name = ocd.Name, City = ocd.City, Money = ocd.Money, ProductName = p.ProductName });
+```
+
+第二种用法是通过 `into` 关键字来完成，该关键字其实可以根据 `join` 的数据源的不同来达成不同的效果，其一类似于 `INNER JOIN` 的效果，和 [前面小结](#复合from) 所提供的样例无恙，而 `into` 在这其中的作用只是提供一个操作的延续，这里我们要重点说下它的 `into` 的第二种效果，它能够为所 `join` 的两个数据源提供一个分组汇总操作，这种做法的好处其一，<span style="color:red">如果能够正确的分配所连接的两个数据源</span>，那么在 `into` 后所给我们做出的分组汇总结果能使我们更加清晰地知道该字段的具体某个值（ `into` 后的结果有一个 `Key` 属性作为参考，具体可以查看这一 [小节](#group) 的内容）到底连接了多少个所 `join` 的数据序列中的元素，第二就是如果我们有类似 `SQLSERVER` 中 `LEFT JOIN` 的需求，那么通过这种方式也能够很方便的呈现出来
+
+关于 `into` 所提供给 `join` 的分组汇总操作我们还需注意一个问题，其实关于这个问题在上面一节也用红色字体标注出来了，在这个过程当中其实有两种不同类型的数据源，一种是 `连接数据源` 另一种是 `需要被连接的数据源` ，这两种数据源之间的元素所表现得形式是需要区分开来的， `连接数据源` 中的需要和另一个数据源( `需要被连接的数据源` )的连接依据，也就是说需要进行相互匹配的成员的值最好不要出现重复性的数据，如：`0、1、2、1、0` 这样子的数据，我们应当保证该成员的值在当前数据源的元素当中的存在是唯一性的，如： `0、1、2、3、4` ，这样我们才能称呼这个数据源为 `连接数据源` ，那么在具体的编写Linq查询表达式的过程当中， `join` 关键字后面所连接的数据源我们要保证它的类型为 `需要被连接的数据源` ，而已作用于当前Linq查询表达式上下文的数据源，换句话说就是在使用 `join` 关键字之前当前Linq表达式所使用的数据源我们要保证它的类型为 `连接数据源` ，原因其实很简单，因为 `join into` 会把 `连接数据源` 中我们所指定的连接逻辑的成员所包含的元素都一一拿出来与 `需要被连接的数据源` 相互匹配的，还是刚刚的例子，比如说我们所指定的连接逻辑成员为 `ProductId` 成员，那么则会把 `连接数据源` 中 `ProductId` 的值 `0、1、2、3、4` 都拿出来与另一边的 `需要被连接的数据源` 相互匹配，如果存在一样的则把它拿出来并 `into` 到分组汇总的结果当中去，那么在这一个过程当中，如果 `连接数据源` 中的 `ProductId` 的值存在一个重复的话，则可能会出现重复的组的情况，比如说重复的数据 `0、1、2、1、0` 则会出现重复的 `1` 组和 `0` 组
+
+```csharp
+    // 标准的 join into 查询
+    var query_Exp_Default = from p in products
+                            join d in details on p.ProductID equals d.ProductID into dGroup
+                            from dGroupProcess in dGroup
+                            select dGroupProcess;
+
+    var query_Fun_Default = products.GroupJoin( details,
+                            p => p.ProductID,
+                            d => d.ProductID,
+                            (p, dGroup) => dGroup);
+
+    // 左连接形式的 join into 查询
+    var query_Exp_left = from p in products
+                            join d in details on p.ProductID equals d.ProductID into dGroup
+                            from dGroupPro in dGroup.DefaultIfEmpty()
+                            select dGroupPro;
+
+    var query_Fun_left = products.GroupJoin(details,
+                         p => p.ProductID,
+                         d => d.ProductID,
+                         (p, dGroup) => dGroup.DefaultIfEmpty());
+```
+
+<br/>
+
+### 参考文档
+
+---
+
+- [.NET深入解析LINQ框架（一：LINQ优雅的前奏）](#https://www.cnblogs.com/wangiqngpei557/archive/2012/11/10/2764201.html)
+- [.NET深入解析LINQ框架（二：LINQ优雅的前奏）](#https://www.cnblogs.com/wangiqngpei557/archive/2012/11/22/2783357.html)
+- [.NET深入解析LINQ框架（三：LINQ优雅的前奏）](#https://www.cnblogs.com/wangiqngpei557/archive/2012/12/04/2801181.html)
+- [.NET深入解析LINQ框架（四：IQueryable、IQueryProvider接口详解)](#https://www.cnblogs.com/wangiqngpei557/archive/2012/12/11/2813490.html)
+- [.NET深入解析LINQ框架（五：IQueryable、IQueryProvider接口详解)](#https://www.cnblogs.com/wangiqngpei557/archive/2012/12/14/2817559.html)
+- [语言集成查询 (LINQ)](#https://docs.microsoft.com/zh-cn/dotnet/csharp/programming-guide/concepts/linq/)
+- [查询关键字（C# 参考）](#https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/keywords/query-keywords)
+- [语言集成查询 (LINQ)](#https://docs.microsoft.com/zh-cn/dotnet/csharp/linq/index)
+- [[深入学习C#]LINQ查询表达式详解(1)——基本语法、使用扩展方法和Lambda表达式简化LINQ查询](#https://blog.csdn.net/honantic/article/details/46472647)
+- [[深入学习C#]LINQ查询表达式详解(2)——查询表达式的转换](#https://blog.csdn.net/xuchen_wang/article/details/86520995)
+- [C#基础之IEnumerable](#https://www.cnblogs.com/fangyz/p/5721269.html)
+- [.NET复习笔记之LINQ，从IQueryable说起](#https://zhuanlan.zhihu.com/p/47776558)
+- [打造自己的LINQ Provider（上）：Expression Tree揭秘](#https://www.cnblogs.com/Terrylee/archive/2008/08/01/custom-linq-provider-part-1-expression-tree.html)
+- [打造自己的LINQ Provider（中）：IQueryable和IQueryProvider](#https://www.cnblogs.com/Terrylee/archive/2008/08/25/custom-linq-provider-part-2-IQueryable-IQueryProvider.html)
