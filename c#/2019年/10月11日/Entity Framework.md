@@ -42,11 +42,14 @@ Entity Framework 采用元数据来描述对象一关系映射细节，元数据
 
 ![Mygif.gif](https://i.loli.net/2019/10/11/8M5s7hWAtwZ6ja9.gif)
 
-由上图可知，Entity Framework 主要由 `三层关系` 构建成的一个 ORM 对象关系模型的框架，其中：
+由上图可知，Entity Framework 主要由以下三种模型和具有相应文件扩展构建成的一个 ORM 对象关系模型的框架：
 - `SSDL` 概念层：负责向上的对象与属性显露与访问
 - `CSDL` 储存层：依不同数据库与数据结构，而显露出实体的数据结构体，和 `Provider` 一起，负责实际对数据库的访问的工作
 - `C-S` 映射层：将 概念层 和 储存层 的数据结构关系映射在一起
 
+<div align=center>
+<img src = "https://i.loli.net/2019/10/11/7oVYtLsnzPWFcSu.png" />
+</div>
 
 <br/>
 
