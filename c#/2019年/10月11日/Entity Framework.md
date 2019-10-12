@@ -57,6 +57,8 @@ Entity Framework 采用元数据来描述对象一关系映射细节，元数据
 
 
 
+![微信截图_20191012212334.png](https://i.loli.net/2019/10/12/4DnTIculd7fH2tv.png)
+
 <br/>
 
 ### Entity Framework 的具体使用
@@ -64,4 +66,18 @@ Entity Framework 采用元数据来描述对象一关系映射细节，元数据
 ---
 
 #### 1. 关于 Entity Framework 的四种开发模式
-- DataBase First：该模式从数据库作为出发点，先从数据库中设计好表的结构和其所对应的业务逻辑，然后再通过该模式把数据库中已经创建好的结构映射成 `Visual Studio` 的实体数据模型文件 `*.edmx`
+- `DataBase First`：该模式从数据库作为出发点，先从数据库中设计好表的结构和其所对应的业务逻辑，然后再通过该模式把数据库中已经创建好的结构映射成 `Visual Studio` 的实体数据模型文件 `*.edmx`
+
+![Mygif.gif](https://i.loli.net/2019/10/12/jbInYs1v8QaM3VH.gif)
+
+- `Module First`：该模式从 `Visual Studio` 作为出发点，其刚好是跟 `DataBase First` 模式是相反的，先在实体数据模型文件 `*.edmx` 中通过可视化模型编辑器设计好模型和其所对应的业务逻辑，再通过该模式把所建立好的结构映射到数据库当中去
+
+![Mygif.gif](https://i.loli.net/2019/10/12/y3DIzlaYo1jQ2Jx.gif)
+
+- `Code First`：该模式脱离了传统的 `Visual Studio` 所提供的可视化模型编辑器进行模型编辑还有使用T4模板进行自动的生成模型类的特定，该模式从一个类为出发点，一切从代码中开始，并且也通过代码把我们所设计好的模型映射到数据库中去
+
+![Mygif.gif](https://i.loli.net/2019/10/12/ckFQ3iTuPMpIBoG.gif)
+
+- `DataBase CodeFirst`：该模式和 `Code First` 是一个概念，一切都是通过代码来完成，但是该模式的出发点转换成了数据库，在数据库中设计好相应的表和业务逻辑最后在通过该模式把数据库中的架构映射到代码当中去
+
+![Mygif.gif](https://i.loli.net/2019/10/12/LNnPofOWQsBclCp.gif)
