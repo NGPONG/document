@@ -51,8 +51,17 @@ Entity Framework 采用元数据来描述对象一关系映射细节，元数据
 <img src = "https://i.loli.net/2019/10/11/7oVYtLsnzPWFcSu.png" />
 </div>
 
+#### 4. 关于实体数据模型文件的介绍
+
+实体数据模型文件是针对于 `DataBase First` / `Module First` 这两种开发模式的，它是 `Entity Framework` 框架在 `Visual Studio` 中的一个集成，其中不单单只是提供给了开发人员一个可视化操作的 `Module` 编辑器，所对应的实体类、EF的核心还有 `T4模板` 都被集成在了这个 `*.edmx` 文件当中
+
+
+
 <br/>
 
 ### Entity Framework 的具体使用
 
 ---
+
+#### 1. 关于 Entity Framework 的四种开发模式
+- DataBase First：该模式从数据库作为出发点，先从数据库中设计好表的结构和其所对应的业务逻辑，然后再通过该模式把数据库中已经创建好的结构映射成 `Visual Studio` 的实体数据模型文件 `*.edmx`
