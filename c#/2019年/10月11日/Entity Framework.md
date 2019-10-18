@@ -40,7 +40,7 @@ ORM 的实体模型
 
 Entity Framework 采用元数据来描述对象一关系映射细节，元数据采用XML格式所展现出来，并且存放在我们所新建的实体数据模型文件 `*.edmx` 当中，只要提供了持久化类与表的映射关系，ORM框架在运行时就能参照映射文件的信息，把对象持久化到数据库中
 
-![Mygif.gif](https://i.loli.net/2019/10/11/8M5s7hWAtwZ6ja9.gif)
+![![Mygif.gif](httpsi.loli.net201910118M5s7hWAtwZ6ja9.gif)](https://i.loli.net/2019/10/18/7yxe5qAN4btvsX2.gif)
 
 由上图可知，Entity Framework 主要由以下三种模型和具有相应文件扩展构建成的一个 ORM 对象关系模型的框架：
 - `SSDL` 概念层：负责向上的对象与属性显露与访问
