@@ -198,7 +198,7 @@ DbSet 是一个实体的集合，是数据库中的某个表所涵盖的数据�
     }
 ```
 
-- `DbContext.Configuration.LazyLoadingEnabled`：是否允许延迟加载机制，该延迟加载机制仅针对实体中类型为导航属性的成员，也就是说当我们关闭了该选项后，实体的类型为导航属性成员的值就算我们是查询出来的但是也永远为 `Null` ，需要我们手动显示的为导航属性成员的值进行加载
+- `DbContext.Configuration.LazyLoadingEnabled`：是否允许延迟加载机制，该延迟加载机制仅针对实体中类型为 [导航属性](#关于导航属性) 的成员，也就是说当我们关闭了该选项后，实体的类型为导航属性成员的值就算我们是查询出来的但是也永远为 `Null` ，需要我们手动显示的为导航属性成员的值进行加载
 
 ```csharp
     using (EFDemoEntities db = new EFDemoEntities())
@@ -412,4 +412,284 @@ DbSet 是一个实体的集合，是数据库中的某个表所涵盖的数据�
     }
 ```
 
-- 
+- `DbContext.Database.ExecuteSqlCommand(string sql, params object[] parameters)`：执行关于 新增 / 删除 / 修改 类型的 SQL 语句，并返回受影响的行数，支持参数化格式
+```csharp
+
+    using (MyTestModule db = new MyTestModule())
+    {
+        // init database
+        SqlParameter[] parameters = 
+        {
+            new SqlParameter("@Name","NGPONG"),
+            new SqlParameter("@Address","Shenzhen.LongHUa")
+        }
+
+        int count = db.Database.ExecuteSqlCommand("insert into UserInfo (Name,Address) values(@Name,@Address)",parameters);
+    }
+```
+
+- `DbContext.Database.SqlQuery<T>(string sql, params object[] parameters)`：执行关于 查询 类型的 SQL 语句，支持参数化格式，所指定的泛型则为查询 SQL 所返回的结果集所对应的实体类型
+```csharp
+
+    using (MyTestModule db = new MyTestModule())
+    {
+        // init database
+        SqlParameter[] parameters = 
+        {
+            new SqlParameter("@Name","NGPONG"),
+            new SqlParameter("@Address","Shenzhen.LongHUa")
+        }
+
+        var userInfos = db.Database.SqlQuery<UserInfo>("select * from UserInfo where Name = @Name and Address = @Address)",parameters);
+    }
+```
+
+##### 4.2 DbContext.Entry&#60;TEntity&#62;(TEntity entity)：
+如果所指定类型 `TEntity` 的实体的实例 `entity` 已经存在于实体集的本地缓存当中并且 EF 已经对其状态进行了监听跟踪的工作，则该函数永远只会返回已经在实体集中缓存的实体实例的 `Entry` 类型
+
+如果所添加的实体实例是还未缓存至本地实体集当中的话，该函数则会把该实体实例添加到本地缓存当中去，然后设置其跟踪状态为 `Detached` ，并返回其 `Enrty` 类型，而这个跟踪状态的含义就意味着这个实体实例的本身包括其内部的成员都会被认为是 脏 的，不会被 EF 所跟踪，造成的后果在修改的过程当中尤为明显，因为通过该方式所添加到缓存集的实体会被认为是 脏 的，所以就算我们对已经调用了该函数的实体进行某个成员的修改，该实体也不会被 EF 跟踪为修改的状态，只有我们手动的更改该函数所返回类型的 State 属性为修改状态的时候才会进行相应的修改SQL的执行，但是一旦通过这种方式的话，那么所有字段都会被更新上去 `包括我们不想修改的`，指定当前实体被 EF 所跟踪的状态才能够完成操作，如果这时候我们再去把
+entry所添加的实体的状态跟踪为 Modified 的时候，那么所有字段（包括我们不想修改的）都会被一起更新上去，<span style = "color:red">所以在使用 EF 进行修改操作的时候要慎用该函数进行操作</span>
+
+```csharp
+    using (MyTestModule db = new MyTestModule())
+    {
+        // Add
+        var customer_Add = new CustomerSet()
+        {
+            CustomerName = "EF DataTest",
+            CustomerAddress = "Shenzhen.Longhua"
+        };
+        // 把实体添加至实体集的本地缓存当中去，并将其状态跟踪为 Detached
+        db.CustomerSet.Attach(customer_Add);
+        // 将已经添加到本地缓存及中的实体的状态手动调整为 Add
+        db.Entry<CustomerSet>(customer_Add).State = EntityState.Added;
+        db.SaveChanges();
+
+
+        // Deleted
+        var customer_Deleted = new CustomerSet()
+        {
+            CustomerId = 5
+        };
+        // 把实体添加至实体集的本地缓存当中去，并将其状态跟踪为 Detached
+        db.CustomerSet.Attach(customer_Deleted);
+        // 从本地缓存中删除刚刚通过 Attach 所添加的实体，并将其状态调整为 Deleted
+        db.Entry<CustomerSet>((customer_Deleted).State = EntityState.Deleted;
+        db.SaveChanges();
+    }
+```
+
+##### 4.3 DbContext.SaveChanges()：
+
+通过该函数能够把调用该函数之前，对实体的所有合法的操作都会生成相应的　SQL语句　并执行，最后都映射回数据库当中
+
+需要注意的是，该函数在默认情况下会为我们开启事务的管控功能，并且其生成的SQL语句都会为我们参数化，防止SQL注入
+
+```csharp
+    using (MyTestModule db = new MyTestModule())
+    {
+        // Deleted
+        var customer_Deleted = new CustomerSet()
+        {
+            CustomerId = 5
+        };
+        // 把实体添加至实体集的本地缓存当中去，并将其状态跟踪为 Detached
+        db.CustomerSet.Attach(customer_Deleted);
+        // 从本地缓存中删除刚刚通过 Attach 所添加的实体，并将其状态调整为 Deleted
+        db.Entry<CustomerSet>((customer_Deleted).State = EntityState.Deleted;
+        db.SaveChanges();
+    }
+```
+
+<br/>
+
+#### <span id = "关于导航属性">5. 关于导航属性</span>
+
+导航属性并不是数据库中某个表的外键，但是他又和外键存在着密切的关系，主要原因是因为他的存在是由 .Net 所抽象出来的，去目的在于能够在使用 EF 的过程当中，能够通过某个实体成员的导航属性更加准确的访问到其外部所涵盖的实体关系，举个例子，顾客和订单存在着外键对应关系，一个顾客下面会有多个订单，一个订单只属于一个顾客，那么它们所对应的实体模型中，顾客实体就存在一个订单类型集合的导航属性，而订单实体中就存在一个顾客类型的导航属性
+
+##### 5.1 导航属性的延迟加载
+
+在使用 EF 开发的过程当中，我们可以手动的选择是否开启延迟加载的功能，但是这个延迟加载的功能仅仅只是针对导航属性的，而导航属性延迟加载的效果莫过于我们只有在访问该导航属性成员的时候才会去数据库中查询对应表的数据出来，需要注意的是，一个查询出来的实体集数据序列的本身是无法同步这一设置的，因为它们延迟加载的机制是由 `IQueryable` / `IQueryable<T>` 所决定的
+
+当我们需要为导航属性开启延迟加载的话，必须要注意以下几点是否是正确实施的，只要有任意一点配置不正确则无法开启导航属性延迟加载的机制，简而言之就是实体集数据序列中导航属性类型的成员的值永远为 `Null`
+- 实体类是由 `Public` 修饰，不能是封闭类，也就是说，不能带有 `Sealded` 修饰符
+- 实体类型所声明的导航属性必须使用 `virtual` 关键字进行标注
+- 必须已经打开了EF全局配置中延迟加载的特性
+
+##### 5.2 导航属性的贪婪加载
+
+通过在查询某个实体集的过程当中，通过该实体集的 `Include(string path)` 函数来把导航属性的内容也一起贪婪加载出来
+```csharp
+    using (MyTestModule db = new MyTestModule())
+    {
+        // Products为Order实体的导航属性，通过Include表示在查询过程当中把所Include的成员也一起查询出来
+        var query = from o in db.Order.Include("Products")
+                             where o.OrderId > 2
+                             select o;
+
+        foreach (var item in query)
+        {
+            foreach (var p in item.Products)
+            {
+                
+            }
+        }
+    }
+```
+
+##### 5.3 导航属性的显示加载
+
+这种模式其实和默认的延迟加载的机制是非常类似的，具体做法则为通过所查询出来数据序列中类型为导航属性的实体实例的 `Entry` 类型的 `Reference` (针对单个) / `Collection` (针对集合)，进行对导航属性的显示加载，这种做法和默认的延迟加载的机制区别就在于，我们可以手动的去管控这个导航属性加载的时机
+
+```csharp
+    using (MyTestModule db = new MyTestModule())
+    {
+        // Collection
+        var query = from o in db.Order
+                    where o.OrderId > 2
+                    select o;
+
+        foreach (var item in query)
+        {
+            // 显示加载导航属性
+            db.Entry<Order>(item).Collection(o => o.Products).Load();
+
+            foreach (var product in item.Products)
+            {
+                
+            }
+        }
+
+
+        // Reference
+        var query = from p in db.Product
+                    where p.ProductId > 2
+                    select p;
+
+        foreach (var item in query)
+        {
+            // 显示加载导航属性
+            db.Entry<Product>(item).Reference(p => p.Order).Load();
+
+            Order order = item.Order;
+        }
+    }
+```
+
+<br/>
+
+#### 6. 在 Entity Framework 中使用事务
+
+EF 中使用事务主要有三种方式
+
+##### 6.1 DbContext.SaveChanges() 默认的为我们的 `CRUD` 进行时事务的管控
+```csharp
+    using (EFDemo2Entities db = new EFDemo2Entities())
+    {
+        // 该事务管理SavaChanges()前所有的修改
+
+        Order order = new Order()
+        {
+            OrderName = "NGPONG Test",
+            CreateDate = DateTime.Now
+        };
+        db.Order.Add(order);
+
+        Product product = new Product()
+        {
+            ProductName = "NGPONG TrantestPro",
+            OrderId = 100 // 模拟错误，OrderId为外键，输入一个不存在的OrderId
+        };
+        db.Product.Add(product);
+
+        // SaveChanges默认的会为我们进行事务的管控
+        db.SaveChanges();
+    }
+```
+
+##### 6.2 DbContext.Database 中存在几组函数能够让我们更自由的对事务进行控制
+```csharp
+    using (EFDemo2Entities db = new EFDemo2Entities())
+    {
+        // Begin Trans
+        using (var dbTrans = db.Database.BeginTransaction())
+        {
+            // 该实现方式可以手动管理事务，对比单纯的SaveChanges()灵活，并且能够管理在一个上下文档中多次SavaeChanges()的回滚
+            try
+            {
+                // 前两次通过SaveChanges()是已经成功执行的，但是第三次通过SQL语句进行插入数据的时候失败了，所以前两次的成功执行也一起回滚了
+                Order order = new Order()
+                {
+                    OrderName = "NGPONG Test",
+                    CreateDate = DateTime.Now
+                };
+                db.Order.Add(order);
+                db.SaveChanges();
+
+                Product product = new Product()
+                {
+                    ProductName = "NGPONG Test Pro",
+                    Order = order
+                };
+                db.Product.Add(product);
+                db.SaveChanges();
+
+                // 故意制造失败的情况，OrderId字段有着非空约束
+                db.Database.ExecuteSqlCommand(
+                    "insert into Product (ProductName) values(@ProductName)",
+                    new SqlParameter[] { new SqlParameter("@ProductName", "NGPONG ProductTest") });
+
+                // Commit Trans
+                dbTrans.Commit();
+            }
+            catch (Exception objException)
+            {
+                // Rollback Trans
+                dbTrans.Rollback();
+            }
+        }
+    }
+```
+
+##### 6.3 通过 `TransactionScope` 这一类型进行事务的控制操作，其用法类似于 `6.2` 节点所提供的方案
+```csharp
+    using (EFDemo2Entities db = new EFDemo2Entities())
+    {
+        // Begin Trans
+        using (TransactionScope dbTrans = new TransactionScope())
+        {
+            try
+            {
+                // 前两次通过SaveChanges()是已经成功执行的，但是第三次通过SQL语句进行插入数据的时候失败了，所以前两次的成功执行也一起回滚了
+                Order order = new Order()
+                {
+                    OrderName = "NGPONG Test",
+                    CreateDate = DateTime.Now
+                };
+                db.Order.Add(order);
+                db.SaveChanges();
+
+                Product product = new Product()
+                {
+                    ProductName = "NGPONG Test Pro",
+                    Order = order
+                };
+                db.Product.Add(product);
+                db.SaveChanges();
+
+                // 故意制造失败的情况，OrderId字段有着非空约束
+                db.Database.ExecuteSqlCommand(
+                    "insert into Product (ProductName) values(@ProductName)",
+                    new SqlParameter[] { new SqlParameter("@ProductName", "NGPONG ProductTest") });
+
+                // Commit Trans
+                dbTrans.Complete();
+            }
+            catch (Exception objException)
+            {
+                // Rollback Trans
+                Transaction.Current.Rollback();
+            }
+        }
+    }
+```
