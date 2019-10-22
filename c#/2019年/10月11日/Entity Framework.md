@@ -327,6 +327,7 @@ DbSet 是一个实体的集合，是数据库中的某个表所涵盖的数据�
 
 
         // Update
+        // 使用该方式让 EF 进行对数据的修改只能是在知道实体主键的情况下才能够适用
         var customer_Update = new CustomerSet()
         {
             CustomerId = 5
