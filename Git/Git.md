@@ -54,8 +54,9 @@
 - 配置用户名和密码的存储方式：
   - cache：登陆凭证存放在内存中，15分钟后清楚
   - store：登陆凭证用明文的形式存放在磁盘中，永不过期  
+  - manager：关于 `manager` 的更多信息请参阅 [这里](https://www.cnblogs.com/chucklu/p/5650927.html "Git Credential For Windows")
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config --global credential.helper store/cache`
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config --global credential.helper store/cache/manager`
 
 - 取消 [全局] 配置：
 
