@@ -71,9 +71,15 @@
   - Url：Remote的地址
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git remote add [ShortName] [Url]`
+
 - 设置Remote关联地址
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git remote set-url origin [Url]`
+
+- 获取Remote的一些信息
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git remote show origin`
+
 - 把Remote克隆到本机上，下载一个项目和它的整个历史代码
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git clone [Url]`
@@ -85,9 +91,18 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`git remote show [ShortName]`
 
 ##### 5. 分支
-- 查看Repository所存在的分支，和 `HEAD` 目前所指向的分支
+- 查看本机Repository所存在的分支，和 `HEAD` 目前所指向的分支
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git branch`
+
+- 查看本机Repository所存在的分支、`HEAD` 目前所指向的分支和远程已有的分支
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git branch -a`
+
+- 查看本机Repository所存在的分支于远程Repository所存在的分支的追踪关系
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git branch -vv`
+
 - 为当前Repository创建一个分支
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git branch [branchName]`
@@ -96,9 +111,14 @@
     - 举例目前我们有两个分支，分别是原始分支 `origin` 还有另一个我们所新建的作为开发用的分支 `dev`，当新建的分支在创建后并对工作区中的文件内容进行了更改但还未做任何 `commit` 操作的时候，我们这时候是可以随意切换分支的，并且我们使用dev分支对工作区中的内容所做的更改，在我们切换到另一条master分支的时候，查看 `$ git status` 会发现，我们在dev分支所做的更改也会被 `Git` 认为是在master分支上做的，原因其实很简单，因为两条分支并没有在更改工作区文件后做过任何的 `commit` 操作，这时候 `Git` 是无法分辨到底此次更改是由哪条分支来完成的，所以才会出现这种情况。那么换句话说，当我们使用一个分支 `commit` 了工作区中的更改后，这时候两条分支的路线就不同了，在这种情况之下，当我们使用任意一条分支对工作区的内容进行了更改并且还未进行 `commit` 操作后，这时候我们就必须要 `commit` 掉当前分支所做的更改才能够继续切换分支，因为切换分支的过程当中还会切换工作区的更改至目标分支所做的 `commit` ，简而言之就是会造成工作区所更改的内容的丢失，但是 `Git` 会聪明的杜绝掉这一种情况，所以才会导致我们在这一种情景下无法再自由的对分支进行切换操作
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git checkout [branchName]`
+
 - 创建并切换到该分支，为上面两个步骤的一种简写形式
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git checkout -b [branchName]`
+
+- 追踪远程Repository中的指定分支，并在本机Repository中创建一个与之同名的分支
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git checkout --track origin/branch_name`
 - 合并指定分支所 `commit` 的内容到当前分支上
     - 在合并分支的过程当中，可能会遇到无法合并的问题，如下：
 
