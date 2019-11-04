@@ -40,12 +40,12 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git init`  
 
 ##### 3. 基础配置
-- 设置提交人：
+- 设置 [全局] 提交人：
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config --global user.name "Your Name"`
-- 设置提交人的Email地址：
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config [--global] user.name "Your Name"`
+- 设置 [全局] 提交人的Email地址：
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config --global user.email "email@example.com"`
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config [--global] user.email "email@example.com"`
 
 - 设置Git使用SS代理http协议：
 
@@ -59,6 +59,9 @@
 - 取消https协议的代理设置：
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config --global --unset https.proxy`
+- 查看 [全局] 配置：
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config [--global] --list`
 - 配置用户名和密码的存储方式：
   - cache：登陆凭证存放在内存中，15分钟后清楚
   - store：登陆凭证用明文的形式存放在磁盘中，永不过期  
