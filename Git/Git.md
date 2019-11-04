@@ -47,26 +47,22 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config [--global] user.email "email@example.com"`
 
-- 设置Git使用SS代理http协议：
+- 设置Git使用SS代理 http/https 协议：
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config --global http.proxy http://127.0.0.1:1080`
-- 设置Git使用SS代理https协议：
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config --global http/https.proxy http/https://127.0.0.1:1080`
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config --global https.proxy https://127.0.0.1:1080`
-- 取消http协议的代理设置：
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config --global --unset http.proxy`
-- 取消https协议的代理设置：
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config --global --unset https.proxy`
-- 查看 [全局] 配置：
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config [--global] --list`
 - 配置用户名和密码的存储方式：
   - cache：登陆凭证存放在内存中，15分钟后清楚
   - store：登陆凭证用明文的形式存放在磁盘中，永不过期  
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config --global credential.helper store/cache`
+
+- 取消 [全局] 配置：
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config [--global] --unset ConfigName`
+- 查看 [全局] 配置：
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config [--global] --list`
 
 ##### 4. 远程
 - 添加Repository相关联的Remote
@@ -124,9 +120,10 @@
   - 可以指定具体的文件名，也可以通过 `.` 来指定当前工作区下的所有文件都提交至暂存区中
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git add [FileName/.]`
-- 把暂存区的文件提交至Repository的`HEAD`所指向的分支上
+- 把暂存区的文件提交至本机Repository的`HEAD`所指向的分支上
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git commit -m "Commit Message"`
+
 - 把本地分支 `BranchName` 的内容推送到远程仓库上去
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`git push [RepositoryName] [BranchName]`
