@@ -224,10 +224,10 @@ Git的差异检测是反向检测的，什么意思呢，比如说我们工作�
 - 显示分支合并记录
     - 显示完整版本的分支合并记录
 
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git log --graph`
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git log --graph --all`
     - 显示简化版本的分支合并记录
 
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git log --graph --pretty=oneline --abbrev-commit`
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git log --graph --all --pretty=oneline --abbrev-commit`
 
 ##### 11. Git中的一些概念
 > 7.1 本机Git工作区的构成
