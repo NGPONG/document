@@ -1,4 +1,4 @@
-# *Language Intergated Query*
+* # *Language Intergated Query*
 
 <br/>
 
@@ -169,8 +169,9 @@ var query_Exp = from c in customers
 ![微信截图_20190926204230.png](https://i.loli.net/2019/09/26/t4WqPkrghajBfQ8.png)
 
 #### 2. 复合from<span id="复合from"></span>
+
+针对一个数据源的内部如果存在成员的类型也是一个数据序列的类型的时候，可使用复合from来把这个数据序列作为数据源引入到当前Linq查询表达式当中
 ```csharp
-    // 针对一个数据源的内部如果存在成员的类型也是一个数据序列的类型的时候，可使用复合from来把这个数据序列作为数据源引入到当前Linq查询表达式当中
     var query_Exp = from c in customers
                     from o in c.Orders
                     from d in o.Details
