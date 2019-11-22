@@ -112,7 +112,7 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git checkout [branchName]`
 
-- 创建并切换到该分支，为上面两个步骤的一种简写形式
+- 创建并切换到该分支，为上面两个步骤的一种简写形式，需要注意的是，`checkout` 指令所创建的分支如果说存在相匹配的远程分支名(通过 `git branch -a` 指令查看)的话，那么会自动追踪到该远程分支的更改
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git checkout -b [branchName]`
 
