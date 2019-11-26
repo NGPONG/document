@@ -47,7 +47,7 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config [--global] user.email "email@example.com"`
 
-- 设置Git使用SS代理 http/https 协议：
+- 设置Git使用Socks5代理 http/https 协议：
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`$ git config --global http/https.proxy http/https://127.0.0.1:1080`
 
