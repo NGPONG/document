@@ -699,11 +699,13 @@ EF 中使用事务主要有三种方式
 
 #### 7. DbContext 实例创建所需要注意的问题
 
-如果EF的实例在同一个上下文被创建了多次，拟定在这个上下文中有两个线程 `ThreadA` 和 `ThreadB`，它们分别创建了不同的 `DbContext` 对象去对数据库进行操作，ThreadA读取了 `UserInfo` 表的数据并尝试对他进行修改， ThreadB 也进行了相同的操作并且先于 ThreadA `SavaChanges()` 完成，即所修改的数据已经同步到数据库中的 UserInfo 表当中，这时候 ThreadA 所创建的 DbContext 实例 在这个过程当中是无法实时同步到 ThreadB 针对 UserInfo 所操作的数据的，那么在这一情景下， ThreadA 就会发生 `脏读` 的情况
+如果EF的实例在同一个上下文被创建了多次是存在脏读的问题的，现在我们假设一个环境，函数A和B，函数B被函数A所调用，函数A中创建了一个EF的实例，并使用它对数据进行了一些比如说在一个函数A中我们创建了一个 `DbContext` 实例，并使用它对 `UserInfo` 表进行了一些查询操作，这时候调用了函数B，而函数B有创建了一个新的 `DbContext` 实例，并使用它对 `UserInfo` 表进行了删除的操作，这时候因为函数A中 `DbContext` 的实例和函数B中的实例是不同的，我们无法让EF去追踪一个最新的结果，函数A中的 `DbContext` 对于 `UserInfo` 表的追踪操作这时候是不同步函数B中 `DbContext` 的实例的，简而言之就是发生了脏读的情况
 
 如果保证 DbContext 的实例在整个 `AppDomain` 中全局只有一个，即 `单例模式` ，虽然看似是解决了第一种情况所存在的 脏读 问题，但是随之而来却又诞生了第二种问题，因为所有线程都是使用的一个实例，假设在这里同样是两个线程 `ThreadA` 和 `ThreadB`，ThreadA 对 `UserInfo` 表中的数据进行了一些修改但是还未调用 `SaveChanges()` 同步到数据库，也许因为某些原因它还不想那么快进行同步，但是 `ThreadB` 也对 UserInfo 的数据进行了修改并且完成了执行 SavaChanges() 的工作，这时候 ThreadA 中还不想那么快同步到数据库中的数据也一并同步上去了，此外，这一情景只是针对两个线程，我们尝试把这个问题的角度转换到 `WebApplication` 身上，因为一个用户的请求都会从线程池中抽取一个线程进行逻辑处理，而在这个过程当中因为一直使用的是一个 `DbContext` 实例面向多个线程的操作，实体集的本地缓存的占用也会不断的进行增加，简而言之内存的损耗也会因为 `DbContext` 的实例无法即时释放，随之时间的推移，不断的累加
 
 为了解决上述的两种问题，可以沿用 `HttpContext` 的 `线程内唯一对象` 的思想去处理
+
+但还有一个问题需要注意，线程内唯一对象还是会存在一定的脏读问题，拟定在一个上下文中有两个线程 `ThreadA` 和 `ThreadB`，因为是不同线程，并且DbContext仅仅只是一个 `线程内唯一对象` ，所以它们分别创建了不同的 `DbContext` 对象去对数据库进行操作，ThreadA读取了 `UserInfo` 表的数据并尝试对他进行修改， ThreadB 也进行了相同的操作并且先于 ThreadA `SavaChanges()` 完成，即所修改的数据已经同步到数据库中的 UserInfo 表当中，这时候 ThreadA 所创建的 DbContext 实例 在这个过程当中是无法实时同步到 ThreadB 针对 UserInfo 所操作的数据的，那么在这一情景下， ThreadA 就会发生 `脏读` 的情况，诚然，这种方式是线程的不同步所造成的，这种情况我们应该针对其他方案去施以控制
 
 ##### 7.1 HttpContext.Items
 因为 HttpContext 本身就是一个 `线程内唯一对象` ，而其提供的 `Items` 成员又能够用于存储只是 <span style="color:red">应用于当前上下文</span> 所需要存储的一些数据，那么我们就可以把 `DbContext` 交由它来进行处理，关于该属性的具体使用其实在其他篇章已经讲过，详情可以参考 [这里](https://github.com/NGPONG/document/blob/master/ASP.NET/ASP.NET%E5%9F%BA%E7%A1%80/HttpContext.docx) 
