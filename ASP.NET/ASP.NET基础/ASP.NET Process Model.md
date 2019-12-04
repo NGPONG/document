@@ -164,7 +164,7 @@ private void ProcessRequestInternal(HttpWorkerRequest wr)
 - 判断 Application Pool 是否存在未被使用的 `HttpApplication` ，如果不存在则通过反射的方式创建一个基于 Global.asax 的 `HttpApplication`
 - 通过 `EnsureAppStartCalled` 函数去触发 HttpApplication 的 `Application_Start Event Handler`
 - 通过 `HookupEventHandlersForApplicationAndModules` 函数完成对 Global.asax 中的 Event Handler 的注册
-- 通过配置文件 (默认为本机的 `machine.config`，同样也适配于自己在 `web.config` 中定义的 `<modules>` ) 中的映射关系去创建 `HttpModule`，并循环执行每个 `HttpModule` 的 `init` 函数，完成所有 `HttpModule` 内置 Event Handler 的注册
+- 通过配置文件 (默认为本机的全局 `web.config`，同样也适配于自己本站 `web.config` 中定义的 `<modules>` ) 中的映射关系去创建 `HttpModule`，并循环执行每个 `HttpModule` 的 `init` 函数，完成所有 `HttpModule` 内置 Event Handler 的注册
 - 通过 `BuildStep` 函数最终为HttpApplication完成19个管道事件的注册
 
 ```csharp
@@ -256,7 +256,7 @@ internal IAsyncResult BeginProcessRequestNotification(HttpContext context, Async
 
 ![图片4.png](https://i.loli.net/2019/12/04/FDpmd1fLExGJ8Sb.png)
 
-在 `Http PipeLine` 中，当执行到第8个管道的时候，会根据配置文件 (默认为本机的 `machine.config`，同样也适配于自己在 `web.config` 中定义的 `<handlers>` ) 中的映射关系，构造一个属于当前 Resource Request 的HttpHandler，那么在第11至12之间，会调用这个 HttpHandler 的 `ProcessRequest` 函数去进行后续的逻辑处理
+在 `Http PipeLine` 中，当执行到第8个管道的时候，会根据配置文件 (默认为本机的全局 `web.config`，同样也适配于自己本站 `web.config` 中定义的 `<handlers>` ) 中的映射关系，构造一个属于当前 Resource Request 的HttpHandler，那么在第11至12之间，会调用这个 HttpHandler 的 `ProcessRequest` 函数去进行后续的逻辑处理
 
 ![图片6.png](https://i.loli.net/2019/12/04/MBrFxjXk9nHfqop.png)
 
