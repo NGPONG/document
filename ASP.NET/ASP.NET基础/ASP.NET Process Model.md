@@ -164,8 +164,8 @@ private void ProcessRequestInternal(HttpWorkerRequest wr)
 - 判断 Application Pool 是否存在未被使用的 `HttpApplication` ，如果不存在则通过反射的方式创建一个基于 Global.asax 的 `HttpApplication`
 - 通过 `EnsureAppStartCalled` 函数去触发 HttpApplication 的 `Application_Start Event Handler`
 - 通过 `HookupEventHandlersForApplicationAndModules` 函数完成对 Global.asax 中的 Event Handler 的注册
-- 通过配置文件 (默认为本机的全局 `web.config`，同样也适配于自己本站 `web.config` 中定义的 `<modules>` ) 中的映射关系去创建 `HttpModule`，并循环执行每个 `HttpModule` 的 `init` 函数，完成所有 `HttpModule` 内置 Event Handler 的注册
-- 通过 `BuildStep` 函数最终为HttpApplication完成19个管道事件的注册
+- 通过配置文件 (默认为本机的全局 `web.config`，同样也适配于自己本站 `web.config` 中定义的 `<modules>` ) 中的映射关系去创建 `HttpModule`，并循环执行每个 `HttpModule` 的 `init` 函数，再这个 init 函数内部，不同的 `HttpModule` 会针对 `HttpApplication` 中所分发的不同的 `Event` 去注册独属自己的、当前 **Module** 的逻辑，那么关于为什么在 `HttpApplication` 的第7个事件的时候才会去创建一个 `HttpHandler`，因为不管是 WebForm 也好还是MVC也好，它们都有属于自己的一个 `HttpModule`，并且其内部的 `Init` 函数的内部会注册第7个事件，并指定的 `Event Handler` 中会负责参与创建当前 `Handler` 所对应的 `HttpHandler`，如：MVC 则为 `MvcHandler`
+- 通过 `BuildStep` 函数最终为 HttpApplication 完成 对于 19个事件(`默认`) 的注册
 
 ```csharp
 private void ProcessRequestInternal(HttpWorkerRequest wr)
@@ -256,7 +256,7 @@ internal IAsyncResult BeginProcessRequestNotification(HttpContext context, Async
 
 ![图片4.png](https://i.loli.net/2019/12/04/FDpmd1fLExGJ8Sb.png)
 
-在 `Http PipeLine` 中，当执行到第8个管道的时候，会根据配置文件 (默认为本机的全局 `web.config`，同样也适配于自己本站 `web.config` 中定义的 `<handlers>` ) 中的映射关系，构造一个属于当前 Resource Request 的HttpHandler，那么在第11至12之间，会调用这个 HttpHandler 的 `ProcessRequest` 函数去进行后续的逻辑处理
+在 `Http PipeLine` 中，当执行到第8个事件的时候，会根据配置文件 (默认为本机的全局 `web.config`，同样也适配于自己本站 `web.config` 中定义的 `<handlers>` ) 中的映射关系，在结合当前的 Resource Request 去匹配在第7个事件中所创建 HttpHandler，那么在第11至12之间，会调用这个 HttpHandler 的 `ProcessRequest` 函数去进行后续的逻辑处理
 
 ![图片6.png](https://i.loli.net/2019/12/04/MBrFxjXk9nHfqop.png)
 
