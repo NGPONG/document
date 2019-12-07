@@ -397,3 +397,120 @@ public class MvcRouteHandler : IRouteHandler
 
 ---
 
+`ASP.NET MVC Area` 可以将一个大型的网站划分为相对独立的区域，该区域同样享有 `Model` `Controller` `View` 的结构模式，并且也有着属于自己的一个 `web.config` 和路由规则，关于如何创建 `Area` 可以参考这一篇[文章](https://www.codeproject.com/Articles/1139669/How-to-Create-an-Area-in-ASP-NET-MVC-Application)
+
+我们都知道，一个 `Area` 路由规则的注册是通过在新建 `Area` 工程项目的时候，VS自动帮我创建的 `AreaNameAreaRegistration.cs` 这个类中去完成的，我们看一下这个类中的具体实现
+
+```csharp
+public class AreaTestAreaRegistration : AreaRegistration 
+{
+	public override string AreaName 
+	{
+		get 
+		{
+			return "AreaTest";
+		}
+	}
+
+	public override void RegisterArea(AreaRegistrationContext context) 
+	{
+		context.MapRoute(
+			"AreaTest_default",
+			"AreaTest/{controller}/{action}/{id}",
+			new { action = "Index", id = UrlParameter.Optional }
+		);
+	}
+}
+```
+
+可以清楚的看到，Area 的路由注册也是通过 `MapRoute` 来完成的，但需要注意的是，这里的 MapRoute 和前面所讲的 MapRoute 是不同的成员提供的，Area 中的 MapRoute 由 `AreaRegistrationContext` 这个类所提供出来，那我们进入这个类中再仔细看下它的内部实现和之前的 `MapRoute` 有何不同
+
+```csharp
+public class AreaRegistrationContext
+{
+	public Route MapRoute(string name, string url, object defaults, object constraints, string[] namespaces)
+	{
+		if (namespaces == null && Namespaces != null)
+		{
+			namespaces = Namespaces.ToArray();
+		}
+
+		Route route = Routes.MapRoute(name, url, defaults, constraints, namespaces);
+		route.DataTokens[RouteDataTokenKeys.Area] = AreaName;
+
+		// disabling the namespace lookup fallback mechanism keeps this areas from accidentally picking up
+		// controllers belonging to other areas
+		bool useNamespaceFallback = (namespaces == null || namespaces.Length == 0);
+		route.DataTokens[RouteDataTokenKeys.UseNamespaceFallback] = useNamespaceFallback;
+
+		return route;
+	}
+}
+```
+
+可以看到它和之前的 `MapRoute` 存在的区别不是很大，也是调用了在上文所说的 `RouteCollection.MapRoute` 的函数来完成 `Route` 的最终创建，有一点不同的是，Area 在创建完成之后还特别针对当前 `Area` 的命名空间为上一步所创建的 `Route` 写入了一个 `DataToken`
+
+关于 `DataToken` 还是有必要稍微展开讲一下，故名起义，这个成员就是属于 `Route` 的一个Token，其目的主要是为了避免 `Area` 和原始的母 MVC 项目存在同名 `Controller` 的情况，可以看出其实际上只有在 `Area` 中能够达到实际作用
+
+回过头来我们已经知道了 `Area` 的路由规则是如何建立的，但是还存在着一个问题，`AreaNameAreaRegistration.RegisterArea(AreaRegistrationContext context)` 这个函数又是在哪里会调用的呢？其实也是在 `Application_Start` 当中被调用，具体体现在
+
+```csharp
+public class MvcApplication : System.Web.HttpApplication
+{
+	protected void Application_Start()
+	{
+		AreaRegistration.RegisterAllAreas();
+
+		// More...
+	}
+}
+```
+
+我们进入到 `AreaRegistration.RegisterAllAreas()` 这个函数的内部一探究竟
+
+```csharp
+public abstract class AreaRegistration
+{
+	internal static void RegisterAllAreas(RouteCollection routes, IBuildManager buildManager, object state)
+	{
+		List<Type> areaRegistrationTypes = TypeCacheUtil.GetFilteredTypesFromAssemblies(TypeCacheName, IsAreaRegistrationType, buildManager);
+		foreach (Type areaRegistrationType in areaRegistrationTypes)
+		{
+			AreaRegistration registration = (AreaRegistration)Activator.CreateInstance(areaRegistrationType);
+			registration.CreateContextAndRegister(routes, state);
+		}
+	}
+}
+```
+
+具体含义其实不复杂，首先枚举出当前当前 `AppDomain` 中所有继承于 `AreaRegistration` 的子类 (VS自动帮我创建的 `AreaNameAreaRegistration.cs` 这个类就是 `AreaRegistration` 的派生类)，然后调用了其 `CreateContextAndRegister(RouteCollection routes, object state)` 函数，我们继续深究进入这个函数的内部
+
+```csharp
+public abstract class AreaRegistration
+{
+	internal void CreateContextAndRegister(RouteCollection routes, object state)
+	{
+		AreaRegistrationContext context = new AreaRegistrationContext(AreaName, routes, state);
+
+		string thisNamespace = GetType().Namespace;
+		if (thisNamespace != null)
+		{
+			context.Namespaces.Add(thisNamespace + ".*");
+		}
+
+		RegisterArea(context);
+	}
+}
+```
+
+这时候仿佛就豁然开朗了，看到了熟悉的 `RegisterArea(AreaRegistrationContext context)` 函数，明白了其具体的调用的过程
+
+在这里也稍微总结一下，在 `Application_Start` 中，通过 `AreaRegistration.RegisterAllAreas()` 函数，找到当前 `AppDomain` 下所有派生于 `AreaRegistration` 的子类，并调用其 `RegisterArea` 方法完成 `Area` 的路由注册，最后呈现的效果是则为在全局路由表 `RouteTable` 中添加一条属于 `Area` 的路由规则，并且，再添加完成路由规则后还会把当前的 `AreaRegistration` 派生类的命名空间和 `UseNamespaceFallback` 加到 `Route` 的 `DataToken` 中，关于这个 `DataToken` 的具体使用我们放在下一节点揭开其面纱
+
+<br/>
+
+### Controller的激活
+
+---
+
+
