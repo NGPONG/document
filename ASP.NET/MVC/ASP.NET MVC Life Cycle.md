@@ -3,7 +3,7 @@
 <br/>
 
 ### 路由的开始
-
+<span id="路由的开始"></span>
 ---
 
 路由系统是 `ASP.NET MVC` 的核心，其隶属于 `System.Web.Routing.dll` 组件，关于MVC的入口也是从它开始
@@ -253,7 +253,7 @@ public class Route : RouteBase
 
 在回到 `PostResolveRequestCache(HttpContextBase context)` 的进一步解析前，最后还要回头来看下 `RouteData` 对象，在前面说到，`RouteData` 是路由系统的核心对象之一，`Route` 对象也不例外，其实 `Route` 和 `RouteData` 之间是存在着千丝万缕的关系的，`Route` 就相当于我们在 `Application_Start` 的时候所录入的自定义路由规则，而 `RouteData` 就是当前所请求的 URL 能够成功匹配到所定义的一个 `Route`，当当前所请的 URL 地址符合某个 `Route` 的时候，就会调用这个 `Route` 的 `GetRouteData` 函数去返回一个与之对应的 `RouteData`，以下代码则为 `RouteCollection.GetRouteData(HttpContext context)` 函数的内部逻辑，可以清楚的看到，`ASP.NET MVC` 框架匹配路由的方式是偏离所有所定义的路由规则 ( `RouteTable.Routes` -> `RouteCollection` ) 去完成校验的
 
-此外还要补充一点的是，`RouteData` 中存在一个属性 `RouteHandler`，其类型也是 `MvcRouteHandler`，并且其引用是和生成这个 `RouteData` 的 `Route` 是存在着对应关系的
+此外还要补充一点的是，`RouteData` 中存在一个属性 `RouteHandler`，其类型也是 `MvcRouteHandler`，并且其引用是和生成这个 `RouteData` 的 `Route` 是存在着对应关系的，最后，稍微剧透一下，`RouteData` 这个类在后面的 `Controller的激活` 步骤中起到了非常关键性的作用，我们脑子里先警醒着这个 `RouteData` 先
 
 ```csharp
 public class RouteCollection : Collection<RouteBase>
@@ -397,7 +397,7 @@ public class MvcRouteHandler : IRouteHandler
 
 ---
 
-`ASP.NET MVC Area` 可以将一个大型的网站划分为相对独立的区域，该区域同样享有 `Model` `Controller` `View` 的结构模式，并且也有着属于自己的一个 `web.config` 和路由规则，关于如何创建 `Area` 可以参考这一篇[文章](https://www.codeproject.com/Articles/1139669/How-to-Create-an-Area-in-ASP-NET-MVC-Application)
+`ASP.NET MVC Area` 可以将一个大型的网站划分为相对独立的区域，该区域同样享有 `Model` `Controller` `View` 的结构模式，并且也有着属于自己的一个 `web.config` 和路由规则，关于如何创建 `Area` 可以参考这一篇 [文章](https://www.codeproject.com/Articles/1139669/How-to-Create-an-Area-in-ASP-NET-MVC-Application)
 
 我们都知道，一个 `Area` 路由规则的注册是通过在新建 `Area` 工程项目的时候，VS自动帮我创建的 `AreaNameAreaRegistration.cs` 这个类中去完成的，我们看一下这个类中的具体实现
 
@@ -509,8 +509,322 @@ public abstract class AreaRegistration
 
 <br/>
 
-### Controller的激活
+### Controller 的激活
 
 ---
 
+续 [路由的开始](#路由的开始)，请求流程走到了 `BeginProcessRequest` 函数，再该函数内部紧接着又调用了 `ProcessRequestInit` 函数，该函数的工作可以视为 `Controller激活` 的一个入口，在这里，`Controller` 的实例被真正的构建出来，我们深入了解下该函数的内部
 
+```csharp
+public class MvcHandler : IHttpAsyncHandler, IHttpHandler, IRequiresSessionState
+{
+	private void ProcessRequestInit(HttpContextBase httpContext, out IController controller, out IControllerFactory factory)
+	{
+		// If request validation has already been enabled, make it lazy. This allows attributes like [HttpPost] (which looks
+		// at Request.Form) to work correctly without triggering full validation.
+		// Tolerate null HttpContext for testing.
+		HttpContext currentContext = HttpContext.Current;
+		if (currentContext != null)
+		{
+			bool? isRequestValidationEnabled =  .IsValidationEnabled(currentContext);
+			if (isRequestValidationEnabled == true)
+			{
+				ValidationUtility.EnableDynamicValidation(currentContext);
+			}
+		}
+
+		AddVersionHeader(httpContext);
+		RemoveOptionalRoutingParameters();
+
+		// Get the controller type
+		string controllerName = RequestContext.RouteData.GetRequiredString("controller");
+
+		// Instantiate the controller and call Execute
+		factory = ControllerBuilder.GetControllerFactory();
+		controller = factory.CreateController(RequestContext, controllerName);
+		if (controller == null)
+		{
+			throw new InvalidOperationException(
+				String.Format(
+					CultureInfo.CurrentCulture,
+					MvcResources.ControllerBuilder_FactoryReturnedNull,
+					factory.GetType(),
+					controllerName));
+		}
+	}
+}
+```
+前面的代码可以无视，主要是做一些请求验证的处理工作，我们把关注点从 `Get the controller type` 这一句注释开始，在这里我们又看到了熟悉的 `RouteData` 对象，它是当前所请求的 URL 成功匹配到自定义路由规则 `Route` 所创建的 `RouteData`，在这里通过它去调用 `RouteData.GetRequiredString(string valueName)` 去获取 `Controller` 具体的名字
+
+紧接着，通过 `ControllerBuilder.GetControllerFactory()` 获取一个 `Controller工厂`，在这里需要稍微扩展以下 `ControllerBuilder` 这个类，可以清楚的看到 `ASP.NET MVC` 关于 `Controller` 的获取采用了抽象工厂的模式，默认情况下所返回的工厂为 `DefaultControllerFactory` (接下来深入的流程也是会围绕着这个类进行展开)，另外还要扩充一点的是，`ControllerBuilder` 对于工厂的实例化采取了 `Dependency Injection` (依赖注入) 的方式来展开，具体可以查看以下代码
+
+```csharp
+public class ControllerBuilder
+{
+	internal ControllerBuilder(IResolver<IControllerFactory> serviceResolver)
+	{
+		_serviceResolver = serviceResolver ?? new SingleServiceResolver<IControllerFactory>(
+													() => _factoryThunk(),
+													new DefaultControllerFactory { ControllerBuilder = this },
+													"ControllerBuilder.GetControllerFactory");
+	}
+}
+```
+
+回到正题，我们看一下，在获取了一个 `Controller工厂` 后，我们看一下它的 `IControllerFactory.CreateController(RequestContext requestContext, string controllerName)` 又做了什么，先上一下源码
+
+```csharp
+public class DefaultControllerFactory : IControllerFactory
+{
+	public virtual IController CreateController(RequestContext requestContext, string controllerName)
+	{
+		// More....
+
+		// Step 1
+		Type controllerType = GetControllerType(requestContext, controllerName);
+
+		// Step 2
+		IController controller = GetControllerInstance(requestContext, controllerType);
+
+		return controller;
+	}
+}
+```
+
+还是分开来一步一步讲解把，先从 `Step 1` 开始，我们进入 `GetControllerType` 这个函数的内部看下具体做了什么
+
+```csharp
+public class DefaultControllerFactory : IControllerFactory
+{
+	protected internal virtual Type GetControllerType(RequestContext requestContext, string controllerName)
+	{
+		// More....
+
+		// first search in the current route's namespace collection
+		object routeNamespacesObj;
+		Type match;
+		if (routeData != null && routeData.DataTokens.TryGetValue(RouteDataTokenKeys.Namespaces, out routeNamespacesObj))
+		{
+			IEnumerable<string> routeNamespaces = routeNamespacesObj as IEnumerable<string>;
+			if (routeNamespaces != null && routeNamespaces.Any())
+			{
+				HashSet<string> namespaceHash = new HashSet<string>(routeNamespaces, StringComparer.OrdinalIgnoreCase);
+				match = GetControllerTypeWithinNamespaces(routeData.Route, controllerName, namespaceHash);
+
+				// the UseNamespaceFallback key might not exist, in which case its value is implicitly "true"
+				if (match != null || false.Equals(routeData.DataTokens[RouteDataTokenKeys.UseNamespaceFallback]))
+				{
+					// got a match or the route requested we stop looking
+					return match;
+				}
+			}
+		}
+
+		// then search in the application's default namespace collection
+		RouteBase route = routeData == null ? null : routeData.Route;
+		if (ControllerBuilder.DefaultNamespaces.Count > 0)
+		{
+			HashSet<string> namespaceDefaults = new HashSet<string>(ControllerBuilder.DefaultNamespaces, StringComparer.OrdinalIgnoreCase);
+			match = GetControllerTypeWithinNamespaces(route, controllerName, namespaceDefaults);
+			if (match != null)
+			{
+				return match;
+			}
+		}
+
+		// if all else fails, search every namespace
+		return GetControllerTypeWithinNamespaces(route, controllerName, null /* namespaces */);
+	}
+}
+```
+
+在这里我们又看到了熟悉的 `RouteData.DataTokens` ，没错这里也是判断 `DataTokens` 中是否存在与当前相符的 `NameSpace`，如果存在则调用 `GetControllerTypeWithinNamespaces` 函数对 `Controller` 进行下一步的检索工作，我们看下这个函数具体做了什么
+
+```csharp
+public class DefaultControllerFactory : IControllerFactory
+{
+	private Type GetControllerTypeWithinNamespaces(RouteBase route, string controllerName, HashSet<string> namespaces)
+	{
+		// Once the master list of controllers has been created we can quickly index into it
+		ControllerTypeCache.EnsureInitialized(BuildManager);
+
+		ICollection<Type> matchingTypes = ControllerTypeCache.GetControllerTypes(controllerName, namespaces);
+		switch (matchingTypes.Count)
+		{
+			case 0:
+				// no matching types
+				return null;
+
+			case 1:
+				// single matching type
+				return matchingTypes.First();
+
+			default:
+				// multiple matching types
+				throw CreateAmbiguousControllerException(route, controllerName, matchingTypes);
+		}
+	}
+}
+```
+
+这里可以看到 `ControllerTypeCache.EnsureInitialized` 这个函数，我们在进入其内部看看发生了什么
+
+```csharp
+internal sealed class ControllerTypeCache
+{
+	public void EnsureInitialized(IBuildManager buildManager)
+	{
+		if (_cache == null)
+		{
+			lock (_lockObj)
+			{
+				if (_cache == null)
+				{
+					List<Type> controllerTypes = TypeCacheUtil.GetFilteredTypesFromAssemblies(TypeCacheName, IsControllerType, buildManager);
+					var groupedByName = controllerTypes.GroupBy(
+						t => t.Name.Substring(0, t.Name.Length - "Controller".Length),
+						StringComparer.OrdinalIgnoreCase);
+					_cache = groupedByName.ToDictionary(
+						g => g.Key,
+						g => g.ToLookup(t => t.Namespace ?? String.Empty, StringComparer.OrdinalIgnoreCase),
+						StringComparer.OrdinalIgnoreCase);
+				}
+			}
+		}
+	}
+}
+```
+
+在这里，我们似乎又看到了一个熟悉的函数 `TypeCacheUtil.GetFilteredTypesFromAssemblies`，不过距离上次看到是在 `Area` 部分当中用于当前 `AppDomain` 中所有派生自 `AreaRegistration` 的类型，在这里我们深入研究下具体它干了些什么
+
+```csharp
+internal static class TypeCacheUtil
+{
+	public static List<Type> GetFilteredTypesFromAssemblies(string cacheName, Predicate<Type> predicate, IBuildManager buildManager)
+	{
+		TypeCacheSerializer serializer = new TypeCacheSerializer();
+
+		// first, try reading from the cache on disk
+		List<Type> matchingTypes = ReadTypesFromCache(cacheName, predicate, buildManager, serializer);
+		if (matchingTypes != null)
+		{
+			return matchingTypes;
+		}
+
+		// if reading from the cache failed, enumerate over every assembly looking for a matching type
+		matchingTypes = FilterTypesInAssemblies(buildManager, predicate).ToList();
+
+		// finally, save the cache back to disk
+		SaveTypesToCache(cacheName, matchingTypes, buildManager, serializer);
+
+		return matchingTypes;
+	}
+}
+```
+
+在这里就没有继续往下研究的必要了，有一点需要补充下，`ASP.NET MVC` 针对请求次数过多和反射耗费性能的问题，针对反射出来的类也需要缓存在一个文件中进行保存，而这个函数其内部的思想就体现了解决这一问题所在，具体的流程就是就是从缓存文件中获取到一个 `Type` 的集合，`ASP.NET MVC` 对应 `Controller` 的缓存文件则为 `Mvc-ControllerTypeCache.xml` ，下面可以看下它里面的内容稍微扩充一下
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--This file is automatically generated. Please do not modify the contents of this file.-->
+<typeCache lastModified="11/4/2012 8:52:26 PM" mvcVersionId="a5d58bd9-3a4a-4d1d-a7ce-9cef11e4c380">
+  <assembly name="MVCApp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <module versionId="c7b3d847-7853-44f3-87d0-9cc040c4cb53">
+      <type>MVCApp.Areas.Admin.Controllers.HomeController</type>
+      <type>MVCApp.Controllers.HomeController</type>
+    </module>
+  </assembly>
+</typeCache>
+```
+
+另外还要补充一点的是，`GetFilteredTypesFromAssemblies` 函数的 Signature `Predicate<Type> predicate` 也是很有意思，我们可以看下它具体的实现
+
+```csharp
+internal static bool IsControllerType(Type t) 
+{
+	return t != null &&
+		   t.IsPublic &&
+		   t.Name.EndsWith("Controller", StringComparison.OrdinalIgnoreCase) &&
+		   !t.IsAbstract &&
+		   typeof(IController).IsAssignableFrom(t);
+}
+```
+
+可以看出，一个类如果要能够成为 `Controller`，类名必须以 `Controller` 结尾，必须是public的，必须实现IController接口
+
+我们把关注点再回到 `EnsureInitialized` 函数的身上，在获取到当前 `AppDomain` 中 `Controller` 所反射的 `Type` 的集合 `controllerTypes` 之后，还会对这个集合进行一些过滤条件的动作，比如说根据 `Controller` 的名字进行分组，再根据 `NameSpace` 进行下一步的筛选，其目的在于为后面可以更加的方便的获取到 `Controller` 的信息
+
+我们再把关注点回到 `GetControllerTypeWithinNamespaces` 函数的身上，在调用完成 `ControllerTypeCache.EnsureInitialized` 对 `Controller` 的 `Type` 进行一些预初始化工作后，紧接着又调用了 `ControllerTypeCache.GetControllerTypes` 去真正的获取当前所请求的 URL 所对应的 `Controller`，关于其内部实现就不做进一步的展示了，具体含义只是做一些后期的校验和匹配工作
+
+目光再回到 `GetControllerType` 函数身上，我们发现这里一共是调用了三次 `GetControllerTypeWithinNamespaces` 函数，上面所讲的是针对正常情况下的获取 `Controller` 的流程，后面两次也不做详细探讨，如果第一次 `GetControllerTypeWithinNamespaces` 返回了 null，并且 `UseNamespaceFallback` 设为true，那么会进行下一步的搜索，否则返回 null，下一步的搜索就是在项目的 `DefaultNamespace` 下进行搜索，对于没有 `Namespace` 的 `RouteData`，默认就是在这里搜索的。最后在所有的 `Namespace` 中搜索
+
+回到 `CreateController` 函数身上，在调用完成 `GetControllerType` 获取到具体的 `Controller` 的 `Type` 以后，紧接着又调用了 `GetControllerInstance` 函数去真正进入创建 `Controller` 实例的流程，我们可以看下以下代码
+
+```csharp
+public class DefaultControllerFactory : IControllerFactory
+{
+	protected internal virtual IController GetControllerInstance(RequestContext requestContext, Type controllerType)
+	{
+		if (requestContext == null)
+		{
+			throw new ArgumentNullException("requestContext");
+		}
+		if (controllerType == null)
+		{
+			throw new HttpException(404,
+									String.Format(
+										CultureInfo.CurrentCulture,
+										MvcResources.DefaultControllerFactory_NoControllerFound,
+										requestContext.HttpContext.Request.Path));
+		}
+		if (!typeof(IController).IsAssignableFrom(controllerType))
+		{
+			throw new ArgumentException(
+				String.Format(
+					CultureInfo.CurrentCulture,
+					MvcResources.DefaultControllerFactory_TypeDoesNotSubclassControllerBase,
+					controllerType),
+				"controllerType");
+		}
+
+		return ControllerActivator.Create(requestContext, controllerType);
+	}
+}
+```
+
+在这里也可以看到，如果在调用 `GetControllerType` 所获取到的 `Controller` 的 `Type` 为空，则弹出 `404` 的错误，在这里也要稍微扩充一点，`ASP.NET MVC` 区别于 `WebForm` 的是，一切请求都是基于所注册的路由路径来完成的，而 `WebForm` 的请求是基于 `文件的虚拟路径来完成的`，回到正题，最终的调用落定在 `ControllerActivator.Create` 身上
+
+关于 `ControllerActivator` 这个类的实例化，`ASP.NET MVC` 再一次采用了 `Dependency Injection` 的机制，它继承于 `IControllerActivator` 接口，默认情况下它为 `DefaultControllerActivator` 的实例，那么在 `Create` 函数的内部紧着又调用了 `IDependencyResolver.GetService` 函数，这个函数的内部完成了 `Controller` 的最终实例化工作，我们可以看下以下代码
+
+```csharp
+private class DefaultDependencyResolver : IDependencyResolver
+{
+	public object GetService(Type serviceType)
+	{
+		// Since attempting to create an instance of an interface or an abstract type results in an exception, immediately return null
+		// to improve performance and the debugging experience with first-chance exceptions enabled.
+		if (serviceType.IsInterface || serviceType.IsAbstract)
+		{
+			return null;
+		}
+
+		try
+		{
+			// 终于等到你
+			return Activator.CreateInstance(serviceType);
+		}
+		catch
+		{
+			return null;
+		}
+	}
+}
+```
+
+至此，`Controller` 的创建步骤已然完成，那么步骤又重新回到了 `BeginProcessRequest` 身上，我们将在下一个节点继续介绍 `Filter 和 Action 的执行`
+
+<br/>
+
+### Filter 和 Action 的执行
+
+---
