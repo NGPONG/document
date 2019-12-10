@@ -829,3 +829,182 @@ private class DefaultDependencyResolver : IDependencyResolver
 
 ---
 
+继续 `BeginProcessRequest` 这个函数之旅，在获取完成 `Controller` 之后，会先查看所返回的 `Controller` 类型是否是异步Controller `IAsyncController`，这里又是一个新的类型，但是我们不对其做分析，我们来分析 `Synchronous Controller` 的进一步实现
+
+在 `Synchronous Controller` 模式下，会调用上面所说的所返回的 `Controller` 的 `Execute` 函数进入下一步的流程，该函数实现自 `Controller` 的最高基类 `ControllerBase`，我们来看下该函数的具体实现
+
+```csharp
+public abstract class ControllerBase : IController
+{
+	protected virtual void Execute(RequestContext requestContext)
+	{
+		// More....
+
+		VerifyExecuteCalledOnce();
+		Initialize(requestContext);
+
+		using (ScopeStorage.CreateTransientScope())
+		{
+			ExecuteCore();
+		}
+	}
+}
+```
+
+在该函数中，首先除了做了一些函数安全检查之外，还通过 `Initialize` 函数实例化了 `ControllerContext` 类，该类包含着当前请求上下文和 `Controller` 的实现，最后我们把关注点放在 `ExecuteCore` 函数身上，该函数是一个抽象函数，真正的实现在 `ControllerBase` 的下级派生类 `Controller` 身上，先看看下其内部的实现
+
+```csharp
+public abstract class Controller : ControllerBase, IActionFilter, IAuthenticationFilter, IAuthorizationFilter, IDisposable, IExceptionFilter, IResultFilter, IAsyncController, IAsyncManagerContainer
+{
+	protected override void ExecuteCore()
+	{
+		// If code in this method needs to be updated, please also check the BeginExecuteCore() and
+		// EndExecuteCore() methods of AsyncController to see if that code also must be updated.
+
+		PossiblyLoadTempData();
+		try
+		{
+			string actionName = GetActionName(RouteData);
+			if (!ActionInvoker.InvokeAction(ControllerContext, actionName))
+			{
+				HandleUnknownAction(actionName);
+			}
+		}
+		finally
+		{
+			PossiblySaveTempData();
+		}
+	}
+}
+```
+
+该函数首先会加载临时数据，在这里不做讨论，在下面有一个需要重点关注且稍显复杂的地方 `InvokeAction`，他是接口 `IActionInvoker` 的函数，具体的实现来自于 `ControllerActionInvoker`，该函数是 `Action` 的发现和 `Filter` 执行的一个核心，我们进入该函数具体探究下其实现
+
+```csharp
+public class ControllerActionInvoker : IActionInvoker
+{
+	public virtual bool InvokeAction(ControllerContext controllerContext, string actionName)
+	{
+		// More...
+
+		ControllerDescriptor controllerDescriptor = GetControllerDescriptor(controllerContext);
+		ActionDescriptor actionDescriptor = FindAction(controllerContext, controllerDescriptor, actionName);
+
+		if (actionDescriptor != null)
+		{
+			FilterInfo filterInfo = GetFilters(controllerContext, actionDescriptor);
+
+			try
+			{
+				AuthenticationContext authenticationContext = InvokeAuthenticationFilters(controllerContext, filterInfo.AuthenticationFilters, actionDescriptor);
+
+				if (authenticationContext.Result != null)
+				{
+					// An authentication filter signaled that we should short-circuit the request. Let all
+					// authentication filters contribute to an action result (to combine authentication
+					// challenges). Then, run this action result.
+					AuthenticationChallengeContext challengeContext = InvokeAuthenticationFiltersChallenge(
+						controllerContext, filterInfo.AuthenticationFilters, actionDescriptor,
+						authenticationContext.Result);
+					InvokeActionResult(controllerContext, challengeContext.Result ?? authenticationContext.Result);
+				}
+				else
+				{
+					AuthorizationContext authorizationContext = InvokeAuthorizationFilters(controllerContext, filterInfo.AuthorizationFilters, actionDescriptor);
+					if (authorizationContext.Result != null)
+					{
+						// An authorization filter signaled that we should short-circuit the request. Let all
+						// authentication filters contribute to an action result (to combine authentication
+						// challenges). Then, run this action result.
+						AuthenticationChallengeContext challengeContext = InvokeAuthenticationFiltersChallenge(
+							controllerContext, filterInfo.AuthenticationFilters, actionDescriptor,
+							authorizationContext.Result);
+						InvokeActionResult(controllerContext, challengeContext.Result ?? authorizationContext.Result);
+					}
+					else
+					{
+						if (controllerContext.Controller.ValidateRequest)
+						{
+							ValidateRequest(controllerContext);
+						}
+
+						IDictionary<string, object> parameters = GetParameterValues(controllerContext, actionDescriptor);
+						ActionExecutedContext postActionContext = InvokeActionMethodWithFilters(controllerContext, filterInfo.ActionFilters, actionDescriptor, parameters);
+
+						// The action succeeded. Let all authentication filters contribute to an action result (to
+						// combine authentication challenges; some authentication filters need to do negotiation
+						// even on a successful result). Then, run this action result.
+						AuthenticationChallengeContext challengeContext = InvokeAuthenticationFiltersChallenge(
+							controllerContext, filterInfo.AuthenticationFilters, actionDescriptor,
+							postActionContext.Result);
+						InvokeActionResultWithFilters(controllerContext, filterInfo.ResultFilters,
+							challengeContext.Result ?? postActionContext.Result);
+					}
+				}
+			}
+			catch (ThreadAbortException)
+			{
+				// This type of exception occurs as a result of Response.Redirect(), but we special-case so that
+				// the filters don't see this as an error.
+				throw;
+			}
+			catch (Exception ex)
+			{
+				// something blew up, so execute the exception filters
+				ExceptionContext exceptionContext = InvokeExceptionFilters(controllerContext, filterInfo.ExceptionFilters, ex);
+				if (!exceptionContext.ExceptionHandled)
+				{
+					throw;
+				}
+				InvokeActionResult(controllerContext, exceptionContext.Result);
+			}
+
+			return true;
+		}
+
+		// notify controller that no method matched
+		return false;
+	}
+}
+```
+
+我们一步一步来解读，首先通过了 `GetControllerDescriptor(ControllerContext controllerContext)` 函数获取了一个 `ControllerDescriptor` 的抽象类，其具体的实现为 `ReflectedControllerDescriptor`，接下来又调用了 `FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, string actionName)` 函数，其中 `ControllerDescriptor` Signature的具体引用则为刚刚所获取到的 `ReflectedControllerDescriptor`，我们先来看下这个函数的具体实现
+
+```csharp
+public class ControllerActionInvoker : IActionInvoker
+{
+	protected virtual ActionDescriptor FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, string actionName)
+	{
+		// More....
+
+		ActionDescriptor actionDescriptor = controllerDescriptor.FindAction(controllerContext, actionName);
+		return actionDescriptor;
+	}
+}
+```
+
+通过上面的代码可以看到，通过 `controllerDescriptor` 这个参数调用了 `FindAction(ControllerContext controllerContext, string actionName)` 并返回了一个 `ActionDescriptor` 的抽象类，前面说过，`controllerDescriptor` 的具体实现为 `ReflectedControllerDescriptor`，我们先进入 `FindAction` 这个函数的内部一叹究，看看 `ActionDescriptor` 的具体实现到底什么
+
+```csharp
+public class ReflectedControllerDescriptor : ControllerDescriptor
+{
+	public override ActionDescriptor FindAction(ControllerContext controllerContext, string actionName)
+	{
+		// More....
+
+		MethodInfo matched = _selector.FindActionMethod(controllerContext, actionName);
+		if (matched == null)
+		{
+			return null;
+		}
+
+		return new ReflectedActionDescriptor(matched, actionName, this);
+	}
+}
+```
+
+在这里，我们可以看到通过 `ControllerContext` 和 `ActionName` 调用了 `_selector` 的 `FindActionMethod` 函数去获取到了一个 `MethoInfo`，关于 `MethodInfo` 我们可以理解成 `Reflected` 了指定 `Controller` 的所有 `Action`，并于 `ActionName` 进行匹配后拿到一个当前请求 URL 所对应的具体 `Action` 的 `MethodInfo`，还有另外需要补充的是，`_selector` 是一个 `ActionMethodSelectorBase` 的抽象类，其具体实现为 `ActionMethodSelector`，当然这里仅做了解
+
+当获取完成 `MethodInfo` 后，将其封装至 `ReflectedActionDescriptor` 类中，那我们也能够了解到，`ActionDescriptor` 的具体实现则为 `ReflectedActionDescriptor` 并且其内部封装了具体 `Action` 的 `Reflected` 
+
+致此，我们可以把思绪转会到 `InvokeAction` 这个函数身上，看看下一步具体还做什么
