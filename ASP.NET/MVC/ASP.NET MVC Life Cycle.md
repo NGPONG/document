@@ -1007,4 +1007,4 @@ public class ReflectedControllerDescriptor : ControllerDescriptor
 
 当获取完成 `MethodInfo` 后，将其封装至 `ReflectedActionDescriptor` 类中，那我们也能够了解到，`ActionDescriptor` 的具体实现则为 `ReflectedActionDescriptor` 并且其内部封装了具体 `Action` 的 `Reflected` 
 
-致此，我们可以把思绪转会到 `InvokeAction` 这个函数身上，看看下一步具体还做什么
+致此，我们可以把思绪转回到 `InvokeAction` 这个函数身上，看看下一步具体还做什么
