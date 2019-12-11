@@ -1264,42 +1264,62 @@ public class ControllerActionInvoker : IActionInvoker
 在这里紧接着又调用了 `InvokeActionResultFilterRecursive(IList<IResultFilter> filters, int filterIndex, ResultExecutingContext preContext, ControllerContext controllerContext, ActionResult actionResult)`
 
 ```csharp
-private ResultExecutedContext InvokeActionResultFilterRecursive(IList<IResultFilter> filters, int filterIndex, ResultExecutingContext preContext, ControllerContext controllerContext, ActionResult actionResult)
+public class ControllerActionInvoker : IActionInvoker
 {
-	// More....
-
-	filter.OnResultExecuting(preContext);
-
-	// More....
-
-	try
+	private ResultExecutedContext InvokeActionResultFilterRecursive(IList<IResultFilter> filters, int filterIndex, ResultExecutingContext preContext, ControllerContext controllerContext, ActionResult actionResult)
 	{
+		// Performance-sensitive
+
+		// For compatbility, the following behavior must be maintained
+		//   The OnResultExecuting events must fire in forward order
+		//   The InvokeActionResult must then fire
+		//   The OnResultExecuted events must fire in reverse order
+		//   Earlier filters can process the results and exceptions from the handling of later filters
+		// This is achieved by calling recursively and moving through the filter list forwards
+
+		// If there are no more filters to recurse over, create the main result
+		if (filterIndex > filters.Count - 1)
+		{
+			InvokeActionResult(controllerContext, actionResult);
+			return new ResultExecutedContext(controllerContext, actionResult, canceled: false, exception: null);
+		}
+
 		// More....
 
-		postContext = InvokeActionResultFilterRecursive(filters, nextFilterIndex, preContext, controllerContext, actionResult);
-	}
-	catch (ThreadAbortException)
-	{
+		filter.OnResultExecuting(preContext);
+
 		// More....
+
+		try
+		{
+			// More....
+
+			postContext = InvokeActionResultFilterRecursive(filters, nextFilterIndex, preContext, controllerContext, actionResult);
+		}
+		catch (ThreadAbortException)
+		{
+			// More....
+
+			filter.OnResultExecuted(postContext);
+			throw;
+		}
+		catch (Exception ex)
+		{
+			// More....
+
+			filter.OnResultExecuted(postContext);
+			throw;
+			// More....
+		}
 
 		filter.OnResultExecuted(postContext);
-		throw;
-	}
-	catch (Exception ex)
-	{
-		// More....
-
-		filter.OnResultExecuted(postContext);
-		throw;
+		
 		// More....
 	}
-
-	filter.OnResultExecuted(postContext);
-	
-	// More....
 }
 ```
 
+<span i="标识1"></span>
 在这里同样是省略了很多不必要的代码，但是其思想和 `InvokeActionMethodFilter` 函数是类似的，可以清楚的看到 `IResultFilter` 的执行顺序和处理 `ActionResult` 的步骤 (`InvokeActionResultFilterRecursive`)
 
 还剩下一个 `IExceptionFilter` 未提起，其实他也就是在 `InvokeAction` 发生异常的时候就会调用该 `Filter` 的一些逻辑，这里就跳过不研究它了
@@ -1314,4 +1334,290 @@ private ResultExecutedContext InvokeActionResultFilterRecursive(IList<IResultFil
 ### ActionResult 的执行
 
 ---
+
+在正式进入正题之前，先来回顾下 `ActionResult` 具体有哪些类型
+
+- System.Web.Mvc.ContentResult
+- System.Web.Mvc.EmptyResult 
+- System.Web.Mvc.FileResult
+- System.Web.Mvc.HttpStatusCodeResult
+- System.Web.Mvc.JavaScriptResult
+- System.Web.Mvc.JsonResult
+- System.Web.Mvc.RedirectResult
+- System.Web.Mvc.RedirectToRouteResult
+- System.Web.Mvc.ViewResultBase
+
+在本节中，仅针对 `System.Web.Mvc.ViewResultBase` 进行分析，简而言之就是分析视图的加载和渲染的处理流程
+
+回到正题，接 [上一节](#标识1) 的内容，我们知道 `ActionResult` 的真正执行是在 `InvokeActionResultFilterRecursive` 函数里头执行的，具体体现在 `InvokeActionResult(ControllerContext controllerContext, ActionResult actionResult)` 我们先看下其内部构造
+
+```csharp
+public class ControllerActionInvoker : IActionInvoker
+{
+	protected virtual void InvokeActionResult(ControllerContext controllerContext, ActionResult actionResult)
+	{
+		actionResult.ExecuteResult(controllerContext);
+	}
+}
+```
+
+在该函数中，紧跟着又调用了 `ActionResult` 的抽象函数 `ExecuteResult`，其具体实现体现在 `ViewResultBase` 这个类身上，我们进入其内部看下到底发生了什么
+
+```csharp
+public abstract class ViewResultBase : ActionResult
+{
+	public override void ExecuteResult(ControllerContext context)
+	{
+		// More....
+
+		if (String.IsNullOrEmpty(ViewName))
+		{
+			ViewName = context.RouteData.GetRequiredString("action");
+		}
+
+		ViewEngineResult result = null;
+
+		if (View == null)
+		{
+			result = FindView(context);
+			View = result.View;
+		}
+
+		TextWriter writer = context.HttpContext.Response.Output;
+		ViewContext viewContext = new ViewContext(context, View, ViewData, TempData, writer);
+		View.Render(viewContext, writer);
+
+		if (result != null)
+		{
+			result.ViewEngine.ReleaseView(context, View);
+		}
+	}
+}
+```
+
+首先是会先找到视图的名字，在 `ASP.NET MVC` 中，构造控制器所对应的视图必须要和控制器中具体的 `Action` 名字相同，在这里我们也可以发现，其寻找视图名字的方式也就是寻找控制器中具体 `Action` 的名字来实现的，当成功匹配到视图名后，紧接着调用了 `FindView(ControllerContext context)` 函数去具体的匹配视图的物理路劲，需要注意的是，该函数在 `ViewResultBase` 这个类中隶属于一个抽象函数，其具体的实现体现在 `ViewResultBase` 的派生类 `ViewResult` 身上，我们进入其内部看下 `FindView(ControllerContext context)` 这个函数的具体实现
+
+```csharp
+ public class ViewResult : ViewResultBase
+{
+	protected override ViewEngineResult FindView(ControllerContext context)
+	{
+		ViewEngineResult result = ViewEngineCollection.FindView(context, ViewName, MasterName);
+		if (result.View != null)
+		{
+			return result;
+		}
+
+		// we need to generate an exception containing all the locations we searched
+		StringBuilder locationsText = new StringBuilder();
+		foreach (string location in result.SearchedLocations)
+		{
+			locationsText.AppendLine();
+			locationsText.Append(location);
+		}
+		throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture,
+														  MvcResources.Common_ViewNotFound, ViewName, locationsText));
+	}
+}
+```
+
+<span id="标识2"></span>
+调用又落定在 `ViewEngineCollection` 这个类的 `FindView(ControllerContext controllerContext, string viewName, string masterName)` 函数身上，在这里我们先关注下 `ViewEngineCollection` 这个类，`ViewEngineCollection` 在默认情况下有两个元素，分别是 `WebFormViewEngine` 和 `RazorViewEngine`，在这里我们只关注 `RazorViewEngine`，而关于 `RazorViewEngine` 的构造函数似乎又出现了一些比较有意思的东西，见下面代码
+
+```csharp
+public class RazorViewEngine : BuildManagerViewEngine
+{
+	public RazorViewEngine(IViewPageActivator viewPageActivator)
+		: base(viewPageActivator)
+	{
+		AreaViewLocationFormats = new[]
+		{
+			"~/Areas/{2}/Views/{1}/{0}.cshtml",
+			"~/Areas/{2}/Views/{1}/{0}.vbhtml",
+			"~/Areas/{2}/Views/Shared/{0}.cshtml",
+			"~/Areas/{2}/Views/Shared/{0}.vbhtml"
+		};
+		AreaMasterLocationFormats = new[]
+		{
+			"~/Areas/{2}/Views/{1}/{0}.cshtml",
+			"~/Areas/{2}/Views/{1}/{0}.vbhtml",
+			"~/Areas/{2}/Views/Shared/{0}.cshtml",
+			"~/Areas/{2}/Views/Shared/{0}.vbhtml"
+		};
+		AreaPartialViewLocationFormats = new[]
+		{
+			"~/Areas/{2}/Views/{1}/{0}.cshtml",
+			"~/Areas/{2}/Views/{1}/{0}.vbhtml",
+			"~/Areas/{2}/Views/Shared/{0}.cshtml",
+			"~/Areas/{2}/Views/Shared/{0}.vbhtml"
+		};
+
+		ViewLocationFormats = new[]
+		{
+			"~/Views/{1}/{0}.cshtml",
+			"~/Views/{1}/{0}.vbhtml",
+			"~/Views/Shared/{0}.cshtml",
+			"~/Views/Shared/{0}.vbhtml"
+		};
+		MasterLocationFormats = new[]
+		{
+			"~/Views/{1}/{0}.cshtml",
+			"~/Views/{1}/{0}.vbhtml",
+			"~/Views/Shared/{0}.cshtml",
+			"~/Views/Shared/{0}.vbhtml"
+		};
+		PartialViewLocationFormats = new[]
+		{
+			"~/Views/{1}/{0}.cshtml",
+			"~/Views/{1}/{0}.vbhtml",
+			"~/Views/Shared/{0}.cshtml",
+			"~/Views/Shared/{0}.vbhtml"
+		};
+
+		FileExtensions = new[]
+		{
+			"cshtml",
+			"vbhtml",
+		};
+	}
+}
+```
+
+我们会发现，`RazorViewEngine` 在初始化的过程中，为其最上级基类的 `Area view location` 和 `Default view loaction` 中注册了相应的一些磁盘物理路径，通过这点其实也能够看出 `ASP.NET MVC` 框架在寻找视图的具体路径时候的顺序，此外需要补充的是这些 `xxxLocationFormats` 是隶属于 `RazorViewEngine` 的最上级基类 `VirtualPathProviderViewEngine` 中的属性成员
+
+说了这么多，回到 `ViewEngineCollection` 的 `FindView` 函数，先看看其具体的实现
+
+```csharp
+public class ViewEngineCollection : Collection<IViewEngine>
+{
+	public virtual ViewEngineResult FindView(ControllerContext controllerContext, string viewName, string masterName)
+	{
+		// More....
+
+		return Find(e => e.FindView(controllerContext, viewName, masterName, true),
+					e => e.FindView(controllerContext, viewName, masterName, false));
+	}
+}
+```
+
+在这里我们会发现又调用了 `Find` 函数，不过我们其实是不需要研究其内部的实现的，前面说到 `ViewEngineCollection` 在默认情况下有两个元素，分别是 `WebFormViewEngine` 和 `RazorViewEngine`，那么这两个 `e` 我们也可以理解为对应的 `ViewEngine` 的实现，需要注意的是，这里并不是属于对应的 `ViewEngine` 的实现，而是隶属于他们共同的最终父类 `VirtualPathProviderViewEngine` 的实现，只是它们继承了共同的最上级基类，这属于抽象化的一种体现，废话不多说，我们来看下 `VirtualPathProviderViewEngine.FindView` 函数的具体实现
+
+<span id = "标识3"></span>
+
+```csharp
+public abstract class VirtualPathProviderViewEngine : IViewEngine
+{
+	public virtual ViewEngineResult FindView(ControllerContext controllerContext, string viewName, string masterName, bool useCache)
+	{
+		// More....
+
+		string[] viewLocationsSearched;
+		string[] masterLocationsSearched;
+
+		string controllerName = controllerContext.RouteData.GetRequiredString("controller");
+		string viewPath = GetPath(controllerContext, ViewLocationFormats, AreaViewLocationFormats, "ViewLocationFormats", viewName, controllerName, CacheKeyPrefixView, useCache, out viewLocationsSearched);
+		string masterPath = GetPath(controllerContext, MasterLocationFormats, AreaMasterLocationFormats, "MasterLocationFormats", masterName, controllerName, CacheKeyPrefixMaster, useCache, out masterLocationsSearched);
+
+		if (String.IsNullOrEmpty(viewPath) || (String.IsNullOrEmpty(masterPath) && !String.IsNullOrEmpty(masterName)))
+		{
+			return new ViewEngineResult(viewLocationsSearched.Union(masterLocationsSearched));
+		}
+
+		return new ViewEngineResult(CreateView(controllerContext, viewPath, masterPath), this);
+	}
+}
+```
+
+在这里直观上看可以发现通过 `GetPath(ControllerContext controllerContext, string[] locations, string[] areaLocations, string locationsPropertyName, string name, string controllerName, string cacheKeyPrefix, bool useCache, out string[] searchedLocations)` 函数获得了两种不同的路劲，这里我们只需要关注 `viewPath` 的返回结果即可，其次，我们会发现调用这个 `GetPath` 函数的时候会把 [前面说到的]("#标识2") 的所注册的  `Area view location` 和 `Default view loaction` 都传进去了，我们先进入其内部看看具体的实现
+
+```csharp
+public abstract class VirtualPathProviderViewEngine : IViewEngine
+{
+	private string GetPath(ControllerContext controllerContext, string[] locations, string[] areaLocations, string locationsPropertyName, string name, string controllerName, string cacheKeyPrefix, bool useCache, out string[] searchedLocations)
+	{
+		searchedLocations = _emptyLocations;
+
+		// More....
+
+		string areaName = AreaHelpers.GetAreaName(controllerContext.RouteData);
+		bool usingAreas = !String.IsNullOrEmpty(areaName);
+		List<ViewLocation> viewLocations = GetViewLocations(locations, (usingAreas) ? areaLocations : null);
+
+		if (viewLocations.Count == 0)
+		{
+			throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture,
+																MvcResources.Common_PropertyCannotBeNullOrEmpty, locationsPropertyName));
+		}
+
+		bool nameRepresentsPath = IsSpecificPath(name);
+		string cacheKey = CreateCacheKey(cacheKeyPrefix, name, (nameRepresentsPath) ? String.Empty : controllerName, areaName);
+
+		if (useCache)
+		{
+			// More....
+		}
+		else
+		{
+			return nameRepresentsPath
+				? GetPathFromSpecificName(controllerContext, name, cacheKey, ref searchedLocations)
+				: GetPathFromGeneralName(controllerContext, viewLocations, name, controllerName, areaName, cacheKey, ref searchedLocations);
+		}
+	}
+}
+```
+
+在这里其实还运用到了缓存的机制，通过访问缓存来找物理路径，不过这里我们不参与其具体的实现，我们先把关注点先从上面开始
+
+首先是查看当前 `Controller` 是不是在 `Area` 中的，接下来就会获取 `GetViewLocations(string[] viewLocationFormats, string[] areaViewLocationFormats)` 来获取视图具体的位置，我们先看下该函数的实现
+
+```csharp
+public abstract class VirtualPathProviderViewEngine : IViewEngine
+{
+	private static List<ViewLocation> GetViewLocations(string[] viewLocationFormats, string[] areaViewLocationFormats)
+	{
+		List<ViewLocation> allLocations = new List<ViewLocation>();
+
+		if (areaViewLocationFormats != null)
+		{
+			foreach (string areaViewLocationFormat in areaViewLocationFormats)
+			{
+				allLocations.Add(new AreaAwareViewLocation(areaViewLocationFormat));
+			}
+		}
+
+		if (viewLocationFormats != null)
+		{
+			foreach (string viewLocationFormat in viewLocationFormats)
+			{
+				allLocations.Add(new ViewLocation(viewLocationFormat));
+			}
+		}
+
+		return allLocations;
+	}
+}
+```
+
+在该函数中，会把 `Controller` 中所有 `Action` 的路径都会放在一个集合当中，包括 `Area` 的，在这里其实我们也可以发现一些隐藏的比较有意思的事情，比如说我们在 `Area` 的控制器中具体某个 `Action` 的视图并不在 `Area` 对应视图的目录下，但是却在默认的 `Views` 文件夹下，那么也能够正确查找到对应视图名字的视图文件的，因为这里的路径实现实际上包括了 `Area location` 和 `View location`
+
+回到 `VirtualPathProviderViewEngine` 中，在初始化完成物理路径的集合后，会通过 `GetPathFromGeneralName(ControllerContext controllerContext, List<ViewLocation> locations, string name, string controllerName, string areaName, string cacheKey, ref string[] searchedLocations)` 来为路径做一些格式化操作，具体就是把虚拟路径映射为具体的物理路径的操作
+
+至此，我们可以把目光回到 `VirtualPathProviderViewEngine.FindView` 函数身上，具体代码在[这里](#标识3)，在获取完成视图的物理路径后，紧接着会调用 `CreateView(ControllerContext controllerContext, string viewPath, string masterPath)` 去构建一个视图对象，需要注意的是，这个函数也是一个抽象函数，其具体的实现体现在其对应的派生类 `ViewEngine` 当中，我们进入其内部一探究竟
+
+```csharp
+public class RazorViewEngine : BuildManagerViewEngine
+{
+	protected override IView CreateView(ControllerContext controllerContext, string viewPath, string masterPath)
+	{
+		var view = new RazorView(controllerContext, viewPath,
+									layoutPath: masterPath, runViewStartPages: true, viewStartFileExtensions: FileExtensions, viewPageActivator: ViewPageActivator)
+		{
+			DisplayModeProvider = DisplayModeProvider
+		};
+		return view;
+	}
+}
+```
+
+其实意思也很简单，只是根据具体的路径生成了一个实现于 `IView` 接口的具体视图对象罢了，最后又把生成的视图对象再封装至 `ViewEngineResult` 这个类当中，并携带着这个结果逐步退回到 `ViewResultBase.ExecuteResult` 函数身上
 
