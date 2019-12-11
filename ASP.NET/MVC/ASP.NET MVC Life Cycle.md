@@ -1619,5 +1619,7 @@ public class RazorViewEngine : BuildManagerViewEngine
 }
 ```
 
-其实意思也很简单，只是根据具体的路径生成了一个实现于 `IView` 接口的具体视图对象罢了，最后又把生成的视图对象再封装至 `ViewEngineResult` 这个类当中，并携带着这个结果逐步退回到 `ViewResultBase.ExecuteResult` 函数身上
+其实意思也很简单，只是根据具体的路径生成了一个实现于 `IView` 接口的具体视图对象罢了，在这里由于该篇文章是围绕着 `Razor` 所展开，所以这里是 `RazorView` 对象
+
+最后又把生成的视图对象再封装至 `ViewEngineResult` 这个类当中，并携带着这个结果逐步退回到 `ViewResultBase.ExecuteResult` 函数身上，开始利用所生成的视图对象 `RazorView` 去完成一些 `HTML` 的渲染工作 
 
