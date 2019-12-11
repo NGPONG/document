@@ -1008,3 +1008,303 @@ public class ReflectedControllerDescriptor : ControllerDescriptor
 当获取完成 `MethodInfo` 后，将其封装至 `ReflectedActionDescriptor` 类中，那我们也能够了解到，`ActionDescriptor` 的具体实现则为 `ReflectedActionDescriptor` 并且其内部封装了具体 `Action` 的 `Reflected` 
 
 致此，我们可以把思绪转回到 `InvokeAction` 这个函数身上，看看下一步具体还做什么
+
+紧接着下一步，调用了 `GetFilters(ControllerContext controllerContext, ActionDescriptor actionDescriptor)` 函数去获取 `Filters`，关于该函数内部的具体调用落定在 `FilterProviders.Providers.GetFilters` 身上，在这里先说两句题外话，我们都知道 `ASP.NET MVC` 为我们提供了三种去注册过滤器的方式，分别是
+- 通过 `Application_Start` 中注册一个全局 `Filter`
+- 自己实现 `ASP.NET MVC` 所提供的4种不同功能的过滤器的接口，并在具体的 `Action` 或 `Controller` 中使用该特性
+- `Controller` 的基类 `Controller` 本身也有几个抽象方法提供了过滤器的功能，通过重写它们以实现这一目标
+
+回过头来，这三种方式其实就是对应着三种 `FilterProvider` 其具体的表现可以从 `FilterProviders` 这个类的静态构造函数中看得出来，以下是它的代码
+
+```csharp
+public static class FilterProviders
+{
+	static FilterProviders()
+	{
+		Providers = new FilterProviderCollection();
+
+		// Global
+		Providers.Add(GlobalFilters.Filters); 
+
+		// Attribute
+		Providers.Add(new FilterAttributeFilterProvider()); 
+
+		// Override abstract method
+		Providers.Add(new ControllerInstanceFilterProvider()); 
+	}
+}
+```
+
+当获取到当前 `AppDomain` 中所注册的 `Filter` 后，就开始正式进入 `Action` 和 `Filter` 的执行关键步骤了，以下再贴一次 `InvokeAction(ControllerContext controllerContext, string actionName)` 这个函数的代码，以方便观看 
+
+```csharp
+public class ControllerActionInvoker : IActionInvoker
+{
+	public virtual bool InvokeAction(ControllerContext controllerContext, string actionName)
+	{
+		// More...
+
+		ControllerDescriptor controllerDescriptor = GetControllerDescriptor(controllerContext);
+		ActionDescriptor actionDescriptor = FindAction(controllerContext, controllerDescriptor, actionName);
+
+		if (actionDescriptor != null)
+		{
+			FilterInfo filterInfo = GetFilters(controllerContext, actionDescriptor);
+
+			try
+			{
+				// More...
+
+				AuthorizationContext authorizationContext = InvokeAuthorizationFilters(controllerContext, filterInfo.AuthorizationFilters, actionDescriptor);
+				if (authorizationContext.Result != null)
+				{
+					// An authorization filter signaled that we should short-circuit the request. Let all
+					// authentication filters contribute to an action result (to combine authentication
+					// challenges). Then, run this action result.
+					AuthenticationChallengeContext challengeContext = InvokeAuthenticationFiltersChallenge(
+						controllerContext, filterInfo.AuthenticationFilters, actionDescriptor,
+						authorizationContext.Result);
+					InvokeActionResult(controllerContext, challengeContext.Result ?? authorizationContext.Result);
+				}
+				else
+				{
+					if (controllerContext.Controller.ValidateRequest)
+					{
+						ValidateRequest(controllerContext);
+					}
+
+					IDictionary<string, object> parameters = GetParameterValues(controllerContext, actionDescriptor);
+					ActionExecutedContext postActionContext = InvokeActionMethodWithFilters(controllerContext, filterInfo.ActionFilters, actionDescriptor, parameters);
+
+					// The action succeeded. Let all authentication filters contribute to an action result (to
+					// combine authentication challenges; some authentication filters need to do negotiation
+					// even on a successful result). Then, run this action result.
+					AuthenticationChallengeContext challengeContext = InvokeAuthenticationFiltersChallenge(
+						controllerContext, filterInfo.AuthenticationFilters, actionDescriptor,
+						postActionContext.Result);
+					InvokeActionResultWithFilters(controllerContext, filterInfo.ResultFilters,
+						challengeContext.Result ?? postActionContext.Result);
+				}
+			}
+			// More ...
+			catch (Exception ex)
+			{
+				// something blew up, so execute the exception filters
+				ExceptionContext exceptionContext = InvokeExceptionFilters(controllerContext, filterInfo.ExceptionFilters, ex);
+				if (!exceptionContext.ExceptionHandled)
+				{
+					throw;
+				}
+				InvokeActionResult(controllerContext, exceptionContext.Result);
+			}
+
+			return true;
+		}
+
+		// notify controller that no method matched
+		return false;
+	}
+}
+```
+
+还忘了一件事，在继续下一步了解之前，先来回顾下 `ASP.NET MVC` 所提供的 4 种 `Filter` 的类型
+
+Filter Type | Interface | Description 
+ - | - | - | - | -
+ Authorization | IAuthorizationFilter | Runs first
+ Action | IActionFilter | Runs before and after the action method 
+ Result | IResultFilter | Runs before and after the result is executed
+ Exception | IExceptionFilter | Runs if another filter or action method throws an exception
+
+首先进入的是 `InvokeAuthorizationFilters(ControllerContext controllerContext,IList<IAuthorizationFilter> filters, ActionDescriptor actionDescriptor)` 函数，该函数的实现为 `Filter` 的第一次过滤，也就是身份验证，先看一下他的源码
+
+```csharp
+public class ControllerActionInvoker : IActionInvoker
+{
+	protected virtual AuthorizationContext InvokeAuthorizationFilters(ControllerContext controllerContext, IList<IAuthorizationFilter> filters, ActionDescriptor actionDescriptor)
+	{
+		AuthorizationContext context = new AuthorizationContext(controllerContext, actionDescriptor);
+		foreach (IAuthorizationFilter filter in filters)
+		{
+			filter.OnAuthorization(context);
+			// short-circuit evaluation when an error occurs
+			if (context.Result != null)
+			{
+				break;
+			}
+		}
+
+		return context;
+	}
+}
+```
+
+在 `Authorization Filter` 内部，我们可以看到一个熟悉的类型 `AuthorizationContext` ，我们知道，如果想要在所实现的 `IAuthorizationFilter` 的 `OnAuthorization(AuthorizationContext context)` 跳转到其他网页的时候，需要指定 `context.Result` 为具体的 `IActionResult` 才能达到跳转的目的，我们先离开这个函数返回 `InvokeAction` 再看看，可以看到调用了 `InvokeAuthorizationFilters` 函数后紧接着返回的就是 `AuthorizationContext`，并且在下一步会判断 `AuthorizationContext` 实例的 `Result` 属性是否为 `NULL`，如果不是的话则会执行 `Result` 所指定的 `IActionResult`，否则的话会继续下一步的执行
+
+紧接着，会调用 `GetParameterValues(ControllerContext controllerContext, ActionDescriptor actionDescriptor)` 获取 `Action` 种具体的参数 `Signature`，在该函数内部还进行了 `Model Binding` 的操作，这也是 `ASP.NET MVC` 的另一个特性之一，我会放在下一个节点说
+
+接下来的调用落定在 `InvokeActionMethodWithFilters(ControllerContext controllerContext, IList<IActionFilter> filters, ActionDescriptor actionDescriptor, IDictionary<string, object> parameters)` 函数身上，在该函数中主要是干了两件事，执行在封装在 `ReflectedActionDescriptor` 中具体 `Action` 的 `MethodInfo`，其次，会根据执行的顺序分辨执行 `IActionFilter` 所实现的具体函数，我们先来看下源代码
+
+```csharp
+public class ControllerActionInvoker : IActionInvoker
+{
+	protected virtual ActionExecutedContext InvokeActionMethodWithFilters(ControllerContext controllerContext, IList<IActionFilter> filters, ActionDescriptor actionDescriptor, IDictionary<string, object> parameters)
+	{
+		ActionExecutingContext preContext = new ActionExecutingContext(controllerContext, actionDescriptor, parameters);
+		Func<ActionExecutedContext> continuation = () =>
+													new ActionExecutedContext(controllerContext, actionDescriptor, false /* canceled */, null /* exception */)
+													{
+														Result = InvokeActionMethod(controllerContext, actionDescriptor, parameters)
+													};
+
+		// need to reverse the filter list because the continuations are built up backward
+		Func<ActionExecutedContext> thunk = filters.Reverse().Aggregate(continuation,
+																		(next, filter) => () => InvokeActionMethodFilter(filter, preContext, next));
+		return thunk();
+	}
+}
+```
+
+关于这个函数大量用到了匿名函数和委托，读起来还是稍微有点难度的，但是我们来拆开里具体看看，首先从 `Func<ActionExecutedContext> continuation` 这个变量看是，可以看到其具体的是又封装了一个 `ActionExecutedContext` 类型，并且我们可以看到该类型中的 `Result` 的属性为 `InvokeActionMethod(controllerContext, actionDescriptor, parameters)` 所调用的结果，那么我们就进入该函数内部具体看看发生了什么
+
+```csharp
+public class ControllerActionInvoker : IActionInvoker
+{
+	protected virtual ActionResult InvokeActionMethod(ControllerContext controllerContext, ActionDescriptor actionDescriptor, IDictionary<string, object> parameters)
+	{
+		object returnValue = actionDescriptor.Execute(controllerContext, parameters);
+		ActionResult result = CreateActionResult(controllerContext, actionDescriptor, returnValue);
+		return result;
+	}
+}
+```
+
+在这里可以看到调用了 `ActionDescriptor` 的抽象函数 `Execute`，在前面说到，`ActionDescriptor` 的具体实现则为 `ReflectedActionDescriptor` 并且其内部封装了具体 `Action` 的 `Reflected`，那么我们进入其内部看看调用情况
+
+```csharp
+
+public override object Execute(ControllerContext controllerContext, IDictionary<string, object> parameters)
+{
+	// More....
+
+	// Performance sensitive so avoid Linq or delegates.
+	ParameterInfo[] parameterInfos = MethodInfo.GetParameters();
+	object[] parametersArray = new object[parameterInfos.Length];
+	for (int i = 0; i < parameterInfos.Length; i++)
+	{
+		ParameterInfo parameterInfo = parameterInfos[i];
+		object parameter = ExtractParameterFromDictionary(parameterInfo, parameters, MethodInfo);
+		parametersArray[i] = parameter;
+	}
+
+	ActionMethodDispatcher dispatcher = DispatcherCache.GetDispatcher(MethodInfo);
+	object actionReturnValue = dispatcher.Execute(controllerContext.Controller, parametersArray);
+	return actionReturnValue;
+}
+```
+
+具体 `Action` 调用的地方体现在 `object actionReturnValue = dispatcher.Execute(controllerContext.Controller, parametersArray);` 这一句话，不过其实我们也没有继续深究的必要了，让我们返回到 `InvokeActionMethodWithFilters` 这个函数的身上来
+
+在封装好调用 `Action` 的委托 `continuation` 后，紧接着调用了 `InvokeActionMethodFilter(IActionFilter filter, ActionExecutingContext preContext, Func<ActionExecutedContext> continuation)` 函数，在该函数中，`Action` 和 `Filter` 才真正被执行，我们看下其具体的实现
+
+```csharp
+public class ControllerActionInvoker : IActionInvoker
+{
+	internal static ActionExecutedContext InvokeActionMethodFilter(IActionFilter filter, ActionExecutingContext preContext, Func<ActionExecutedContext> continuation)
+	{
+		filter.OnActionExecuting(preContext);
+		
+		// More....
+		
+		try
+		{
+			postContext = continuation();
+		}
+		catch (ThreadAbortException)
+		{
+			// More....
+
+			filter.OnActionExecuted(postContext);
+			throw;
+		}
+		catch (Exception ex)
+		{
+			// More....
+
+			filter.OnActionExecuted(postContext);
+			
+			// More....
+		}
+		if (!wasError)
+		{
+			filter.OnActionExecuted(postContext);
+		}
+		return postContext;
+	}
+}
+```
+
+在这里其实省略的很多不必要的代码，但是我们可以看到，`continuation` 这个参数的 Signature 的类型则为我们在上面所说的封装好调用 `Action` 的委托，并且也可以清楚的看到 `IActionFilter` 的具体执行顺序，在这里需要注意的是最后返回的是 `ActionExecutedContext` 类型的 `postContext`，其对应着 `InvokeAction(ControllerContext controllerContext, string actionName)` 函数对应调用 `InvokeActionMethodWithFilters(controllerContext, filterInfo.ActionFilters, actionDescriptor, parameters)` 的返回值 `postActionContext`，这个返回值其实就是 `ActionResult`，会在后面关于到 `IResultFilter` 的执行
+
+紧接着 `InvokeAction` 的执行，调用落定在了 `InvokeActionResultWithFilters(ControllerContext controllerContext, IList<IResultFilter> filters, ActionResult actionResult)` 这个函数身上，其实这个函数的实现和刚刚所说的 `InvokeActionMethodWithFilters(ControllerContext controllerContext, IList<IActionFilter> filters, ActionDescriptor actionDescriptor, IDictionary<string, object> parameters)` 的实现是非常类似的，也是做了两件事情，第一件事就是处理在 `InvokeActionMethodWithFilters` 所返回的 `ActionResult`，其实就是调用相应 `Filter` 的具体步骤，我们先来看下其具体的实现
+
+```csharp
+public class ControllerActionInvoker : IActionInvoker
+{
+	protected virtual ResultExecutedContext InvokeActionResultWithFilters(ControllerContext controllerContext, IList<IResultFilter> filters, ActionResult actionResult)
+	{
+		ResultExecutingContext preContext = new ResultExecutingContext(controllerContext, actionResult);
+
+		int startingFilterIndex = 0;
+		return InvokeActionResultFilterRecursive(filters, startingFilterIndex, preContext, controllerContext, actionResult);
+	}
+}
+```
+
+在这里紧接着又调用了 `InvokeActionResultFilterRecursive(IList<IResultFilter> filters, int filterIndex, ResultExecutingContext preContext, ControllerContext controllerContext, ActionResult actionResult)`
+
+```csharp
+private ResultExecutedContext InvokeActionResultFilterRecursive(IList<IResultFilter> filters, int filterIndex, ResultExecutingContext preContext, ControllerContext controllerContext, ActionResult actionResult)
+{
+	// More....
+
+	filter.OnResultExecuting(preContext);
+
+	// More....
+
+	try
+	{
+		// More....
+
+		postContext = InvokeActionResultFilterRecursive(filters, nextFilterIndex, preContext, controllerContext, actionResult);
+	}
+	catch (ThreadAbortException)
+	{
+		// More....
+
+		filter.OnResultExecuted(postContext);
+		throw;
+	}
+	catch (Exception ex)
+	{
+		// More....
+
+		filter.OnResultExecuted(postContext);
+		throw;
+		// More....
+	}
+
+	filter.OnResultExecuted(postContext);
+	
+	// More....
+}
+```
+
+在这里同样是省略了很多不必要的代码，但是其思想和 `InvokeActionMethodFilter` 函数是类似的，可以清楚的看到 `IResultFilter` 的执行顺序和处理 `ActionResult` 的步骤 (`InvokeActionResultFilterRecursive`)
+
+还剩下一个 `IExceptionFilter` 未提起，其实他也就是在 `InvokeAction` 发生异常的时候就会调用该 `Filter` 的一些逻辑，这里就跳过不研究它了
+
+关于 `Action 和 Filter` 执行步骤最后再说一下，关于这部分的调用其实较为复杂，看到一个博客园的博友总结了一张关于调用顺序的图，这里也稍微引用以下
+
+![201211100745323404.png](https://i.loli.net/2019/12/11/UftGaqjlmiBr7XD.gif)
+
