@@ -1331,6 +1331,8 @@ public class ControllerActionInvoker : IActionInvoker
 
 <br/>
 
+<span id = "标识4"></span>
+
 ### ActionResult 的执行
 
 ---
@@ -1347,7 +1349,7 @@ public class ControllerActionInvoker : IActionInvoker
 - System.Web.Mvc.RedirectToRouteResult
 - System.Web.Mvc.ViewResultBase
 
-在本节中，仅针对 `System.Web.Mvc.ViewResultBase` 进行分析，简而言之就是分析视图的加载和渲染的处理流程
+在本节中，仅针对 `System.Web.Mvc.ViewResultBase` 进行分析
 
 回到正题，接 [上一节](#标识1) 的内容，我们知道 `ActionResult` 的真正执行是在 `InvokeActionResultFilterRecursive` 函数里头执行的，具体体现在 `InvokeActionResult(ControllerContext controllerContext, ActionResult actionResult)` 我们先看下其内部构造
 
@@ -1622,4 +1624,118 @@ public class RazorViewEngine : BuildManagerViewEngine
 其实意思也很简单，只是根据具体的路径生成了一个实现于 `IView` 接口的具体视图对象罢了，在这里由于该篇文章是围绕着 `Razor` 所展开，所以这里是 `RazorView` 对象
 
 最后又把生成的视图对象再封装至 `ViewEngineResult` 这个类当中，并携带着这个结果逐步退回到 `ViewResultBase.ExecuteResult` 函数身上，开始利用所生成的视图对象 `RazorView` 去完成一些 `HTML` 的渲染工作 
+
+
+<br/>
+
+### View 的渲染
+
+---
+
+为什么要把视图的渲染这一模块的的内容要和上一节的 [ActionResult 的执行](#标识4) 的内容要分开来呢？ 其实本身视图的渲染工作适合 `ActionResult` 的执行是密不可分的，要具体来讲他们的步骤的话则是 `ActionResult` 的执行才带来了视图的渲染工作，但是关于视图渲染部分的内容在源码中所带给我们的体现是挺抽象的，并且竟然他作为 `ASP.NET MVC Life Cycle` 这篇文章的末尾，那我需要好好的对它进行分析一番，废话不多说，咱们进入正题
+
+承接上文，上面说到在成功获取到一个 `RazorView` 后就开始利用它去完成 `HTML` 的渲染工作，为了上下文的承接性，我再上一次该函数的代码
+
+```csharp
+public abstract class ViewResultBase : ActionResult
+{
+	public override void ExecuteResult(ControllerContext context)
+	{
+		if (context == null)
+		{
+			throw new ArgumentNullException("context");
+		}
+		if (String.IsNullOrEmpty(ViewName))
+		{
+			ViewName = context.RouteData.GetRequiredString("action");
+		}
+
+		ViewEngineResult result = null;
+
+		if (View == null)
+		{
+			result = FindView(context);
+			View = result.View;
+		}
+
+		TextWriter writer = context.HttpContext.Response.Output;
+		ViewContext viewContext = new ViewContext(context, View, ViewData, TempData, writer);
+		View.Render(viewContext, writer);
+
+		if (result != null)
+		{
+			result.ViewEngine.ReleaseView(context, View);
+		}
+	}
+}
+```
+
+在获取完成一个 `View` ( `RazorView` ) 后，紧接着创建了一个 `TextWriter` 和 `ViewContext`，关于 `TextWriter` 没什么可说，就是一个字符串输出器，而 `ViewContext` 我们可以把它理解成做一些初始化的信息，并把一些初始化信息 (`HttpContext`, `IView`, ……) 都封装在一起，接下来就开始调用 `RazorView` 的 `Render(ViewContext viewContext, TextWriter writer)` 具体来讲的话，该函数应该是属于 `RazorView` 的基类 `BuildManagerCompiledView` 中的函数才对，我们先看下其实现
+
+```csharp
+public abstract class BuildManagerCompiledView : IView
+{
+	public virtual void Render(ViewContext viewContext, TextWriter writer)
+	{
+		// More....
+
+		object instance = null;
+
+		Type type = BuildManager.GetCompiledType(ViewPath);
+		if (type != null)
+		{
+			instance = ViewPageActivator.Create(_controllerContext, type);
+		}
+
+		if (instance == null)
+		{
+			throw new InvalidOperationException(
+				String.Format(
+					CultureInfo.CurrentCulture,
+					MvcResources.CshtmlView_ViewCouldNotBeCreated,
+					ViewPath));
+		}
+
+		RenderView(viewContext, writer, instance);
+	}
+}
+```
+
+在这里其实我们需要了解另一个信息，`ASP.NET MVC` 和 `WebForm` 一样，我们所写入的视图文件其实都是属于一个具体的类型，当我们第一次请求一个视图页的时候，`.NET Runtime` 就会统一编译一次当前项目下的所有视图文件，并把它们打包至一个命名空间内，所编译后生成的 `dll` 会放在 `ASP.NET` 的临时目录下，关于该临时目录如何查找这里不做阐述，在这个命名空间类下所包含的不同的类对应着我们不同的视图页面，需要注意的是，这些类都是继承于 `WebViewPage<T>` 的，暂且记住这个类型，在后面起到非常关键的作用
+
+我们先来看一下该 `dll` 在反编译后的具体结构
+
+![微信截图_20191212171523.png](https://i.loli.net/2019/12/12/AYDIH4zKsN1wgRm.png)
+
+竟然知道视图文件都会统一编译成一个 `dll` 并且都对应着相应的类型这个信息后，我们再来看一下 `Render` 函数中的这一句 `Type type = BuildManager.GetCompiledType(ViewPath)` 这一句也同样是印证了刚刚的说法，没错，这里就是在系统中找到对应的临时dll的路径，将他反射出来并拿到相应的 `Type`，当然这里的 `Type` 仅仅是当前请求 URL 中 `Action` 所对应的视图文件的某个类而已，在拿到具体某个类的 `Type` 后，会调用一个 `IViewPageActivator` 的 `Create` 方法来创建实例，这里采用了依赖注入的手法，但是在默认情况下，也只是调用反射来创建一个实例而已，在 `ASP.NET MVC` 框架中，这种地方已经出现多次了
+
+当视图文件所对应的 `Type` 的实例创建成功后，紧接着又调用了 `RenderView(ViewContext viewContext, TextWriter writer, object instance)` 函数，但是这个函数在 `BuildManagerCompiledView` 中是一个抽象体现，其具体的实现在 `BuildManagerCompiledView` 的派生类 `RazorView` 身上，我们先看下其具体的实现
+
+```csharp
+public class RazorView : BuildManagerCompiledView
+{
+	protected override void RenderView(ViewContext viewContext, TextWriter writer, object instance)
+	{
+		// More....
+
+		// An overriden master layout might have been specified when the ViewActionResult got returned.
+		// We need to hold on to it so that we can set it on the inner page once it has executed.
+		webViewPage.OverridenLayoutPath = LayoutPath;
+		webViewPage.VirtualPath = ViewPath;
+		webViewPage.ViewContext = viewContext;
+		webViewPage.ViewData = viewContext.ViewData;
+
+		webViewPage.InitHelpers();
+
+		// More....
+
+		WebPageRenderingBase startPage = null;
+		if (RunViewStartPages)
+		{
+			startPage = StartPageLookup(webViewPage, RazorViewEngine.ViewStartFileName, ViewStartFileExtensions);
+		}
+		webViewPage.ExecutePageHierarchy(new WebPageContext(context: viewContext.HttpContext, page: null, model: null), writer, startPage);
+	}
+}
+```
 
