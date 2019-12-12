@@ -1701,11 +1701,19 @@ public abstract class BuildManagerCompiledView : IView
 }
 ```
 
-在这里其实我们需要了解另一个信息，`ASP.NET MVC` 和 `WebForm` 一样，我们所写入的视图文件其实都是属于一个具体的类型，当我们第一次请求一个视图页的时候，`.NET Runtime` 就会统一编译一次当前项目下的所有视图文件，并把它们打包至一个命名空间内，所编译后生成的 `dll` 会放在 `ASP.NET` 的临时目录下，关于该临时目录如何查找这里不做阐述，在这个命名空间类下所包含的不同的类对应着我们不同的视图页面，需要注意的是，这些类都是继承于 `WebViewPage<T>` 的，暂且记住这个类型，在后面起到非常关键的作用
+在这里其实我们需要了解另一个信息，`ASP.NET MVC` 和 `WebForm` 一样，我们所写入的视图文件其实都是属于一个具体的类型，当我们第一次请求一个视图页的时候，`.NET Runtime` 就会统一编译一次当前项目下的所有视图文件，并把它们打包至一个命名空间内，所编译后生成的 `dll` 会放在 `ASP.NET` 的临时目录下，关于该临时目录如何查找这里不做阐述，在这个命名空间类下所包含的不同的类对应着我们不同的视图页面，需要注意的是，`View` `StartPage` `LayoutPage` 都会生成不同的 `dll` ，并且其所继承的基类也是不同，关于 `View` 和 `LayoutPage` 所生成的类 都是继承于 `WebViewPage<T>` 的，而 `WebViewPage<T>` 又派生自 `WebViewPage`，暂且记住这个类型，在后面起到非常关键的作用，而 `StartPage` 所生成的类则是继承于 `ViewStartPage`，暂且也要记住这个类，后面关于 `StartPage` 的生成也有关键作用
 
-我们先来看一下该 `dll` 在反编译后的具体结构
+我们先来看一下这些 `dll` 在反编译后的具体结构
 
+- View <span id="ViewPic"></span>
 ![微信截图_20191212171523.png](https://i.loli.net/2019/12/12/AYDIH4zKsN1wgRm.png)
+
+- StartPage <span id="startPagePic"></span>
+![微信截图_20191212232735.png](https://i.loli.net/2019/12/12/RxPWKhb6FG2HufY.png)
+
+- LayoutPage
+![微信截图_20191212232813.png](https://i.loli.net/2019/12/12/AZUwOXdzt7lIGLJ.png)
+
 
 竟然知道视图文件都会统一编译成一个 `dll` 并且都对应着相应的类型这个信息后，我们再来看一下 `Render` 函数中的这一句 `Type type = BuildManager.GetCompiledType(ViewPath)` 这一句也同样是印证了刚刚的说法，没错，这里就是在系统中找到对应的临时dll的路径，将他反射出来并拿到相应的 `Type`，当然这里的 `Type` 仅仅是当前请求 URL 中 `Action` 所对应的视图文件的某个类而已，在拿到具体某个类的 `Type` 后，会调用一个 `IViewPageActivator` 的 `Create` 方法来创建实例，这里采用了依赖注入的手法，但是在默认情况下，也只是调用反射来创建一个实例而已，在 `ASP.NET MVC` 框架中，这种地方已经出现多次了
 
@@ -1717,6 +1725,16 @@ public class RazorView : BuildManagerCompiledView
 	protected override void RenderView(ViewContext viewContext, TextWriter writer, object instance)
 	{
 		// More....
+
+		WebViewPage webViewPage = instance as WebViewPage;
+		if (webViewPage == null)
+		{
+			throw new InvalidOperationException(
+				String.Format(
+					CultureInfo.CurrentCulture,
+					MvcResources.CshtmlView_WrongViewBase,
+					ViewPath));
+		}
 
 		// An overriden master layout might have been specified when the ViewActionResult got returned.
 		// We need to hold on to it so that we can set it on the inner page once it has executed.
@@ -1739,3 +1757,364 @@ public class RazorView : BuildManagerCompiledView
 }
 ```
 
+首先，我们可以发现把当视图文件所对应的 `Type` 的实例转换成了其基类 `WebViewPage` 类型，然后我们把关注点放在 `StartPageLookup` 这个函数身上，我们先看下其 `RazorViewEngine.ViewStartFileName` 这个参数的值是什么
+
+```csharp
+public class RazorViewEngine : BuildManagerViewEngine
+{
+	internal static readonly string ViewStartFileName = "_ViewStart";
+}
+```
+
+通过这点我们也可以大胆的去猜测，该函数其具体作用就是寻找我们的 `_ViewStart.cshtml` 所生成的临时类加载并渲染其逻辑，我们进去其内部看下它的具体实现
+
+```csharp
+public abstract class StartPage : WebPageRenderingBase
+{
+	internal static WebPageRenderingBase GetStartPage(WebPageRenderingBase page, IVirtualPathFactory virtualPathFactory, string appDomainAppVirtualPath,
+															string fileName, IEnumerable<string> supportedExtensions)
+	{
+		// Build up a list of pages to execute, such as one of the following:
+		// ~/somepage.cshtml
+		// ~/_pageStart.cshtml --> ~/somepage.cshtml
+		// ~/_pageStart.cshtml --> ~/sub/_pageStart.cshtml --> ~/sub/somepage.cshtml
+		WebPageRenderingBase currentPage = page;
+		var pageDirectory = VirtualPathUtility.GetDirectory(page.VirtualPath);
+
+		// Start with the requested page's directory, find the init page,
+		// and then traverse up the hierarchy to find init pages all the
+		// way up to the root of the app.
+		while (!String.IsNullOrEmpty(pageDirectory) && pageDirectory != "/" && PathUtil.IsWithinAppRoot(appDomainAppVirtualPath, pageDirectory))
+		{
+			// Go through the list of supported extensions
+			foreach (var extension in supportedExtensions)
+			{
+				var virtualPath = VirtualPathUtility.Combine(pageDirectory, fileName + "." + extension);
+
+				// Can we build a file from the current path?
+				if (virtualPathFactory.Exists(virtualPath))
+				{
+					var parentStartPage = virtualPathFactory.CreateInstance<StartPage>(virtualPath);
+					parentStartPage.VirtualPath = virtualPath;
+					parentStartPage.ChildPage = currentPage;
+					parentStartPage.VirtualPathFactory = virtualPathFactory;
+					currentPage = parentStartPage;
+
+					break;
+				}
+			}
+
+			pageDirectory = currentPage.GetDirectory(pageDirectory);
+		}
+
+		// At this point 'currentPage' is the root-most StartPage (if there were
+		// any StartPages at all) or it is the requested page itself.
+		return currentPage;
+	}
+}
+```
+
+<span id="标注6"></span>
+结合代码和注释，我们可以总结出 `ASP.NET MVC` 关于 `_ViewStart.cshtml` 这个文件的查找规则，首先从当前请求 `URL` 指向的 `Action` 所对应的视图文件的目录开始查找，以此向上层开始遍历，如果找到了的话就创建这个 `_ViewStart.cshtml` 的实例 `StartPage`，并且把当前请求 `URL` 指向的 `Action` 所对应的 `WebViewPage` 封装至 `StartPage` 的 `ChildPage` 属性中，需要关注的地方就这两点，需要特别留意的还是那个 `ChildPage` 属性，这里，我们先暂时返回到 `RenderView(ViewContext viewContext, TextWriter writer, object instance)` 函数中，在获取完成 `StartPage` 后，紧接着调用来到了 `ExecutePageHierarchy(WebPageContext pageContext, TextWriter writer, WebPageRenderingBase startPage)` 函数的调用
+
+在开始进入这个函数之前，我们先说两句题外话，我们先理解下这个函数的意思 `ExecutePageHierarchy` 页面层次执行，那么在 `ASP.NET MVC` 中，什么又是页面的层级关系呢？我先来举个例子，假设目前我们有三个 `cshtml` 文件，它们分别是
+
+- View
+
+```c#
+@{
+    ViewBag.Title = "Code in View";
+}
+```
+
+- _ViewStart.cshtml
+
+```csharp
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+```
+
+- _Layout.cshtml
+
+```csharp
+@{ 
+    ViewBag.ToView = "Data from Layout";
+}
+<div>
+    Data In View: @ViewBag.Title
+</div>
+<div>
+    @RenderBody();    
+</div>
+```
+
+<span id = "标注9"></span>
+在这样子的方式下，我们会发现 `_Layout.cshtml` 中的 `Data In View` 是能够正确打印出来的，这点无可厚非，那么如果我们换一个角度，要在 `View` 界面上输出 `ViewBag.ToView` 呢？答案是什么都没有，从这点其实我们也可以看出其加载顺序是从 `StartPage` -> `Page` -> `LayoutPage`，在这里我们就可以认为是一种层次的关系
+
+好了解释完成层次关系后，我们正式进入到 `ExecutePageHierarchy(WebPageContext pageContext, TextWriter writer, WebPageRenderingBase startPage)` 函数的内部实现中去，在这里也稍微扩充一下，虽然该函数是通过 `WebViewPage` 对象所调用，但是其具体的实现还是在它的基类 `WebPageBase` 身上
+```csharp
+public abstract class WebPageBase : WebPageRenderingBase
+{
+	public void ExecutePageHierarchy(WebPageContext pageContext, TextWriter writer, WebPageRenderingBase startPage)
+	{
+		PushContext(pageContext, writer);
+
+		if (startPage != null)
+		{
+			if (startPage != this)
+			{
+				var startPageContext = WebPageContext.CreateNestedPageContext<object>(parentContext: pageContext, pageData: null, model: null, isLayoutPage: false);
+				startPageContext.Page = startPage;
+				startPage.PageContext = startPageContext;
+			}
+			startPage.ExecutePageHierarchy();
+		}
+		else
+		{
+			ExecutePageHierarchy();
+		}
+		PopContext();
+	}
+}
+```
+
+在这里我们可以看到几个熟悉的字样 `Push` 和 `Pop`，那么我们可以理解为使用了 栈 的技术，前面说到层级关系的具体含义，微软为了解决这一问题也是使用了 栈 的技术，在这里其实可以总结为一共使用了两种 栈 ，分别是 `OutputStack`，它的职责主要是 <span style="color:red">压入渲染HTML的TextWriter</span>，其次这只是一个页面的处理过程，一个页面之中还会有 `Partial View` 和  `Action` 等，这些的处理方式都是一样的，因此还需要一个栈来记录处理到了哪个（子）页面，因此还有一个栈，称之为 `TemplateStack`，<span style="color:red">里面压入的是PageContext，PageContext维护了view的必要信息，比如Model之类的，当然也包括上面提到的OutputStack</span>
+
+在这里我们可以先看一下其入栈 `PushContext(WebPageContext pageContext, TextWriter writer)` 的实现
+
+```csharp
+public abstract class WebPageBase : WebPageRenderingBase
+{
+	public void PushContext(WebPageContext pageContext, TextWriter writer)
+	{
+		_currentWriter = writer;
+		PageContext = pageContext;
+		pageContext.Page = this;
+
+		InitializePage();
+
+		// Create a temporary writer
+		_tempWriter = new StringWriter(CultureInfo.InvariantCulture);
+
+		// Render the page into it
+		OutputStack.Push(_tempWriter);
+		SectionWritersStack.Push(new Dictionary<string, SectionWriter>(StringComparer.OrdinalIgnoreCase));
+
+		// If the body is defined in the ViewData, remove it and store it on the instance
+		// so that it won't affect rendering of partial pages when they call VerifyRenderedBodyOrSections
+		if (PageContext.BodyAction != null)
+		{
+			_body = PageContext.BodyAction;
+			PageContext.BodyAction = null;
+		}
+	}
+}
+```
+
+入栈成功后，紧接着我们回到 `WebPageBase.ExecutePageHierarchy` 函数身上，下面有判断了一次是否由 [上面](#标注6) 所说的生成的 `StartPage`，如果存在，则调用其所实现的 `ExecutePageHierarchy` 函数了，需要注意的是，这个 `StartPage` 这个类和上面所说的 `WebPageBase` 其实都继承了相同的基类 `WebPageRenderingBase` (在这个基类的基础上又继承了 `WebPageExecutingBase`) ，而 `ExecutePageHierarchy` 是隶属于 `WebPageRenderingBase` 的一个抽象函数，在这里 `StartPage` 实现了这个抽象函数，需要搞清楚的是 `WebPageBase` 虽然也有一个 `ExecutePageHierarchy` 函数，但是其实现并不是实现于其父类中的抽象函数 `WebPageRenderingBase`，而是属于 `WebPageBase` 自己的函数成员，而关于 `WebPageBase` 在哪里实现了其基类的 `WebPageRenderingBase` 的抽象函数的问题，答案就在 `WebPageBase` 的派生类 `WebViewPage` 身上，说了这么多，我们还是先看下 `StartPage.ExecutePageHierarchy` 函数的具体实现 
+
+```csharp
+public abstract class StartPage : WebPageRenderingBase
+{
+	public override void ExecutePageHierarchy()
+	{
+		// Push the current pagestart on the stack. 
+		TemplateStack.Push(Context, this);
+		try
+		{
+			// Execute the developer-written code of the InitPage
+			Execute();
+
+			// If the child page wasn't explicitly run by the developer of the InitPage, then run it now.
+			// The child page is either the next InitPage, or the final WebPage.
+			if (!RunPageCalled)
+			{
+				RunPage();
+			}
+		}
+		finally
+		{
+			TemplateStack.Pop(Context);
+		}
+	}
+}
+```
+
+在这里我们又看到了刚刚提到的 `TemplateStack` 栈，并且调用了 `StartPage` 所 [临时生成的类](#startPagePic) 的 `Execute()` 函数以完成里面逻辑的加载，当加载完成后又调用了 `RunPage()` 函数，我们看下其内部的实现
+
+```csharp
+public abstract class StartPage : WebPageRenderingBase
+{
+	public void RunPage()
+	{
+		RunPageCalled = true;
+		ChildPage.ExecutePageHierarchy();
+	}
+}
+```
+
+在这里，似乎又看到了一个在 [前面]("#标注6") 说到的熟悉的成员 `ChildPage`，我们知道 `ChildPage` 其实就是当前所请求 URL 指向的 `Action` 所对应视图的 `WebViePage`，并且也说过 `WebViewPage` 的 `ExecutePageHierarchy` 函数其实是实现于 `WebPageRenderingBase` 的抽象函数 `ExecutePageHierarchy`，那么我们进入其 `ExecutePageHierarchy` 看看发生了什么
+
+```csharp
+public abstract class WebViewPage : WebPageBase, IViewDataContainer, IViewStartPageChild
+{
+	public override void ExecutePageHierarchy()
+	{
+		// Change the Writer so that things like Html.BeginForm work correctly
+		TextWriter oldWriter = ViewContext.Writer;
+		ViewContext.Writer = Output;
+
+		base.ExecutePageHierarchy();
+
+		// Overwrite LayoutPage so that returning a view with a custom master page works.
+		if (!String.IsNullOrEmpty(OverridenLayoutPath))
+		{
+			Layout = OverridenLayoutPath;
+		}
+
+		// Restore the old View Context Writer
+		ViewContext.Writer = oldWriter;
+	}
+}
+```
+
+在这里我们发现它又调用了其父类的 `ExecutePageHierarchy` 的重载函数，我们进入其内部看看
+
+```csharp
+
+public override void ExecutePageHierarchy()
+{
+	// Unlike InitPages, for a WebPage there is no hierarchy - it is always
+	// the last file to execute in the chain. There can still be layout pages
+	// and partial pages, but they are never part of the hierarchy.
+
+	// (add server header for falcon debugging)
+	// call to MapPath() is expensive. If we are not emiting source files to header, 
+	// don't bother to populate the SourceFiles collection. This saves perf significantly.
+	
+	// More....
+
+	TemplateStack.Push(Context, this);
+	try
+	{
+		// Execute the developer-written code of the WebPage
+		Execute();
+	}
+	finally
+	{
+		TemplateStack.Pop(Context);
+	}
+}
+```
+
+在这里又看到了对于 `TemplateStack` 栈的操作，并且调用了 `View` 所 [临时生成的类](#ViewPic) 的 `Execute()` 函数以完成里面逻辑的加载
+
+至此，我们可以回到 `WebPageBase` 的 `ExecutePageHierarchy(WebPageContext pageContext, TextWriter writer, WebPageRenderingBase startPage)` 函数身上，我们关注下最后的 出栈 操作
+
+```csharp
+public abstract class WebPageBase : WebPageRenderingBase
+{
+	public void PopContext()
+	{
+		// Using the CopyTo extension method on the _tempWriter instead of .ToString()
+		// to avoid allocating large strings that then end up on the Large object heap.
+		OutputStack.Pop();
+
+		if (!String.IsNullOrEmpty(Layout))
+		{
+			string layoutPagePath = NormalizeLayoutPagePath(Layout);
+
+			// If a layout file was specified, render it passing our page content.
+			OutputStack.Push(_currentWriter);
+			RenderSurrounding(
+				layoutPagePath,
+				_tempWriter.CopyTo);
+			OutputStack.Pop();
+		}
+		else
+		{
+			// Otherwise, just render the page.
+			_tempWriter.CopyTo(_currentWriter);
+		}
+
+		VerifyRenderedBodyOrSections();
+		SectionWritersStack.Pop();
+	}
+}
+```
+
+也是和压栈一样差不多的逻辑，但是这里换成了出栈，这里我们还要把关注点放在 `RenderSurrounding(
+layoutPagePath,_tempWriter.CopyTo)` 函数身上，我们发现有一个参数是 `layoutPagePath`，那么我估计你们也猜到八九不离十了，但是我们还是进入其内部看看具体的操作
+
+```csharp
+public abstract class WebPageBase : WebPageRenderingBase
+{
+	private void RenderSurrounding(string partialViewName, Action<TextWriter> body)
+	{
+		// Save the previous body action and set ours instead.
+		// This value will be retrieved by the sub-page being rendered when it runs
+		// Render(ViewData, TextWriter).
+		var priorValue = PageContext.BodyAction;
+		PageContext.BodyAction = body;
+
+		// Render the layout file
+		Write(RenderPageCore(partialViewName, isLayoutPage: true, data: new object[0]));
+
+		// Restore the state
+		PageContext.BodyAction = priorValue;
+	}
+}
+```
+
+继续进入内部看下 `RenderPageCore(partialViewName, isLayoutPage: true, data: new object[0])` 的下一步调用
+
+```csharp
+public abstract class WebPageBase : WebPageRenderingBase
+{
+	private HelperResult RenderPageCore(string path, bool isLayoutPage, object[] data)
+	{
+		if (String.IsNullOrEmpty(path))
+		{
+			throw new ArgumentException(CommonResources.Argument_Cannot_Be_Null_Or_Empty, "path");
+		}
+
+		return new HelperResult(writer =>
+		{
+			path = NormalizePath(path);
+			WebPageBase subPage = CreatePageFromVirtualPath(path, Context, VirtualPathFactory.Exists, DisplayModeProvider, DisplayMode);
+			var pageContext = CreatePageContextFromParameters(isLayoutPage, data);
+
+			subPage.ConfigurePage(this);
+			subPage.ExecutePageHierarchy(pageContext, writer);
+		});
+	}
+}
+```
+
+在这里我们可以看到其根据 `LayoutPage` 的具体路径又创建了一个 `WebPageBase`，并且通过它又调用了一次 `ExecutePageHierarchy` 函数，以这种递归的方式完成 `LayoutPage` 的视图渲染和加载，关于其 `ExecutePageHierarchy` 函数内部的逻辑和 [前面](#标注9) 所说的是一模一样的，只是之前的角色是通过 `View` 的 `WebViewPage` 去实现，而这里换成了 `LayoutPage` 的 `WebViewPage` 去实现罢了
+
+至此我们 `ASP.NET MVC Life Cycle` 的整体流程就已经结束了，但还是跟我最后一次慢慢退出这些函数
+
+- `WebPageBase.ExecutePageHierarchy(WebPageContext pageContext, TextWriter writer, WebPageRenderingBase startPage)`
+- `RazorView.RenderView(ViewContext viewContext, TextWriter writer, object instance)`
+- `BuildManagerCompiledView.Render(ViewContext viewContext, TextWriter writer)`
+- `ViewResultBase.ExecuteResult(ControllerContext context)`
+- `ControllerActionInvoker.InvokeActionResult(ControllerContext controllerContext, ActionResult actionResult)`
+- 回到 [ActionResult 的执行](#标识4)
+
+
+<br/>
+
+### 参考文档
+
+---
+
+- [深入ASP.NET MVC 之一：IIS到路由表](https://www.cnblogs.com/yinzixin/archive/2012/10/30/2745713.html)
+- [深入ASP.NET MVC之二：路由模块如何工作](https://www.cnblogs.com/yinzixin/archive/2012/11/05/2754483.html#)
+- [深入ASP.NET MVC之三：Controller的激活](https://www.cnblogs.com/yinzixin/archive/2012/11/06/2754484.html)
+- [深入ASP.NET MVC之四：Filter和Action的执行](https://www.cnblogs.com/yinzixin/archive/2012/11/10/2763625.html)
+- [深入ASP.NET MVC之七：ActionResult的执行（View的加载和渲染）](https://www.cnblogs.com/yinzixin/archive/2012/12/05/2799459.html)
+- [ASP.Net请求处理机制初步探索之旅 - Part 2 核心](https://www.cnblogs.com/edisonchou/p/4195259.html)
+- [ASP.Net请求处理机制初步探索之旅 - Part 3 管道](https://www.cnblogs.com/edisonchou/p/4201855.html)
+- [ASP.Net请求处理机制初步探索之旅 - Part 5 ASP.Net MVC请求处理流程](https://www.cnblogs.com/edisonchou/p/4226558.html)
