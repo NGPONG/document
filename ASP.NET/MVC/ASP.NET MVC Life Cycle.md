@@ -1,5 +1,17 @@
 # *<span>ASP.NET</span> MVC Life Cycle*
 
+
+<br/>
+
+### 目录
+
+- [路由的开始](#路由的开始)
+- [Area 的注册](#Area的注册)
+- [Controller 的激活](#Controller的激活)
+- [Filter 和 Action 的执行](#Filter和Action的执行)
+- [ActionResult 的执行](#标识4)
+- [View 的渲染](#View的渲染)
+
 <br/>
 
 ### 路由的开始
@@ -393,6 +405,8 @@ public class MvcRouteHandler : IRouteHandler
 
 <br/>
 
+<span id = "Area的注册"></span>
+
 ### Area 的注册
 
 ---
@@ -508,6 +522,8 @@ public abstract class AreaRegistration
 在这里也稍微总结一下，在 `Application_Start` 中，通过 `AreaRegistration.RegisterAllAreas()` 函数，找到当前 `AppDomain` 下所有派生于 `AreaRegistration` 的子类，并调用其 `RegisterArea` 方法完成 `Area` 的路由注册，最后呈现的效果是则为在全局路由表 `RouteTable` 中添加一条属于 `Area` 的路由规则，并且，再添加完成路由规则后还会把当前的 `AreaRegistration` 派生类的命名空间和 `UseNamespaceFallback` 加到 `Route` 的 `DataToken` 中，关于这个 `DataToken` 的具体使用我们放在下一节点揭开其面纱
 
 <br/>
+
+<span id = "Controller的激活"></span>
 
 ### Controller 的激活
 
@@ -824,6 +840,8 @@ private class DefaultDependencyResolver : IDependencyResolver
 至此，`Controller` 的创建步骤已然完成，那么步骤又重新回到了 `BeginProcessRequest` 身上，我们将在下一个节点继续介绍 `Filter 和 Action 的执行`
 
 <br/>
+
+<span id = "Filter和Action的执行"></span>
 
 ### Filter 和 Action 的执行
 
@@ -1627,6 +1645,8 @@ public class RazorViewEngine : BuildManagerViewEngine
 
 
 <br/>
+
+<span id = "View的渲染"></span>
 
 ### View 的渲染
 
