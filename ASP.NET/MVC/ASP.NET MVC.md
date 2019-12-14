@@ -90,3 +90,275 @@ public class RouteConfig
 
 ---
 
+#### 控制器的简单介绍
+
+我们所新建的控制器都被统一放在当前 `WebApplication` 的 `Controllers`，并且所建立的控制器必须以 `Controller` 作为结尾，这点无可厚非，没什么好说，在这里需要介绍下 `Controller` 中的 `Action`
+
+#### 指定 Action 的 Http Method
+
+在 `Action` 中，如果我们不具体指定 `Action` 的 Http 方式，则允许以 `GET` `POST` 的方式对该 `Action` 进行调用，具体识别的过程交由 `ASP.NET MVC` 框架来完成，反之，如果我们想让该 `Action` 只能通过某种 Http，在这里 `ASP.NET MVC` 针对不同的 HttpMethod 的请求，为 `Action` 提供了相应的特性，查看以下代码
+
+```csharp
+public class DefaultController : Controller
+{
+    [HttpGet]
+    public ActionResult Get()
+    {
+        return Content("Hello,World!");
+    }
+
+    [HttpPost]
+    public ActionResult Post()
+    {
+        return Content("Hello,World!");
+    }
+
+    [HttpPut]
+    public ActionResult Put()
+    {
+        return Content("Hello,World!");
+    }
+
+    [HttpDelete]
+    public ActionResult Delete()
+    {
+        return Content("Hello,World!");
+    }
+
+    [HttpPatch]
+    public ActionResult Patch()
+    {
+        return Content("Hello,World!");
+    }
+}
+```
+
+#### Action 的重载
+
+`ASP.NET MVC` 是不允许任意一个 `Controller` 中的 `Action` 存在重载关系的，当存在重载情况的时候，这个 `WebApplication` 的启动的过程中就会弹出 `操作方法之间不明确` 的黄页，虽然是不支持方法本身的重载，但是 `ASP.NET MVC` 却支持在引用了不同 HttpMethod 的情况下进行重载，如下代码所示
+
+```csharp
+public class DefaultController : Controller
+{
+    [HttpGet]
+    public ActionResult MyAction()
+    {
+        return Content("Hello,World!");
+    }
+
+    [HttpPost]
+    public ActionResult MyAction()
+    {
+        return Content("Hello,World!");
+    }
+}
+```
+
+#### 自动的把请求参数录入至 Action 中对应的参数名的参数身上
+
+前面说到，路由路径中我们是可以指定自定义变量的，当一个请求 `URL` 中自定义变量的位置复合当前所请求的 `Action` 的 Signature 的时候，则会把 URL 上对应自定义变量位置上的值录入到 `Action` 中相应的位置，除此之外，`Action` 本身对请求所附带的参数也支持这一特性，举个例子，一个请求中所附带的参数名如果和当前所请求的 `Action` 的 Signature 是一致的话，则会自动地把请求所附带的参数的值赋值到 `Action` 中对应的参数身上，并且这一特性同样也适用于 `Action` 的参数是一个实体的情况，比如说实体的属性和请求所附带的参数名是一致的话，同样会把请求参数的值复制到实体类的示例身上，但是这种情况其实只适用于 `HttpGet` 的 `Action`，如果一个 `Action` 被标识为 `HttpPost` 的情况下，则需要在 Post 请求头上附带上 `Content-Type=application/x-www-form-urlencoded` 才能够适用于这一种特性
+
+#### ActionResult
+
+`Action` 所返回的类型通常情况下需要返回一个实现于 `IActionResult` 的类型，当然并不是说一定需要返回这个，但是返回 `IActionResult` 能够更契合 `ASP.NET MVC` 这个框架的主体
+
+`ASP.NET MVC` 为我们提供了以下几种实现于 `IActionResult` 的类型
+
+- [ContentResult](https://docs.microsoft.com/en-us/dotnet/api/system.web.mvc.contentresult?redirectedfrom=MSDN&view=aspnet-mvc-5.2)
+- [EmptyResult](https://docs.microsoft.com/en-us/dotnet/api/system.web.mvc.emptyresult?redirectedfrom=MSDN&view=aspnet-mvc-5.2)
+- [FileResult](https://docs.microsoft.com/en-us/dotnet/api/system.web.mvc.fileresult?redirectedfrom=MSDN&view=aspnet-mvc-5.2)
+- [HttpStatusCodeResult](https://docs.microsoft.com/en-us/dotnet/api/system.web.mvc.httpstatuscoderesult?redirectedfrom=MSDN&view=aspnet-mvc-5.2)
+- [JavaScriptResult](https://docs.microsoft.com/en-us/dotnet/api/system.web.mvc.javascriptresult?redirectedfrom=MSDN&view=aspnet-mvc-5.2)
+- [JsonResult](https://docs.microsoft.com/en-us/dotnet/api/system.web.mvc.jsonresult?redirectedfrom=MSDN&view=aspnet-mvc-5.2)
+- [RedirectResult](https://docs.microsoft.com/en-us/dotnet/api/system.web.mvc.redirectresult?redirectedfrom=MSDN&view=aspnet-mvc-5.2)
+- [RedirectToRouteResul](https://docs.microsoft.com/en-us/dotnet/api/system.web.mvc.redirecttorouteresult?redirectedfrom=MSDN&view=aspnet-mvc-5.2)
+- [ViewResultBase](https://docs.microsoft.com/en-us/dotnet/api/system.web.mvc.viewresultbase?redirectedfrom=MSDN&view=aspnet-mvc-5.2)
+    - [PartialViewResult](https://docs.microsoft.com/en-us/dotnet/api/system.web.mvc.partialviewresult?redirectedfrom=MSDN&view=aspnet-mvc-5.2)
+    - [ViewResult](https://docs.microsoft.com/en-us/dotnet/api/system.web.mvc.viewresult?redirectedfrom=MSDN&view=aspnet-mvc-5.2)
+
+在这里只是针对几种常用的 `IActionResult` 进行注解，需要事先说明的是，这几种实现于 `IActionResult` 类型在控制器的父类 `Controller` 中都封装了相应的函数去返回它们
+
+`1. ViewResult：Controller.View`
+
+该种类型的是控制器所对应视图的内容结果，需要注意的是，该函数提供了几种重载的结果，在什么参数都不录入的情况下就是直接返回一个对应视图的结果，进入视图渲染的工作环节，但是我们也可以指定一个任意类型的示例，为 `Razor` 的强类型视图注入我们所指定的类型的实例
+
+```csharp
+public class DefaultController : Controller
+{
+    [HttpGet]
+    public ActionResult DefaultAction()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    public ActionResult TypeAction()
+    {
+        return View(new Entity(){
+            Name = "NGPONG",
+            Age  = 22
+        });
+    }
+}
+
+public class Entity
+{
+    public string Name { get; set; }
+    public string Age { get; set; }
+}
+```
+
+<br/>
+
+`2. ContentResult：Controller.Content`
+
+该种类型返回的是一种字符串格式的信息，其实就相当于之前的 `HttpContext.Response.Writer(value)`，将字符串写入 HTTP 响应体中返回给 Client，该函数提供了一种重载的格式可以让我们去指定返回 `Response` 的 `Content-type`
+
+```csharp
+public class DefaultController : Controller
+{
+    [HttpGet]
+    public ActionResult DefaultAction1()
+    {
+        return Content("Hello,World");
+    }
+
+    [HttpGet]
+    public ActionResult DefaultAction2()
+    {
+        return Content("Hello,World","text/pain");
+    }
+}
+```
+
+<br/>
+
+`3. RedirectToRouteResul / RedirectResult：Controller.RedirectToAction / Controller.Redirect`
+
+这里把它放在一起的目的是因为其功能性是一样的，也是重定向至另一个页面，其功能相当于 `HttpContext.Response.Redirect(url)`
+
+```csharp
+public class DefaultController : Controller
+{
+    [HttpGet]
+    public ActionResult RedirectToRouteResul()
+    {
+        return RedirectToAction("Home","Index");
+    }
+
+    [HttpGet]
+    public ActionResult RedirectResult()
+    {
+        return Redirect("~/Home/Index");
+    }
+
+    [HttpGet]
+    public ActionResult Index()
+    {
+        return View();
+    }
+}
+```
+
+<br/>
+
+`4. JsonResult：Controller.Json`
+
+该种类型能够将返回的结果进行 `Json` 序列化 ( 采用 `ASP.NET MVC` 框架所提供的序列化器 )，并自动地为我们添加上 `Content-type = application/json` 的 `Response Header`
+
+```csharp
+public class DefaultController : Controller
+{
+    [HttpGet]
+    public ActionResult DefaultAction()
+    {
+        return Json(new Entity(){
+            Name = "NGPONG",
+            Age  = 22
+        });
+    }
+}
+
+public class Entity
+{
+    public string Name { get; set; }
+    public string Age { get; set; }
+}
+```
+
+#### ViewBag 于 ViewData
+
+`ViewBag` 和 `ViewData` 其作用是一样的，只针对当前请求上下文去存放一些数据提供 `View` 去使用，虽然其作用是一样的，但是功能上本质还是存在一定的区别
+
+`ViewBag`
+
+- 动态类型，获取的时候不需要进行数据转换
+- `ASP.NET MVC 3` 后才有的新功能
+- `基于 .Net Framework 4.0` 的实现 
+- 可读性更好
+- ViewBag 是属于对 `ViewData` 的进一步的封装，就效率而言 ViewData 是高于 ViewBag 的
+
+```csharp
+public class DefaultController : Controller
+{
+    [HttpGet]
+    public ActionResult DefaultAction()
+    {
+        ViewBag.Title = "WuPeng";
+        ViewBag.Description = "Hello,World";
+        ViewBag.Age = 22;
+
+        return View();
+    }
+}
+```
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <h1>Hello, My name is @ViewBag.Title, I'm @ViewBag.Age Years old, @ViewBag.Description</h1>
+</body>
+</html>
+```
+
+`ViewData`
+
+- 它是键为 `string` 值为 `Object` 的字典集合，故获取的时候需要进行数据类型的转换
+- ViewData 带有的 Model 属性可以作为给强类型视图的 Model 的实例，是实现强类型视图获取 `Model` 实例的一种方式
+- 从 `Asp.net MVC 1` 就开始支持了
+- 基于 `.Net Framework 3.5` 的实现
+- 由于 ViewBage 是基于 ViewData 所封装的属性，所以就效率而言，ViewData 比 ViewBag 高
+
+```csharp
+public class DefaultController : Controller
+{
+    [HttpGet]
+    public ActionResult DefaultAction()
+    {
+        ViewBag[Title] = "WuPeng";
+        ViewBag[Description] = "Hello,World";
+        ViewBag[Age] = 22;
+
+        return View();
+    }
+}
+```
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <h1>Hello, My name is @ViewData["Title"]?.ToString(), I'm @Convert.ToInt32(ViewData[Age]).ToString() Years old, @ViewData[Description]?.ToString()</h1>
+</body>
+</html>
+```
+
