@@ -464,7 +464,7 @@ public class AreaRegistrationContext
 
 可以看到它和之前的 `MapRoute` 存在的区别不是很大，也是调用了在上文所说的 `RouteCollection.MapRoute` 的函数来完成 `Route` 的最终创建，有一点不同的是，Area 在创建完成之后还特别针对当前 `Area` 的命名空间为上一步所创建的 `Route` 写入了一个 `DataToken`
 
-关于 `DataToken` 还是有必要稍微展开讲一下，故名起义，这个成员就是属于 `Route` 的一个Token，其目的主要是为了避免 `Area` 和原始的母 MVC 项目存在同名 `Controller` 的情况，可以看出其实际上只有在 `Area` 中能够达到实际作用
+关于 `DataToken` 还是有必要稍微展开讲一下，故名起义，这个成员就是属于 `Route` 的一个Token，其目的主要是为了避免 `Area` 和原始的母 MVC 项目存在同名 `Controller` 的情况，具体如何实现的呢？其内部存放的就是我们在注册路由的时候所指定的 `namespaces` 属性的值，以该 `namespaces` 来区分一个 `WebApplication` 下，出现 `Area` 的控制器和主目录的控制器重名的情况，可以看出其实际上只有在 `Area` 中能够达到实际作用
 
 回过头来我们已经知道了 `Area` 的路由规则是如何建立的，但是还存在着一个问题，`AreaNameAreaRegistration.RegisterArea(AreaRegistrationContext context)` 这个函数又是在哪里会调用的呢？其实也是在 `Application_Start` 当中被调用，具体体现在
 
@@ -1999,7 +1999,7 @@ public abstract class WebViewPage : WebPageBase, IViewDataContainer, IViewStartP
 }
 ```
 
-在这里我们发现它又调用了其父类的 `ExecutePageHierarchy` 的重载函数，我们进入其内部看看
+在这里，我们发现如果在渲染当前所请求 URL 指向的 `Action` 所对应视图的 `WebViePage` 中指定了 `Layout` 的话，会为 `WebViewPage` 的 `Layout` 属性赋值，除此之外，在这里我们发现它又调用了其父类的 `ExecutePageHierarchy` 的重载函数，我们进入其内部看看
 
 ```csharp
 
@@ -2064,8 +2064,8 @@ public abstract class WebPageBase : WebPageRenderingBase
 }
 ```
 
-也是和压栈一样差不多的逻辑，但是这里换成了出栈，这里我们还要把关注点放在 `RenderSurrounding(
-layoutPagePath,_tempWriter.CopyTo)` 函数身上，我们发现有一个参数是 `layoutPagePath`，那么我估计你们也猜到八九不离十了，但是我们还是进入其内部看看具体的操作
+也是和压栈一样差不多的逻辑，但是这里换成了出栈，这里我们仔细观察会发现，只有当前面提到 `Layout` 不为空的时候才进入以下的逻辑，那么我就可以大胆的猜测，在该代码块的内部其实就是渲染 `LayoutPage` 的一个工作，我们把关注点放在 `RenderSurrounding(
+layoutPagePath,_tempWriter.CopyTo)` 函数身上，我们发现有一个参数是 `layoutPagePath`，这时候也能更加肯定自己的猜测了，但是我们还是进入其内部看看具体的操作
 
 ```csharp
 public abstract class WebPageBase : WebPageRenderingBase

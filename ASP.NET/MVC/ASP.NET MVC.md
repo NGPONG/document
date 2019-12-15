@@ -57,7 +57,7 @@ MVC 拆解开来的话由三部分所组成，分别是
 - constraints：该参数主要功能是针对动态参数的具体规则，其接收参数体现在两个方面
     - 单纯的指定一个正则能够达到的效果就是所指定的动态参数在 Client 录入请求 URL 的时候相应位置必须要按照正则表达式进行匹配
     - 指定一个继承并实现与 `IRouteConstraint` 接口的实例，在其所实现的 `Match` 函数中进行校验，这里要扩展下，我们还能通过该参数来校验 HTTP 请求的方式，比如说 `ASP.NET MVC` 默认就提供了 `HttpMethodConstraint` 的实现来达到这一种效果
-
+- namespaces：为重名的控制器注册命名空间，控制器的建立在一个 `ASP.NET MVC WebApplication` 是不能出现重复的情况的，比如说在一个 `Area` 中建立了一个于当前 `ASP.NET MVC` 主目录下重名的控制器，那么当访问这个控制器的 `Action` 的时候则会报错，这时候我们就可以通过设定该属性的值为重名控制器的命名空间则可以避免这个问题
 
 来看下 `RouteConfig` 中关于路由注册的实现
 
@@ -72,7 +72,8 @@ public class RouteConfig
             name: "Default",
             url: "{controller}/{action}",
             defaults: new { controller = "Home", action = "About" },
-            constraints: new { httpMethod = new HttpMethodConstraint("GET")}
+            constraints: new { httpMethod = new HttpMethodConstraint("GET")},
+            namespaces: new string[] { "ASP.NET_MVC_Study_03.Controllers" }
         );
     }
 }
@@ -92,7 +93,11 @@ public class RouteConfig
 
 #### 控制器的简单介绍
 
-我们所新建的控制器都被统一放在当前 `WebApplication` 的 `Controllers`，并且所建立的控制器必须以 `Controller` 作为结尾，这点无可厚非，没什么好说，在这里需要介绍下 `Controller` 中的 `Action`
+我们所新建的控制器都被统一放在当前 `WebApplication` 的 `Controllers`，并且所建立的控制器必须以 `Controller` 作为结尾
+
+控制器的建立在一个 `ASP.NET MVC WebApplication` 是不能出现重复的情况的，比如说在一个 `Area` 中建立了一个于当前 `ASP.NET MVC` 主目录下重名的控制器，那么当访问这个控制器的 `Action` 的时候则会报错，这时候我们就可以通过 [前面](#路由) 所提到的，在注册路由的时候指定特定重名的控制器的 `namespaces` 则可以解决这个问题
+
+下面开始介绍下 `Controller` 中的 `Action`
 
 #### 指定 Action 的 Http Method
 
@@ -178,7 +183,7 @@ public class DefaultController : Controller
 
 在这里只是针对几种常用的 `IActionResult` 进行注解，需要事先说明的是，这几种实现于 `IActionResult` 类型在控制器的父类 `Controller` 中都封装了相应的函数去返回它们
 
-`1. ViewResult：Controller.View`
+<span id = "Controller.View">1.</span> `ViewResult：Controller.View`
 
 该种类型的是控制器所对应视图的内容结果，需要注意的是，该函数提供了几种重载的结果，在什么参数都不录入的情况下就是直接返回一个对应视图的结果，进入视图渲染的工作环节，但是我们也可以指定一个任意类型的示例，为 `Razor` 的强类型视图注入我们所指定的类型的实例
 
@@ -208,9 +213,7 @@ public class Entity
 }
 ```
 
-<br/>
-
-`2. ContentResult：Controller.Content`
+<span>2.</span> `ContentResult：Controller.Content`
 
 该种类型返回的是一种字符串格式的信息，其实就相当于之前的 `HttpContext.Response.Writer(value)`，将字符串写入 HTTP 响应体中返回给 Client，该函数提供了一种重载的格式可以让我们去指定返回 `Response` 的 `Content-type`
 
@@ -231,9 +234,7 @@ public class DefaultController : Controller
 }
 ```
 
-<br/>
-
-`3. RedirectToRouteResul / RedirectResult：Controller.RedirectToAction / Controller.Redirect`
+<span>3.</span> `RedirectToRouteResul / RedirectResult：Controller.RedirectToAction / Controller.Redirect`
 
 这里把它放在一起的目的是因为其功能性是一样的，也是重定向至另一个页面，其功能相当于 `HttpContext.Response.Redirect(url)`
 
@@ -260,9 +261,7 @@ public class DefaultController : Controller
 }
 ```
 
-<br/>
-
-`4. JsonResult：Controller.Json`
+<span>4.</span> `JsonResult：Controller.Json`
 
 该种类型能够将返回的结果进行 `Json` 序列化 ( 采用 `ASP.NET MVC` 框架所提供的序列化器 )，并自动地为我们添加上 `Content-type = application/json` 的 `Response Header`
 
@@ -286,7 +285,7 @@ public class Entity
 }
 ```
 
-#### ViewBag 于 ViewData
+#### ViewBag & ViewData
 
 `ViewBag` 和 `ViewData` 其作用是一样的，只针对当前请求上下文去存放一些数据提供 `View` 去使用，虽然其作用是一样的，但是功能上本质还是存在一定的区别
 
@@ -362,3 +361,408 @@ public class DefaultController : Controller
 </html>
 ```
 
+<br/>
+
+### Area
+
+<span id="Area"></span>
+
+---
+
+#### 介绍
+
+随着业务的需要，结构需求会越来越多,`Views` 目录下面的文件夹越来越多，更或者你需要更细结构的页面路径，另外可能是多个人合作开发，有多个Web项目需要进行合并在一个网站中访问，在这时候 `Area` 就起到了很大的作用
+
+`ASP.NET MVC Area` 可以将一个大型的网站划分为相对独立的区域，该区域同样享有 `Model` `Controller` `View` 的结构模式，并且也有着属于自己的一个 `web.config` 和 路由规则
+
+#### 如何创建一个 Area
+
+![Mygif.gif](https://i.loli.net/2019/12/15/ymDEZFlhu5djRcI.gif)
+
+#### Area 中的路由
+
+Area 种路由的注册通过在新建一个 Area 的时候帮我自动生成的 `*AreaRegistration.cs` 来完成，和一个 `ASP.NET MVC` 主项目一样，也是通过 `MapRoute` 函数来完成自己定义的路由规则的注册，需要注意的是，这里关于 `MapRoute` 函数的提供方是换了一个人的，在 `ASP.NET MVC` 上路由注册的由 `RouteCollection` 来提供，而在 `Area` 中却由 `AreaRegistrationContext` 来提供，虽然两者之间的 `Provider` 不同，但是在 `Area` 中路由注册的一些注意事项同样可以沿用在 [前面](#路由) 所说的信息
+
+在 `Area` 中，为了解决可能存在某个控制器会跟 `ASP.NET MVC` 主项目中的控制器重名的情况，在录入路由路径注册的过程中，底层会为 `Area` 所注册的路由添加一个 `DataToken` 以来添加标识，而这个 `DataToken` 就是我们在 [注册路由](#路由) 时候所指定的 `namespaces`，关于更多信息可以查看这一篇 [文章](https://github.com/NGPONG/document/blob/master/ASP.NET/MVC/ASP.NET%20MVC%20Life%20Cycle.md)
+
+下面的代码展示了 `Area` 中注册路由的方式
+
+```csharp
+public class MyAreaAreaRegistration : AreaRegistration 
+{
+    public override string AreaName 
+    {
+        get 
+        {
+            return "MyArea";
+        }
+    }
+
+    public override void RegisterArea(AreaRegistrationContext context) 
+    {
+        context.MapRoute(
+            "MyArea_default",
+            "MyArea/{controller}/{action}/{id}",
+            new { action = "Index", id = UrlParameter.Optional }
+        );
+    }
+}
+```
+
+在这里也稍微扩展下，我们都知道在 `ASP.NET MVC` 上面所注册路由的函数在创建一个 `ASP.NET MVC` 项目的时候，都会自动帮我在 `Application_Start` 中进行调用，以完成路由的注册工作，但是在 `Area` 中的 `RegisterArea` 关于注册路由的函数却没有找到显示的调用，其实其调用是在 `Application_Start` 中为我们自动调用的 `AreaRegistration.RegisterAllAreas` 函数身上，关于其具体实现，可以参考这篇 [文章](https://github.com/NGPONG/document/blob/master/ASP.NET/MVC/ASP.NET%20MVC%20Life%20Cycle.md)
+
+<br/>
+
+### Filter
+
+<span id="Filter"></span>
+
+---
+
+#### 介绍
+
+Filter 是 `ASP.NET MVC` 这个框架对于 `AOP` 思想的体现之一，它的出现能够让我们可以更加自主的控制一个请求的流程
+
+#### Filter 的使用
+
+`ASP.NET MVC` 为我们提供了4种类型的 `Filter` 所对应的接口，每种接口都对应着不同动作时候需要执行的 `Filter`，参考以下表格
+
+Filter Type | Interface | Description 
+ - | - | - | - | -
+ Authorization | IAuthorizationFilter | Runs first
+ Action | IActionFilter | Runs before and after the action method 
+ Result | IResultFilter | Runs before and after the result is executed
+ Exception | IExceptionFilter | Runs if another filter or action method throws an exception
+
+`Filter` 除了上面提到的这些具体过程的接口之外，还有一个重要的类型 `FilterAttribute`，我们所自定义的 `Filter` 除了需要实现上面所说到的那些接口外，还需要继承于这个类型，无口否认的是，`Filter` 的使用沿用了特性的思想，那么集成这个类的第一个目的也是能够把这个类声明称一个特性，除此之外，只有继承了 `FilterAttribute` 这个特性才能够 `ASP.NET MVC` 框架发现这个特性是属于 `Filter` 的特性
+
+在完成了继承 `FilterAttribute` 并且实现自上面提到的任意一个接口后，只需在相应的 `Action` 的位置引用这个特性 (也可以在 `Controller` 身上使用，如果直接在 `Controller` 上使用则表明该 `Controler` 下所有的 `Action` 都使用这一种 `Filter`) 即可以完成 `Filter` 的工作，以下代码只是展示了一种 `Filter` 所对应的工作
+
+```csharp
+public class MyFilterAttribute : FilterAttribute, IActionFilter
+{
+    public void OnActionExecuted(ActionExecutedContext filterContext)
+    {
+        filterContext.HttpContext.Response.Write("I'm OnActionExecuted Filter");
+    }
+
+    public void OnActionExecuting(ActionExecutingContext filterContext)
+    {
+        filterContext.HttpContext.Response.Write("I'm OnActionExecuting Filter");
+    }
+}
+```
+
+```csharp
+public class HomeController : Controller
+{
+    public ActionResult Index()
+    {
+        return View();
+    }
+
+    [MyFilter]
+    public ActionResult About()
+    {
+        ViewBag.Message = "Your application description page."; 
+        return View();
+    }
+}
+```
+
+<br/>
+
+上面所说的直接在控制器或Action中使用一个继承于 `FilterAttribute` 并实现了 `Filter` 接口的特性只能够沿用当前控制器或Action上面，同样的，我们还可以把这个特性沿用到全局控制器下面，我们只需要在 `ASP.NET MVC` 项目在创建的过程中为我们自动创建的在 `App_Start` 目录下的 `FilterConfig` 类中的 `RegisterGlobalFilters` 中添加一个全局 `Filter` 即可，在默认生成完毕情况下，`RegisterGlobalFilters` 这个函数会在 `Application_Start` 进行了调用，所以我们的关注点也就只用放在 `RegisterGlobalFilters` 这个函数身上即可，以下代码展示了注册一个全局 `Filter` 的方式，该 `Filter` 将引用至当前 `WebApplication` 中的所有 `Controller` 和 `Action`，当然也包括 `Area` 中的所有 `Controller` 和 `Action`
+
+```csharp
+public class MyFilterAttribute : FilterAttribute, IActionFilter
+{
+    public void OnActionExecuted(ActionExecutedContext filterContext)
+    {
+        filterContext.HttpContext.Response.Write("I'm OnActionExecuted Filter");
+    }
+
+    public void OnActionExecuting(ActionExecutingContext filterContext)
+    {
+        filterContext.HttpContext.Response.Write("I'm OnActionExecuting Filter");
+    }
+}
+```
+
+```csharp
+public class FilterConfig
+{
+    public static void RegisterGlobalFilters(GlobalFilterCollection filters)
+    {
+        filters.Add(new HandleErrorAttribute());
+
+        filters.Add(new MyFilterAttribute());
+    }
+}
+```
+
+```csharp
+public class MvcApplication : System.Web.HttpApplication
+{
+    protected void Application_Start()
+    {
+        // More....
+        FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+    }
+}
+```
+
+<br/>
+
+除了能使用特性的方式来完成 `Filter` 的工作外，控制器默认所继承的 `Controller` 也提供了几个对于请求步骤截取的函数进行重写，重写这些函数也可以完成 `Filter` 的工作，需要注意的是，这种方式的 `Filter` 使用会沿用至当前控制器下所有的 `Action`，查看以下代码
+
+```csharp
+public class HomeController : Controller
+{
+    public ActionResult Index()
+    {
+        return View();
+    }
+
+    public ActionResult About()
+    {
+        ViewBag.Message = "Your application description page."; 
+        return View();
+    }
+
+    public ActionResult Contact()
+    {
+        ViewBag.Message = "Your contact page.";
+
+        return View();
+    }
+
+    protected override void OnActionExecuting(ActionExecutingContext filterContext)
+    {
+        filterContext.HttpContext.Response.Write("I'm OnActionExecuting Filter");
+        base.OnActionExecuting(filterContext);
+    }
+
+    protected override void OnActionExecuted(ActionExecutedContext filterContext)
+    {
+        filterContext.HttpContext.Response.Write("I'm OnActionExecuted Filter");
+        base.OnActionExecuted(filterContext);
+
+    }
+}
+```
+
+<br/>
+
+### Razor
+
+<span id="Razor"></span>
+
+---
+
+#### 介绍
+
+`Razor` 是 `ASP.NET MVC` 引入的一种新的视图引擎模板，区别于 `WebForm` 的是，Razor的语法简单且清晰，只需要最小化的输入，并且Razor可以 `HTML` 和 `C#` 代码混合进行使用
+
+`Razor` 文件是以 `*.cshtml` 所结尾的，其去除了传统 `WebForm` 视图文件还有一个后置代码文件的规格，并将其分离至 `Controller` 当中，使项目的耦合度更低
+
+#### Razor 的命名空间
+
+和 `WebForm` 一样，一个 `ASP.NET MVC WebApplication` 在启动的过程当中，也会把当前 `WebApplication` 的视图文件编译成一个继承于 `WebViewPage<T>` 或 `ViewStartPage` 的类，并且把他们打包至 `DLL` 类放在系统的临时文件夹目录作为缓存文件缓存起来，但是区别于 `WebForm` 的是，`Razor` 所编译后的 `DLL` 具体来说由三个，分别是 
+- `View` 目录下视图文件所生成的
+![微信截图_20191212171523.png](https://i.loli.net/2019/12/12/AYDIH4zKsN1wgRm.png)
+- `_ViewStart.cshtml` 文件所生成的
+![微信截图_20191212232735.png](https://i.loli.net/2019/12/12/RxPWKhb6FG2HufY.png)
+- `Shared` 目录下视图文件所生成的
+![微信截图_20191212232813.png](https://i.loli.net/2019/12/12/AZUwOXdzt7lIGLJ.png)
+
+关于它们的更多信息，本篇不做更多的阐述，更多请查看这篇 [文章](https://github.com/NGPONG/document/blob/master/ASP.NET/MVC/ASP.NET%20MVC%20Life%20Cycle.md)
+
+#### Razor 语法简单描述
+
+`@`
+
+输出一个变量，或者是输出一个函数的返回值，不能单独用来输出一个值，比如说字符串或数字
+
+`@( )`
+
+解决上一种语法所存在的问题，用来输出一个值，比如说字符串或数字
+
+`@{ }`
+
+标识一个代码块，在这里可以直接编写 `C#` 的代码
+
+`@* *@`
+
+标识注释块
+
+`@section sectionName{ }`
+
+是写在布局页中，部分渲染区域 `sectionName` 里面的内容
+
+`@using namespance`
+
+引入命名空间
+
+`@model namespace.class`
+
+指定强类型视图的具体类型
+
+```csharp
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+}
+
+@using System.Reflection;
+
+@model ASP.NET_MVC_Study_03.Models.CustomEntity
+
+<h1>@Assembly.GetExecutingAssembly().Location</h1>
+
+<h1>@("Hello, World!")</h1>
+
+@*<h1>111</h1>*@
+
+@{ 
+    for (int i = 0; i < 10; i++)
+    {
+        <h1>@i.ToString()</h1>
+    }
+}
+```
+
+#### LayoutPage 布局页
+<br/>
+
+<span>1.</span> 简述
+
+`Razor` 的布局页和 `WebForm` 中的模板页是一个概念，也是作为一个子页面嵌套于一个布局页中的使用，作为布局页，其统一放在网站根目录的 `~/Views/Shared` 目录下
+
+<br/>
+
+<span>2.</span> 如何指定布局页
+
+我们可以通过两种方式来指定一个视图页所对应的布局页，第一种方式是一种全局嵌套的方式，在一个 `ASP.NET MVC` 项目在创建后，会自动为我们生成一个 `_ViewStart.cshtml` 的视图，这个视图页在开始渲染当前请求所指定的 `Action` 所映射的视图前开始执行，在这里面我们就可以通过其父类 `ViewStartPage` 的属性 `Layout` 来指定一个布局页
+
+```csharp
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+```
+
+第二种方式则是指定部分页面所引用的布局页，和上面一个方法一样，也是通过其父类 `WebViewPage<T>` 的 `Layout` 属性来指定一个布局页，这里要区分开来，在 `_ViewStart.cshtml` 的父类和视图的父类是不一样的
+
+其次在这里，我们也可以通过指定 `Layout` 的属性为 `Null` or `Empty` 来取消在 `_ViewStart.cshtml` 所设定的全局布局页的设定
+
+```csharp
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+```
+
+<br/>
+
+<span>3.</span> 视图页的渲染顺序
+
+他们三者之间的渲染顺序是由 _ViewStart.cshtml -> 视图页 - 布局页 进行渲染的，这也印证了为什么能够在视图页中指定 `Layout` 属性的值为为 `Null` or `Empty` 就可以取消在 `_ViewStart.cshtml` 所设定的全局布局页的原理，但是关于更多信息可以参考这篇 [文章](https://github.com/NGPONG/document/blob/master/ASP.NET/MVC/ASP.NET%20MVC%20Life%20Cycle.md)
+
+<br/>
+
+<span>4.</span> 布局页的使用方法
+
+通过在布局页中使用 `@RenderBody()` 来渲染在视图页中的内容，如果视图页使用了该布局也的话，视图页里面的内容则一定会渲染在使用该函数的区域
+
+通过在布局页中使用 `@RenderSection(string sectionName,bool required)` 来标识部分渲染的内容，其中也可以指定 `required` 参数来决定是否必须要渲染这部分区域，除此之外，在相应的引用了这个布局页的视图页中，需要通过语法 `@section sectionName{ }` 来构造布局页中调用 `@RenderSection` 区域的内容
+
+```html
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+
+    <script type="text/javascript">
+        @RenderSection("scripts", required: false)
+    </script>
+
+</head>
+<body>
+
+    @RenderBody()
+
+</body>
+</html>
+```
+
+```html
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutPage.cshtml";
+}
+
+@section scripts{
+    $(this).ready(function () {
+
+    window.alert("Hello, I'm the content of section area!")
+    });
+}
+
+
+<h1>Hello,World!</h1>
+```
+
+<br/>
+
+<span>5.</span> 强类型视图
+
+`ViewData` & `ViewBag` 在前面已经介绍过，它们可以提供给当前请求上下文去存放一些数据提供 `View` 去使用，但是它们还是会存在一个很大的缺陷就是类型的问题，使用 `ViewData` 的时候需要对类型进行转换，而是用 `ViewBag` 由于是动态类型，所以在编写的时候无法让编译器起到一个很好的检查作用，`ASP.NET MVC` 针对这一问题还为开发人员提供了一种利用强类型的方法来将数据或对象传递到视图模板中，这种强类型的方法为你的编码过程提供了很丰富的编辑时的智能输入提示信息与非常好的编译时的检查，通过这种方法后我们所编写的视图页也可以称之为 `强类型视图`
+
+指定 `View` 所使用的强类型模型的实例通过两种方式，第一种就是通过 [上面](#Controller.View) 所提到的在控制器中通过 `Controller.View(object entity)` 函数，在返回视图结果的同时把一个类型的实例也一起返回给视图
+
+```csharp
+public class MyController : Controller
+{
+    [HttpGet]
+    public ActionResult Index()
+    {
+        return View(new MyEntity(){
+            Name = "Wupeng",
+            Age  = 22
+        };
+    }
+}
+```
+
+第二种方式则是通过 `ViewData.Model` 属性来指定强类型模型的实例
+
+```csharp
+public class MyController : Controller
+{
+    [HttpGet]
+    public ActionResult Index()
+    {
+        base.ViewData.Model = new MyEntity(){
+            Name = "Wupeng",
+            Age  = 22
+        };
+
+        return View();
+    }
+}
+```
+
+当我们强类型视图所具体使用的强类型模型的实例后，我们还需要在视图页面上通过 `@model namespace.model` 语法来引入强类型模型的命名空间，接下来只需要通过视图页的父类 `WebViewPage<T>` 所提供的 `Model` 属性 或者是直接通过 `ViewData.Model` 就可以访问我们在刚刚所设定的强类型模型中的属性了，因为在 `Controller` 中又设定了强类型模型的具体实例，所以这里的输出是有效值的
+
+这里也稍微扩展下，为什么视图页的父类中有一个泛型 `WebViewPage<T>`，这个泛型其实就是我们在视图页中通过 `@model namespace.model` 语法所设定的强类型
+
+```html
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutPage.cshtml";
+}
+
+<h1> Hello,@Model.Name! </h1>
+<h1> I'm @ViewData.Model.Age.ToString() years old </h1>
+```
