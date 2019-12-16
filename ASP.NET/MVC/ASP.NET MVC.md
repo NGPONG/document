@@ -439,12 +439,12 @@ Filter 是 `ASP.NET MVC` 这个框架对于 `AOP` 思想的体现之一，它的
 
 `ASP.NET MVC` 为我们提供了4种类型的 `Filter` 所对应的接口，每种接口都对应着不同动作时候需要执行的 `Filter`，参考以下表格
 
-Filter Type | Interface | Description 
+Filter Type|Interface|Description 
 --------|--------------|------------|------------|------------|------------
-Authorization | IAuthorizationFilter | Runs first
-Action | IActionFilter | Runs before and after the action method
-Result | IResultFilter | Runs before and after the result is executed
-Exception | IExceptionFilter | Runs if another filter or action method throws an exception
+Authorization|IAuthorizationFilter|Runs first
+Action|IActionFilter|Runs before and after the action method
+Result|IResultFilter|Runs before and after the result is executed
+Exception|IExceptionFilter|Runs if another filter or action method throws an exception
 
 `Filter` 除了上面提到的这些具体过程的接口之外，还有一个重要的类型 `FilterAttribute`，我们所自定义的 `Filter` 除了需要实现上面所说到的那些接口外，还需要继承于这个类型，无口否认的是，`Filter` 的使用沿用了特性的思想，那么集成这个类的第一个目的也是能够把这个类声明称一个特性，除此之外，只有继承了 `FilterAttribute` 这个特性才能够 `ASP.NET MVC` 框架发现这个特性是属于 `Filter` 的特性
 
