@@ -440,7 +440,7 @@ Filter 是 `ASP.NET MVC` 这个框架对于 `AOP` 思想的体现之一，它的
 `ASP.NET MVC` 为我们提供了4种类型的 `Filter` 所对应的接口，每种接口都对应着不同动作时候需要执行的 `Filter`，参考以下表格
 
 Filter Type|Interface|Description 
---------|--------------|------------|------------|------------|------------
+--------|--------------|------------
 Authorization|IAuthorizationFilter|Runs first
 Action|IActionFilter|Runs before and after the action method
 Result|IResultFilter|Runs before and after the result is executed
