@@ -1,0 +1,21 @@
+类型的转换：
+1:显式类型 高往低转 方法
+	int a=1;
+	long b=3;
+	a=(int)b;
+2:隐式类型 低往高转 方法
+	int a =1;
+	long b =3;
+	b=a;
+3:Parse()用作解析字符串 如加减乘除 方法
+
+	var str1 = System.Console.ReadLine();
+	var str2 = System.Console.ReadLine();
+
+	int a1 = int.Parse(str1);
+	int a2 = int.Parse(str2);
+
+	System.Console.WriteLine(a1+a2);
+Parse()后面需跟数据类型 如 double.Parse()/long.Parse()
+Parse()用作解析字符串，而字符串属手工录入，或者开头特别说明等途径录入，所以当输入a + b等同类型的时候就会发生错误
+

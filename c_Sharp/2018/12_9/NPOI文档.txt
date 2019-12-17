@@ -1,0 +1,28 @@
+工作本HSSFWorkbook
+	构造方法，无参表示创建一个新的工作本，可以接收一个流用于打开一个现有的工作本
+	方法CreateSheet(索引)：创建指定索引的sheet对象
+	方法GetSheetAt(索引)：根据索引获取sheet对象
+	方法CreateCellStyle()：创建单元格样式对象
+	方法CreateFont()：创建字体对象
+	方法Write(stream)：将工作本输出到流中
+工作表HSSFSheet
+	方法CreateRow(索引)：创建指定索引的行
+	方法GetRow(索引)：根据索引获取行
+	方法AddMergedRegion()：设置合并区域，参数包括开始行索引、开始列索引、结束行索引、结束列索引
+	方法SetColumnWidth(索引,宽度)：设置指定列的宽度，单位是一个字符宽度的256分之1
+		说明：一个汉字占用两个字符
+	属性FirstRowNum、LastRowNum：获取第一行、最后一行的索引值
+行HSSFRow
+	方法CreateCell(索引)：创建指定索引的行
+	方法GetCell(索引)：根据索引获取单元格
+	属性HeightInPoints：指定或设置高度
+单元格HSSFCell
+	方法SetCellValue()：设置单元格中的值
+	属性***CellValue：获取单元格中指定类型的值，如果类型不匹配则抛异常
+	属性CellStyle：获取或设置单元格样式
+单元格样式HSSFCellStyle
+	方法SetFont(字体对象)：设置字体样式
+	属性Alignment：水平对齐，1左，2中，3右
+字体对象HSSFFont
+	属性FontHeightInPoints：获取或设置字体大小
+	属性Boldweight：获取或设置字体加粗
