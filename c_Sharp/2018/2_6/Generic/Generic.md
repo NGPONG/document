@@ -39,7 +39,7 @@ public class Person<T,T2,T3,T4,T5>
 回到正题，在使用了泛型后，其编译的代码都带有一个特殊的标识符，那么当引用了这个 [[dll]] 的 [[Appdomain]] 在实际运行的过程当中，[[CLR]] 会进行一次二次编译的工作，在二次编译的过程中，[[JIT]] 就会找到 [[IL]] 代码中存在特殊占位符的代码，并把我们所指定的相应的 [[封闭类型]] 填充至相应的占位符的位置，通过这样就可以形成运行时编译录入我们所指定的封闭类型的特点
 
 !!!
-    泛型是由 [[.NET Framework 2.0]] 才开始引入的新特性，从上面的说明也能够看出 [[Version 1.0]] ~ [[Version 2.0]] 之间也一并更新了 编译器 和 [[CLR]] 的功能才能够独以该特性的支持
+    泛型是由 [[.NET Framework 2.0]] 才开始引入的新特性，从上面的说明也能够看出 [[Version 1.0]] ~ [[Version 2.0]] 之间也一并更新了 编译器 和 [[CLR]] 的功能才能够独以支持该特性
 
 #### 泛型类中静态成员的特殊性
 
@@ -70,9 +70,223 @@ class Program
 }
 ```
 
+#### 关于在一个泛型成员中，相同类型参数的延续性
+
+比如说我们现在有一个函数包含了一个泛型类型参数 `<T>`，如果在该函数的 [[Signture]] 中同样也存在类型名为 `T` 的参数，那么该函数的参数的类型同样也沿用调用该函数时所设定的具体封闭类型，如下代码
+
+```csharp
+namespace Generic
+{
+    public delegate T1 GenericHandler<T1, T2>(T2 value);
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            CommonMethod.Get(delegate (int inPut)
+            {
+                return (++inPut).ToString();
+            }, 1);
+
+            Console.ReadKey(true);
+        }
+    }
+
+    public class CommonMethod
+    {
+        public static void Get<T1,T2>(GenericHandler<T1,T2> handler,T2 value)
+        {
+            Console.WriteLine($"Hello! Value test:{handler.Invoke(value)}");
+        }
+    }
+}
+```
+
+
+
 <br/>
 
 ### 泛型的具体实现
 
 ---
 
+使用一个泛型成员，我们需要在该成员名结束的地方以 `<T>` 作为标记，以表明该成员需要使用一个名字为 [[T]] 的类型参数，如果需要指定多个的话，则以 [[,]] 为标记，例如：[[<T1,T2,T3,T4,T5,……>]]
+
+!!! danger
+    一旦声明了一个泛型参数类型给某一个泛型成员，那么在使用它的过程中必须要指定它具体的封闭类型，当然我们也可以隐式进行指定，什么是隐式进行指定？例如一个泛型方法中标明了一个泛型参数类型 `<T>`，并且其带有的参数也是泛型参数 `T` 类型，这时候我们在调用这个函数的时候就不需要另外再指定它泛型的参数类型具体是某个封闭类型了，直接在输入参数中录入相应的实例即可自动识别，如下面代码
+
+    ```csharp
+    namespace Generic
+    {
+        class Program
+        {
+            static void Main(string[] args)
+            {
+                CommonMethod.Get(new Person() { Name = "NGPONG" });
+
+                Console.ReadKey(true);
+            }
+        }
+
+        public class Person
+        {
+            public string Name { get; set; }
+        }
+
+        public class CommonMethod
+        {
+            public static void Get<T>(T t)
+            {
+                var per = t as Person;
+
+                Console.WriteLine(per.Name);
+            }
+        }
+    }
+    ```
+
+我们大致可以把泛型的应用分为四种类型，它们分别是
+
+- 泛型方法
+
+```csharp
+namespace Generic
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            CommonMethod.Get(new Person() { Name = "NGPONG" });
+
+            Console.ReadKey(true);
+        }
+    }
+
+    public class Person
+    {
+        public string Name { get; set; }
+    }
+
+    public class CommonMethod
+    {
+        public static void Get<T>(T t)
+        {
+            var per = t as Person;
+
+            Console.WriteLine(per.Name);
+        }
+    }
+}
+```
+
+- 泛型委托
+
+```csharp
+namespace Generic
+{
+    public delegate T1 GenericHandler<T1, T2>(T2 value);
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            CommonMethod.Get(delegate (int inPut)
+            {
+                return (++inPut).ToString();
+            }, 1);
+
+            Console.ReadKey(true);
+        }
+    }
+
+    public class CommonMethod
+    {
+        public static void Get<T1,T2>(GenericHandler<T1,T2> handler,T2 value)
+        {
+            Console.WriteLine($"Hello! Value test:{handler.Invoke(value)}");
+        }
+    }
+}
+```
+
+- 泛型接口
+
+```csharp
+namespace Generic
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            IGenericTest<string> genericTest = new GenericTest<string>();
+            genericTest.Get("NGPONG");
+
+            Console.ReadKey(true);
+        }
+    }
+
+    public class GenericTest<T> : IGenericTest<T>
+    {
+        public void Get(T value)
+        {
+            Console.WriteLine(value.ToString());
+        }
+    }
+
+    public interface IGenericTest<T>
+    {
+        void Get(T value);
+    }
+}
+```
+
+- 泛型类
+
+```csharp
+namespace Generic
+{
+    public delegate int GenericHandler<T>(T value1,T value2);
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var commandString = new CommandMethod<string>();
+            var strResult = commandString.GetMaxLength(new string[] { "测试一下", "23333333","666" }, commandString.GetMaxString);
+
+            var commandInt = new CommandMethod<int>();
+            var intResult = commandInt.GetMaxLength(new int[] { 1, 2, 3, 4, 5, 6, 7, 8 }, commandInt.GetMaxInt);
+
+            Console.ReadKey(true);
+        }
+    }
+
+    public class CommandMethod<T>
+    {
+        public T GetMaxLength(T[] arrary,GenericHandler<T> handler)
+        {
+            T max = arrary[0];
+
+            for (int i = 0; i < arrary.Length; i++)
+            {
+                if (handler(arrary[i], max) > 0)
+                {
+                    max = arrary[i];
+                }
+            }
+
+            return max;
+        }
+
+        public int GetMaxInt(int value1, int value2)
+        {
+            return value1 - value2;
+        }
+
+        public int GetMaxString(string value1, string value2)
+        {
+            return value1.Length - value2.Length;
+        }
+    }
+}
+```
