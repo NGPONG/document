@@ -394,7 +394,7 @@ Normal DictionaryCache
 
 ---
 
-泛型约束我们可以称之为 <kbd>权利和义务</kbd>，什么是权利？当我们为一个泛型成员规定了一个泛型约束后，那么他就拥有某种约束的 <kbd>权利</kbd>，而使用这个泛型成员也必须按照具体的约束来指定类型参数，这就是一种 <kbd>义务</kbd>
+泛型约束我们可以称之为 <kbd>权利和义务</kbd>，什么是权利？当我们为一个泛型成员规定了一个泛型约束后，那么他就拥有对于类型参数进行某种约束的 <kbd>权利</kbd>，而使用这个泛型成员也必须按照具体的约束来指定类型参数，这就是一种 <kbd>义务</kbd>
 
 泛型约束可以分为5种类型，他们分别是：
 
@@ -478,3 +478,106 @@ public class CommandMethods<T>
 
 }
 ```
+
+<br/>
+
+### 泛型逆变和协变
+
+---
+
+#### 什么是逆变和协变
+
+逆变和协变的概念由 <kbd>.NET Framework 4.0</kbd> 以后针对于泛型所产生的两种概念，在解释它们之前我们先说一个另外一种概念，假设我们现在有两种类型 <kbd>T</kbd> & <kbd>u</kbd>，咱们先不谈这两个类型之间的关系，假设它们之间存在着一种类型安全的隐式转换，并且能够把这一特性带到对于它们的成员 ([[数组]]) 的身上去，我们就可以把这种能力称为 [[可变性 Variance ]] ，我们在此基础上进一步的进行扩展，假设 [[T]] 为 [[U]] 的基类，基于 [[里氏转换原则]] 我们把 U 赋值给 T，那么我们可以称之为这一段关系为 [[协变 covariant]]，反之，如果只是 [[存粹地]] 把 T 赋值给了 U，并且是类型安全的转换，那么我们可以称这一段关系为 [[逆变 contravariant]]
+
+!!!
+    简而言之，如果一个可变性和子类到父类转换的方向一样，就称作[[协变]]，而如果和子类到父类的转换方向相反，就叫 [[逆变]]
+    
+!!! danger 注意
+    需要注意的是，协变和逆变的概念在 [[.NET]] 中仅仅是针对 [[泛型]] 所出现的，并且只是针对 [[泛型接口]] 和 [[泛型委托]]，为什么说仅仅只是针对泛型所出现的呢？因为逆变的概念涉及到父类直接转换为子类的应用，在正常的 [[csharp]] 语言的角度考虑是不允许的，由于 [[里式原则]] 的存在，基类想转换为一个有效的派生类必须要基类是已经经过派生类赋值的基础上才能够进行
+
+#### 逆变和协变的具体实现
+
+在 .NET 中，逆变和协变的存在通常是用来指定泛型成员之间互相进行安全的类型转换的问题的，并且仅仅只是针对 [[泛型接口]] 和 [[泛型委托]]，在这里我们使用 [[泛型接口]] 来举例子，查看以下代码，假设有一个接口 `Interface<T>`，分别对它进行了两种参数类型的指定 `Interface<string>` 和 `Interface<object>`，
+
+```csharp
+namespace Contravariant_and_Covariant
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            IPerson<string> personStr = new Student<string>();
+
+            IPerson<object> personObj = new Student<object>();
+
+            personObj = personStr;
+
+            Console.ReadKey(true);
+        }
+    }
+
+    public interface IPerson<T>
+    {
+        void Test(T);
+    }
+
+    public class Student<T> : IPerson<T>
+    {
+        public void Test(T)
+        {
+            return default(T);
+        }
+    }
+}
+```
+
+在这里有一个接口 `IPerson<T>` 并且有一个实现于它的成员 `Student<T>`，我们可以看到 `Student<T>` 分别指定了两种不同类型参数分别是 [[string]] 和 [[object]]，但是在下一行代码 [[personObj = personStr]] 会编译不通过，因为这就涉及到了泛型成员类型转换间的问题了，我们知道，[[string]] -> [[object]] 之间是一种 [[协变]] 的关系，那我们就要在相应的泛型成员中通过 [[out]] 关键字来强调这一种关系，反之 [[object]] -> [[string]] 属于一种逆变的关系，那我们就需要在相应的泛型成员中通过 [[in]] 关键字来强调着一种关系
+
+!!!
+    在一个支持 [[in & out]] 的泛型成员中使用了这两个关键字对类型参数进行修饰后，我们并不能单纯的称为这个泛型成员是支持 [[逆变 & 协变]] 的，更准确的说法应该为这个泛型成员中通过 [[in]] 所修饰的参数类型是支持 [[逆变]] 的，反之，通过 [[out]] 所修饰的参数类型是支持 [[协变]] 的
+
+!!!
+    虽然通过 [[in & out]] 关键字能够达到 [[逆变 & 协变]] 之间转换的目的，但是使用它们还存在的另外的一些限制
+    - 使用 [[in]] 所修饰的类型参数只能用作于 输入参数
+    - 使用 [[out]] 所修饰的类型参数只能用作与 输出参数
+
+以下代码展示了 [[in]] 和 [[out]] 的具体使用，也展现了不同类型参数之间进行 [[协变]] 和 [[逆变]] 的关系
+
+```csharp
+namespace Contravariant_and_Covariant
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            IPerson<string,object> personStr = new Student<string, object>();
+
+            IPerson<object,string> personObj = new Student<object, string>();
+
+            personStr = personObj;
+
+            Console.ReadKey(true);
+        }
+    }
+
+    public interface IPerson<in TIn,out TOut>
+    {
+        TOut Test(TIn value);
+    }
+
+    public class Student<TIn,TOut> : IPerson<TIn, TOut>
+    {
+        public TOut Test(TIn value)
+        {
+            return default(TOut);
+        }
+    }
+}
+```
+
+下面还有几点关于泛型逆变和协变需要注意的一些问题
+
+!!!danger 注意
+    - 仅有泛型接口和泛型委托支持对类型参数的可变性，泛型类或泛型方法是不支持的
+    - 值类型不参与协变或反变，因为.NET泛型，每个值类型会生成专属的封闭构造类型，与引用类型版本不兼容
+    - 在泛型成员中使用了 [[协变 & 逆变]] 后如果存在声明的属性时要注意，可读写的属性会将类型同时用于参数 [[输入]] 和返回值 [[输出]]，因此只有只读属性才允许使用 [[out]] 类型参数，只写属性能够使用 [[in]] 参数
