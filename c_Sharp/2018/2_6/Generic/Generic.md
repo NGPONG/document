@@ -41,7 +41,7 @@ public class Person<T,T2,T3,T4,T5>
 !!!
     泛型是由 [[.NET Framework 2.0]] 才开始引入的新特性，从上面的说明也能够看出 [[Version 1.0]] ~ [[Version 2.0]] 之间也一并更新了 编译器 和 [[CLR]] 的功能才能够独以支持该特性
 
-#### 泛型类中静态成员的特殊性
+#### 泛型类中静态成员的特殊性 <span id = "标识1"></span>
 
 因为 [[泛型]] 的引入，导致一个泛型类中的静态成员也发生了一些变化，在以往的认知中，一个类中的静态成员 [[CLR]] 会优先初始化静态变量和静态构造函数，且只有在第一次实例化的时候进行初始化，后续都不在进行初始化，但是在泛型类中，静态成员变量在相同封闭类型间共享，不同的封闭类型间不共享，简而言之就是这个泛型类所采用的不同类型的封闭类型都会针对它去生成一份 [[副本]]，这也导致了一种肉眼可见的一种结果，同一个类里面的静态成员会出现多次初始化的情况，详情可以查看下面的代码
 
@@ -102,8 +102,6 @@ namespace Generic
 }
 ```
 
-
-
 <br/>
 
 ### 泛型的具体实现
@@ -145,7 +143,7 @@ namespace Generic
     }
     ```
 
-我们大致可以把泛型的应用分为四种类型，它们分别是
+泛型的应用领域大致可以把它们分为四种类型，它们分别是
 
 - 泛型方法
 
@@ -288,5 +286,198 @@ namespace Generic
             return value1.Length - value2.Length;
         }
     }
+}
+```
+
+<br/>
+
+### 泛型缓存
+
+---
+
+根据 [上文](#标识1)，依赖于泛型类中静态类型的特性我们可以设定一个以 [[Type]] 作为键的泛型字典缓存，其性能对比单纯的以 [[Type]] 作为键的字典集合要优秀的很多，下面的代码展示除了泛型缓存和字典缓存之间的性能对比
+
+```csharp
+namespace GenericCache
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            GenericCacheTest<object>.TestGenericStorage();
+            DictionaryCacheTest.TestDictionaryStorage();
+
+            Console.ReadKey(true);
+        }
+    }
+
+    public static class Cache_Generic<T>
+    {
+        public static object Instance { get; set; }
+    }
+
+    public static class Cache_Dic
+    {
+        public static Dictionary<Type, object> Instance { get; set; }
+    }
+
+    public class GenericCacheTest<T>
+    {
+        static GenericCacheTest()
+        {
+            Cache_Generic<T>.Instance = new object();
+        }
+
+        public static void TestGenericStorage()
+        {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
+            for (int i = 0; i < 100_000_000; i++)
+            {
+                var obj = Cache_Generic<T>.Instance;
+            }
+
+            watch.Stop();
+            Console.WriteLine($"GenericCache:{watch.ElapsedMilliseconds.ToString()}");
+        }
+    }
+
+    public class DictionaryCacheTest
+    {
+        static DictionaryCacheTest()
+        {
+            Cache_Dic.Instance = new Dictionary<Type, object>();
+
+            Cache_Dic.Instance[typeof(object)] = new object();
+        }
+
+        public static void TestDictionaryStorage()
+        {
+            var type = typeof(object);
+
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
+            for (int i = 0; i < 100_000_000; i++)
+            {
+                var obj = Cache_Dic.Instance[type];
+            }
+
+            watch.Stop();
+            Console.WriteLine($"DictionaryCache:{watch.ElapsedMilliseconds.ToString()}");
+        }
+    }
+}
+```
+
+```console
+GenericCache
+        Time Elapsed:   1803ms
+        CPU Cycles:     151,015,248
+        Gen 0:          0
+        Gen 1:          0
+        Gen 2:          0
+
+Normal DictionaryCache
+        Time Elapsed:   3619ms
+        CPU Cycles:     22,475,810,124
+        Gen 0:          0
+        Gen 1:          0
+        Gen 2:          0
+```
+
+可以看到执行结果，使用了泛型缓存和使用普通的字典缓存，进行一亿次数据获取的情况下，泛型缓存的速度大约是字典缓存的 [[2倍多]]
+
+就性能而言，我们可以肉眼看得到差距，但是泛型缓存自身也存在很多的缺点，例如：占用的空间（应该）较多、一个类型的键只能全局唯一，不如普通字典的缓存方式来的灵活，另外，除非能够在代码中得到泛型参数，否则同样无法使用泛型字典
+
+<br/>
+
+### 泛型约束
+
+---
+
+泛型约束我们可以称之为 [[权利和义务]]，什么是权利？当我们为一个泛型成员规定了一个泛型约束后，那么他就拥有某种约束的 [[权利]]，而使用这个泛型成员也必须按照具体的约束来指定类型参数，这就是一种 [[义务]]
+
+泛型约束可以分为5种类型，他们分别是：
+
+> 每一种类型不可以随意进行搭配，不同的泛型约束类型都拥有一定得局限性，不可随意进行搭配
+
+- 基类约束：所指定的参数类型必须继承与或者就是约束类型的本身
+    - 一条约束条文中不可以出现多个
+    - 出现的位置必须要出现在最前面
+
+```csharp
+public class Person
+{
+    public string Name { get; set; }
+}
+
+public class CommandMethods<T>
+    where T : Person
+{
+
+}
+```
+
+- 接口约束：所指定的参数类型必须实现于指定约束的接口
+    - 一条约束条文中可以多次使用接口约束，就其本身可以任意搭配，并无具体的限制要求
+
+```csharp
+public interface IPerson
+{
+    string Name { get; set; }
+}
+
+public interface IMan
+{
+    char Gender { get; set; }
+}
+
+public class CommandMethods<T>
+    where T : IPerson,IMan
+{
+
+}
+```
+
+- 无参构造函数约束：所指定的参数类型必须是引用类型切包含无参的构造函数
+    - 一条约束条文中不可以出现多个
+    - 出现的位置必须要出现在最后面
+    - 不可以和值类型约束一同使用
+
+```csharp
+public class CommandMethods<T>
+    where T : new ()
+{
+
+}
+```
+
+- 值类型约束：所指定的参数类型必须为值类型
+    - 一条约束条文中不可以出现多个
+    - 出现的位置必须要出现在最前面
+    - 不可以和引用类型约束一起使用
+    - 不可以和无参构造函数约束一起使用
+
+```csharp
+public class CommandMethods<T>
+    where T : struct
+{
+
+}
+```
+
+- 引用类型约束：所指定的参数类型必须为引用类型
+    - 一条约束条文中不可以出现多个
+    - 出现的位置必须要出现在最前面
+    - 不可以和值类型约束一起使用
+    - 不可以和基类约束一起使用
+
+```csharp
+public class CommandMethods<T>
+    where T : class
+{
+
 }
 ```
