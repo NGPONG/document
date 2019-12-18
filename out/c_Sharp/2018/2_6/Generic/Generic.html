@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Generic.md</title>
+
+<!-- official styles start -->
+<!-- markdown.css -->
+<link rel="stylesheet" type="text/css" href="data:text/css;base64,LyotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KICogIENvcHlyaWdodCAoYykgTWljcm9zb2Z0IENvcnBvcmF0aW9uLiBBbGwgcmlnaHRzIHJlc2VydmVkLgogKiAgTGljZW5zZWQgdW5kZXIgdGhlIE1JVCBMaWNlbnNlLiBTZWUgTGljZW5zZS50eHQgaW4gdGhlIHByb2plY3Qgcm9vdCBmb3IgbGljZW5zZSBpbmZvcm1hdGlvbi4KICotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSovCgpodG1sLCBib2R5IHsKCWZvbnQtZmFtaWx5OiB2YXIoLS12c2NvZGUtbWFya2Rvd24tZm9udC1mYW1pbHksIC1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgIlNlZ29lIFdQQyIsICJTZWdvZSBVSSIsICJVYnVudHUiLCAiRHJvaWQgU2FucyIsIHNhbnMtc2VyaWYpOwoJZm9udC1zaXplOiB2YXIoLS12c2NvZGUtbWFya2Rvd24tZm9udC1zaXplLCAxNHB4KTsKCXBhZGRpbmc6IDAgMjZweDsKCWxpbmUtaGVpZ2h0OiB2YXIoLS12c2NvZGUtbWFya2Rvd24tbGluZS1oZWlnaHQsIDIycHgpOwoJd29yZC13cmFwOiBicmVhay13b3JkOwp9CgojY29kZS1jc3Atd2FybmluZyB7Cglwb3NpdGlvbjogZml4ZWQ7Cgl0b3A6IDA7CglyaWdodDogMDsKCWNvbG9yOiB3aGl0ZTsKCW1hcmdpbjogMTZweDsKCXRleHQtYWxpZ246IGNlbnRlcjsKCWZvbnQtc2l6ZTogMTJweDsKCWZvbnQtZmFtaWx5OiBzYW5zLXNlcmlmOwoJYmFja2dyb3VuZC1jb2xvcjojNDQ0NDQ0OwoJY3Vyc29yOiBwb2ludGVyOwoJcGFkZGluZzogNnB4OwoJYm94LXNoYWRvdzogMXB4IDFweCAxcHggcmdiYSgwLDAsMCwuMjUpOwp9CgojY29kZS1jc3Atd2FybmluZzpob3ZlciB7Cgl0ZXh0LWRlY29yYXRpb246IG5vbmU7CgliYWNrZ3JvdW5kLWNvbG9yOiMwMDdhY2M7Cglib3gtc2hhZG93OiAycHggMnB4IDJweCByZ2JhKDAsMCwwLC4yNSk7Cn0KCmJvZHkuc2Nyb2xsQmV5b25kTGFzdExpbmUgewoJbWFyZ2luLWJvdHRvbTogY2FsYygxMDB2aCAtIDIycHgpOwp9Cgpib2R5LnNob3dFZGl0b3JTZWxlY3Rpb24gLmNvZGUtbGluZSB7Cglwb3NpdGlvbjogcmVsYXRpdmU7Cn0KCmJvZHkuc2hvd0VkaXRvclNlbGVjdGlvbiAuY29kZS1hY3RpdmUtbGluZTpiZWZvcmUsCmJvZHkuc2hvd0VkaXRvclNlbGVjdGlvbiAuY29kZS1saW5lOmhvdmVyOmJlZm9yZSB7Cgljb250ZW50OiAiIjsKCWRpc3BsYXk6IGJsb2NrOwoJcG9zaXRpb246IGFic29sdXRlOwoJdG9wOiAwOwoJbGVmdDogLTEycHg7CgloZWlnaHQ6IDEwMCU7Cn0KCmJvZHkuc2hvd0VkaXRvclNlbGVjdGlvbiBsaS5jb2RlLWFjdGl2ZS1saW5lOmJlZm9yZSwKYm9keS5zaG93RWRpdG9yU2VsZWN0aW9uIGxpLmNvZGUtbGluZTpob3ZlcjpiZWZvcmUgewoJbGVmdDogLTMwcHg7Cn0KCi52c2NvZGUtbGlnaHQuc2hvd0VkaXRvclNlbGVjdGlvbiAuY29kZS1hY3RpdmUtbGluZTpiZWZvcmUgewoJYm9yZGVyLWxlZnQ6IDNweCBzb2xpZCByZ2JhKDAsIDAsIDAsIDAuMTUpOwp9CgoudnNjb2RlLWxpZ2h0LnNob3dFZGl0b3JTZWxlY3Rpb24gLmNvZGUtbGluZTpob3ZlcjpiZWZvcmUgewoJYm9yZGVyLWxlZnQ6IDNweCBzb2xpZCByZ2JhKDAsIDAsIDAsIDAuNDApOwp9CgoudnNjb2RlLWxpZ2h0LnNob3dFZGl0b3JTZWxlY3Rpb24gLmNvZGUtbGluZSAuY29kZS1saW5lOmhvdmVyOmJlZm9yZSB7Cglib3JkZXItbGVmdDogbm9uZTsKfQoKLnZzY29kZS1kYXJrLnNob3dFZGl0b3JTZWxlY3Rpb24gLmNvZGUtYWN0aXZlLWxpbmU6YmVmb3JlIHsKCWJvcmRlci1sZWZ0OiAzcHggc29saWQgcmdiYSgyNTUsIDI1NSwgMjU1LCAwLjQpOwp9CgoudnNjb2RlLWRhcmsuc2hvd0VkaXRvclNlbGVjdGlvbiAuY29kZS1saW5lOmhvdmVyOmJlZm9yZSB7Cglib3JkZXItbGVmdDogM3B4IHNvbGlkIHJnYmEoMjU1LCAyNTUsIDI1NSwgMC42MCk7Cn0KCi52c2NvZGUtZGFyay5zaG93RWRpdG9yU2VsZWN0aW9uIC5jb2RlLWxpbmUgLmNvZGUtbGluZTpob3ZlcjpiZWZvcmUgewoJYm9yZGVyLWxlZnQ6IG5vbmU7Cn0KCi52c2NvZGUtaGlnaC1jb250cmFzdC5zaG93RWRpdG9yU2VsZWN0aW9uIC5jb2RlLWFjdGl2ZS1saW5lOmJlZm9yZSB7Cglib3JkZXItbGVmdDogM3B4IHNvbGlkIHJnYmEoMjU1LCAxNjAsIDAsIDAuNyk7Cn0KCi52c2NvZGUtaGlnaC1jb250cmFzdC5zaG93RWRpdG9yU2VsZWN0aW9uIC5jb2RlLWxpbmU6aG92ZXI6YmVmb3JlIHsKCWJvcmRlci1sZWZ0OiAzcHggc29saWQgcmdiYSgyNTUsIDE2MCwgMCwgMSk7Cn0KCi52c2NvZGUtaGlnaC1jb250cmFzdC5zaG93RWRpdG9yU2VsZWN0aW9uIC5jb2RlLWxpbmUgLmNvZGUtbGluZTpob3ZlcjpiZWZvcmUgewoJYm9yZGVyLWxlZnQ6IG5vbmU7Cn0KCmltZyB7CgltYXgtd2lkdGg6IDEwMCU7CgltYXgtaGVpZ2h0OiAxMDAlOwp9CgphIHsKCXRleHQtZGVjb3JhdGlvbjogbm9uZTsKfQoKYTpob3ZlciB7Cgl0ZXh0LWRlY29yYXRpb246IHVuZGVybGluZTsKfQoKYTpmb2N1cywKaW5wdXQ6Zm9jdXMsCnNlbGVjdDpmb2N1cywKdGV4dGFyZWE6Zm9jdXMgewoJb3V0bGluZTogMXB4IHNvbGlkIC13ZWJraXQtZm9jdXMtcmluZy1jb2xvcjsKCW91dGxpbmUtb2Zmc2V0OiAtMXB4Owp9CgpociB7Cglib3JkZXI6IDA7CgloZWlnaHQ6IDJweDsKCWJvcmRlci1ib3R0b206IDJweCBzb2xpZDsKfQoKaDEgewoJcGFkZGluZy1ib3R0b206IDAuM2VtOwoJbGluZS1oZWlnaHQ6IDEuMjsKCWJvcmRlci1ib3R0b20td2lkdGg6IDFweDsKCWJvcmRlci1ib3R0b20tc3R5bGU6IHNvbGlkOwp9CgpoMSwgaDIsIGgzIHsKCWZvbnQtd2VpZ2h0OiBub3JtYWw7Cn0KCnRhYmxlIHsKCWJvcmRlci1jb2xsYXBzZTogY29sbGFwc2U7Cn0KCnRhYmxlID4gdGhlYWQgPiB0ciA+IHRoIHsKCXRleHQtYWxpZ246IGxlZnQ7Cglib3JkZXItYm90dG9tOiAxcHggc29saWQ7Cn0KCnRhYmxlID4gdGhlYWQgPiB0ciA+IHRoLAp0YWJsZSA+IHRoZWFkID4gdHIgPiB0ZCwKdGFibGUgPiB0Ym9keSA+IHRyID4gdGgsCnRhYmxlID4gdGJvZHkgPiB0ciA+IHRkIHsKCXBhZGRpbmc6IDVweCAxMHB4Owp9Cgp0YWJsZSA+IHRib2R5ID4gdHIgKyB0ciA+IHRkIHsKCWJvcmRlci10b3A6IDFweCBzb2xpZDsKfQoKYmxvY2txdW90ZSB7CgltYXJnaW46IDAgN3B4IDAgNXB4OwoJcGFkZGluZzogMCAxNnB4IDAgMTBweDsKCWJvcmRlci1sZWZ0LXdpZHRoOiA1cHg7Cglib3JkZXItbGVmdC1zdHlsZTogc29saWQ7Cn0KCmNvZGUgewoJZm9udC1mYW1pbHk6IE1lbmxvLCBNb25hY28sIENvbnNvbGFzLCAiRHJvaWQgU2FucyBNb25vIiwgIkNvdXJpZXIgTmV3IiwgbW9ub3NwYWNlLCAiRHJvaWQgU2FucyBGYWxsYmFjayI7Cglmb250LXNpemU6IDFlbTsKCWxpbmUtaGVpZ2h0OiAxLjM1N2VtOwp9Cgpib2R5LndvcmRXcmFwIHByZSB7Cgl3aGl0ZS1zcGFjZTogcHJlLXdyYXA7Cn0KCnByZTpub3QoLmhsanMpLApwcmUuaGxqcyBjb2RlID4gZGl2IHsKCXBhZGRpbmc6IDE2cHg7Cglib3JkZXItcmFkaXVzOiAzcHg7CglvdmVyZmxvdzogYXV0bzsKfQoKcHJlIGNvZGUgewoJY29sb3I6IHZhcigtLXZzY29kZS1lZGl0b3ItZm9yZWdyb3VuZCk7Cgl0YWItc2l6ZTogNDsKfQoKLyoqIFRoZW1pbmcgKi8KCi52c2NvZGUtbGlnaHQgcHJlIHsKCWJhY2tncm91bmQtY29sb3I6IHJnYmEoMjIwLCAyMjAsIDIyMCwgMC40KTsKfQoKLnZzY29kZS1kYXJrIHByZSB7CgliYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDEwLCAxMCwgMTAsIDAuNCk7Cn0KCi52c2NvZGUtaGlnaC1jb250cmFzdCBwcmUgewoJYmFja2dyb3VuZC1jb2xvcjogcmdiKDAsIDAsIDApOwp9CgoudnNjb2RlLWhpZ2gtY29udHJhc3QgaDEgewoJYm9yZGVyLWNvbG9yOiByZ2IoMCwgMCwgMCk7Cn0KCi52c2NvZGUtbGlnaHQgdGFibGUgPiB0aGVhZCA+IHRyID4gdGggewoJYm9yZGVyLWNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuNjkpOwp9CgoudnNjb2RlLWRhcmsgdGFibGUgPiB0aGVhZCA+IHRyID4gdGggewoJYm9yZGVyLWNvbG9yOiByZ2JhKDI1NSwgMjU1LCAyNTUsIDAuNjkpOwp9CgoudnNjb2RlLWxpZ2h0IGgxLAoudnNjb2RlLWxpZ2h0IGhyLAoudnNjb2RlLWxpZ2h0IHRhYmxlID4gdGJvZHkgPiB0ciArIHRyID4gdGQgewoJYm9yZGVyLWNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuMTgpOwp9CgoudnNjb2RlLWRhcmsgaDEsCi52c2NvZGUtZGFyayBociwKLnZzY29kZS1kYXJrIHRhYmxlID4gdGJvZHkgPiB0ciArIHRyID4gdGQgewoJYm9yZGVyLWNvbG9yOiByZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMTgpOwp9Cg=="/>
+<!-- highlight.css -->
+<link rel="stylesheet" type="text/css" href="data:text/css;base64,LyoKaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2lzYWdhbGFldi9oaWdobGlnaHQuanMvbWFzdGVyL3NyYy9zdHlsZXMvdnMyMDE1LmNzcwoqLwovKgogKiBWaXN1YWwgU3R1ZGlvIDIwMTUgZGFyayBzdHlsZQogKiBBdXRob3I6IE5pY29sYXMgTExPQkVSQSA8bmxsb2JlcmFAZ21haWwuY29tPgogKi8KCgouaGxqcy1rZXl3b3JkLAouaGxqcy1saXRlcmFsLAouaGxqcy1zeW1ib2wsCi5obGpzLW5hbWUgewoJY29sb3I6ICM1NjlDRDY7Cn0KLmhsanMtbGluayB7Cgljb2xvcjogIzU2OUNENjsKCXRleHQtZGVjb3JhdGlvbjogdW5kZXJsaW5lOwp9CgouaGxqcy1idWlsdF9pbiwKLmhsanMtdHlwZSB7Cgljb2xvcjogIzRFQzlCMDsKfQoKLmhsanMtbnVtYmVyLAouaGxqcy1jbGFzcyB7Cgljb2xvcjogI0I4RDdBMzsKfQoKLmhsanMtc3RyaW5nLAouaGxqcy1tZXRhLXN0cmluZyB7Cgljb2xvcjogI0Q2OUQ4NTsKfQoKLmhsanMtcmVnZXhwLAouaGxqcy10ZW1wbGF0ZS10YWcgewoJY29sb3I6ICM5QTUzMzQ7Cn0KCi5obGpzLXN1YnN0LAouaGxqcy1mdW5jdGlvbiwKLmhsanMtdGl0bGUsCi5obGpzLXBhcmFtcywKLmhsanMtZm9ybXVsYSB7Cgljb2xvcjogI0RDRENEQzsKfQoKLmhsanMtY29tbWVudCwKLmhsanMtcXVvdGUgewoJY29sb3I6ICM1N0E2NEE7Cglmb250LXN0eWxlOiBpdGFsaWM7Cn0KCi5obGpzLWRvY3RhZyB7Cgljb2xvcjogIzYwOEI0RTsKfQoKLmhsanMtbWV0YSwKLmhsanMtbWV0YS1rZXl3b3JkLAouaGxqcy10YWcgewoJY29sb3I6ICM5QjlCOUI7Cn0KCi5obGpzLXZhcmlhYmxlLAouaGxqcy10ZW1wbGF0ZS12YXJpYWJsZSB7Cgljb2xvcjogI0JENjNDNTsKfQoKLmhsanMtYXR0ciwKLmhsanMtYXR0cmlidXRlLAouaGxqcy1idWlsdGluLW5hbWUgewoJY29sb3I6ICM5Q0RDRkU7Cn0KCi5obGpzLXNlY3Rpb24gewoJY29sb3I6IGdvbGQ7Cn0KCi5obGpzLWVtcGhhc2lzIHsKCWZvbnQtc3R5bGU6IGl0YWxpYzsKfQoKLmhsanMtc3Ryb25nIHsKCWZvbnQtd2VpZ2h0OiBib2xkOwp9CgovKi5obGpzLWNvZGUgewoJZm9udC1mYW1pbHk6J01vbm9zcGFjZSc7Cn0qLwoKLmhsanMtYnVsbGV0LAouaGxqcy1zZWxlY3Rvci10YWcsCi5obGpzLXNlbGVjdG9yLWlkLAouaGxqcy1zZWxlY3Rvci1jbGFzcywKLmhsanMtc2VsZWN0b3ItYXR0ciwKLmhsanMtc2VsZWN0b3ItcHNldWRvIHsKCWNvbG9yOiAjRDdCQTdEOwp9CgouaGxqcy1hZGRpdGlvbiB7CgliYWNrZ3JvdW5kLWNvbG9yOiB2YXIoLS12c2NvZGUtZGlmZkVkaXRvci1pbnNlcnRlZFRleHRCYWNrZ3JvdW5kLCByZ2JhKDE1NSwgMTg1LCA4NSwgMC4yKSk7Cgljb2xvcjogcmdiKDE1NSwgMTg1LCA4NSk7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7Cgl3aWR0aDogMTAwJTsKfQoKLmhsanMtZGVsZXRpb24gewoJYmFja2dyb3VuZDogdmFyKC0tdnNjb2RlLWRpZmZFZGl0b3ItcmVtb3ZlZFRleHRCYWNrZ3JvdW5kLCByZ2JhKDI1NSwgMCwgMCwgMC4yKSk7Cgljb2xvcjogcmdiKDI1NSwgMCwgMCk7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7Cgl3aWR0aDogMTAwJTsKfQoKCi8qCkZyb20gaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2lzYWdhbGFldi9oaWdobGlnaHQuanMvbWFzdGVyL3NyYy9zdHlsZXMvdnMuY3NzCiovCi8qCgpWaXN1YWwgU3R1ZGlvLWxpa2Ugc3R5bGUgYmFzZWQgb24gb3JpZ2luYWwgQyMgY29sb3JpbmcgYnkgSmFzb24gRGlhbW9uZCA8amFzb25AZGlhbW9uZC5uYW1lPgoKKi8KCi52c2NvZGUtbGlnaHQgLmhsanMtZnVuY3Rpb24sCi52c2NvZGUtbGlnaHQgLmhsanMtcGFyYW1zLAoudnNjb2RlLWxpZ2h0IC5obGpzLW51bWJlciwKLnZzY29kZS1saWdodCAuaGxqcy1jbGFzcyAgewoJY29sb3I6IGluaGVyaXQ7Cn0KCi52c2NvZGUtbGlnaHQgLmhsanMtY29tbWVudCwKLnZzY29kZS1saWdodCAuaGxqcy1xdW90ZSwKLnZzY29kZS1saWdodCAuaGxqcy1udW1iZXIsCi52c2NvZGUtbGlnaHQgLmhsanMtY2xhc3MsCi52c2NvZGUtbGlnaHQgLmhsanMtdmFyaWFibGUgewoJY29sb3I6ICMwMDgwMDA7Cn0KCi52c2NvZGUtbGlnaHQgLmhsanMta2V5d29yZCwKLnZzY29kZS1saWdodCAuaGxqcy1zZWxlY3Rvci10YWcsCi52c2NvZGUtbGlnaHQgLmhsanMtbmFtZSwKLnZzY29kZS1saWdodCAuaGxqcy10YWcgewoJY29sb3I6ICMwMGY7Cn0KCi52c2NvZGUtbGlnaHQgLmhsanMtYnVpbHRfaW4sCi52c2NvZGUtbGlnaHQgLmhsanMtYnVpbHRpbi1uYW1lIHsKCWNvbG9yOiAjMDA3YWNjOwp9CgoudnNjb2RlLWxpZ2h0IC5obGpzLXN0cmluZywKLnZzY29kZS1saWdodCAuaGxqcy1zZWN0aW9uLAoudnNjb2RlLWxpZ2h0IC5obGpzLWF0dHJpYnV0ZSwKLnZzY29kZS1saWdodCAuaGxqcy1saXRlcmFsLAoudnNjb2RlLWxpZ2h0IC5obGpzLXRlbXBsYXRlLXRhZywKLnZzY29kZS1saWdodCAuaGxqcy10ZW1wbGF0ZS12YXJpYWJsZSwKLnZzY29kZS1saWdodCAuaGxqcy10eXBlIHsKCWNvbG9yOiAjYTMxNTE1Owp9CgoudnNjb2RlLWxpZ2h0IC5obGpzLXNlbGVjdG9yLWF0dHIsCi52c2NvZGUtbGlnaHQgLmhsanMtc2VsZWN0b3ItcHNldWRvLAoudnNjb2RlLWxpZ2h0IC5obGpzLW1ldGEsCi52c2NvZGUtbGlnaHQgLmhsanMtbWV0YS1rZXl3b3JkIHsKCWNvbG9yOiAjMmI5MWFmOwp9CgoudnNjb2RlLWxpZ2h0IC5obGpzLXRpdGxlLAoudnNjb2RlLWxpZ2h0IC5obGpzLWRvY3RhZyB7Cgljb2xvcjogIzgwODA4MDsKfQoKLnZzY29kZS1saWdodCAuaGxqcy1hdHRyIHsKCWNvbG9yOiAjZjAwOwp9CgoudnNjb2RlLWxpZ2h0IC5obGpzLXN5bWJvbCwKLnZzY29kZS1saWdodCAuaGxqcy1idWxsZXQsCi52c2NvZGUtbGlnaHQgLmhsanMtbGluayB7Cgljb2xvcjogIzAwYjBlODsKfQoKCi52c2NvZGUtbGlnaHQgLmhsanMtZW1waGFzaXMgewoJZm9udC1zdHlsZTogaXRhbGljOwp9CgoudnNjb2RlLWxpZ2h0IC5obGpzLXN0cm9uZyB7Cglmb250LXdlaWdodDogYm9sZDsKfQo="/>
+<!-- official styles end -->
+
+<!-- third party styles start -->
+<!-- markdown-it-admonition.css -->
+<link rel="stylesheet" type="text/css" href="data:text/css;base64,QGZvbnQtZmFjZSB7CiAgZm9udC1mYW1pbHk6ICJNYXRlcmlhbCBJY29ucyI7CiAgZm9udC1zdHlsZTogbm9ybWFsOwogIGZvbnQtd2VpZ2h0OiA0MDA7CiAgc3JjOiBsb2NhbCgiTWF0ZXJpYWwgSWNvbnMiKSwgbG9jYWwoIk1hdGVyaWFsSWNvbnMtUmVndWxhciIpLCB1cmwoImRhdGE6YXBwbGljYXRpb24veC1mb250LXdvZmY7Y2hhcnNldD11dGYtODtiYXNlNjQsZDA5R1JnQUJBQUFBQUFmSUFBc0FBQUFBRERBQUFRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUJIVTFWQ0FBQUJDQUFBQURNQUFBQkNzUDZ6N1U5VEx6SUFBQUU4QUFBQVJBQUFBRlpXN2tvc1kyMWhjQUFBQVlBQUFBRFRBQUFDanRQNnl0Qm5iSGxtQUFBQ1ZBQUFBeGdBQUFRNHpSdHZsR2hsWVdRQUFBVnNBQUFBTHdBQUFEWVJ3WnNuYUdobFlRQUFCWndBQUFBY0FBQUFKQWVLQXp4b2JYUjRBQUFGdUFBQUFCSUFBQUE4T0dRQUFHeHZZMkVBQUFYTUFBQUFJQUFBQUNBRzVBZndiV0Y0Y0FBQUJld0FBQUFmQUFBQUlBRWZBRVJ1WVcxbEFBQUdEQUFBQVZjQUFBS0ZrQWhvQzNCdmMzUUFBQWRrQUFBQVlnQUFBSzJ2ejd3a2VKeGpZR1JnWU9CaWtHUFFZV0IwY2ZNSlllQmdZR0dBQUpBTVkwNW1laUpRRE1vRHlyR0FhUTRnWm9PSUFnQ0tJd05QQUhpY1kyQmtQc1E0Z1lHVmdZT3BrK2tNQXdORFA0Um1mTTFneE1qQndNREV3TXJNZ0JVRXBMbW1NRGd3Vkx5NHhLenpYNGNoaHJtSzRRcFFtQkVrQndBWnlneXdlSnpGa3IwTndqQVFoWitURVA2Q1JVZkhCRXdSVVdhUVRJQ3lRYnBNd1JDc2tBNVJVSU9OeEcwUm5uTnBLQUlWNHF6UGt1LzhjMzUzQUNZQVlySWpDV0N1TUFoMnB0ZjAvaGlMM3AvZ3lQVVdhM29zcWx0MEwxenU5cjcxejhkR3JKUnlrRm9hdVhRZDkzMkxqNXZoRytNanhHZVlJOE1LRVRPYk1wc2xmNUV5UDh0Zyt2SHVuNXI1MzlQdmx2WHphVmhSRlZRRFRQRVdLVlFSOTBLaG5uQzVFazY3dlVLTjRWdUZhc00vbGRBUmo0M0NDa0NzRWpwSlNvVlZnUnlVMEdWU0s2d1VwRkZDeDhsRmdYMEJpWHBSUFFCNG5FMlRUV2pjUmhUSDN4dHRwRGh4Tjd1eFBscDN1L0ZLN21vUlBpeGFmUmlqTm9zeFN3L0xVc0l3TmNhRUhQWmdnby9GbUVLTUNLV1U0a05PT2Z0UVNsaEU4YWxuSDBJeDlCcVduSG9vUFJyVFEwK21udTJiWFR1MnBQZEdNOUxNLzZjM2Z3RUNUTTRnQkJNWVFOcXh6THJaQWpxWVNscXUyVEFIWlFBMC9EUUpINkZ0enFHRG52YnQ0R2d3dnp3L25MOEVmSDhrVzBmc3VScWhnV1hablk3TTFwaWNhVUw3RHU1QkhlRHpNSWw4M2RBdDAxNndIMXFtdnRTTW81UjZZUkpIVFIvL0ZYc2ZmL25qL3RjLzVLOVA1ZCtuUDIyK2ZGSzV1N3YzSzM5U1czeStPdERLTzNMODV2RDA5UEQ5ejVYMTdhMk4xZzR0cWswMVJscVg3Z3lvRW1uc1dRdFZyNHJ0Wk1tdWtFYUZCWnh6ZWZrQ24xMWN5S01MWmdzaFJ3Z1RZTm9MTlhDQnoyamE3SHZaRzdoRHBQU05mb281dnMwa25LLzloYityTnB1KzhrSFBnay9BbzRrSzN0V3RUcFNFdHZrQTljK3dFNlVhVWR3aWVOa2FIZzU1dEJFdFJpRVB3MXMwK0Z0cnRUY2M5dHdvMmxoTWtuVjdQWkYvY3M2K3VVRlRtcFRHYkV4N3NRQ1BTTE90dEhTM0dSbHRxcDdTTnpWU0t6bDZhV25aVC9DWDVrNi92OU4zSGg4ZkhCd2ZmSlZqaHJDNk9nSDVka0l0L3RQc3ErZC9QRDVRejdHN2VmenExVEhGamRaVlBlL042dWxRM0puRFdTRTVqdW5zRnNWSWlGd0wvaHRmMVM1Z0ozQmZPY1V4ZkhLTG56cXBGcHlmWjljWCsvNVdCNmErWTBwSHB6a05yWU5WRHdNc2lrSyt5N1d1TENSZy9vRkhrQThWVDNyRGc1Wm5VNmt0enpJTnltVjBtNzRYZDVwZklHWHlGZVZFUVNTaGt6cUc3VEJCYTJPeFZSS2l0TFh2N2gzdXVmdFhuWHE3bHoydFovV25XYTlkeDlkQ2pEaEh6bXVWUUFUbG1sanI5ZFpFclV5ZFNvMkhiaS9iMXZYdHJPZUdDazIvOHMzWmxPOCt1ZUpUOEJWbHc1cEd3Mm9ZY2NkU2lISHF4MFJsYWJIcWROUjlqQUVUbDZQcmVKY1BCbm5mcFRMbk9ROEMzT1Y4QW1RR3pvdVYxaVpkZWI1U1NJb1ZjOFc4L2tjRHRrc1VINUZyVTYvYXFCcU5XY01FenhHNERBUTE0cVJRaGk5bVdVMHJ6ZXBLZXpiamZnQ3dRS3hWWXE1YWpSZ3BScXk0NUNxd2tKeWRjRWtiVGt2Uno4UDUvMlpwRFRONG5HTmdaR0JnQU9LYjZ2Ky94dlBiZkdYZ1ptRUFnZXVCMmtrSSt2OGJGZ2JtS2lDWGc0RUpKQW9BUHlBS2hRQjRuR05nWkdCZzF2bXZ3eEREd2dBQ1FKS1JBUlh3QXdBelpRSFFlSnhqWVFDQ0ZBWUdGZ2JTTVFBY1dBQ2RBQUFBQUFBQUFBd0FMZ0JnQUlRQW1BRFNBUWdCSWdFOEFWQUJvQUhlQWZ3Q0hIaWNZMkJrWUdEZ1o3QmdZR01BQVNZZzVnSkNCb2IvWUQ0REFBL2hBV1FBZUp4bGtidHV3a0FVUk1jODhnQXBRb21VSm9xMFRkSVF6RU9wVURva0tDTlIwQnV6QmlPL3RGNlFTSmNQeUhmbEU5S2x5eWVrejJDdUc4Y3I3NTQ3TTNkOUpRTzR4amNjbko1N3ZpZDJjTUhxeERXYzQwRzRUdjFKdUVGK0ZtNmlqUmZoTStvejRSYTZlQlZ1NHdadnZNRnBYTElhNDBQWVFRZWZ3alZjNFV1NFR2MUh1RUgrRlc3aTFta0tuNkhqM0FtM3NIQzZ3bTA4T3U4dHBTWkdlMWF2MVBLZ2dqU3hQZDh6SnRTR1R1aW55VkdhNi9VdThreFpsdWRDbXp4TUV6VjBCNlUwMDRrMjVXMzVmajJ5TmxDQlNXTTFwYXVqS0ZXWlNiZmF0KzdHMm16Yzd3ZWl1MzRhY3p6Rk5ZR0JoZ2ZMZmNWNmlRUDNBQ2tTYWozNDlBeFhTTjlJVDBqMTZKZXBPYjAxZG9pS2JOV3Qxb3ZpcHB6NnNWWVl3c1hnWDJyR1ZGSWtxN1BsMlBOckk2cVc2ZU9zaGoweGFTcTltcE5FWklXczhMWlVmT291TmtWWHhwL2Q1d29xZWJlWUlmNEQySjF5d1FCNG5HM0xPdzZBSUJBRTBCMzg0QitQQWtnRWErUXdOblltSHQrRXBYU2FsNWxrU0JCbm9QOG9DRlNvMGFDRlJJY2VBMFpNbUxGQVlTVzg4cm12dE1VakczUmlROUh2cGZ1c002eldObXRjNUgvaVBld2hhNTB0T3Q1UFMvUUJ4MkllU3dBQSIpIGZvcm1hdCgid29mZiIpOwp9CgouYWRtb25pdGlvbiB7CiAgYm94LXNoYWRvdzogMCAycHggMnB4IDAgcmdiYSgwLCAwLCAwLCAuMTQpLCAwIDFweCA1cHggMCByZ2JhKDAsIDAsIDAsIC4xMiksIDAgM3B4IDFweCAtMnB4IHJnYmEoMCwgMCwgMCwgLjIpOwogIHBvc2l0aW9uOiByZWxhdGl2ZTsKICBtYXJnaW46IDEuNTYyNWVtIDA7CiAgcGFkZGluZzogMCAxLjJyZW07CiAgYm9yZGVyLWxlZnQ6IC40cmVtIHNvbGlkIHJnYmEoNjgsIDEzOCwgMjU1LCAuOCk7CiAgYm9yZGVyLXJhZGl1czogLjJyZW07CiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgyNTUsIDI1NSwgMjU1LCAwLjA1KTsKICBvdmVyZmxvdzogYXV0bzsKfQoKLmFkbW9uaXRpb24+LmFkbW9uaXRpb24tdGl0bGUgewogIG1hcmdpbjogMCAtMS4ycmVtOwogIHBhZGRpbmc6IC44cmVtIDEuMnJlbSAuOHJlbSAzLjZyZW07CiAgYm9yZGVyLWJvdHRvbTogMXB4IHNvbGlkIHJnYmEoNjgsIDEzOCwgMjU1LCAuMik7CiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSg2OCwgMTM4LCAyNTUsIC4xKTsKICBmb250LXdlaWdodDogNzAwOwp9CgouYWRtb25pdGlvbj4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIHBvc2l0aW9uOiBhYnNvbHV0ZTsKICBsZWZ0OiAxLjJyZW07CiAgZm9udC1zaXplOiAxLjVyZW07CiAgY29sb3I6IHJnYmEoNjgsIDEzOCwgMjU1LCAuOCk7CiAgY29udGVudDogIlxFM0M5IjsKfQoKLmFkbW9uaXRpb24+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlIHsKICBmb250LWZhbWlseTogTWF0ZXJpYWwgSWNvbnM7CiAgZm9udC1zdHlsZTogbm9ybWFsOwogIGZvbnQtdmFyaWFudDogbm9ybWFsOwogIGZvbnQtd2VpZ2h0OiA0MDA7CiAgbGluZS1oZWlnaHQ6IDJyZW07CiAgdGV4dC10cmFuc2Zvcm06IG5vbmU7CiAgd2hpdGUtc3BhY2U6IG5vd3JhcDsKICBzcGVhazogbm9uZTsKICB3b3JkLXdyYXA6IG5vcm1hbDsKICBkaXJlY3Rpb246IGx0cjsKfQoKLmFkbW9uaXRpb24uc3VtbWFyeSwKLmFkbW9uaXRpb24uYWJzdHJhY3QsCi5hZG1vbml0aW9uLnRsZHIgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDAsIDE3NiwgMjU1LCAuOCk7Cn0KCi5hZG1vbml0aW9uLnN1bW1hcnk+LmFkbW9uaXRpb24tdGl0bGUsCi5hZG1vbml0aW9uLmFic3RyYWN0Pi5hZG1vbml0aW9uLXRpdGxlLAouYWRtb25pdGlvbi50bGRyPi5hZG1vbml0aW9uLXRpdGxlIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDE3NiwgMjU1LCAuMSk7CiAgYm9yZGVyLWJvdHRvbS1jb2xvcjogcmdiYSgwLCAxNzYsIDI1NSwgLjIpOwp9CgouYWRtb25pdGlvbi5zdW1tYXJ5Pi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSwKLmFkbW9uaXRpb24uYWJzdHJhY3Q+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlLAouYWRtb25pdGlvbi50bGRyPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSB7CiAgY29sb3I6IHJnYmEoMCwgMTc2LCAyNTUsIDEpOwogIDsKICBjb250ZW50OiAiXEU4RDIiOwp9CgouYWRtb25pdGlvbi5oaW50LAouYWRtb25pdGlvbi50aXAgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDAsIDE5MSwgMTY1LCAuOCk7Cn0KCi5hZG1vbml0aW9uLmhpbnQ+LmFkbW9uaXRpb24tdGl0bGUsCi5hZG1vbml0aW9uLnRpcD4uYWRtb25pdGlvbi10aXRsZSB7CiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgwLCAxOTEsIDE2NSwgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMCwgMTkxLCAxNjUsIC4yKTsKfQoKLmFkbW9uaXRpb24uaGludD4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUsCi5hZG1vbml0aW9uLnRpcD4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIGNvbG9yOiByZ2JhKDAsIDE5MSwgMTY1LCAxKTsKICBjb250ZW50OiAiXEU4MEUiOwp9CgouYWRtb25pdGlvbi5pbmZvLAouYWRtb25pdGlvbi50b2RvIHsKICBib3JkZXItbGVmdC1jb2xvcjogcmdiYSgwLCAxODQsIDIxMiwgLjgpOwp9CgouYWRtb25pdGlvbi5pbmZvPi5hZG1vbml0aW9uLXRpdGxlLAouYWRtb25pdGlvbi50b2RvPi5hZG1vbml0aW9uLXRpdGxlIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDE4NCwgMjEyLCAuMSk7CiAgYm9yZGVyLWJvdHRvbS1jb2xvcjogcmdiYSgwLCAxODQsIDIxMiwgLjIpOwp9CgouYWRtb25pdGlvbi5pbmZvPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSwKLmFkbW9uaXRpb24udG9kbz4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIGNvbG9yOiByZ2JhKDAsIDE4NCwgMjEyLCAxKTsKICA7CiAgY29udGVudDogIlxFODhFIjsKfQoKLmFkbW9uaXRpb24uc3VjY2VzcywKLmFkbW9uaXRpb24uY2hlY2ssCi5hZG1vbml0aW9uLmRvbmUgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDAsIDIwMCwgODMsIC44KTsKfQoKLmFkbW9uaXRpb24uc3VjY2Vzcz4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uY2hlY2s+LmFkbW9uaXRpb24tdGl0bGUsCi5hZG1vbml0aW9uLmRvbmU+LmFkbW9uaXRpb24tdGl0bGUgewogIGJhY2tncm91bmQtY29sb3I6IHJnYmEoMCwgMjAwLCA4MywgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMCwgMjAwLCA4MywgLjIpOwp9CgouYWRtb25pdGlvbi5zdWNjZXNzPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSwKLmFkbW9uaXRpb24uY2hlY2s+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlLAouYWRtb25pdGlvbi5kb25lPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSB7CiAgY29sb3I6IHJnYmEoMCwgMjAwLCA4MywgMSk7CiAgOwogIGNvbnRlbnQ6ICJcRTg3NiI7Cn0KCi5hZG1vbml0aW9uLnF1ZXN0aW9uLAouYWRtb25pdGlvbi5oZWxwLAouYWRtb25pdGlvbi5mYXEgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDEwMCwgMjIxLCAyMywgLjgpOwp9CgouYWRtb25pdGlvbi5xdWVzdGlvbj4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uaGVscD4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uZmFxPi5hZG1vbml0aW9uLXRpdGxlIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDEwMCwgMjIxLCAyMywgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMTAwLCAyMjEsIDIzLCAuMik7Cn0KCi5hZG1vbml0aW9uLnF1ZXN0aW9uPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSwKLmFkbW9uaXRpb24uaGVscD4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUsCi5hZG1vbml0aW9uLmZhcT4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIGNvbG9yOiByZ2JhKDEwMCwgMjIxLCAyMywgMSk7CiAgOwogIGNvbnRlbnQ6ICJcRTg4NyI7Cn0KCi5hZG1vbml0aW9uLndhcm5pbmcsCi5hZG1vbml0aW9uLmF0dGVudGlvbiwKLmFkbW9uaXRpb24uY2F1dGlvbiB7CiAgYm9yZGVyLWxlZnQtY29sb3I6IHJnYmEoMjU1LCAxNDUsIDAsIC44KTsKfQoKLmFkbW9uaXRpb24ud2FybmluZz4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uYXR0ZW50aW9uPi5hZG1vbml0aW9uLXRpdGxlLAouYWRtb25pdGlvbi5jYXV0aW9uPi5hZG1vbml0aW9uLXRpdGxlIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDI1NSwgMTQ1LCAwLCAuMSk7CiAgYm9yZGVyLWJvdHRvbS1jb2xvcjogcmdiYSgyNTUsIDE0NSwgMCwgLjIpOwp9CgouYWRtb25pdGlvbi5hdHRlbnRpb24+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlIHsKICBjb2xvcjogcmdiYSgyNTUsIDE0NSwgMCwgMSk7CiAgY29udGVudDogIlxFNDE3IjsKfQoKLmFkbW9uaXRpb24ud2FybmluZz4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUsCi5hZG1vbml0aW9uLmNhdXRpb24+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlIHsKICBjb2xvcjogcmdiYSgyNTUsIDE0NSwgMCwgMSk7CiAgY29udGVudDogIlxFMDAyIjsKfQoKLmFkbW9uaXRpb24uZmFpbHVyZSwKLmFkbW9uaXRpb24uZmFpbCwKLmFkbW9uaXRpb24ubWlzc2luZyB7CiAgYm9yZGVyLWxlZnQtY29sb3I6IHJnYmEoMjU1LCA4MiwgODIsIC44KTsKfQoKLmFkbW9uaXRpb24uZmFpbHVyZT4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uZmFpbD4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24ubWlzc2luZz4uYWRtb25pdGlvbi10aXRsZSB7CiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgyNTUsIDgyLCA4MiwgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMjU1LCA4MiwgODIsIC4yKTsKfQoKLmFkbW9uaXRpb24uZmFpbHVyZT4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUsCi5hZG1vbml0aW9uLmZhaWw+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlLAouYWRtb25pdGlvbi5taXNzaW5nPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSB7CiAgY29sb3I6IHJnYmEoMjU1LCA4MiwgODIsIDEpOwogIDsKICBjb250ZW50OiAiXEUxNEMiOwp9CgouYWRtb25pdGlvbi5kYW5nZXIsCi5hZG1vbml0aW9uLmVycm9yLAouYWRtb25pdGlvbi5idWcgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDI1NSwgMjMsIDY4LCAuOCk7Cn0KCi5hZG1vbml0aW9uLmRhbmdlcj4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uZXJyb3I+LmFkbW9uaXRpb24tdGl0bGUsCi5hZG1vbml0aW9uLmJ1Zz4uYWRtb25pdGlvbi10aXRsZSB7CiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgyNTUsIDIzLCA2OCwgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMjU1LCAyMywgNjgsIC4yKTsKfQoKLmFkbW9uaXRpb24uZGFuZ2VyPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSB7CiAgY29sb3I6IHJnYmEoMjU1LCAyMywgNjgsIDEpOwogIGNvbnRlbnQ6ICJcRTNFNyI7Cn0KCi5hZG1vbml0aW9uLmVycm9yPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSB7CiAgY29sb3I6IHJnYmEoMjU1LCAyMywgNjgsIDEpOwogIGNvbnRlbnQ6ICJcRTE0QyI7Cn0KCi5hZG1vbml0aW9uLmJ1Zz4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIGNvbG9yOiByZ2JhKDI1NSwgMjMsIDY4LCAxKTsKICBjb250ZW50OiAiXEU4NjgiOwp9CgouYWRtb25pdGlvbi5leGFtcGxlLAouYWRtb25pdGlvbi5zbmlwcGV0IHsKICBib3JkZXItbGVmdC1jb2xvcjogcmdiYSgwLCAxODQsIDIxMiwgLjgpOwp9CgouYWRtb25pdGlvbi5leGFtcGxlPi5hZG1vbml0aW9uLXRpdGxlLAouYWRtb25pdGlvbi5zbmlwcGV0Pi5hZG1vbml0aW9uLXRpdGxlIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDE4NCwgMjEyLCAuMSk7CiAgYm9yZGVyLWJvdHRvbS1jb2xvcjogcmdiYSgwLCAxODQsIDIxMiwgLjIpOwp9CgouYWRtb25pdGlvbi5leGFtcGxlPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSwKLmFkbW9uaXRpb24uc25pcHBldD4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIGNvbG9yOiByZ2JhKDAsIDE4NCwgMjEyLCAxKTsKICA7CiAgY29udGVudDogIlxFMjQyIjsKfQoKLmFkbW9uaXRpb24ucXVvdGUsCi5hZG1vbml0aW9uLmNpdGUgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDE1OCwgMTU4LCAxNTgsIC44KTsKfQoKLmFkbW9uaXRpb24ucXVvdGU+LmFkbW9uaXRpb24tdGl0bGUsCi5hZG1vbml0aW9uLmNpdGU+LmFkbW9uaXRpb24tdGl0bGUgewogIGJhY2tncm91bmQtY29sb3I6IHJnYmEoMTU4LCAxNTgsIDE1OCwgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMTU4LCAxNTgsIDE1OCwgLjIpOwp9CgouYWRtb25pdGlvbi5xdW90ZT4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUsCi5hZG1vbml0aW9uLmNpdGU+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlIHsKICBjb2xvcjogcmdiYSgxNTgsIDE1OCwgMTU4LCAxKTsKICA7CiAgY29udGVudDogIlxFMjQ0IjsKfQ=="/>
+<!-- markdown-it-kbd.css -->
+<link rel="stylesheet" type="text/css" href="data:text/css;base64,LnZzY29kZS1saWdodCBrYmQsCi52c2NvZGUtZGFyayBrYmQsCi52c2NvZGUtaGlnaC1jb250cmFzdCBrYmQgewogIGRpc3BsYXk6IGlubGluZS1ibG9jazsKICBwYWRkaW5nOiAzcHggNXB4OwogIGZvbnQ6IDExcHggIlNGTW9uby1SZWd1bGFyIiwgQ29uc29sYXMsICJMaWJlcmF0aW9uIE1vbm8iLCBNZW5sbywgQ291cmllciwgbW9ub3NwYWNlOwogIGxpbmUtaGVpZ2h0OiAxMHB4OwogIHZlcnRpY2FsLWFsaWduOiBtaWRkbGU7CiAgYm9yZGVyOiBzb2xpZCAxcHggI2QxZDVkYTsKICBib3JkZXItYm90dG9tLWNvbG9yOiAjYzZjYmQxOwogIGJvcmRlci1yYWRpdXM6IDNweDsKICBib3gtc2hhZG93OiBpbnNldCAwIC0xcHggMCAjYzZjYmQxOwp9CgoudnNjb2RlLWxpZ2h0IGtiZCB7CiAgY29sb3I6ICM0NDRkNTY7CiAgYmFja2dyb3VuZC1jb2xvcjogI2ZhZmJmYzsKfQ=="/>
+<!-- third party styles end -->
+
+</head>
+<body class="markdown-body vscode-body vscode-light">
+<div class="content">
+    <a for="toc-anchor" id="*generic*"></a><h1 id="generic-2" data-line="0" class="code-line"><em>Generic</em></h1>
+<br/>
+<a for="toc-anchor" id="%E5%89%8D%E8%A8%80"></a><h3 id="e5898de8a880-2" data-line="5" class="code-line">前言</h3>
+<hr>
+<a for="toc-anchor" id="%E6%B3%9B%E5%9E%8B%E7%9A%84%E4%BB%8B%E7%BB%8D"></a><h4 id="e6b39be59e8be79a84e4bb8be7bb8d-2" data-line="9" class="code-line">泛型的介绍</h4>
+<p data-line="11" class="code-line">泛型是所存储或使用的一个或多个类型具有占位符 （ <kbd>类型形参</kbd> ） 意义的类、结构、接口和方法，通过这个类型参数可以提供具体 <kbd>参数化 </kbd>的类型，事实上，泛型类型的类型参数变成了泛型类型的元数据，运行时在需要的时候会利用它们去构造合适且符合的类型，通过这些类型，我们有可以实例化不同类型的对象，也就是说</p>
+<blockquote data-line="13" class="code-line">
+<p data-line="13" class="code-line">未绑定泛型类型是来构造泛型类型的蓝图，已构造泛型类型又是实际对象的蓝图</p>
+</blockquote>
+<a for="toc-anchor" id="%E4%BD%BF%E7%94%A8%E6%B3%9B%E5%9E%8B%E6%89%80%E5%B8%A6%E6%9D%A5%E7%9A%84%E5%A5%BD%E5%A4%84"></a><h4 id="e4bdbfe794a8e6b39be59e8be68980e5b8a6e69da5e79a84e5a5bde5a484-2" data-line="15" class="code-line">使用泛型所带来的好处</h4>
+<ul>
+<li data-line="17" class="code-line">泛型将类型安全的负担从开发人员手里转移到编译器，开发人员没有必要编写代码来测试正确的数据类型，因为它会在编译时强制执行，这一定程度上降低了强制类型转换的必要性和运行时错误的可能性</li>
+<li data-line="18" class="code-line">使用泛型能够有效地避免对值类型进行装箱和拆箱时所造成的性能损失</li>
+<li data-line="19" class="code-line">如果使用的恰当，泛型能够很大的程度上避免代码的重用</li>
+</ul>
+<br/>
+<a for="toc-anchor" id="%E5%85%88%E6%9D%A5%E8%AE%A8%E8%AE%BA%E4%B8%8B%E6%B3%9B%E5%9E%8B"></a><h3 id="e58588e69da5e8aea8e8aebae4b88be6b39be59e8b-2" data-line="24" class="code-line">先来讨论下泛型</h3>
+<hr>
+<a for="toc-anchor" id=".net-%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E6%B3%9B%E5%9E%8B%E7%9A%84%EF%BC%9F"></a><h4 id="net-e698afe5a682e4bd95e5ae9ee78eb0e6b39be59e8be79a84-2" data-line="28" class="code-line">.NET 是如何实现泛型的？</h4>
+<p data-line="30" class="code-line">泛型的开始，由我们在 IDE 中输入一个 <code>&lt;T&gt;</code> 开始，当编译器在编译的过程中遇到我们所写的泛型的时候，会针对该语法，并采用一种特殊的占位符来表示这种类型参数 <kbd>`x</kbd>，在这里 <kbd>x</kbd> 表示为 <kbd>元数</kbd>，其代表着这个泛型类型所具有的类型参数的数量，如下面代码所示，泛型类中一共包含了3个类型参数，那么最终该行代码，或者说这个泛型类被编译成 <kbd>IL</kbd> 后其占位符所存在的元数则为 3</p>
+<pre><code data-line="32" class="code-line language-csharp"><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Person</span>&lt;<span class="hljs-title">T</span>,<span class="hljs-title">T2</span>,<span class="hljs-title">T3</span>,<span class="hljs-title">T4</span>,<span class="hljs-title">T5</span>&gt;
+{
+}
+</div></code></pre>
+<p data-line="38" class="code-line">回到正题，在使用了泛型后，其编译的代码都带有一个特殊的标识符，那么当引用了这个 <kbd>dll</kbd> 的 <kbd>Appdomain</kbd> 在实际运行的过程当中，<kbd>CLR</kbd> 会进行一次二次编译的工作，在二次编译的过程中，<kbd>JIT</kbd> 就会找到 <kbd>IL</kbd> 代码中存在特殊占位符的代码，并把我们所指定的相应的 <kbd>封闭类型</kbd> 填充至相应的占位符的位置，通过这样就可以形成运行时编译录入我们所指定的封闭类型的特点</p>
+<blockquote data-line="40" class="code-line">
+<p data-line="40" class="code-line">泛型是由 <kbd>.NET Framework 2.0</kbd> 才开始引入的新特性，从上面的说明也能够看出 <kbd>Version 1.0</kbd> ~ <kbd>Version 2.0</kbd> 之间也一并更新了 编译器 和 <kbd>CLR</kbd> 的功能才能够独以支持该特性</p>
+</blockquote>
+<a for="toc-anchor" id="%E6%B3%9B%E5%9E%8B%E7%B1%BB%E4%B8%AD%E9%9D%99%E6%80%81%E6%88%90%E5%91%98%E7%9A%84%E7%89%B9%E6%AE%8A%E6%80%A7-%3Cspan-id-%3D-%22%E6%A0%87%E8%AF%861%22%3E%3C%2Fspan%3E"></a><h4 id="e6b39be59e8be7b1bbe4b8ade99d99e68081e68890e59198e79a84e789b9e6ae8ae680a7-span-id--22e6a087e8af86122span-2" data-line="42" class="code-line">泛型类中静态成员的特殊性 <span id = "标识1"></span></h4>
+<p data-line="44" class="code-line">因为 <kbd>泛型</kbd> 的引入，导致一个泛型类中的静态成员也发生了一些变化，在以往的认知中，一个类中的静态成员 <kbd>CLR</kbd> 会优先初始化静态变量和静态构造函数，且只有在第一次实例化的时候进行初始化，后续都不在进行初始化，但是在泛型类中，静态成员变量在相同封闭类型间共享，不同的封闭类型间不共享，简而言之就是这个泛型类所采用的不同类型的封闭类型都会针对它去生成一份 <kbd>副本</kbd>，这也导致了一种肉眼可见的一种结果，同一个类里面的静态成员会出现多次初始化的情况，详情可以查看下面的代码</p>
+<pre><code data-line="46" class="code-line language-csharp"><div><span class="hljs-keyword">class</span> <span class="hljs-title">TypeWithField</span>&lt;<span class="hljs-title">T</span>&gt;
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">string</span> field;
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">PrintField</span>(<span class="hljs-params"></span>)</span>
+    {
+        Console.WriteLine(field);
+    }
+}
+
+<span class="hljs-keyword">class</span> <span class="hljs-title">Program</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>(<span class="hljs-params"><span class="hljs-keyword">string</span>[] args</span>)</span>
+    {
+        TypeWithField&lt;<span class="hljs-keyword">int</span>&gt;.field = <span class="hljs-string">"Int Field"</span>;
+        TypeWithField&lt;<span class="hljs-keyword">string</span>&gt;.field = <span class="hljs-string">"String Field"</span>;
+
+        TypeWithField&lt;<span class="hljs-keyword">int</span>&gt;.PrintField();
+        TypeWithField&lt;<span class="hljs-keyword">string</span>&gt;.PrintField();
+
+        Console.Read();
+    }
+}
+</div></code></pre>
+<a for="toc-anchor" id="%E5%85%B3%E4%BA%8E%E5%9C%A8%E4%B8%80%E4%B8%AA%E6%B3%9B%E5%9E%8B%E6%88%90%E5%91%98%E4%B8%AD%EF%BC%8C%E7%9B%B8%E5%90%8C%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0%E7%9A%84%E5%BB%B6%E7%BB%AD%E6%80%A7"></a><h4 id="e585b3e4ba8ee59ca8e4b880e4b8aae6b39be59e8be68890e59198e4b8ade79bb8e5908ce7b1bbe59e8be58f82e695b0e79a84e5bbb6e7bbade680a7-2" data-line="71" class="code-line">关于在一个泛型成员中，相同类型参数的延续性</h4>
+<p data-line="73" class="code-line">比如说我们现在有一个函数包含了一个泛型类型参数 <code>&lt;T&gt;</code>，如果在该函数的 <kbd>Signture</kbd> 中同样也存在类型名为 <code>T</code> 的参数，那么该函数的参数的类型同样也沿用调用该函数时所设定的具体封闭类型，如下代码</p>
+<pre><code data-line="75" class="code-line language-csharp"><div><span class="hljs-keyword">namespace</span> <span class="hljs-title">Generic</span>
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">delegate</span> T1 GenericHandler&lt;T1, T2&gt;(T2 <span class="hljs-keyword">value</span>);
+
+    <span class="hljs-keyword">class</span> <span class="hljs-title">Program</span>
+    {
+        <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>(<span class="hljs-params"><span class="hljs-keyword">string</span>[] args</span>)</span>
+        {
+            CommonMethod.Get(<span class="hljs-keyword">delegate</span> (<span class="hljs-keyword">int</span> inPut)
+            {
+                <span class="hljs-keyword">return</span> (++inPut).ToString();
+            }, <span class="hljs-number">1</span>);
+
+            Console.ReadKey(<span class="hljs-literal">true</span>);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">CommonMethod</span>
+    {
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> Get&lt;T1,T2&gt;(GenericHandler&lt;T1,T2&gt; handler,T2 <span class="hljs-keyword">value</span>)
+        {
+            Console.WriteLine(<span class="hljs-string">$"Hello! Value test:<span class="hljs-subst">{handler.Invoke(<span class="hljs-keyword">value</span>)}</span>"</span>);
+        }
+    }
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E6%B3%9B%E5%9E%8B%E7%9A%84%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"></a><h3 id="e6b39be59e8be79a84e585b7e4bd93e5ae9ee78eb0-2" data-line="105" class="code-line">泛型的具体实现</h3>
+<hr>
+<p data-line="109" class="code-line">使用一个泛型成员，我们需要在该成员名结束的地方以 <code>&lt;T&gt;</code> 作为标记，以表明该成员需要使用一个名字为 <kbd>T</kbd> 的类型参数，如果需要指定多个的话，则以 <kbd>,</kbd> 为标记，例如：<kbd>&lt;T1,T2,T3,T4,T5,……&gt;</kbd></p>
+<blockquote data-line="111" class="code-line">
+<p data-line="111" class="code-line">一旦声明了一个泛型参数类型给某一个泛型成员，那么在使用它的过程中必须要指定它具体的封闭类型，当然我们也可以隐式进行指定，什么是隐式进行指定？例如一个泛型方法中标明了一个泛型参数类型 <code>&lt;T&gt;</code>，并且其带有的参数也是泛型参数 <code>T</code> 类型，这时候我们在调用这个函数的时候就不需要另外再指定它泛型的参数类型具体是某个封闭类型了，直接在输入参数中录入相应的实例即可自动识别，如下面代码</p>
+</blockquote>
+<pre><code data-line="112" class="code-line language-csharp"><div><span class="hljs-keyword">namespace</span> <span class="hljs-title">Generic</span>
+{
+    <span class="hljs-keyword">class</span> <span class="hljs-title">Program</span>
+    {
+        <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>(<span class="hljs-params"><span class="hljs-keyword">string</span>[] args</span>)</span>
+        {
+            CommonMethod.Get(<span class="hljs-keyword">new</span> Person() { Name = <span class="hljs-string">"NGPONG"</span> });
+
+            Console.ReadKey(<span class="hljs-literal">true</span>);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Person</span>
+    {
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> Name { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">CommonMethod</span>
+    {
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> Get&lt;T&gt;(T t)
+        {
+            <span class="hljs-keyword">var</span> per = t <span class="hljs-keyword">as</span> Person;
+
+            Console.WriteLine(per.Name);
+        }
+    }
+}
+</div></code></pre>
+<p data-line="142" class="code-line">泛型的应用领域大致可以把它们分为四种类型，它们分别是</p>
+<ul>
+<li data-line="144" class="code-line">泛型方法</li>
+</ul>
+<pre><code data-line="146" class="code-line language-csharp"><div><span class="hljs-keyword">namespace</span> <span class="hljs-title">Generic</span>
+{
+    <span class="hljs-keyword">class</span> <span class="hljs-title">Program</span>
+    {
+        <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>(<span class="hljs-params"><span class="hljs-keyword">string</span>[] args</span>)</span>
+        {
+            CommonMethod.Get(<span class="hljs-keyword">new</span> Person() { Name = <span class="hljs-string">"NGPONG"</span> });
+
+            Console.ReadKey(<span class="hljs-literal">true</span>);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Person</span>
+    {
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> Name { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">CommonMethod</span>
+    {
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> Get&lt;T&gt;(T t)
+        {
+            <span class="hljs-keyword">var</span> per = t <span class="hljs-keyword">as</span> Person;
+
+            Console.WriteLine(per.Name);
+        }
+    }
+}
+</div></code></pre>
+<ul>
+<li data-line="176" class="code-line">泛型委托</li>
+</ul>
+<pre><code data-line="178" class="code-line language-csharp"><div><span class="hljs-keyword">namespace</span> <span class="hljs-title">Generic</span>
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">delegate</span> T1 GenericHandler&lt;T1, T2&gt;(T2 <span class="hljs-keyword">value</span>);
+
+    <span class="hljs-keyword">class</span> <span class="hljs-title">Program</span>
+    {
+        <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>(<span class="hljs-params"><span class="hljs-keyword">string</span>[] args</span>)</span>
+        {
+            CommonMethod.Get(<span class="hljs-keyword">delegate</span> (<span class="hljs-keyword">int</span> inPut)
+            {
+                <span class="hljs-keyword">return</span> (++inPut).ToString();
+            }, <span class="hljs-number">1</span>);
+
+            Console.ReadKey(<span class="hljs-literal">true</span>);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">CommonMethod</span>
+    {
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> Get&lt;T1,T2&gt;(GenericHandler&lt;T1,T2&gt; handler,T2 <span class="hljs-keyword">value</span>)
+        {
+            Console.WriteLine(<span class="hljs-string">$"Hello! Value test:<span class="hljs-subst">{handler.Invoke(<span class="hljs-keyword">value</span>)}</span>"</span>);
+        }
+    }
+}
+</div></code></pre>
+<ul>
+<li data-line="206" class="code-line">泛型接口</li>
+</ul>
+<pre><code data-line="208" class="code-line language-csharp"><div><span class="hljs-keyword">namespace</span> <span class="hljs-title">Generic</span>
+{
+    <span class="hljs-keyword">class</span> <span class="hljs-title">Program</span>
+    {
+        <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>(<span class="hljs-params"><span class="hljs-keyword">string</span>[] args</span>)</span>
+        {
+            IGenericTest&lt;<span class="hljs-keyword">string</span>&gt; genericTest = <span class="hljs-keyword">new</span> GenericTest&lt;<span class="hljs-keyword">string</span>&gt;();
+            genericTest.Get(<span class="hljs-string">"NGPONG"</span>);
+
+            Console.ReadKey(<span class="hljs-literal">true</span>);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">GenericTest</span>&lt;<span class="hljs-title">T</span>&gt; : <span class="hljs-title">IGenericTest</span>&lt;<span class="hljs-title">T</span>&gt;
+    {
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Get</span>(<span class="hljs-params">T <span class="hljs-keyword">value</span></span>)</span>
+        {
+            Console.WriteLine(<span class="hljs-keyword">value</span>.ToString());
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IGenericTest</span>&lt;<span class="hljs-title">T</span>&gt;
+    {
+        <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Get</span>(<span class="hljs-params">T <span class="hljs-keyword">value</span></span>)</span>;
+    }
+}
+</div></code></pre>
+<ul>
+<li data-line="237" class="code-line">泛型类</li>
+</ul>
+<pre><code data-line="239" class="code-line language-csharp"><div><span class="hljs-keyword">namespace</span> <span class="hljs-title">Generic</span>
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">delegate</span> <span class="hljs-keyword">int</span> GenericHandler&lt;T&gt;(T value1,T value2);
+
+    <span class="hljs-keyword">class</span> <span class="hljs-title">Program</span>
+    {
+        <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>(<span class="hljs-params"><span class="hljs-keyword">string</span>[] args</span>)</span>
+        {
+            <span class="hljs-keyword">var</span> commandString = <span class="hljs-keyword">new</span> CommandMethod&lt;<span class="hljs-keyword">string</span>&gt;();
+            <span class="hljs-keyword">var</span> strResult = commandString.GetMaxLength(<span class="hljs-keyword">new</span> <span class="hljs-keyword">string</span>[] { <span class="hljs-string">"测试一下"</span>, <span class="hljs-string">"23333333"</span>,<span class="hljs-string">"666"</span> }, commandString.GetMaxString);
+
+            <span class="hljs-keyword">var</span> commandInt = <span class="hljs-keyword">new</span> CommandMethod&lt;<span class="hljs-keyword">int</span>&gt;();
+            <span class="hljs-keyword">var</span> intResult = commandInt.GetMaxLength(<span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>[] { <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>, <span class="hljs-number">7</span>, <span class="hljs-number">8</span> }, commandInt.GetMaxInt);
+
+            Console.ReadKey(<span class="hljs-literal">true</span>);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">CommandMethod</span>&lt;<span class="hljs-title">T</span>&gt;
+    {
+        <span class="hljs-function"><span class="hljs-keyword">public</span> T <span class="hljs-title">GetMaxLength</span>(<span class="hljs-params">T[] arrary,GenericHandler&lt;T&gt; handler</span>)</span>
+        {
+            T max = arrary[<span class="hljs-number">0</span>];
+
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; arrary.Length; i++)
+            {
+                <span class="hljs-keyword">if</span> (handler(arrary[i], max) &gt; <span class="hljs-number">0</span>)
+                {
+                    max = arrary[i];
+                }
+            }
+
+            <span class="hljs-keyword">return</span> max;
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">GetMaxInt</span>(<span class="hljs-params"><span class="hljs-keyword">int</span> value1, <span class="hljs-keyword">int</span> value2</span>)</span>
+        {
+            <span class="hljs-keyword">return</span> value1 - value2;
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">GetMaxString</span>(<span class="hljs-params"><span class="hljs-keyword">string</span> value1, <span class="hljs-keyword">string</span> value2</span>)</span>
+        {
+            <span class="hljs-keyword">return</span> value1.Length - value2.Length;
+        }
+    }
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E6%B3%9B%E5%9E%8B%E7%BC%93%E5%AD%98"></a><h3 id="e6b39be59e8be7bc93e5ad98-2" data-line="290" class="code-line">泛型缓存</h3>
+<hr>
+<p data-line="294" class="code-line">根据 <a href="#%E6%A0%87%E8%AF%861" data-href="#%E6%A0%87%E8%AF%861">上文</a>，依赖于泛型类中静态类型的特性我们可以设定一个以 <kbd>Type</kbd> 作为键的泛型字典缓存，其性能对比单纯的以 <kbd>Type</kbd> 作为键的字典集合要优秀的很多，下面的代码展示除了泛型缓存和字典缓存之间的性能对比</p>
+<pre><code data-line="296" class="code-line language-csharp"><div><span class="hljs-keyword">namespace</span> <span class="hljs-title">GenericCache</span>
+{
+    <span class="hljs-keyword">class</span> <span class="hljs-title">Program</span>
+    {
+        <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>(<span class="hljs-params"><span class="hljs-keyword">string</span>[] args</span>)</span>
+        {
+            GenericCacheTest&lt;<span class="hljs-keyword">object</span>&gt;.TestGenericStorage();
+            DictionaryCacheTest.TestDictionaryStorage();
+
+            Console.ReadKey(<span class="hljs-literal">true</span>);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Cache_Generic</span>&lt;<span class="hljs-title">T</span>&gt;
+    {
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">object</span> Instance { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Cache_Dic</span>
+    {
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Dictionary&lt;Type, <span class="hljs-keyword">object</span>&gt; Instance { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">GenericCacheTest</span>&lt;<span class="hljs-title">T</span>&gt;
+    {
+        <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-title">GenericCacheTest</span>(<span class="hljs-params"></span>)</span>
+        {
+            Cache_Generic&lt;T&gt;.Instance = <span class="hljs-keyword">new</span> <span class="hljs-keyword">object</span>();
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">TestGenericStorage</span>(<span class="hljs-params"></span>)</span>
+        {
+            Stopwatch watch = <span class="hljs-keyword">new</span> Stopwatch();
+            watch.Start();
+
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>_000_000; i++)
+            {
+                <span class="hljs-keyword">var</span> obj = Cache_Generic&lt;T&gt;.Instance;
+            }
+
+            watch.Stop();
+            Console.WriteLine(<span class="hljs-string">$"GenericCache:<span class="hljs-subst">{watch.ElapsedMilliseconds.ToString()}</span>"</span>);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">DictionaryCacheTest</span>
+    {
+        <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-title">DictionaryCacheTest</span>(<span class="hljs-params"></span>)</span>
+        {
+            Cache_Dic.Instance = <span class="hljs-keyword">new</span> Dictionary&lt;Type, <span class="hljs-keyword">object</span>&gt;();
+
+            Cache_Dic.Instance[<span class="hljs-keyword">typeof</span>(<span class="hljs-keyword">object</span>)] = <span class="hljs-keyword">new</span> <span class="hljs-keyword">object</span>();
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">TestDictionaryStorage</span>(<span class="hljs-params"></span>)</span>
+        {
+            <span class="hljs-keyword">var</span> type = <span class="hljs-keyword">typeof</span>(<span class="hljs-keyword">object</span>);
+
+            Stopwatch watch = <span class="hljs-keyword">new</span> Stopwatch();
+            watch.Start();
+
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>_000_000; i++)
+            {
+                <span class="hljs-keyword">var</span> obj = Cache_Dic.Instance[type];
+            }
+
+            watch.Stop();
+            Console.WriteLine(<span class="hljs-string">$"DictionaryCache:<span class="hljs-subst">{watch.ElapsedMilliseconds.ToString()}</span>"</span>);
+        }
+    }
+}
+</div></code></pre>
+<pre><code data-line="370" class="code-line language-console"><div>GenericCache
+        Time Elapsed:   1803ms
+        CPU Cycles:     151,015,248
+        Gen 0:          0
+        Gen 1:          0
+        Gen 2:          0
+
+Normal DictionaryCache
+        Time Elapsed:   3619ms
+        CPU Cycles:     22,475,810,124
+        Gen 0:          0
+        Gen 1:          0
+        Gen 2:          0
+</div></code></pre>
+<p data-line="386" class="code-line">可以看到执行结果，使用了泛型缓存和使用普通的字典缓存，进行一亿次数据获取的情况下，泛型缓存的速度大约是字典缓存的 <kbd>2倍多</kbd></p>
+<p data-line="388" class="code-line">就性能而言，我们可以肉眼看得到差距，但是泛型缓存自身也存在很多的缺点，例如：占用的空间（应该）较多、一个类型的键只能全局唯一，不如普通字典的缓存方式来的灵活，另外，除非能够在代码中得到泛型参数，否则同样无法使用泛型字典</p>
+<br/>
+<a for="toc-anchor" id="%E6%B3%9B%E5%9E%8B%E7%BA%A6%E6%9D%9F"></a><h3 id="e6b39be59e8be7baa6e69d9f-2" data-line="392" class="code-line">泛型约束</h3>
+<hr>
+<p data-line="396" class="code-line">泛型约束我们可以称之为 <kbd>权利和义务</kbd>，什么是权利？当我们为一个泛型成员规定了一个泛型约束后，那么他就拥有对于类型参数进行某种约束的 <kbd>权利</kbd>，而使用这个泛型成员也必须按照具体的约束来指定类型参数，这就是一种 <kbd>义务</kbd></p>
+<p data-line="398" class="code-line">泛型约束可以分为5种类型，他们分别是：</p>
+<blockquote data-line="400" class="code-line">
+<p data-line="400" class="code-line">每一种类型不可以随意进行搭配，不同的泛型约束类型都拥有一定得局限性，不可随意进行搭配</p>
+</blockquote>
+<ul>
+<li data-line="402" class="code-line">基类约束：所指定的参数类型必须继承与或者就是约束类型的本身
+<ul>
+<li data-line="403" class="code-line">一条约束条文中不可以出现多个</li>
+<li data-line="404" class="code-line">出现的位置必须要出现在最前面</li>
+</ul>
+</li>
+</ul>
+<pre><code data-line="406" class="code-line language-csharp"><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Person</span>
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> Name { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">CommandMethods</span>&lt;<span class="hljs-title">T</span>&gt;
+    <span class="hljs-title">where</span> <span class="hljs-title">T</span> : <span class="hljs-title">Person</span>
+{
+
+}
+</div></code></pre>
+<ul>
+<li data-line="419" class="code-line">接口约束：所指定的参数类型必须实现于指定约束的接口
+<ul>
+<li data-line="420" class="code-line">一条约束条文中可以多次使用接口约束，就其本身可以任意搭配，并无具体的限制要求</li>
+</ul>
+</li>
+</ul>
+<pre><code data-line="422" class="code-line language-csharp"><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IPerson</span>
+{
+    <span class="hljs-keyword">string</span> Name { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IMan</span>
+{
+    <span class="hljs-keyword">char</span> Gender { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">CommandMethods</span>&lt;<span class="hljs-title">T</span>&gt;
+    <span class="hljs-title">where</span> <span class="hljs-title">T</span> : <span class="hljs-title">IPerson</span>,<span class="hljs-title">IMan</span>
+{
+
+}
+</div></code></pre>
+<ul>
+<li data-line="440" class="code-line">无参构造函数约束：所指定的参数类型必须是引用类型切包含无参的构造函数
+<ul>
+<li data-line="441" class="code-line">一条约束条文中不可以出现多个</li>
+<li data-line="442" class="code-line">出现的位置必须要出现在最后面</li>
+<li data-line="443" class="code-line">不可以和值类型约束一同使用</li>
+</ul>
+</li>
+</ul>
+<pre><code data-line="445" class="code-line language-csharp"><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">CommandMethods</span>&lt;<span class="hljs-title">T</span>&gt;
+    <span class="hljs-title">where</span> <span class="hljs-title">T</span> : <span class="hljs-title">new</span> ()
+{
+
+}
+</div></code></pre>
+<ul>
+<li data-line="453" class="code-line">值类型约束：所指定的参数类型必须为值类型
+<ul>
+<li data-line="454" class="code-line">一条约束条文中不可以出现多个</li>
+<li data-line="455" class="code-line">出现的位置必须要出现在最前面</li>
+<li data-line="456" class="code-line">不可以和引用类型约束一起使用</li>
+<li data-line="457" class="code-line">不可以和无参构造函数约束一起使用</li>
+</ul>
+</li>
+</ul>
+<pre><code data-line="459" class="code-line language-csharp"><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">CommandMethods</span>&lt;<span class="hljs-title">T</span>&gt;
+    <span class="hljs-title">where</span> <span class="hljs-title">T</span> : <span class="hljs-title">struct</span>
+{
+
+}
+</div></code></pre>
+<ul>
+<li data-line="467" class="code-line">引用类型约束：所指定的参数类型必须为引用类型
+<ul>
+<li data-line="468" class="code-line">一条约束条文中不可以出现多个</li>
+<li data-line="469" class="code-line">出现的位置必须要出现在最前面</li>
+<li data-line="470" class="code-line">不可以和值类型约束一起使用</li>
+<li data-line="471" class="code-line">不可以和基类约束一起使用</li>
+</ul>
+</li>
+</ul>
+<pre><code data-line="473" class="code-line language-csharp"><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">CommandMethods</span>&lt;<span class="hljs-title">T</span>&gt;
+    <span class="hljs-title">where</span> <span class="hljs-title">T</span> : <span class="hljs-title">class</span>
+{
+
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E6%B3%9B%E5%9E%8B%E9%80%86%E5%8F%98%E5%92%8C%E5%8D%8F%E5%8F%98"></a><h3 id="e6b39be59e8be98086e58f98e5928ce58d8fe58f98-2" data-line="483" class="code-line">泛型逆变和协变</h3>
+<hr>
+<a for="toc-anchor" id="%E4%BB%80%E4%B9%88%E6%98%AF%E9%80%86%E5%8F%98%E5%92%8C%E5%8D%8F%E5%8F%98"></a><h4 id="e4bb80e4b988e698afe98086e58f98e5928ce58d8fe58f98-2" data-line="487" class="code-line">什么是逆变和协变</h4>
+<p data-line="489" class="code-line">逆变和协变的概念由 <kbd>.NET Framework 4.0</kbd> 以后针对于泛型所产生的两种概念，在解释它们之前我们先说一个另外一种概念，假设我们现在有两种类型 <kbd>T</kbd> &amp; <kbd>u</kbd>，咱们先不谈这两个类型之间的关系，假设它们之间存在着一种类型安全的隐式转换，并且能够把这一特性带到对于它们的成员 (<kbd>数组</kbd>) 的身上去，我们就可以把这种能力称为 <kbd>可变性 Variance </kbd> ，我们在此基础上进一步的进行扩展，假设 <kbd>T</kbd> 为 <kbd>U</kbd> 的基类，基于 <kbd>里氏转换原则</kbd> 我们把 U 赋值给 T，那么我们可以称之为这一段关系为 <kbd>协变 covariant</kbd>，反之，如果只是 <kbd>存粹地</kbd> 把 T 赋值给了 U，并且是类型安全的转换，那么我们可以称这一段关系为 <kbd>逆变 contravariant</kbd></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p data-line="492" class="code-line">简而言之，如果一个可变性和子类到父类转换的方向一样，就称作<kbd>协变</kbd>，而如果和子类到父类的转换方向相反，就叫 <kbd>逆变</kbd></p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">注意</p>
+<p data-line="495" class="code-line">需要注意的是，协变和逆变的概念在 <kbd>.NET</kbd> 中仅仅是针对 <kbd>泛型</kbd> 所出现的，并且只是针对 <kbd>泛型接口</kbd> 和 <kbd>泛型委托</kbd>，为什么说仅仅只是针对泛型所出现的呢？因为逆变的概念涉及到父类直接转换为子类的应用，在正常的 <kbd>csharp</kbd> 语言的角度考虑是不允许的，由于 <kbd>里式原则</kbd> 的存在，基类想转换为一个有效的派生类必须要基类是已经经过派生类赋值的基础上才能够进行</p>
+</div>
+<a for="toc-anchor" id="%E9%80%86%E5%8F%98%E5%92%8C%E5%8D%8F%E5%8F%98%E7%9A%84%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"></a><h4 id="e98086e58f98e5928ce58d8fe58f98e79a84e585b7e4bd93e5ae9ee78eb0-2" data-line="497" class="code-line">逆变和协变的具体实现</h4>
+<p data-line="499" class="code-line">在 .NET 中，逆变和协变的存在通常是用来指定泛型成员之间互相进行安全的类型转换的问题的，并且仅仅只是针对 <kbd>泛型接口</kbd> 和 <kbd>泛型委托</kbd>，在这里我们使用 <kbd>泛型接口</kbd> 来举例子，查看以下代码，假设有一个接口 <code>Interface&lt;T&gt;</code>，分别对它进行了两种参数类型的指定 <code>Interface&lt;string&gt;</code> 和 <code>Interface&lt;object&gt;</code>，</p>
+<pre><code data-line="501" class="code-line language-csharp"><div><span class="hljs-keyword">namespace</span> <span class="hljs-title">Contravariant_and_Covariant</span>
+{
+    <span class="hljs-keyword">class</span> <span class="hljs-title">Program</span>
+    {
+        <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>(<span class="hljs-params"><span class="hljs-keyword">string</span>[] args</span>)</span>
+        {
+            IPerson&lt;<span class="hljs-keyword">string</span>&gt; personStr = <span class="hljs-keyword">new</span> Student&lt;<span class="hljs-keyword">string</span>&gt;();
+
+            IPerson&lt;<span class="hljs-keyword">object</span>&gt; personObj = <span class="hljs-keyword">new</span> Student&lt;<span class="hljs-keyword">object</span>&gt;();
+
+            personObj = personStr;
+
+            Console.ReadKey(<span class="hljs-literal">true</span>);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IPerson</span>&lt;<span class="hljs-title">T</span>&gt;
+    {
+        <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Test</span>(<span class="hljs-params">T</span>)</span>;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Student</span>&lt;<span class="hljs-title">T</span>&gt; : <span class="hljs-title">IPerson</span>&lt;<span class="hljs-title">T</span>&gt;
+    {
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Test</span>(<span class="hljs-params">T</span>)</span>
+        {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">default</span>(T);
+        }
+    }
+}
+</div></code></pre>
+<p data-line="533" class="code-line">在这里有一个接口 <code>IPerson&lt;T&gt;</code> 并且有一个实现于它的成员 <code>Student&lt;T&gt;</code>，我们可以看到 <code>Student&lt;T&gt;</code> 分别指定了两种不同类型参数分别是 <kbd>string</kbd> 和 <kbd>object</kbd>，但是在下一行代码 <kbd>personObj = personStr</kbd> 会编译不通过，因为这就涉及到了泛型成员类型转换间的问题了，我们知道，<kbd>string</kbd> -&gt; <kbd>object</kbd> 之间是一种 <kbd>协变</kbd> 的关系，那我们就要在相应的泛型成员中通过 <kbd>out</kbd> 关键字来强调这一种关系，反之 <kbd>object</kbd> -&gt; <kbd>string</kbd> 属于一种逆变的关系，那我们就需要在相应的泛型成员中通过 <kbd>in</kbd> 关键字来强调着一种关系</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p data-line="536" class="code-line">在一个支持 <kbd>in &amp; out</kbd> 的泛型成员中使用了这两个关键字对类型参数进行修饰后，我们并不能单纯的称为这个泛型成员是支持 <kbd>逆变 &amp; 协变</kbd> 的，更准确的说法应该为这个泛型成员中通过 <kbd>in</kbd> 所修饰的参数类型是支持 <kbd>逆变</kbd> 的，反之，通过 <kbd>out</kbd> 所修饰的参数类型是支持 <kbd>协变</kbd> 的</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p data-line="539" class="code-line">虽然通过 <kbd>in &amp; out</kbd> 关键字能够达到 <kbd>逆变 &amp; 协变</kbd> 之间转换的目的，但是使用它们还存在的另外的一些限制</p>
+<ul>
+<li data-line="540" class="code-line">使用 <kbd>in</kbd> 所修饰的类型参数只能用作于 输入参数</li>
+<li data-line="541" class="code-line">使用 <kbd>out</kbd> 所修饰的类型参数只能用作与 输出参数</li>
+</ul>
+</div>
+<p data-line="543" class="code-line">以下代码展示了 <kbd>in</kbd> 和 <kbd>out</kbd> 的具体使用，也展现了不同类型参数之间进行 <kbd>协变</kbd> 和 <kbd>逆变</kbd> 的关系</p>
+<pre><code data-line="545" class="code-line language-csharp"><div><span class="hljs-keyword">namespace</span> <span class="hljs-title">Contravariant_and_Covariant</span>
+{
+    <span class="hljs-keyword">class</span> <span class="hljs-title">Program</span>
+    {
+        <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>(<span class="hljs-params"><span class="hljs-keyword">string</span>[] args</span>)</span>
+        {
+            IPerson&lt;<span class="hljs-keyword">string</span>,<span class="hljs-keyword">object</span>&gt; personStr = <span class="hljs-keyword">new</span> Student&lt;<span class="hljs-keyword">string</span>, <span class="hljs-keyword">object</span>&gt;();
+
+            IPerson&lt;<span class="hljs-keyword">object</span>,<span class="hljs-keyword">string</span>&gt; personObj = <span class="hljs-keyword">new</span> Student&lt;<span class="hljs-keyword">object</span>, <span class="hljs-keyword">string</span>&gt;();
+
+            personStr = personObj;
+
+            Console.ReadKey(<span class="hljs-literal">true</span>);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IPerson</span>&lt;<span class="hljs-title">in</span> <span class="hljs-title">TIn</span>,<span class="hljs-title">out</span> <span class="hljs-title">TOut</span>&gt;
+    {
+        <span class="hljs-function">TOut <span class="hljs-title">Test</span>(<span class="hljs-params">TIn <span class="hljs-keyword">value</span></span>)</span>;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Student</span>&lt;<span class="hljs-title">TIn</span>,<span class="hljs-title">TOut</span>&gt; : <span class="hljs-title">IPerson</span>&lt;<span class="hljs-title">TIn</span>, <span class="hljs-title">TOut</span>&gt;
+    {
+        <span class="hljs-function"><span class="hljs-keyword">public</span> TOut <span class="hljs-title">Test</span>(<span class="hljs-params">TIn <span class="hljs-keyword">value</span></span>)</span>
+        {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">default</span>(TOut);
+        }
+    }
+}
+</div></code></pre>
+<p data-line="577" class="code-line">下面还有几点关于泛型逆变和协变需要注意的一些问题</p>
+<div class="admonition danger">
+<p class="admonition-title">注意</p>
+<ul>
+<li data-line="580" class="code-line">仅有泛型接口和泛型委托支持对类型参数的可变性，泛型类或泛型方法是不支持的</li>
+<li data-line="581" class="code-line">值类型不参与协变或反变，因为.NET泛型，每个值类型会生成专属的封闭构造类型，与引用类型版本不兼容</li>
+<li data-line="582" class="code-line">在泛型成员中使用了 <kbd>协变 &amp; 逆变</kbd> 后如果存在声明的属性时要注意，可读写的属性会将类型同时用于参数 <kbd>输入</kbd> 和返回值 <kbd>输出</kbd>，因此只有只读属性才允许使用 <kbd>out</kbd> 类型参数，只写属性能够使用 <kbd>in</kbd> 参数</li>
+</ul>
+</div>
+</div>
+
+</body>
+</html>
