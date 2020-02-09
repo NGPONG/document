@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>C_Programming_Language.md</title>
+
+<!-- official styles start -->
+<!-- markdown.css -->
+<link rel="stylesheet" type="text/css" href="data:text/css;base64,LyotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KICogIENvcHlyaWdodCAoYykgTWljcm9zb2Z0IENvcnBvcmF0aW9uLiBBbGwgcmlnaHRzIHJlc2VydmVkLgogKiAgTGljZW5zZWQgdW5kZXIgdGhlIE1JVCBMaWNlbnNlLiBTZWUgTGljZW5zZS50eHQgaW4gdGhlIHByb2plY3Qgcm9vdCBmb3IgbGljZW5zZSBpbmZvcm1hdGlvbi4KICotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSovCgpodG1sLCBib2R5IHsKCWZvbnQtZmFtaWx5OiB2YXIoLS12c2NvZGUtbWFya2Rvd24tZm9udC1mYW1pbHksIC1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgIlNlZ29lIFdQQyIsICJTZWdvZSBVSSIsICJVYnVudHUiLCAiRHJvaWQgU2FucyIsIHNhbnMtc2VyaWYpOwoJZm9udC1zaXplOiB2YXIoLS12c2NvZGUtbWFya2Rvd24tZm9udC1zaXplLCAxNHB4KTsKCXBhZGRpbmc6IDAgMjZweDsKCWxpbmUtaGVpZ2h0OiB2YXIoLS12c2NvZGUtbWFya2Rvd24tbGluZS1oZWlnaHQsIDIycHgpOwoJd29yZC13cmFwOiBicmVhay13b3JkOwp9CgojY29kZS1jc3Atd2FybmluZyB7Cglwb3NpdGlvbjogZml4ZWQ7Cgl0b3A6IDA7CglyaWdodDogMDsKCWNvbG9yOiB3aGl0ZTsKCW1hcmdpbjogMTZweDsKCXRleHQtYWxpZ246IGNlbnRlcjsKCWZvbnQtc2l6ZTogMTJweDsKCWZvbnQtZmFtaWx5OiBzYW5zLXNlcmlmOwoJYmFja2dyb3VuZC1jb2xvcjojNDQ0NDQ0OwoJY3Vyc29yOiBwb2ludGVyOwoJcGFkZGluZzogNnB4OwoJYm94LXNoYWRvdzogMXB4IDFweCAxcHggcmdiYSgwLDAsMCwuMjUpOwp9CgojY29kZS1jc3Atd2FybmluZzpob3ZlciB7Cgl0ZXh0LWRlY29yYXRpb246IG5vbmU7CgliYWNrZ3JvdW5kLWNvbG9yOiMwMDdhY2M7Cglib3gtc2hhZG93OiAycHggMnB4IDJweCByZ2JhKDAsMCwwLC4yNSk7Cn0KCmJvZHkuc2Nyb2xsQmV5b25kTGFzdExpbmUgewoJbWFyZ2luLWJvdHRvbTogY2FsYygxMDB2aCAtIDIycHgpOwp9Cgpib2R5LnNob3dFZGl0b3JTZWxlY3Rpb24gLmNvZGUtbGluZSB7Cglwb3NpdGlvbjogcmVsYXRpdmU7Cn0KCmJvZHkuc2hvd0VkaXRvclNlbGVjdGlvbiAuY29kZS1hY3RpdmUtbGluZTpiZWZvcmUsCmJvZHkuc2hvd0VkaXRvclNlbGVjdGlvbiAuY29kZS1saW5lOmhvdmVyOmJlZm9yZSB7Cgljb250ZW50OiAiIjsKCWRpc3BsYXk6IGJsb2NrOwoJcG9zaXRpb246IGFic29sdXRlOwoJdG9wOiAwOwoJbGVmdDogLTEycHg7CgloZWlnaHQ6IDEwMCU7Cn0KCmJvZHkuc2hvd0VkaXRvclNlbGVjdGlvbiBsaS5jb2RlLWFjdGl2ZS1saW5lOmJlZm9yZSwKYm9keS5zaG93RWRpdG9yU2VsZWN0aW9uIGxpLmNvZGUtbGluZTpob3ZlcjpiZWZvcmUgewoJbGVmdDogLTMwcHg7Cn0KCi52c2NvZGUtbGlnaHQuc2hvd0VkaXRvclNlbGVjdGlvbiAuY29kZS1hY3RpdmUtbGluZTpiZWZvcmUgewoJYm9yZGVyLWxlZnQ6IDNweCBzb2xpZCByZ2JhKDAsIDAsIDAsIDAuMTUpOwp9CgoudnNjb2RlLWxpZ2h0LnNob3dFZGl0b3JTZWxlY3Rpb24gLmNvZGUtbGluZTpob3ZlcjpiZWZvcmUgewoJYm9yZGVyLWxlZnQ6IDNweCBzb2xpZCByZ2JhKDAsIDAsIDAsIDAuNDApOwp9CgoudnNjb2RlLWxpZ2h0LnNob3dFZGl0b3JTZWxlY3Rpb24gLmNvZGUtbGluZSAuY29kZS1saW5lOmhvdmVyOmJlZm9yZSB7Cglib3JkZXItbGVmdDogbm9uZTsKfQoKLnZzY29kZS1kYXJrLnNob3dFZGl0b3JTZWxlY3Rpb24gLmNvZGUtYWN0aXZlLWxpbmU6YmVmb3JlIHsKCWJvcmRlci1sZWZ0OiAzcHggc29saWQgcmdiYSgyNTUsIDI1NSwgMjU1LCAwLjQpOwp9CgoudnNjb2RlLWRhcmsuc2hvd0VkaXRvclNlbGVjdGlvbiAuY29kZS1saW5lOmhvdmVyOmJlZm9yZSB7Cglib3JkZXItbGVmdDogM3B4IHNvbGlkIHJnYmEoMjU1LCAyNTUsIDI1NSwgMC42MCk7Cn0KCi52c2NvZGUtZGFyay5zaG93RWRpdG9yU2VsZWN0aW9uIC5jb2RlLWxpbmUgLmNvZGUtbGluZTpob3ZlcjpiZWZvcmUgewoJYm9yZGVyLWxlZnQ6IG5vbmU7Cn0KCi52c2NvZGUtaGlnaC1jb250cmFzdC5zaG93RWRpdG9yU2VsZWN0aW9uIC5jb2RlLWFjdGl2ZS1saW5lOmJlZm9yZSB7Cglib3JkZXItbGVmdDogM3B4IHNvbGlkIHJnYmEoMjU1LCAxNjAsIDAsIDAuNyk7Cn0KCi52c2NvZGUtaGlnaC1jb250cmFzdC5zaG93RWRpdG9yU2VsZWN0aW9uIC5jb2RlLWxpbmU6aG92ZXI6YmVmb3JlIHsKCWJvcmRlci1sZWZ0OiAzcHggc29saWQgcmdiYSgyNTUsIDE2MCwgMCwgMSk7Cn0KCi52c2NvZGUtaGlnaC1jb250cmFzdC5zaG93RWRpdG9yU2VsZWN0aW9uIC5jb2RlLWxpbmUgLmNvZGUtbGluZTpob3ZlcjpiZWZvcmUgewoJYm9yZGVyLWxlZnQ6IG5vbmU7Cn0KCmltZyB7CgltYXgtd2lkdGg6IDEwMCU7CgltYXgtaGVpZ2h0OiAxMDAlOwp9CgphIHsKCXRleHQtZGVjb3JhdGlvbjogbm9uZTsKfQoKYTpob3ZlciB7Cgl0ZXh0LWRlY29yYXRpb246IHVuZGVybGluZTsKfQoKYTpmb2N1cywKaW5wdXQ6Zm9jdXMsCnNlbGVjdDpmb2N1cywKdGV4dGFyZWE6Zm9jdXMgewoJb3V0bGluZTogMXB4IHNvbGlkIC13ZWJraXQtZm9jdXMtcmluZy1jb2xvcjsKCW91dGxpbmUtb2Zmc2V0OiAtMXB4Owp9CgpociB7Cglib3JkZXI6IDA7CgloZWlnaHQ6IDJweDsKCWJvcmRlci1ib3R0b206IDJweCBzb2xpZDsKfQoKaDEgewoJcGFkZGluZy1ib3R0b206IDAuM2VtOwoJbGluZS1oZWlnaHQ6IDEuMjsKCWJvcmRlci1ib3R0b20td2lkdGg6IDFweDsKCWJvcmRlci1ib3R0b20tc3R5bGU6IHNvbGlkOwp9CgpoMSwgaDIsIGgzIHsKCWZvbnQtd2VpZ2h0OiBub3JtYWw7Cn0KCnRhYmxlIHsKCWJvcmRlci1jb2xsYXBzZTogY29sbGFwc2U7Cn0KCnRhYmxlID4gdGhlYWQgPiB0ciA+IHRoIHsKCXRleHQtYWxpZ246IGxlZnQ7Cglib3JkZXItYm90dG9tOiAxcHggc29saWQ7Cn0KCnRhYmxlID4gdGhlYWQgPiB0ciA+IHRoLAp0YWJsZSA+IHRoZWFkID4gdHIgPiB0ZCwKdGFibGUgPiB0Ym9keSA+IHRyID4gdGgsCnRhYmxlID4gdGJvZHkgPiB0ciA+IHRkIHsKCXBhZGRpbmc6IDVweCAxMHB4Owp9Cgp0YWJsZSA+IHRib2R5ID4gdHIgKyB0ciA+IHRkIHsKCWJvcmRlci10b3A6IDFweCBzb2xpZDsKfQoKYmxvY2txdW90ZSB7CgltYXJnaW46IDAgN3B4IDAgNXB4OwoJcGFkZGluZzogMCAxNnB4IDAgMTBweDsKCWJvcmRlci1sZWZ0LXdpZHRoOiA1cHg7Cglib3JkZXItbGVmdC1zdHlsZTogc29saWQ7Cn0KCmNvZGUgewoJZm9udC1mYW1pbHk6IE1lbmxvLCBNb25hY28sIENvbnNvbGFzLCAiRHJvaWQgU2FucyBNb25vIiwgIkNvdXJpZXIgTmV3IiwgbW9ub3NwYWNlLCAiRHJvaWQgU2FucyBGYWxsYmFjayI7Cglmb250LXNpemU6IDFlbTsKCWxpbmUtaGVpZ2h0OiAxLjM1N2VtOwp9Cgpib2R5LndvcmRXcmFwIHByZSB7Cgl3aGl0ZS1zcGFjZTogcHJlLXdyYXA7Cn0KCnByZTpub3QoLmhsanMpLApwcmUuaGxqcyBjb2RlID4gZGl2IHsKCXBhZGRpbmc6IDE2cHg7Cglib3JkZXItcmFkaXVzOiAzcHg7CglvdmVyZmxvdzogYXV0bzsKfQoKcHJlIGNvZGUgewoJY29sb3I6IHZhcigtLXZzY29kZS1lZGl0b3ItZm9yZWdyb3VuZCk7Cgl0YWItc2l6ZTogNDsKfQoKLyoqIFRoZW1pbmcgKi8KCi52c2NvZGUtbGlnaHQgcHJlIHsKCWJhY2tncm91bmQtY29sb3I6IHJnYmEoMjIwLCAyMjAsIDIyMCwgMC40KTsKfQoKLnZzY29kZS1kYXJrIHByZSB7CgliYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDEwLCAxMCwgMTAsIDAuNCk7Cn0KCi52c2NvZGUtaGlnaC1jb250cmFzdCBwcmUgewoJYmFja2dyb3VuZC1jb2xvcjogcmdiKDAsIDAsIDApOwp9CgoudnNjb2RlLWhpZ2gtY29udHJhc3QgaDEgewoJYm9yZGVyLWNvbG9yOiByZ2IoMCwgMCwgMCk7Cn0KCi52c2NvZGUtbGlnaHQgdGFibGUgPiB0aGVhZCA+IHRyID4gdGggewoJYm9yZGVyLWNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuNjkpOwp9CgoudnNjb2RlLWRhcmsgdGFibGUgPiB0aGVhZCA+IHRyID4gdGggewoJYm9yZGVyLWNvbG9yOiByZ2JhKDI1NSwgMjU1LCAyNTUsIDAuNjkpOwp9CgoudnNjb2RlLWxpZ2h0IGgxLAoudnNjb2RlLWxpZ2h0IGhyLAoudnNjb2RlLWxpZ2h0IHRhYmxlID4gdGJvZHkgPiB0ciArIHRyID4gdGQgewoJYm9yZGVyLWNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuMTgpOwp9CgoudnNjb2RlLWRhcmsgaDEsCi52c2NvZGUtZGFyayBociwKLnZzY29kZS1kYXJrIHRhYmxlID4gdGJvZHkgPiB0ciArIHRyID4gdGQgewoJYm9yZGVyLWNvbG9yOiByZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMTgpOwp9Cg=="/>
+<!-- highlight.css -->
+<link rel="stylesheet" type="text/css" href="data:text/css;base64,LyoKaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2lzYWdhbGFldi9oaWdobGlnaHQuanMvbWFzdGVyL3NyYy9zdHlsZXMvdnMyMDE1LmNzcwoqLwovKgogKiBWaXN1YWwgU3R1ZGlvIDIwMTUgZGFyayBzdHlsZQogKiBBdXRob3I6IE5pY29sYXMgTExPQkVSQSA8bmxsb2JlcmFAZ21haWwuY29tPgogKi8KCgouaGxqcy1rZXl3b3JkLAouaGxqcy1saXRlcmFsLAouaGxqcy1zeW1ib2wsCi5obGpzLW5hbWUgewoJY29sb3I6ICM1NjlDRDY7Cn0KLmhsanMtbGluayB7Cgljb2xvcjogIzU2OUNENjsKCXRleHQtZGVjb3JhdGlvbjogdW5kZXJsaW5lOwp9CgouaGxqcy1idWlsdF9pbiwKLmhsanMtdHlwZSB7Cgljb2xvcjogIzRFQzlCMDsKfQoKLmhsanMtbnVtYmVyLAouaGxqcy1jbGFzcyB7Cgljb2xvcjogI0I4RDdBMzsKfQoKLmhsanMtc3RyaW5nLAouaGxqcy1tZXRhLXN0cmluZyB7Cgljb2xvcjogI0Q2OUQ4NTsKfQoKLmhsanMtcmVnZXhwLAouaGxqcy10ZW1wbGF0ZS10YWcgewoJY29sb3I6ICM5QTUzMzQ7Cn0KCi5obGpzLXN1YnN0LAouaGxqcy1mdW5jdGlvbiwKLmhsanMtdGl0bGUsCi5obGpzLXBhcmFtcywKLmhsanMtZm9ybXVsYSB7Cgljb2xvcjogI0RDRENEQzsKfQoKLmhsanMtY29tbWVudCwKLmhsanMtcXVvdGUgewoJY29sb3I6ICM1N0E2NEE7Cglmb250LXN0eWxlOiBpdGFsaWM7Cn0KCi5obGpzLWRvY3RhZyB7Cgljb2xvcjogIzYwOEI0RTsKfQoKLmhsanMtbWV0YSwKLmhsanMtbWV0YS1rZXl3b3JkLAouaGxqcy10YWcgewoJY29sb3I6ICM5QjlCOUI7Cn0KCi5obGpzLXZhcmlhYmxlLAouaGxqcy10ZW1wbGF0ZS12YXJpYWJsZSB7Cgljb2xvcjogI0JENjNDNTsKfQoKLmhsanMtYXR0ciwKLmhsanMtYXR0cmlidXRlLAouaGxqcy1idWlsdGluLW5hbWUgewoJY29sb3I6ICM5Q0RDRkU7Cn0KCi5obGpzLXNlY3Rpb24gewoJY29sb3I6IGdvbGQ7Cn0KCi5obGpzLWVtcGhhc2lzIHsKCWZvbnQtc3R5bGU6IGl0YWxpYzsKfQoKLmhsanMtc3Ryb25nIHsKCWZvbnQtd2VpZ2h0OiBib2xkOwp9CgovKi5obGpzLWNvZGUgewoJZm9udC1mYW1pbHk6J01vbm9zcGFjZSc7Cn0qLwoKLmhsanMtYnVsbGV0LAouaGxqcy1zZWxlY3Rvci10YWcsCi5obGpzLXNlbGVjdG9yLWlkLAouaGxqcy1zZWxlY3Rvci1jbGFzcywKLmhsanMtc2VsZWN0b3ItYXR0ciwKLmhsanMtc2VsZWN0b3ItcHNldWRvIHsKCWNvbG9yOiAjRDdCQTdEOwp9CgouaGxqcy1hZGRpdGlvbiB7CgliYWNrZ3JvdW5kLWNvbG9yOiB2YXIoLS12c2NvZGUtZGlmZkVkaXRvci1pbnNlcnRlZFRleHRCYWNrZ3JvdW5kLCByZ2JhKDE1NSwgMTg1LCA4NSwgMC4yKSk7Cgljb2xvcjogcmdiKDE1NSwgMTg1LCA4NSk7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7Cgl3aWR0aDogMTAwJTsKfQoKLmhsanMtZGVsZXRpb24gewoJYmFja2dyb3VuZDogdmFyKC0tdnNjb2RlLWRpZmZFZGl0b3ItcmVtb3ZlZFRleHRCYWNrZ3JvdW5kLCByZ2JhKDI1NSwgMCwgMCwgMC4yKSk7Cgljb2xvcjogcmdiKDI1NSwgMCwgMCk7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7Cgl3aWR0aDogMTAwJTsKfQoKCi8qCkZyb20gaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2lzYWdhbGFldi9oaWdobGlnaHQuanMvbWFzdGVyL3NyYy9zdHlsZXMvdnMuY3NzCiovCi8qCgpWaXN1YWwgU3R1ZGlvLWxpa2Ugc3R5bGUgYmFzZWQgb24gb3JpZ2luYWwgQyMgY29sb3JpbmcgYnkgSmFzb24gRGlhbW9uZCA8amFzb25AZGlhbW9uZC5uYW1lPgoKKi8KCi52c2NvZGUtbGlnaHQgLmhsanMtZnVuY3Rpb24sCi52c2NvZGUtbGlnaHQgLmhsanMtcGFyYW1zLAoudnNjb2RlLWxpZ2h0IC5obGpzLW51bWJlciwKLnZzY29kZS1saWdodCAuaGxqcy1jbGFzcyAgewoJY29sb3I6IGluaGVyaXQ7Cn0KCi52c2NvZGUtbGlnaHQgLmhsanMtY29tbWVudCwKLnZzY29kZS1saWdodCAuaGxqcy1xdW90ZSwKLnZzY29kZS1saWdodCAuaGxqcy1udW1iZXIsCi52c2NvZGUtbGlnaHQgLmhsanMtY2xhc3MsCi52c2NvZGUtbGlnaHQgLmhsanMtdmFyaWFibGUgewoJY29sb3I6ICMwMDgwMDA7Cn0KCi52c2NvZGUtbGlnaHQgLmhsanMta2V5d29yZCwKLnZzY29kZS1saWdodCAuaGxqcy1zZWxlY3Rvci10YWcsCi52c2NvZGUtbGlnaHQgLmhsanMtbmFtZSwKLnZzY29kZS1saWdodCAuaGxqcy10YWcgewoJY29sb3I6ICMwMGY7Cn0KCi52c2NvZGUtbGlnaHQgLmhsanMtYnVpbHRfaW4sCi52c2NvZGUtbGlnaHQgLmhsanMtYnVpbHRpbi1uYW1lIHsKCWNvbG9yOiAjMDA3YWNjOwp9CgoudnNjb2RlLWxpZ2h0IC5obGpzLXN0cmluZywKLnZzY29kZS1saWdodCAuaGxqcy1zZWN0aW9uLAoudnNjb2RlLWxpZ2h0IC5obGpzLWF0dHJpYnV0ZSwKLnZzY29kZS1saWdodCAuaGxqcy1saXRlcmFsLAoudnNjb2RlLWxpZ2h0IC5obGpzLXRlbXBsYXRlLXRhZywKLnZzY29kZS1saWdodCAuaGxqcy10ZW1wbGF0ZS12YXJpYWJsZSwKLnZzY29kZS1saWdodCAuaGxqcy10eXBlIHsKCWNvbG9yOiAjYTMxNTE1Owp9CgoudnNjb2RlLWxpZ2h0IC5obGpzLXNlbGVjdG9yLWF0dHIsCi52c2NvZGUtbGlnaHQgLmhsanMtc2VsZWN0b3ItcHNldWRvLAoudnNjb2RlLWxpZ2h0IC5obGpzLW1ldGEsCi52c2NvZGUtbGlnaHQgLmhsanMtbWV0YS1rZXl3b3JkIHsKCWNvbG9yOiAjMmI5MWFmOwp9CgoudnNjb2RlLWxpZ2h0IC5obGpzLXRpdGxlLAoudnNjb2RlLWxpZ2h0IC5obGpzLWRvY3RhZyB7Cgljb2xvcjogIzgwODA4MDsKfQoKLnZzY29kZS1saWdodCAuaGxqcy1hdHRyIHsKCWNvbG9yOiAjZjAwOwp9CgoudnNjb2RlLWxpZ2h0IC5obGpzLXN5bWJvbCwKLnZzY29kZS1saWdodCAuaGxqcy1idWxsZXQsCi52c2NvZGUtbGlnaHQgLmhsanMtbGluayB7Cgljb2xvcjogIzAwYjBlODsKfQoKCi52c2NvZGUtbGlnaHQgLmhsanMtZW1waGFzaXMgewoJZm9udC1zdHlsZTogaXRhbGljOwp9CgoudnNjb2RlLWxpZ2h0IC5obGpzLXN0cm9uZyB7Cglmb250LXdlaWdodDogYm9sZDsKfQo="/>
+<!-- official styles end -->
+
+<!-- third party styles start -->
+<!-- markdown-it-admonition.css -->
+<link rel="stylesheet" type="text/css" href="data:text/css;base64,QGZvbnQtZmFjZSB7CiAgZm9udC1mYW1pbHk6ICJNYXRlcmlhbCBJY29ucyI7CiAgZm9udC1zdHlsZTogbm9ybWFsOwogIGZvbnQtd2VpZ2h0OiA0MDA7CiAgc3JjOiBsb2NhbCgiTWF0ZXJpYWwgSWNvbnMiKSwgbG9jYWwoIk1hdGVyaWFsSWNvbnMtUmVndWxhciIpLCB1cmwoImRhdGE6YXBwbGljYXRpb24veC1mb250LXdvZmY7Y2hhcnNldD11dGYtODtiYXNlNjQsZDA5R1JnQUJBQUFBQUFmSUFBc0FBQUFBRERBQUFRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUJIVTFWQ0FBQUJDQUFBQURNQUFBQkNzUDZ6N1U5VEx6SUFBQUU4QUFBQVJBQUFBRlpXN2tvc1kyMWhjQUFBQVlBQUFBRFRBQUFDanRQNnl0Qm5iSGxtQUFBQ1ZBQUFBeGdBQUFRNHpSdHZsR2hsWVdRQUFBVnNBQUFBTHdBQUFEWVJ3WnNuYUdobFlRQUFCWndBQUFBY0FBQUFKQWVLQXp4b2JYUjRBQUFGdUFBQUFCSUFBQUE4T0dRQUFHeHZZMkVBQUFYTUFBQUFJQUFBQUNBRzVBZndiV0Y0Y0FBQUJld0FBQUFmQUFBQUlBRWZBRVJ1WVcxbEFBQUdEQUFBQVZjQUFBS0ZrQWhvQzNCdmMzUUFBQWRrQUFBQVlnQUFBSzJ2ejd3a2VKeGpZR1JnWU9CaWtHUFFZV0IwY2ZNSlllQmdZR0dBQUpBTVkwNW1laUpRRE1vRHlyR0FhUTRnWm9PSUFnQ0tJd05QQUhpY1kyQmtQc1E0Z1lHVmdZT3BrK2tNQXdORFA0Um1mTTFneE1qQndNREV3TXJNZ0JVRXBMbW1NRGd3Vkx5NHhLenpYNGNoaHJtSzRRcFFtQkVrQndBWnlneXdlSnpGa3IwTndqQVFoWitURVA2Q1JVZkhCRXdSVVdhUVRJQ3lRYnBNd1JDc2tBNVJVSU9OeEcwUm5uTnBLQUlWNHF6UGt1LzhjMzUzQUNZQVlySWpDV0N1TUFoMnB0ZjAvaGlMM3AvZ3lQVVdhM29zcWx0MEwxenU5cjcxejhkR3JKUnlrRm9hdVhRZDkzMkxqNXZoRytNanhHZVlJOE1LRVRPYk1wc2xmNUV5UDh0Zyt2SHVuNXI1MzlQdmx2WHphVmhSRlZRRFRQRVdLVlFSOTBLaG5uQzVFazY3dlVLTjRWdUZhc00vbGRBUmo0M0NDa0NzRWpwSlNvVlZnUnlVMEdWU0s2d1VwRkZDeDhsRmdYMEJpWHBSUFFCNG5FMlRUV2pjUmhUSDN4dHRwRGh4Tjd1eFBscDN1L0ZLN21vUlBpeGFmUmlqTm9zeFN3L0xVc0l3TmNhRUhQWmdnby9GbUVLTUNLV1U0a05PT2Z0UVNsaEU4YWxuSDBJeDlCcVduSG9vUFJyVFEwK21udTJiWFR1MnBQZEdNOUxNLzZjM2Z3RUNUTTRnQkJNWVFOcXh6THJaQWpxWVNscXUyVEFIWlFBMC9EUUpINkZ0enFHRG52YnQ0R2d3dnp3L25MOEVmSDhrVzBmc3VScWhnV1hablk3TTFwaWNhVUw3RHU1QkhlRHpNSWw4M2RBdDAxNndIMXFtdnRTTW81UjZZUkpIVFIvL0ZYc2ZmL25qL3RjLzVLOVA1ZCtuUDIyK2ZGSzV1N3YzSzM5U1czeStPdERLTzNMODV2RDA5UEQ5ejVYMTdhMk4xZzR0cWswMVJscVg3Z3lvRW1uc1dRdFZyNHJ0Wk1tdWtFYUZCWnh6ZWZrQ24xMWN5S01MWmdzaFJ3Z1RZTm9MTlhDQnoyamE3SHZaRzdoRHBQU05mb281dnMwa25LLzloYityTnB1KzhrSFBnay9BbzRrSzN0V3RUcFNFdHZrQTljK3dFNlVhVWR3aWVOa2FIZzU1dEJFdFJpRVB3MXMwK0Z0cnRUY2M5dHdvMmxoTWtuVjdQWkYvY3M2K3VVRlRtcFRHYkV4N3NRQ1BTTE90dEhTM0dSbHRxcDdTTnpWU0t6bDZhV25aVC9DWDVrNi92OU4zSGg4ZkhCd2ZmSlZqaHJDNk9nSDVka0l0L3RQc3ErZC9QRDVRejdHN2VmenExVEhGamRaVlBlL042dWxRM0puRFdTRTVqdW5zRnNWSWlGd0wvaHRmMVM1Z0ozQmZPY1V4ZkhLTG56cXBGcHlmWjljWCsvNVdCNmErWTBwSHB6a05yWU5WRHdNc2lrSyt5N1d1TENSZy9vRkhrQThWVDNyRGc1Wm5VNmt0enpJTnltVjBtNzRYZDVwZklHWHlGZVZFUVNTaGt6cUc3VEJCYTJPeFZSS2l0TFh2N2gzdXVmdFhuWHE3bHoydFovV25XYTlkeDlkQ2pEaEh6bXVWUUFUbG1sanI5ZFpFclV5ZFNvMkhiaS9iMXZYdHJPZUdDazIvOHMzWmxPOCt1ZUpUOEJWbHc1cEd3Mm9ZY2NkU2lISHF4MFJsYWJIcWROUjlqQUVUbDZQcmVKY1BCbm5mcFRMbk9ROEMzT1Y4QW1RR3pvdVYxaVpkZWI1U1NJb1ZjOFc4L2tjRHRrc1VINUZyVTYvYXFCcU5XY01FenhHNERBUTE0cVJRaGk5bVdVMHJ6ZXBLZXpiamZnQ3dRS3hWWXE1YWpSZ3BScXk0NUNxd2tKeWRjRWtiVGt2Uno4UDUvMlpwRFRONG5HTmdaR0JnQU9LYjZ2Ky94dlBiZkdYZ1ptRUFnZXVCMmtrSSt2OGJGZ2JtS2lDWGc0RUpKQW9BUHlBS2hRQjRuR05nWkdCZzF2bXZ3eEREd2dBQ1FKS1JBUlh3QXdBelpRSFFlSnhqWVFDQ0ZBWUdGZ2JTTVFBY1dBQ2RBQUFBQUFBQUFBd0FMZ0JnQUlRQW1BRFNBUWdCSWdFOEFWQUJvQUhlQWZ3Q0hIaWNZMkJrWUdEZ1o3QmdZR01BQVNZZzVnSkNCb2IvWUQ0REFBL2hBV1FBZUp4bGtidHV3a0FVUk1jODhnQXBRb21VSm9xMFRkSVF6RU9wVURva0tDTlIwQnV6QmlPL3RGNlFTSmNQeUhmbEU5S2x5eWVrejJDdUc4Y3I3NTQ3TTNkOUpRTzR4amNjbko1N3ZpZDJjTUhxeERXYzQwRzRUdjFKdUVGK0ZtNmlqUmZoTStvejRSYTZlQlZ1NHdadnZNRnBYTElhNDBQWVFRZWZ3alZjNFV1NFR2MUh1RUgrRlc3aTFta0tuNkhqM0FtM3NIQzZ3bTA4T3U4dHBTWkdlMWF2MVBLZ2dqU3hQZDh6SnRTR1R1aW55VkdhNi9VdThreFpsdWRDbXp4TUV6VjBCNlUwMDRrMjVXMzVmajJ5TmxDQlNXTTFwYXVqS0ZXWlNiZmF0KzdHMm16Yzd3ZWl1MzRhY3p6Rk5ZR0JoZ2ZMZmNWNmlRUDNBQ2tTYWozNDlBeFhTTjlJVDBqMTZKZXBPYjAxZG9pS2JOV3Qxb3ZpcHB6NnNWWVl3c1hnWDJyR1ZGSWtxN1BsMlBOckk2cVc2ZU9zaGoweGFTcTltcE5FWklXczhMWlVmT291TmtWWHhwL2Q1d29xZWJlWUlmNEQySjF5d1FCNG5HM0xPdzZBSUJBRTBCMzg0QitQQWtnRWErUXdOblltSHQrRXBYU2FsNWxrU0JCbm9QOG9DRlNvMGFDRlJJY2VBMFpNbUxGQVlTVzg4cm12dE1VakczUmlROUh2cGZ1c002eldObXRjNUgvaVBld2hhNTB0T3Q1UFMvUUJ4MkllU3dBQSIpIGZvcm1hdCgid29mZiIpOwp9CgouYWRtb25pdGlvbiB7CiAgYm94LXNoYWRvdzogMCAycHggMnB4IDAgcmdiYSgwLCAwLCAwLCAuMTQpLCAwIDFweCA1cHggMCByZ2JhKDAsIDAsIDAsIC4xMiksIDAgM3B4IDFweCAtMnB4IHJnYmEoMCwgMCwgMCwgLjIpOwogIHBvc2l0aW9uOiByZWxhdGl2ZTsKICBtYXJnaW46IDEuNTYyNWVtIDA7CiAgcGFkZGluZzogMCAxLjJyZW07CiAgYm9yZGVyLWxlZnQ6IC40cmVtIHNvbGlkIHJnYmEoNjgsIDEzOCwgMjU1LCAuOCk7CiAgYm9yZGVyLXJhZGl1czogLjJyZW07CiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgyNTUsIDI1NSwgMjU1LCAwLjA1KTsKICBvdmVyZmxvdzogYXV0bzsKfQoKLmFkbW9uaXRpb24+LmFkbW9uaXRpb24tdGl0bGUgewogIG1hcmdpbjogMCAtMS4ycmVtOwogIHBhZGRpbmc6IC44cmVtIDEuMnJlbSAuOHJlbSAzLjZyZW07CiAgYm9yZGVyLWJvdHRvbTogMXB4IHNvbGlkIHJnYmEoNjgsIDEzOCwgMjU1LCAuMik7CiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSg2OCwgMTM4LCAyNTUsIC4xKTsKICBmb250LXdlaWdodDogNzAwOwp9CgouYWRtb25pdGlvbj4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIHBvc2l0aW9uOiBhYnNvbHV0ZTsKICBsZWZ0OiAxLjJyZW07CiAgZm9udC1zaXplOiAxLjVyZW07CiAgY29sb3I6IHJnYmEoNjgsIDEzOCwgMjU1LCAuOCk7CiAgY29udGVudDogIlxFM0M5IjsKfQoKLmFkbW9uaXRpb24+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlIHsKICBmb250LWZhbWlseTogTWF0ZXJpYWwgSWNvbnM7CiAgZm9udC1zdHlsZTogbm9ybWFsOwogIGZvbnQtdmFyaWFudDogbm9ybWFsOwogIGZvbnQtd2VpZ2h0OiA0MDA7CiAgbGluZS1oZWlnaHQ6IDJyZW07CiAgdGV4dC10cmFuc2Zvcm06IG5vbmU7CiAgd2hpdGUtc3BhY2U6IG5vd3JhcDsKICBzcGVhazogbm9uZTsKICB3b3JkLXdyYXA6IG5vcm1hbDsKICBkaXJlY3Rpb246IGx0cjsKfQoKLmFkbW9uaXRpb24uc3VtbWFyeSwKLmFkbW9uaXRpb24uYWJzdHJhY3QsCi5hZG1vbml0aW9uLnRsZHIgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDAsIDE3NiwgMjU1LCAuOCk7Cn0KCi5hZG1vbml0aW9uLnN1bW1hcnk+LmFkbW9uaXRpb24tdGl0bGUsCi5hZG1vbml0aW9uLmFic3RyYWN0Pi5hZG1vbml0aW9uLXRpdGxlLAouYWRtb25pdGlvbi50bGRyPi5hZG1vbml0aW9uLXRpdGxlIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDE3NiwgMjU1LCAuMSk7CiAgYm9yZGVyLWJvdHRvbS1jb2xvcjogcmdiYSgwLCAxNzYsIDI1NSwgLjIpOwp9CgouYWRtb25pdGlvbi5zdW1tYXJ5Pi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSwKLmFkbW9uaXRpb24uYWJzdHJhY3Q+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlLAouYWRtb25pdGlvbi50bGRyPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSB7CiAgY29sb3I6IHJnYmEoMCwgMTc2LCAyNTUsIDEpOwogIDsKICBjb250ZW50OiAiXEU4RDIiOwp9CgouYWRtb25pdGlvbi5oaW50LAouYWRtb25pdGlvbi50aXAgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDAsIDE5MSwgMTY1LCAuOCk7Cn0KCi5hZG1vbml0aW9uLmhpbnQ+LmFkbW9uaXRpb24tdGl0bGUsCi5hZG1vbml0aW9uLnRpcD4uYWRtb25pdGlvbi10aXRsZSB7CiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgwLCAxOTEsIDE2NSwgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMCwgMTkxLCAxNjUsIC4yKTsKfQoKLmFkbW9uaXRpb24uaGludD4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUsCi5hZG1vbml0aW9uLnRpcD4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIGNvbG9yOiByZ2JhKDAsIDE5MSwgMTY1LCAxKTsKICBjb250ZW50OiAiXEU4MEUiOwp9CgouYWRtb25pdGlvbi5pbmZvLAouYWRtb25pdGlvbi50b2RvIHsKICBib3JkZXItbGVmdC1jb2xvcjogcmdiYSgwLCAxODQsIDIxMiwgLjgpOwp9CgouYWRtb25pdGlvbi5pbmZvPi5hZG1vbml0aW9uLXRpdGxlLAouYWRtb25pdGlvbi50b2RvPi5hZG1vbml0aW9uLXRpdGxlIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDE4NCwgMjEyLCAuMSk7CiAgYm9yZGVyLWJvdHRvbS1jb2xvcjogcmdiYSgwLCAxODQsIDIxMiwgLjIpOwp9CgouYWRtb25pdGlvbi5pbmZvPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSwKLmFkbW9uaXRpb24udG9kbz4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIGNvbG9yOiByZ2JhKDAsIDE4NCwgMjEyLCAxKTsKICA7CiAgY29udGVudDogIlxFODhFIjsKfQoKLmFkbW9uaXRpb24uc3VjY2VzcywKLmFkbW9uaXRpb24uY2hlY2ssCi5hZG1vbml0aW9uLmRvbmUgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDAsIDIwMCwgODMsIC44KTsKfQoKLmFkbW9uaXRpb24uc3VjY2Vzcz4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uY2hlY2s+LmFkbW9uaXRpb24tdGl0bGUsCi5hZG1vbml0aW9uLmRvbmU+LmFkbW9uaXRpb24tdGl0bGUgewogIGJhY2tncm91bmQtY29sb3I6IHJnYmEoMCwgMjAwLCA4MywgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMCwgMjAwLCA4MywgLjIpOwp9CgouYWRtb25pdGlvbi5zdWNjZXNzPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSwKLmFkbW9uaXRpb24uY2hlY2s+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlLAouYWRtb25pdGlvbi5kb25lPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSB7CiAgY29sb3I6IHJnYmEoMCwgMjAwLCA4MywgMSk7CiAgOwogIGNvbnRlbnQ6ICJcRTg3NiI7Cn0KCi5hZG1vbml0aW9uLnF1ZXN0aW9uLAouYWRtb25pdGlvbi5oZWxwLAouYWRtb25pdGlvbi5mYXEgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDEwMCwgMjIxLCAyMywgLjgpOwp9CgouYWRtb25pdGlvbi5xdWVzdGlvbj4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uaGVscD4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uZmFxPi5hZG1vbml0aW9uLXRpdGxlIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDEwMCwgMjIxLCAyMywgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMTAwLCAyMjEsIDIzLCAuMik7Cn0KCi5hZG1vbml0aW9uLnF1ZXN0aW9uPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSwKLmFkbW9uaXRpb24uaGVscD4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUsCi5hZG1vbml0aW9uLmZhcT4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIGNvbG9yOiByZ2JhKDEwMCwgMjIxLCAyMywgMSk7CiAgOwogIGNvbnRlbnQ6ICJcRTg4NyI7Cn0KCi5hZG1vbml0aW9uLndhcm5pbmcsCi5hZG1vbml0aW9uLmF0dGVudGlvbiwKLmFkbW9uaXRpb24uY2F1dGlvbiB7CiAgYm9yZGVyLWxlZnQtY29sb3I6IHJnYmEoMjU1LCAxNDUsIDAsIC44KTsKfQoKLmFkbW9uaXRpb24ud2FybmluZz4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uYXR0ZW50aW9uPi5hZG1vbml0aW9uLXRpdGxlLAouYWRtb25pdGlvbi5jYXV0aW9uPi5hZG1vbml0aW9uLXRpdGxlIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDI1NSwgMTQ1LCAwLCAuMSk7CiAgYm9yZGVyLWJvdHRvbS1jb2xvcjogcmdiYSgyNTUsIDE0NSwgMCwgLjIpOwp9CgouYWRtb25pdGlvbi5hdHRlbnRpb24+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlIHsKICBjb2xvcjogcmdiYSgyNTUsIDE0NSwgMCwgMSk7CiAgY29udGVudDogIlxFNDE3IjsKfQoKLmFkbW9uaXRpb24ud2FybmluZz4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUsCi5hZG1vbml0aW9uLmNhdXRpb24+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlIHsKICBjb2xvcjogcmdiYSgyNTUsIDE0NSwgMCwgMSk7CiAgY29udGVudDogIlxFMDAyIjsKfQoKLmFkbW9uaXRpb24uZmFpbHVyZSwKLmFkbW9uaXRpb24uZmFpbCwKLmFkbW9uaXRpb24ubWlzc2luZyB7CiAgYm9yZGVyLWxlZnQtY29sb3I6IHJnYmEoMjU1LCA4MiwgODIsIC44KTsKfQoKLmFkbW9uaXRpb24uZmFpbHVyZT4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uZmFpbD4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24ubWlzc2luZz4uYWRtb25pdGlvbi10aXRsZSB7CiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgyNTUsIDgyLCA4MiwgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMjU1LCA4MiwgODIsIC4yKTsKfQoKLmFkbW9uaXRpb24uZmFpbHVyZT4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUsCi5hZG1vbml0aW9uLmZhaWw+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlLAouYWRtb25pdGlvbi5taXNzaW5nPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSB7CiAgY29sb3I6IHJnYmEoMjU1LCA4MiwgODIsIDEpOwogIDsKICBjb250ZW50OiAiXEUxNEMiOwp9CgouYWRtb25pdGlvbi5kYW5nZXIsCi5hZG1vbml0aW9uLmVycm9yLAouYWRtb25pdGlvbi5idWcgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDI1NSwgMjMsIDY4LCAuOCk7Cn0KCi5hZG1vbml0aW9uLmRhbmdlcj4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uZXJyb3I+LmFkbW9uaXRpb24tdGl0bGUsCi5hZG1vbml0aW9uLmJ1Zz4uYWRtb25pdGlvbi10aXRsZSB7CiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgyNTUsIDIzLCA2OCwgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMjU1LCAyMywgNjgsIC4yKTsKfQoKLmFkbW9uaXRpb24uZGFuZ2VyPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSB7CiAgY29sb3I6IHJnYmEoMjU1LCAyMywgNjgsIDEpOwogIGNvbnRlbnQ6ICJcRTNFNyI7Cn0KCi5hZG1vbml0aW9uLmVycm9yPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSB7CiAgY29sb3I6IHJnYmEoMjU1LCAyMywgNjgsIDEpOwogIGNvbnRlbnQ6ICJcRTE0QyI7Cn0KCi5hZG1vbml0aW9uLmJ1Zz4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIGNvbG9yOiByZ2JhKDI1NSwgMjMsIDY4LCAxKTsKICBjb250ZW50OiAiXEU4NjgiOwp9CgouYWRtb25pdGlvbi5leGFtcGxlLAouYWRtb25pdGlvbi5zbmlwcGV0IHsKICBib3JkZXItbGVmdC1jb2xvcjogcmdiYSgwLCAxODQsIDIxMiwgLjgpOwp9CgouYWRtb25pdGlvbi5leGFtcGxlPi5hZG1vbml0aW9uLXRpdGxlLAouYWRtb25pdGlvbi5zbmlwcGV0Pi5hZG1vbml0aW9uLXRpdGxlIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDE4NCwgMjEyLCAuMSk7CiAgYm9yZGVyLWJvdHRvbS1jb2xvcjogcmdiYSgwLCAxODQsIDIxMiwgLjIpOwp9CgouYWRtb25pdGlvbi5leGFtcGxlPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSwKLmFkbW9uaXRpb24uc25pcHBldD4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIGNvbG9yOiByZ2JhKDAsIDE4NCwgMjEyLCAxKTsKICA7CiAgY29udGVudDogIlxFMjQyIjsKfQoKLmFkbW9uaXRpb24ucXVvdGUsCi5hZG1vbml0aW9uLmNpdGUgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDE1OCwgMTU4LCAxNTgsIC44KTsKfQoKLmFkbW9uaXRpb24ucXVvdGU+LmFkbW9uaXRpb24tdGl0bGUsCi5hZG1vbml0aW9uLmNpdGU+LmFkbW9uaXRpb24tdGl0bGUgewogIGJhY2tncm91bmQtY29sb3I6IHJnYmEoMTU4LCAxNTgsIDE1OCwgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMTU4LCAxNTgsIDE1OCwgLjIpOwp9CgouYWRtb25pdGlvbi5xdW90ZT4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUsCi5hZG1vbml0aW9uLmNpdGU+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlIHsKICBjb2xvcjogcmdiYSgxNTgsIDE1OCwgMTU4LCAxKTsKICA7CiAgY29udGVudDogIlxFMjQ0IjsKfQ=="/>
+<!-- markdown-it-kbd.css -->
+<link rel="stylesheet" type="text/css" href="data:text/css;base64,LnZzY29kZS1saWdodCBrYmQsCi52c2NvZGUtZGFyayBrYmQsCi52c2NvZGUtaGlnaC1jb250cmFzdCBrYmQgewogIGRpc3BsYXk6IGlubGluZS1ibG9jazsKICBwYWRkaW5nOiAzcHggNXB4OwogIGZvbnQ6IDExcHggIlNGTW9uby1SZWd1bGFyIiwgQ29uc29sYXMsICJMaWJlcmF0aW9uIE1vbm8iLCBNZW5sbywgQ291cmllciwgbW9ub3NwYWNlOwogIGxpbmUtaGVpZ2h0OiAxMHB4OwogIHZlcnRpY2FsLWFsaWduOiBtaWRkbGU7CiAgYm9yZGVyOiBzb2xpZCAxcHggI2QxZDVkYTsKICBib3JkZXItYm90dG9tLWNvbG9yOiAjYzZjYmQxOwogIGJvcmRlci1yYWRpdXM6IDNweDsKICBib3gtc2hhZG93OiBpbnNldCAwIC0xcHggMCAjYzZjYmQxOwp9CgoudnNjb2RlLWxpZ2h0IGtiZCB7CiAgY29sb3I6ICM0NDRkNTY7CiAgYmFja2dyb3VuZC1jb2xvcjogI2ZhZmJmYzsKfQ=="/>
+<!-- third party styles end -->
+
+</head>
+<body class="markdown-body vscode-body vscode-light">
+<div class="content">
+    <a for="toc-anchor" id="*c-programming-language*"></a><h1 id="c-programming-language-2" data-line="0" class="code-line"><em>C Programming language</em></h1>
+<br/>
+<a for="toc-anchor" id="%E7%9B%AE%E5%BD%95"></a><h2 id="e79baee5bd95-2" data-line="4" class="code-line">目录</h2>
+<ul>
+<li data-line="6" class="code-line"><a href="#%E5%8F%98%E9%87%8F" data-href="#%E5%8F%98%E9%87%8F">变量</a>
+<ul>
+<li data-line="7" class="code-line"><a href="#%E5%8F%98%E9%87%8F%E7%9A%84%E5%AE%9A%E4%B9%89%E5%92%8C%E5%8F%98%E9%87%8F%E7%9A%84%E5%A3%B0%E6%98%8E" data-href="#%E5%8F%98%E9%87%8F%E7%9A%84%E5%AE%9A%E4%B9%89%E5%92%8C%E5%8F%98%E9%87%8F%E7%9A%84%E5%A3%B0%E6%98%8E">变量的定义和变量的声明</a></li>
+<li data-line="8" class="code-line"><a href="#%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F%E5%92%8C%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F" data-href="#%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F%E5%92%8C%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F">全局变量和局部变量</a></li>
+<li data-line="9" class="code-line"><a href="#extern" data-href="#extern">extern 关键字</a></li>
+<li data-line="10" class="code-line"><a href="#%E5%8F%98%E9%87%8F" data-href="#%E5%8F%98%E9%87%8F">变量</a></li>
+</ul>
+</li>
+<li data-line="11" class="code-line"><a href="#%E5%B8%B8%E9%87%8F" data-href="#%E5%B8%B8%E9%87%8F">常量</a></li>
+<li data-line="12" class="code-line"><a href="#%E9%9D%99%E6%80%81%E6%88%90%E5%91%98" data-href="#%E9%9D%99%E6%80%81%E6%88%90%E5%91%98">静态成员</a></li>
+<li data-line="13" class="code-line"><a href="#%E5%9F%BA%E7%A1%80%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B" data-href="#%E5%9F%BA%E7%A1%80%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B">基础数据类型</a>
+<ul>
+<li data-line="14" class="code-line"><a href="#%E5%8E%9F%E5%8F%8D%E8%A1%A5" data-href="#%E5%8E%9F%E5%8F%8D%E8%A1%A5">原码 反码 补码</a></li>
+<li data-line="15" class="code-line"><a href="#%E6%95%B4%E5%9E%8B" data-href="#%E6%95%B4%E5%9E%8B">整型</a></li>
+<li data-line="16" class="code-line"><a href="#%E5%AE%9E%E5%9E%8B" data-href="#%E5%AE%9E%E5%9E%8B">实型</a></li>
+<li data-line="17" class="code-line"><a href="#char" data-href="#char">Char</a></li>
+<li data-line="18" class="code-line"><a href="#sizeof" data-href="#sizeof">sizeof</a></li>
+</ul>
+</li>
+<li data-line="19" class="code-line"><a href="#%E5%B8%B8%E9%87%8F" data-href="#%E5%B8%B8%E9%87%8F">常量</a></li>
+<li data-line="20" class="code-line"><a href="#%E5%B8%B8%E9%87%8F" data-href="#%E5%B8%B8%E9%87%8F">常量</a></li>
+</ul>
+<br/>
+<a for="toc-anchor" id="%E5%8F%98%E9%87%8F"></a><h3 id="e58f98e9878f-2" data-line="25" class="code-line">变量</h3>
+<p data-line="26" class="code-line"><span id="变量"></span></p>
+<hr>
+<a for="toc-anchor" id="%E5%8F%98%E9%87%8F%E7%9A%84%E5%AE%9A%E4%B9%89%E5%92%8C%E5%8F%98%E9%87%8F%E7%9A%84%E5%A3%B0%E6%98%8E"></a><h4 id="e58f98e9878fe79a84e5ae9ae4b989e5928ce58f98e9878fe79a84e5a3b0e6988e-2" data-line="29" class="code-line">变量的定义和变量的声明</h4>
+<p data-line="30" class="code-line"><span id="变量的定义和变量的声明"></span></p>
+<p data-line="32" class="code-line">在 C 语言中，是需要严格区分 <kbd>变量的定义</kbd> 和 <kbd>变量的声明</kbd> 的，我们先来看下如何对一个变量进行定义或者声明</p>
+<pre><code data-line="34" class="code-line language-c"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-comment">// Variable definitions</span>
+    <span class="hljs-keyword">int</span> varriable_def = <span class="hljs-number">10</span>;
+
+    <span class="hljs-comment">// Variable declaration</span>
+    <span class="hljs-keyword">int</span> varriable_decl;
+}
+</div></code></pre>
+<p data-line="45" class="code-line">可以看到，我们对于一个变量如果在声明的过程中指定了其具体的值，那么这个变量就会提升为 <kbd>变量的定义</kbd>，反之，我们只是单纯的声明了一个变量的类型和其变量名，那么这种方式就称为 <kbd>变量的声明</kbd></p>
+<p data-line="47" class="code-line">但是，变量的定义 和 变量的声明 的区别不仅于此，最关键的部分还是对于两者的定义编译器是否为之开辟内存空间的问题</p>
+<p data-line="49" class="code-line">对于 <kbd>变量的定义</kbd> 来说，编译器会为我们所定义的变量开辟一块与之对应的内存空间进行存储，而对于 <kbd>变量的声明</kbd> 来说它编译器是不会为它开辟一块内存空间的</p>
+<p data-line="51" class="code-line">其次，在 c 语言中，一个变量成员的使用必须要存在其定义，如果不存在的话，则编译器在编译源程序的时候，编译器则会找到这个变量的声明，并将其隐式提升为定义，并根据这个变量所处的内存段赋予相应的默认值 (在 <kbd>栈</kbd> 上则默认为一个随机数)</p>
+<br/>
+<a for="toc-anchor" id="%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F%E5%92%8C%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F"></a><h4 id="e585a8e5b180e58f98e9878fe5928ce5b180e983a8e58f98e9878f-2" data-line="55" class="code-line">全局变量和局部变量</h4>
+<p data-line="56" class="code-line"><span id="全局变量和局部变量"></span></p>
+<p data-line="58" class="code-line">局部变量: 局部变量声明在函数体内，其作用域由此变量的声明开始，直至该函数体的结束，对于普通的局部变量而言 ( 未使用 <kbd>extern</kbd> 关键字的局部变量 )，如果我们只是声明了一个局部变量，那编译器在编译的过程中仅会尝试在变量的定义位置开始直至当前函数体的结束符 <kbd>}</kbd> 之间寻找该变量的定义，如果不存在，则编译器会赋予它一个随机数</p>
+<p data-line="60" class="code-line">对于一般的局部变量而言，其一般存储在内存的 <kbd>栈</kbd> 上，也就意味着其生命周期在出了该函数体外就会结束掉</p>
+<p data-line="62" class="code-line">全局变量: 全局变量声明在函数体外，其作用域默认情况下由此成员的定义开始直至当前文件的结束，对于全局变量而言，如果我们只是声明了一个全局变量，那编译器在编译的过程中会先从当前全局变量的定义位置开始直至当前文件的结束中寻找该变量的定义，如果不存在，则会从其它需要链接的文件中尝试寻找该变量的定义 ( 这种情况也是间接的提升了全局变量的作用域 )，如果都不存在，则编译器会赋予它一个默认值</p>
+<p data-line="64" class="code-line">对于一般的全局变量而言，其存储在内存的 <kbd>.bss</kbd> 或 <kbd>.rodata</kbd> 段上，也就意味着其生命周期会延续到当前程序的结束</p>
+<div class="admonition danger">
+<p class="admonition-title">注意</p>
+<p data-line="67" class="code-line">对于不同的编译器来说，这方面的实现可能会有所不同，就 <kbd>GCC</kbd> 而言，其符合着以上所说的这一规范，而对于 <kbd>MSVC</kbd> 而言，这个规范仅仅适用于全局变量，对于局部变量来说，其在使用前必须要有其定义，否则会编译错误</p>
+</div>
+<br/>
+<a for="toc-anchor" id="extern-%E5%85%B3%E9%94%AE%E5%AD%97"></a><h4 id="extern-e585b3e994aee5ad97-2" data-line="71" class="code-line">extern 关键字</h4>
+<p data-line="72" class="code-line"><span id="extern"></span></p>
+<p data-line="74" class="code-line">该关键字能够用于扩展 <kbd>函数/变量</kbd> 的可见性，而使用了该关键字的成员 <kbd>只能够用作于声明</kbd>，具体的作用就是在编译器编译步骤至链接的过程中，会在其他文件 ( 也有可能是当前文件 ) 中寻找符合使用了当前该关键字的成员声明的定义，以至使用了该关键字的声明能够映射到找到的相应文件的成员定义当中，从而间接实现了声明的可见性</p>
+<p data-line="76" class="code-line">前面说到，变量在使用前必须要存在定义，如果在使用的时候并没有对该变量的定义的话，编译器则会找到其声明，并将其隐式提升为定义，并赋予其相应的默认值，而使用了该关键字的第一大特性就是，<kbd>它会阻住编译器对于变量进行定义的隐式提升效果</kbd>，也就是说，如果我们对某一个变量使用了该关键字进行了声明后，如果该变量在某处进行了使用，则源程序会在编译的过程中报错，因为编译器不会将其声明隐式提升为定义</p>
+<p data-line="78" class="code-line">该关键字如果给变量使用的话，其可以作用于局部变量和全局变量</p>
+<ul>
+<li data-line="79" class="code-line">局部变量
+<ul>
+<li data-line="80" class="code-line">局部变量使用该关键字的时候，该变量不可以用作于定义</li>
+<li data-line="81" class="code-line">对于局部变量来说，当我们在局部变量使用了该关键字后，该局部变量的具体定义能够映射至当前函数外的任意位置，乃至其它文件中，也就是间接的提升了其作用域</li>
+</ul>
+</li>
+<li data-line="82" class="code-line">全局变量
+<ul>
+<li data-line="83" class="code-line">全局变量使用该关键字的时候，该变量可以用作于定义</li>
+<li data-line="84" class="code-line">对于全局变量来说，使用了该关键字的成员的定义和局部变量一样，其作用域同样也会有一种隐式提升的作用，其实这点就使用了 <kbd>extern</kbd> 关键字的全局变量和 普通的全局变量 来说是非常类似的，但是我们需要注意的是，它们两种声明方式所带来的后果其实是不同的，就 普通的全局变量 来说，其还是一种变量成员，即遵循 <kbd>如果仅存在声明而没有定义的情况下，该声明会隐式提升成定义</kbd> ，而对于使用了 <kbd>extern</kbd> 关键字的全局变量来说，<kbd>它会阻住编译器对于变量进行定义的隐式提升效果</kbd>，也就是说，如果一个声明为 <kbd>extern</kbd> 关键字的全局变量，如果再找不到其定义令他的声明隐式提升为定义的情况下，编译器编译的时候i会报错</li>
+</ul>
+</li>
+</ul>
+<p data-line="86" class="code-line">而该关键字给函数使用的话其实无太大效果，因为我们所声明的函数或者是我们所定义的函数在编译器进行编译的过程中，都会默认的为所声明的函数加上该关键字 <kbd>extern</kbd></p>
+<pre><code data-line="88" class="code-line language-c"><div>Session <span class="hljs-number">1</span>：
+*******main.<span class="hljs-function">c
+<span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span> </span>{
+    
+    <span class="hljs-keyword">extern</span> <span class="hljs-keyword">int</span> a;
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>, a);
+
+    system(<span class="hljs-string">"pause"</span>);
+    <span class="hljs-keyword">return</span> EXIT_SUCCESS;
+}
+
+<span class="hljs-keyword">int</span> a = <span class="hljs-number">10</span>;
+
+
+
+Session <span class="hljs-number">2</span>:
+*******main.<span class="hljs-function">c
+<span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span> </span>{
+    
+    <span class="hljs-keyword">extern</span> <span class="hljs-keyword">int</span> a;
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>, a);
+
+    system(<span class="hljs-string">"pause"</span>);
+    <span class="hljs-keyword">return</span> EXIT_SUCCESS;
+}
+
+*******test.c
+<span class="hljs-keyword">int</span> a = <span class="hljs-number">10</span>;
+
+
+
+Session <span class="hljs-number">3</span>:
+*******main.c
+<span class="hljs-keyword">extern</span> <span class="hljs-keyword">int</span> a;
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span> </span>{
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>, a);
+
+    system(<span class="hljs-string">"pause"</span>);
+    <span class="hljs-keyword">return</span> EXIT_SUCCESS;
+}
+
+*******test.c
+<span class="hljs-keyword">int</span> a = <span class="hljs-number">10</span>;
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E5%B8%B8%E9%87%8F"></a><h3 id="e5b8b8e9878f-2" data-line="140" class="code-line">常量</h3>
+<p data-line="141" class="code-line"><span id="常量"></span></p>
+<hr>
+<p data-line="145" class="code-line">C 语言中的常量是通过关键字 <kbd>const</kbd> 来完成，当我们定义了一个常量，就意味着我们无法通过正常途径去修改这个定义为常量的成员的值，但是我们需要记住的是，当我们把一个常量定义为 <kbd>局部的</kbd>，那么 <kbd>这个常量无法修改的特性是由编译器在编译源程序的过程中所决定的</kbd>，其实更具体点来说，这个变量还是和普通的变量一样存储在 <kbd>栈</kbd> 上，但是因为它使用了 <kbd>const</kbd> 的关键字，所以编译器在编译的时候就会检查这个关键字所定义的变量是否存在修改的情况，由于还是存储在 <kbd>栈</kbd> 上，这也就意味着我们是可以在程序运行时通过 <kbd>间接修改 (指针)</kbd> 的方式去修改这个常量的值，其实简而言之，定义为局部的常量是一种 <kbd>伪常量</kbd></p>
+<pre><code data-line="147" class="code-line language-c"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> a = <span class="hljs-number">10</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p data-line="156" class="code-line">常量的定义，关键字 <kbd>const</kbd> 并不一定需要放在左值表达式的最左侧，对于 <kbd>const</kbd> 关键字来说，其所存放的位置可以在左值表达式的任意位置，对于普通的常量来说我们放在什么位置也好，其实都是没有区别的，而对于 <kbd>指针类型的常量</kbd> 来说，<kbd>const</kbd> 关键字所写入的位置能够决定 <kbd>指针类型的常量</kbd> 的一些额外特性</p>
+</div>
+<p data-line="158" class="code-line">那么当我们把 <kbd>const</kbd> 的关键字使用在 <kbd>全局变量</kbd> 身上的时候，那么该常量就会存储在内存的 [.rodata] 段中，也就是说该常量不能被修改的特性是受到 <kbd>系统内核级</kbd> 的保护的，其实也就是我们不能通过指针来实现间接修改，它是真正意义上，<kbd>长存性</kbd> 的常量</p>
+<pre><code data-line="160" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+
+<span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> a = <span class="hljs-number">10</span>;
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>,a);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p data-line="171" class="code-line">除此之外，常量的定义我们还能在 <kbd>函数的参数</kbd> 身上使用，其实对于参数身上使用，其特性也是符合 <kbd>局部常量</kbd> 的那种特性，但是通过这种方式我们能够达成一个 <kbd>约定俗成</kbd> 的概念，即 <kbd>该参数不能够修改</kbd> 的概念</p>
+<pre><code data-line="173" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">fun_test</span><span class="hljs-params">(<span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> a)</span></span>{
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>,a);
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    fun_test(<span class="hljs-number">10</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E9%9D%99%E6%80%81%E6%88%90%E5%91%98"></a><h3 id="e99d99e68081e68890e59198-2" data-line="190" class="code-line">静态成员</h3>
+<p data-line="191" class="code-line"><span id="静态成员"></span></p>
+<hr>
+<p data-line="195" class="code-line">静态成员使用 <kbd>static</kbd> 关键字来完成定义，它可以使用于 <kbd>函数</kbd> 和 <kbd>变量</kbd>，其存储在内存的 <kbd>.data</kbd> 段或者 <kbd>.bss</kbd> 段中，意味着其生命周期会延续到程序的结束</p>
+<p data-line="197" class="code-line">当静态成员定义为 <kbd>全局成员</kbd> 的时候，意味着该成员的作用域从定义位置开始，到本文件的结束，并且我们不能通过外部声明提升其作用域</p>
+<pre><code data-line="199" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span><span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">fun_test</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Hello,World!"</span>);
+}
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> a = <span class="hljs-number">10</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p data-line="215" class="code-line">当静态成员定义为 <kbd>局部成员</kbd> 的时候，该成员的作用域从定义位置开始，直至当前函数体的结束，需要注意的是，由于它是静态的，所以它的生命周期会延续到程序的结束，也就是说当我们定义了一个静态的局部变量，当我们第一次操作它并改变了相应的值，那么当我们第二次访问该函数的时候，这个静态局部变量的值就是我们改编后的值</p>
+<pre><code data-line="217" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span><span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">fun_test</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> a = <span class="hljs-number">0</span>;
+    a++;
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Hello,World!"</span>);
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">5</span>; i++) {
+
+        fun_test();
+	}
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E5%9F%BA%E7%A1%80%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"></a><h3 id="e59fbae7a180e695b0e68daee7b1bbe59e8b-2" data-line="240" class="code-line">基础数据类型</h3>
+<p data-line="241" class="code-line"><span id="基础数据类型"></span></p>
+<hr>
+<a for="toc-anchor" id="%E5%8E%9F%E7%A0%81-%E5%8F%8D%E7%A0%81-%E8%A1%A5%E7%A0%81"></a><h4 id="e58e9fe7a081-e58f8de7a081-e8a1a5e7a081-2" data-line="245" class="code-line">原码 反码 补码</h4>
+<p data-line="246" class="code-line"><span id="原反补"></span></p>
+<p data-line="248" class="code-line">计算机对于数值的计算都是通过 <kbd>补码</kbd> 来完成的，即我们一个普通的数字要经过 <kbd>原码</kbd> -&gt; <kbd>反码</kbd> -&gt; <kbd>补码</kbd> 的过程才能交由计算机去读取或者是计算</p>
+<ul>
+<li data-line="250" class="code-line">
+<p data-line="250" class="code-line">原码: 一个数的原始二进制数，例如 <kbd>32</kbd> 的原码 则为 <kbd>0010 0010</kbd>，并且把 <kbd>最高位</kbd> 作为 <kbd>符号位</kbd>，如果是 <kbd>0</kbd> 即 <kbd>正数</kbd>，如果是 <kbd>1</kbd> 即 <kbd>负数</kbd></p>
+</li>
+<li data-line="252" class="code-line">
+<p data-line="252" class="code-line">反码: 如果原码为正数，那么反码则不变，如果原码为负数，则除了原码的符号位以外，其余全部位全部取反即为反码</p>
+</li>
+<li data-line="254" class="code-line">
+<p data-line="254" class="code-line">补码: 如果原码为正数，那么补码则不变，如果原码为负数，则为反码数 <kbd>+1</kbd> 即为补码</p>
+</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<ul>
+<li data-line="258" class="code-line">在 C 中，对于基本的数据类型来说是需要区分 <kbd>有符号类型</kbd> 和 <kbd>无符号类型</kbd> 的，即 <kbd>最高位</kbd> 是否用来充当符号位而不参与实际运算</li>
+<li data-line="259" class="code-line">关键字 <kbd>signed</kbd> 所修饰的类型即为 <kbd>有符号类型</kbd>，而我们不使用该关键字所声明的变量的类型默认都为 <kbd>有符号类型</kbd></li>
+<li data-line="260" class="code-line">关键字 <kbd>unsigned</kbd> 所修饰的类型即为 <kbd>无符号类型</kbd></li>
+</ul>
+</div>
+<br/>
+<a for="toc-anchor" id="%E6%95%B4%E5%9E%8B"></a><h4 id="e695b4e59e8b-2" data-line="265" class="code-line">整型</h4>
+<p data-line="266" class="code-line"><span id="整型"></span></p>
+<p data-line="268" class="code-line">有符号整型:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Size</th>
+<th>Length</th>
+<th>example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>int</td>
+<td>4 Bytes</td>
+<td>- 2147483648 ~ 2147483647</td>
+<td><kbd>int a = 10</kbd></td>
+</tr>
+<tr>
+<td>short</td>
+<td>2 Bytes</td>
+<td>- 32768 ~ 32767</td>
+<td><kbd>short a = 10</kbd></td>
+</tr>
+<tr>
+<td>long</td>
+<td><kbd>Windows</kbd> 下统一为 4 Bytes，而 <kbd>Linux</kbd> 下，<kbd>64位系统</kbd> 为 8 Bytes，<kbd>32位系统</kbd> 为 4 Bytes</td>
+<td>- 2147483648 ~ 2147483647</td>
+<td><kbd>long a = 10</kbd></td>
+</tr>
+<tr>
+<td>long long</td>
+<td>8 Bytes</td>
+<td>- 9223372036854775808 ~ 9223372036854775807</td>
+<td><kbd>long long a = 10</kbd></td>
+</tr>
+</tbody>
+</table>
+<p data-line="277" class="code-line">无符号整型:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Size</th>
+<th>Length</th>
+<th>example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>unsigned int</td>
+<td>4 Bytes</td>
+<td>0 ~ 4294967295</td>
+<td><kbd>unsigned int a = 10</kbd></td>
+</tr>
+<tr>
+<td>unsigned short</td>
+<td>2 Bytes</td>
+<td>0 ~ 65535</td>
+<td><kbd>unsigned short a = 10</kbd></td>
+</tr>
+<tr>
+<td>unsigned long</td>
+<td><kbd>Windows</kbd> 下统一为 4 Bytes，而 <kbd>Linux</kbd> 下，<kbd>64位系统</kbd> 为 8 Bytes，<kbd>32位系统</kbd> 为 4 Bytes</td>
+<td>0 ~ 4294967295</td>
+<td><kbd>unsigned long a = 10</kbd></td>
+</tr>
+<tr>
+<td>unsigned long long</td>
+<td>8 Bytes</td>
+<td>0 ~ 18446744073709551615</td>
+<td><kbd>unsigned long long a = 10</kbd></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p data-line="287" class="code-line">整型数据在内存中占的字节数与所选择的操作系统有关，虽然 C 语言标准中没有明确规定整型数据的长度，但 long 类型整数的长度不能短于 int 类型， short 类型整数的长度不能长于 int 类型</p>
+</div>
+<br/>
+<a for="toc-anchor" id="%E5%AE%9E%E5%9E%8B"></a><h4 id="e5ae9ee59e8b-2" data-line="291" class="code-line">实型</h4>
+<p data-line="292" class="code-line"><span id="实型"></span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Size</th>
+<th>Length</th>
+<th>example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>float</td>
+<td>4 Bytes</td>
+<td>- 3.4 * 10^38 ～ 3.4 * 10^38</td>
+<td><kbd>float a = 10</kbd></td>
+</tr>
+<tr>
+<td>double</td>
+<td>8 Bytes</td>
+<td>- 1.7 * 10^-308 ~ 1.7 * 10^308</td>
+<td><kbd>double a = 10</kbd></td>
+</tr>
+</tbody>
+</table>
+<br/>
+<a for="toc-anchor" id="char"></a><h4 id="char-2" data-line="301" class="code-line">Char</h4>
+<p data-line="302" class="code-line"><span id="Char"></span></p>
+<p data-line="304" class="code-line">char 在 C 中除了能够表示一个字符以外，它还能够表示一个 <kbd>1 Bytes</kbd> 大小的整型数据，因为每个 char 类型本身就是一个 <kbd>ASCII</kbd> 字符，即每个字符都有一个在 <kbd>1 Bytes</kbd> 大小一类的数字</p>
+<p data-line="306" class="code-line">除了使用 char 来表示一个字符以外，我们还通常用它来 <kbd>解析内存地址结构</kbd>，原因是因为 char 类型本身只是占 <kbd>1 Bytes</kbd>，即计算机中的基本内存单元，可以更好地去操控</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Size</th>
+<th>Length</th>
+<th>example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>unsigned char</td>
+<td>1 Bytes</td>
+<td>0 ~ 255</td>
+<td><kbd>unsigned char ch = 'A'</kbd></td>
+</tr>
+<tr>
+<td>signed char</td>
+<td>1 Bytes</td>
+<td>-128 ~ 127</td>
+<td><kbd>char ch = 97</kbd></td>
+</tr>
+</tbody>
+</table>
+<br/>
+<a for="toc-anchor" id="sizeof"></a><h4 id="sizeof-2" data-line="315" class="code-line">sizeof</h4>
+<p data-line="316" class="code-line"><span id="sizeof"></span></p>
+<p data-line="318" class="code-line"><kbd>sizeof</kbd> 是一种关键字，它可以获取一个 <kbd>数据类型</kbd> 或者 <kbd>已经定义好数据类型的变量</kbd> 其所占用内存空间的具体大小，以字节为单位</p>
+<p data-line="320" class="code-line"><kbd>sizeof</kbd> 关键字的返回值为 <kbd>size_t</kbd> 类型，在 <kbd>32位操作系统</kbd> 下认作为 <kbd>unsigned int</kbd> 类型</p>
+<pre><code data-line="322" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span><span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">MyStruct</span> {</span>
+
+    <span class="hljs-keyword">int</span> value1;
+    <span class="hljs-keyword">char</span> value2;
+};
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-comment">// 取 已经定义好数据类型的变量</span>
+    <span class="hljs-keyword">int</span> a = <span class="hljs-number">10</span>;
+    <span class="hljs-keyword">size_t</span> size_a = <span class="hljs-keyword">sizeof</span>(a);
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"size of a = %d\n"</span>,size_a);
+
+    <span class="hljs-comment">// 取 数据类型</span>
+    <span class="hljs-keyword">size_t</span> size_double = <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">double</span>);
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"size of double = %d\n"</span>,size_double);
+
+    <span class="hljs-comment">// 取 结构体</span>
+    <span class="hljs-keyword">size_t</span> size_struct = <span class="hljs-keyword">sizeof</span>(struct MyStruct);
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"size of struct = %d\n"</span>,size_struct);
+
+    <span class="hljs-comment">// 取 指针或者是指针所指向的变量</span>
+    <span class="hljs-keyword">int</span> value = <span class="hljs-number">10</span>;
+    <span class="hljs-keyword">int</span> ptr_value = &amp;a;
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"size of pointer = %d\n"</span>,ptr_value);
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"size of value = %d\n"</span>,*ptr_value);
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E6%8C%87%E9%92%88"></a><h3 id="e68c87e99288-2" data-line="358" class="code-line">指针</h3>
+<p data-line="359" class="code-line"><span id="指针"></span></p>
+<hr>
+<a for="toc-anchor" id="%E5%86%85%E5%AD%98%E5%8D%95%E5%85%83"></a><h4 id="e58685e5ad98e58d95e58583-2" data-line="363" class="code-line">内存单元</h4>
+<p data-line="364" class="code-line"><span id="内存单元"></span></p>
+<p data-line="366" class="code-line">内存单元是计算机中内存最小的存储单位，其大小为 <kbd>1 Bytes</kbd> ，而每一个 <kbd>内存单元</kbd> 都有一个唯一的编码，这个编码的长度可能是 8 位 ( 32 位系统 ) 或 16 位 ( 64 位系统 )，对于这个编码，更为亲民的称呼则为 <kbd>地址</kbd>，而指针是什么？ <kbd>指针的实质其实就是这个地址</kbd>，更具体来说的话，指针是存储了一个变量其所对应内存空间中首地址的变量，也就是指向了一个地址</p>
+<br/>
+<a for="toc-anchor" id="%E5%8F%98%E9%87%8F%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E6%A8%A1%E5%9E%8B"></a><h4 id="e58f98e9878fe59ca8e58685e5ad98e4b8ade79a84e5ad98e582a8e6a8a1e59e8b-2" data-line="370" class="code-line">变量在内存中的存储模型</h4>
+<p data-line="371" class="code-line"><span id="变量在内存中的存储模型"></span></p>
+<p data-line="373" class="code-line">在程序编译的过程中，就已经为我们所定义的变量按照变量的数据类型所对应的字节大小规划好了它们所属的内存空间，举个例子，比如说我们定义了一个占用内存空间为 <kbd>4 Bytes</kbd> 的 <kbd>int</kbd> 类型的变量，其存储的值为 <kbd>0x12345678</kbd> ，那么它在内存空间中就有相应的、连续的 <kbd>4个内存单元</kbd> 的存储空间，如下图</p>
+<pre><code data-line="375" class="code-line language-c"><div>
+                <span class="hljs-number">8765</span> <span class="hljs-number">4321</span> Bit      TOP
+               +---------+          ^
+               |         |          |
+               |<span class="hljs-number">1000</span> <span class="hljs-number">0111</span>|          |
+               |         |          |
+<span class="hljs-number">0x00000004</span>&lt;----+---------+          |
+               |         |          |
+               |<span class="hljs-number">0110</span> <span class="hljs-number">0101</span>|          |
+               |         |          |
+<span class="hljs-number">0x00000003</span>&lt;----+---------+          |
+               |         |          |
+               |<span class="hljs-number">0100</span> <span class="hljs-number">0011</span>|          |
+               |         |          |
+<span class="hljs-number">0x00000002</span>&lt;----+---------+          |
+               |         |          |
+               |<span class="hljs-number">0010</span> <span class="hljs-number">0001</span>|          |
+               |         |          |
+<span class="hljs-number">0x00000001</span>&lt;----+---------+          v
+                                   LOW
+
+</div></code></pre>
+<p data-line="399" class="code-line">通过上图我们可以总结出几点结论</p>
+<ol>
+<li data-line="401" class="code-line">
+<p data-line="401" class="code-line">对于一个变量而言，其在内存空间中所使用的是一块 <kbd>地址连续</kbd> 的内存空间，比如说一个 <kbd>int</kbd> 类型占用 <kbd>4 Bytes</kbd>，那么其在内存空间中就是占用了 4 个 <kbd>内存单元</kbd>，且每个内存单元之间是相间一起的，也就是 <kbd>地址连续</kbd></p>
+</li>
+<li data-line="403" class="code-line">
+<p data-line="403" class="code-line">变量所对应的内存空间的地址是连续的，而且其地址总是会从 <kbd>低位 -&gt; 高位</kbd> 的形式来往上递增，除此之外，需要我们注意的是，<kbd>只要我们去操作一个变量，不管是读取还是写入，操作也是从最低为开始进行的</kbd>，也就是最低位的那 <kbd>1 Bit</kbd></p>
+</li>
+<li data-line="405" class="code-line">
+<p data-line="405" class="code-line">除此之外，我们会发现一个数在转换为 <kbd>二进制</kbd> 的数值的时候，其最右边的值则对应的最低位，在上图则为 <kbd>0010 0001</kbd>，而最左边的值则为它的最高位，即 <kbd>1000 0111</kbd></p>
+</li>
+</ol>
+<br/>
+<a for="toc-anchor" id="%E8%8E%B7%E5%8F%96%E4%B8%80%E4%B8%AA%E5%8F%98%E9%87%8F%E5%85%B6%E6%89%80%E5%9C%A8%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E7%9A%84%E9%A6%96%E5%9C%B0%E5%9D%80"></a><h4 id="e88eb7e58f96e4b880e4b8aae58f98e9878fe585b6e68980e59ca8e58685e5ad98e7a9bae997b4e79a84e9a696e59cb0e59d80-2" data-line="409" class="code-line">获取一个变量其所在内存空间的首地址</h4>
+<p data-line="410" class="code-line"><span id="获取一个变量其所在内存空间的首地址"></span></p>
+<p data-line="412" class="code-line">在 c 语言中，通过关键字 <kbd>&amp;</kbd> 即可获取一个变量所在内存空间的首地址</p>
+<pre><code data-line="414" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span><span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-keyword">int</span> a = <span class="hljs-number">10</span>;
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%p\n"</span>,&amp;a);
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E6%8C%87%E9%92%88%E5%8F%98%E9%87%8F%E7%9A%84%E5%AE%9A%E4%B9%89"></a><h4 id="e68c87e99288e58f98e9878fe79a84e5ae9ae4b989-2" data-line="428" class="code-line">指针变量的定义</h4>
+<p data-line="429" class="code-line"><span id="指针变量的定义"></span></p>
+<p data-line="431" class="code-line">指针由于其所存储的是一个变量在内存空间的首地址，故我们定义指针的时候，做左值的操作只需要赋予相应变量的在内存空间中的首地址即可获取到一个 <kbd>安全的指针变量</kbd></p>
+<pre><code data-line="433" class="code-line language-c"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-keyword">int</span> a = <span class="hljs-number">20</span>;
+    <span class="hljs-keyword">int</span> *ptr = &amp;a;
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p data-line="443" class="code-line">定义指针，通过 <kbd>*</kbd> 号来进行定义，一旦在定义变量的过程中，类型与变量名之间出现了 <kbd>*</kbd>，那么编译器就会认为这个定义过程是在定义一个 <kbd>指针变量</kbd>，而上面的代码中，即为定义了一个类型为 <kbd>int *</kbd> 的指针变量 <kbd>p</kbd></p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p data-line="446" class="code-line">一个指针变量在定义完成后，其所指向的内存地址并不是不能改变的，如果有需要，我们是可以在适当的时候改变其指向另一块合法的内存地址</p>
+</div>
+<br/>
+<a for="toc-anchor" id="%E6%8C%87%E9%92%88%E5%92%8C%E5%9C%B0%E5%9D%80"></a><h4 id="e68c87e99288e5928ce59cb0e59d80-2" data-line="451" class="code-line">指针和地址</h4>
+<p data-line="452" class="code-line"><span id="指针和地址"></span></p>
+<p data-line="454" class="code-line">当一个指针变量定义完成后，<kbd>我们直接使用这个指针变量名的时候即为获取这个指针变量所存储的内存地址，即这个指针所指向的地址</kbd>，而指针既然是一个指针变量，那么它也有所对应的内存空间的地址，我们该如何获取它呢？<kbd>对指针变量名使用 &amp; 操作符即为获取到这个指针变量在内存空间中的首地址</kbd></p>
+<p data-line="456" class="code-line">这里需要区分两个地址的概念，一个是指针本身在内存空间中的首地址，一个是指针所指向的其它变量在内存空间中的首地址，如下图</p>
+<pre><code data-line="458" class="code-line language-c"><div>TOP                         <span class="hljs-number">8765</span> <span class="hljs-number">4321</span> Bit
+ ^                         +---------+--------+                      +---------+
+ |                         |         |        |                      |         |
+ |                         |<span class="hljs-number">1000</span> <span class="hljs-number">0111</span>|        |                      |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|
+ |                         |         |        |                      |         |
+ |         <span class="hljs-number">0x00000004</span> &lt;--------------+        |                      +---------+-------&gt; <span class="hljs-number">0x87654324</span>
+ |                         |         |        |                      |         |
+ |                         |<span class="hljs-number">0110</span> <span class="hljs-number">0101</span>|        |                      |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|
+ |                         |         |        |                      |         |
+ |         <span class="hljs-number">0x00000003</span> &lt;--------------+        +--------------------&gt; +---------+-------&gt; <span class="hljs-number">0x87654323</span>
+ |                         |         |        |                      |         |
+ |                         |<span class="hljs-number">0100</span> <span class="hljs-number">0011</span>|        |                      |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|
+ |                         |         |        |                      |         |
+ |         <span class="hljs-number">0x00000002</span> &lt;--------------+        |                      +---------+-------&gt; <span class="hljs-number">0x87654322</span>
+ |                         |         |        |                      |         |
+ |                         |<span class="hljs-number">0010</span> <span class="hljs-number">0001</span>|        |                      |<span class="hljs-number">0001</span> <span class="hljs-number">0100</span>|
+ |                         |         |        |                      |         |
+ v         <span class="hljs-number">0x00000001</span> &lt;----+---------+--------+                      +---------+-------&gt; <span class="hljs-number">0x87654321</span>
+LOW             ^                                                                            ^
+                |                                                                            |
+                |                                                                            |
+                |                                                                            |
+                +                                                                            +
+      Pointer: ptr -&gt; <span class="hljs-number">0x87654321</span>                                                        Int: a -&gt; <span class="hljs-number">20</span>
+
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E5%AF%BB%E5%9D%80%E6%93%8D%E4%BD%9C"></a><h4 id="e5afbbe59d80e6938de4bd9c-2" data-line="490" class="code-line">寻址操作</h4>
+<p data-line="491" class="code-line"><span id="寻址操作"></span></p>
+<p data-line="493" class="code-line">根据某个变量的内存空间的首地址能够找到它的存储区域并完成对这块内存区的读写操作，这个操作就叫做 <kbd>寻址</kbd>，而放在指针身上的更贴切的称呼则为：<kbd>指针的解引用</kbd></p>
+<p data-line="495" class="code-line">解引用操作我们通过操作符 <kbd>*</kbd> 来完成，该操作符能够通过一个给定的合法地址，该合法地址通常是一个变量在内存区域中的首地址，找到这个变量在内存中的具体位置，然后再 <kbd>根据解引用变量的数据类型的大小从首地址往后读取具体个字节的内存单元</kbd> ，再把整体读取到的内存单元拿出来 ( <kbd>即找到内存地址所代表的具体变量</kbd> )，以完成对该内存首地址所指向的内存区域的读写操作，如以下代码</p>
+<pre><code data-line="497" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span><span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-keyword">int</span> a = <span class="hljs-number">10</span>;
+    *(&amp;a) = <span class="hljs-number">20</span>;
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p data-line="509" class="code-line">我们通过操作符 <kbd>&amp;</kbd> 拿到了变量 <kbd>a</kbd> 的内存首地址，然后再通过操作符 <kbd>*</kbd> 对该地址进行解引用，找到变量 <kbd>a</kbd> 在内存中的首地址，由于变量 <kbd>a</kbd> 的类型为 <kbd>int</kbd> 即 <kbd>4 Bytes</kbd>，于是，<kbd>*</kbd> 操作符再根据首地址往后读取 <kbd>4 Bytes</kbd> 大小的内存单元，到此为止，我们就可以拿到变量 <kbd>a</kbd> 本身以完成对它的间接读写操作了</p>
+<p data-line="511" class="code-line">上面的示例是直接通过一个变量的地址来进行解引用操作，对于指针变量的使用也是如此，前面说过，指针变量当定义完成后，直接使用指针变量名则是获取这个指针变量所存储的某个变量在内存空间中的首地址吗，即通过 <kbd>*</kbd> 所解引用的即是指针变量所存储的某个变量的内存地址，先来看下使用</p>
+<pre><code data-line="513" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span><span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-keyword">short</span> a = <span class="hljs-number">10</span>;
+    <span class="hljs-keyword">short</span> *p = &amp;a;
+    *p = <span class="hljs-number">20</span>;
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p data-line="526" class="code-line">以上则是指针变量使用的方式，在前面说到，对于直接对一个地址解引用操作的时候，所解引用的具体字节是根据这个地址本身所映射的变量来决定的，比如说这个地址是属于 <kbd>int</kbd> 类型变量地址的话，那解引用操作所读取的字节则为 <kbd>4 Bytes</kbd>，而对于直接通过一个指针变量来解引用操作的时候，<kbd>具体所读取的字节是通过指针的类型</kbd> 来决定的，在这里，指针的类型为 <kbd>short *</kbd>，即 <kbd>4 Bytes</kbd>，但是还需要注意的是，指针所指向的变量是一个 <kbd>short</kbd> 类型，即本身在内存空间中占用 <kbd>2 Bytes</kbd>，而指针类型又是一个 <kbd>4 Bytes</kbd>，所以本身是不符合常理的</p>
+<p data-line="528" class="code-line">先不要急，我们先拆分来看看这个 <kbd>解引用的表达式</kbd> ，他其实拆分出来分别为 <kbd>p</kbd> 和 <kbd>*p</kbd>，<kbd>p</kbd> 的过程即获取这个指针变量内部所存储的某个变量的内存地址，这时候其实我们对于这个指针变量 <kbd>p</kbd> 本身的类型需要去掉一颗 <kbd>*</kbd>，即 <kbd>short *</kbd> -&gt; <kbd>short</kbd>，在第二步操作的时候则是根据第一步操作所转换掉的类型 ( <kbd>short</kbd> ) 来决定接下来要往内存中读取的字节数，即 <kbd>2 Bytes</kbd>，也就是变量 <kbd>a</kbd> 本身在内存中所存储的 <kbd>完整的</kbd> 数据</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p data-line="531" class="code-line">简而言之，在指针变量使用的时候，我们需要先对于指针变量本身的类型先去掉一个 <kbd>*</kbd> 来看待即可，这一规则包括 <kbd>数组</kbd> 和 <kbd>多级指针</kbd> 都应遵守</p>
+</div>
+<br/>
+<a for="toc-anchor" id="%E6%8C%87%E9%92%88%E7%9A%84%E7%B1%BB%E5%9E%8B"></a><h4 id="e68c87e99288e79a84e7b1bbe59e8b-2" data-line="535" class="code-line">指针的类型</h4>
+<p data-line="536" class="code-line"><span id="指针的类型"></span></p>
+<p data-line="538" class="code-line">一个指针变量也有属于它的类型的，如: <kbd>int *</kbd>、<kbd>short *</kbd>、<kbd>char *</kbd>、……</p>
+<p data-line="540" class="code-line">那么指针的类型具体有什么作用呢？ <kbd>指针的类型能够决定指针变量所存储的地址的步长</kbd></p>
+<p data-line="542" class="code-line">这里还要提及一个步长的概念， <kbd>步长能够决定解引用时所需读取的字节数和对于地址做算数偏移时需要相对于步长数进行偏移</kbd> ，即一个读还有一个是内存地址的偏移</p>
+<p data-line="544" class="code-line">我们先来看一下读：</p>
+<p data-line="546" class="code-line">前面说到，操作符 <kbd>*</kbd> 进行解引用的时候，能够通过所给定的某个变量在内存中的首地址，找到这块变量完整的内存空间以完成对该变量的读写操作，那么这里就有一个疑问，首先一个变量的首地址我们是知道的，因为操作符 <kbd>*</kbd> 所解引用的就是一个变量在内存中的首地址，接下来，假设这个地址为 <kbd>0x00000001</kbd>，并且其所映射的变量是一个 <kbd>short</kbd> 类型的变量，即所存储的内存空间的大小为 <kbd>2 Bytes</kbd>，所以这个变量在内存中具体所占用的地址为： <kbd>0x00000001</kbd> 、 <kbd>0x00000002</kbd>，那么编译器是如何知道操作符 <kbd>*</kbd> 在定位到 <kbd>0x00000001</kbd> 后，需要读取两个字节的数据呢？这个就是靠的 <kbd>读的步长</kbd></p>
+<p data-line="548" class="code-line">接下来看下内存地址的偏移：</p>
+<p data-line="550" class="code-line">我们还是假定一个 <kbd>short</kbd> 类型的变量，并且其在内存中的首地址为 <kbd>0x00000001</kbd>，我们不妨对这个地址进行 <kbd>+ 1</kbd> 操作，即 <kbd>0x00000001 + 1 = ?</kbd> ，该算数表达式在正常情况下其答案为 <kbd>0x00000002</kbd>，然而它实际上是一个内存地址，对于内存地址进行常量算术操作 ( <kbd>偏移</kbd> ) 应该以其步长作为基准，即 <kbd>0x00000001 + 1 * 步长 = 0x00000003</kbd></p>
+<p data-line="552" class="code-line">那么步长到底怎么来， <kbd>单纯以一个变量的地址作为衡量的话，那步长就为这个内存地址所映射的变量的数据类型所占用的具体内存空间的大小</kbd> ，如下面代码获取到步长的方式则是以 <kbd>内存地址所映射的变量的类型</kbd> 来决定的</p>
+<pre><code data-line="554" class="code-line language-c"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-keyword">short</span> a = <span class="hljs-number">10</span>;
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%p\n"</span>,&amp;a + <span class="hljs-number">1</span>);
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p data-line="564" class="code-line">而步长放在一个指针变量身上的话，步长的参考就不能依照指针变量内部所存储的内存地址所映射到的变量的数据类型来决定的了，对于指针变量来说，步长需要参考指针变量本身的类型来，假设这个指针变量为 <kbd>short *</kbd>，即步长为 <kbd>4</kbd> ( 指针类型在内存中都是占用 4 Bytes 大小的空间 )，而指针所指向的变量是一个 <kbd>short</kbd> 类型，即本身在内存空间中占用 <kbd>2 Bytes</kbd>，而指针类型又是一个 <kbd>4 Bytes</kbd>，所以本身是不符合常理的，我们先以指针变量的类型 <kbd>short *</kbd> 为基础，我们发现因为这里存在一颗 <kbd>*</kbd> 导致这个类型变成了一个指针类型，其实一个指针变量名在定义好后，当我们直接使用这个变量名的时候，其步长的参考要以原有类型先去掉一颗 <kbd>*</kbd>，再以去掉 <kbd>*</kbd> 后的指针类型作为下一次步长判断的基准，就拿刚刚的例子来说，我们有个 <kbd>short *</kbd> 的指针变量内部存储着一个 <kbd>short</kbd> 类型变量的首地址，当我们尝试对这个指针进行解引用的时候，首先是使用了指针变量名，即 <kbd>short *</kbd> -&gt; <kbd>short</kbd>，其次就是通过解引用操作符 <kbd>*</kbd> 对这个地址进行解引用，在找到了这个变量在内存中的首地址后，所以指针变量名其实在使用的过程中，就需要先去掉一颗 <kbd>*</kbd>，即 <kbd>short *</kbd> -&gt; <kbd>short</kbd>，下一步操作即为 <kbd>*</kbd> 操作符的解引用操作，根据上一步剩下的 <kbd>short</kbd> 类型，即 <kbd>2 Bytes</kbd> 来决定步长为 <kbd>2</kbd>，在解引用操作后相应的类型还需要去掉，即 <kbd>short</kbd> -&gt; <kbd>无</kbd>，这种方式不只是针对一级指针，对于多级指针同样也是如此，还是假设我们有如下代码</p>
+<pre><code data-line="566" class="code-line language-c"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-keyword">short</span> a = <span class="hljs-number">10</span>;
+    <span class="hljs-keyword">short</span> *p = &amp;a;
+    <span class="hljs-keyword">short</span> **pp = &amp;p;
+}
+</div></code></pre>
+<p data-line="575" class="code-line">我们声明了一个二级指针 <kbd>pp</kbd>，我们尝试对 <kbd>pp</kbd> 进行两次解引用操作 -&gt; <kbd>**pp</kbd>，首先 <kbd>pp</kbd> 为指针类型 <kbd>short **</kbd>，在使用了 <kbd>pp</kbd> 后，该类型要变成 <kbd>short **</kbd> -&gt; <kbd>short *</kbd>，即 <kbd>4 Bytes</kbd>，也就是步长为 <kbd>4</kbd>，在第一次解引用 -&gt; <kbd>*pp</kbd> 的时候，由于此次操作的步长为 <kbd>4</kbd> ，那就是此次解引用通过 <kbd>pp</kbd> 内部存储的是指针变量 <kbd>p</kbd> 在内存中的首地址完整地读取到了 <kbd>p</kbd> 指针变量的内容 ( 指针 <kbd>p</kbd> 类型为 <kbd>int *</kbd>，即 <kbd>4 Bytes</kbd> )，由于此次解引用用了一个 <kbd>*</kbd>，即原本的类型变为 <kbd>short **</kbd> -&gt; <kbd>short *</kbd> -&gt; <kbd>short</kbd>，那么下一次步长则为 <kbd>2</kbd>，那么在第二次解引用的时候 <kbd>**pp</kbd> ，由于步长为 <kbd>2</kbd>，即此次解引用完整的读取到了 <kbd>a</kbd> 变量的完整内容 ( a 变量的类型为 <kbd>short</kbd>，即 <kbd>2 Bytes</kbd> )，那么第二次解引用又使用了一颗 <kbd>*</kbd>，即类型变为 <kbd>short **</kbd> -&gt; <kbd>short *</kbd> -&gt; <kbd>short</kbd> -&gt; <kbd>无</kbd></p>
+<p data-line="577" class="code-line">那么对于 <kbd>数组</kbd> 或者是 <kbd>多维数组</kbd>，由于数组名本身也是一个指向数组首元素的指针，故也需应用上面所说的规则，只是对于数组来说原本指针类型的 <kbd>*</kbd> 替换为 <kbd>[num]</kbd> 罢了</p>
+<a for="toc-anchor" id="%E6%8C%87%E9%92%88%E7%9A%84%E5%A4%A7%E5%B0%8F"></a><h4 id="e68c87e99288e79a84e5a4a7e5b08f-2" data-line="579" class="code-line">指针的大小</h4>
+<p data-line="580" class="code-line"><span id="指针的大小"></span></p>
+<p data-line="582" class="code-line">前面说到，指针也属于一个变量，只是他在内存中所存储的是另一个变量在内存中的首地址，那么，既然它是一个变量，也就是说它也有属于他所占用的内存空间的大小</p>
+<ul>
+<li data-line="584" class="code-line">
+<p data-line="584" class="code-line">在 32 位 系统上，由于内存地址为 8 位 <kbd>0x00000001</kbd> ，即 4 个字节，所以 <kbd>在32位系统上的指针类型的大小则为 4 Bytes</kbd></p>
+</li>
+<li data-line="586" class="code-line">
+<p data-line="586" class="code-line">在 64 位 系统上，由于内存地址为 16 位 <kbd>0x0000000000000001</kbd> ，即 8 个字节，所以 <kbd>在64位系统上的指针类型的大小则为 8 Bytes</kbd></p>
+</li>
+</ul>
+<p data-line="588" class="code-line">既然不管是什么指针类型在相同系统架构下所占用的内存空间的大小是相同的，那么我们可以理解为任何指针类型之间的互转都不会出现数据丢失的问题，当然这个数据丢失仅仅只是针对指针内部所存储的内存地址是否保证完整性，但是需要注意的是我们转换后的指针类型是否符合该指针在解引用操作时所需要的步长，否则数据丢失的可能会出现在解引用操作上</p>
+<p data-line="590" class="code-line">在这里需要扩充下，当我们直接通过关键字 <kbd>sizeof</kbd> 填入一个指针变量的时候，所获取到的则为指针类型所对应的大小 <kbd>4 Bytes or 8 Bytes</kbd>，当我们去 <kbd>对指针进行解引用操作的时候</kbd> 获取到的才是指针所指向的变量其所对应的内存空间的大小</p>
+<pre><code data-line="592" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span><span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-keyword">int</span> a = <span class="hljs-number">10</span>;
+    <span class="hljs-keyword">int</span> *p = &amp;a;
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"size of pointer = %d\n"</span>,<span class="hljs-keyword">sizeof</span>(p));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"size of a = %d\n"</span>,<span class="hljs-keyword">sizeof</span>(*p));
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E5%9C%B0%E5%9D%80%E7%9A%84%E7%AE%97%E6%95%B0%E8%BF%90%E7%AE%97"></a><h4 id="e59cb0e59d80e79a84e7ae97e695b0e8bf90e7ae97-2" data-line="609" class="code-line">地址的算数运算</h4>
+<p data-line="610" class="code-line"><span id="地址的算数运算"></span></p>
+<p data-line="612" class="code-line">当我们对一个内存地址又或者称为指针进行算数运算的时候，这种算术运算并不是简单的算数运算，而是以当前地址所以指向的内存空间首地址整体的存储长度为单位来计算的，简而言之就是运算的同时需要以 <kbd>类型的步长</kbd> 为基准进行计算</p>
+<ul>
+<li data-line="614" class="code-line">
+<p data-line="614" class="code-line">对于地址和常数进行算术</p>
+<ul>
+<li data-line="615" class="code-line">除 / 乘 : 这两种操作符是不合法的，不允许存在的</li>
+<li data-line="616" class="code-line">加 / 减 : 地址 +/- 常数 * 步长</li>
+</ul>
+</li>
+<li data-line="618" class="code-line">
+<p data-line="618" class="code-line">对于地址和地址进行算数</p>
+<ul>
+<li data-line="619" class="code-line">除 / 乘 : 这两种操作符是不合法的，不允许存在的</li>
+<li data-line="620" class="code-line">加 / 减 : (地址1 +/- 地址2) / 步长
+<ul>
+<li data-line="621" class="code-line">地址计算的前提必须是两个地址所映射的变量的数据类型是相同的，两个毫不相干的变量进行内存地址的减法运算，虽然语法和编译器都能够成立该表达式，但是实际做法是毫无意义的，因为我们不知道减出来的结果的地址具体指向是什么东西</li>
+<li data-line="622" class="code-line">该算式的真正运用其实在一个数组中，因为数组中的元素的类型都是相同，并且其内存地址是连续的存储空间，对于人为来说可以更好的控制运算的成果具体所偏移的位置， <kbd>运用在数组中通常用来获取某个下标的元素到某个下标的元素之间所偏移的长度</kbd></li>
+</ul>
+</li>
+<li data-line="623" class="code-line">比较运算 : 对于地址的比较运算，语法上是合理的，而且编译器也允许，但是如果我们针对两个毫无相干的变量的内存地址进行比较运算实际是毫无意义的，所以它的真正运用其实在一个数组中，因为数组中的元素的类型都是相同，并且其内存地址是连续的存储空间，所以具体的逻辑作为开发人员来说更好的把控</li>
+</ul>
+</li>
+</ul>
+<br/>
+<a for="toc-anchor" id="%E6%B3%9B%E5%9E%8B%E6%8C%87%E9%92%88"></a><h4 id="e6b39be59e8be68c87e99288-2" data-line="627" class="code-line">泛型指针</h4>
+<p data-line="628" class="code-line"><span id="泛型指针"></span></p>
+<p data-line="630" class="code-line">泛型指针的类型为 <kbd>void *</kbd>，对于泛型指针来说， <kbd>它可以转换为任意类型的指针</kbd> ，比如说 <kbd>void *</kbd> 可以转换为 <kbd>int *</kbd></p>
+<p data-line="632" class="code-line">由于泛型指针是泛型的，所以泛型指针在定义后，编译器是不知道它所指向的是何种类型的变量内存地址，即无法知道解引用操作时所需要的步长，所以具体要用某一个泛型指针进行解引用的时候，我们必须要先把它转换成相符类型类型的指针定义才能进行解引用操作</p>
+<pre><code data-line="634" class="code-line language-c"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span> </span>{
+
+	<span class="hljs-keyword">int</span> a = <span class="hljs-number">100</span>;
+	<span class="hljs-keyword">void</span> *p_void = &amp;a;
+	<span class="hljs-keyword">int</span> *p = (<span class="hljs-keyword">int</span> *)p_void;
+
+	<span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>, *p);
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E9%87%8E%E6%8C%87%E9%92%88"></a><h4 id="e9878ee68c87e99288-2" data-line="648" class="code-line">野指针</h4>
+<p data-line="649" class="code-line"><span id="野指针"></span></p>
+<p data-line="651" class="code-line">野指针即指针所指向的地址可能是实际存在又或者是不存在的地址，我们对一个野指针进行了解引用操作后，报错方式在 <kbd>windows</kbd> 下 或者是 <kbd>Linux</kbd> 下都不同，但不管如何，野指针的存在肯定是需要杜绝的，如下代码则是一个教科书级别的野指针定义方式</p>
+<pre><code data-line="653" class="code-line language-c"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-keyword">int</span> a = <span class="hljs-number">10</span>;
+    <span class="hljs-keyword">int</span> *p = &amp;a + <span class="hljs-number">1</span>;
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>,*p);
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E7%A9%BA%E6%8C%87%E9%92%88"></a><h4 id="e7a9bae68c87e99288-2" data-line="667" class="code-line">空指针</h4>
+<p data-line="668" class="code-line"><span id="空指针"></span></p>
+<p data-line="670" class="code-line">空指针即指针所指向的地址为 <kbd>0</kbd> -&gt; <kbd>0x00000000</kbd>，也是一个无效的地址，但是它对比野指针来说，它的出现通常用来判断指针的有效性，在某种程度上对比野指针来说更有实际意义</p>
+<p data-line="672" class="code-line">在 c 中空指针的定义通常通过一个宏定义 <kbd>NULL</kbd> ( <kbd>#define NULL ((void *)0)</kbd> ) 来定义</p>
+<pre><code data-line="674" class="code-line language-c"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-keyword">int</span> *p = <span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">int</span>));
+    <span class="hljs-keyword">if</span>(p == <span class="hljs-literal">NULL</span>){
+
+        <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+    }
+
+    *p = <span class="hljs-number">20</span>;
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>,*p);
+
+    <span class="hljs-built_in">free</span>(p);
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="const-%E4%BF%AE%E9%A5%B0%E6%8C%87%E9%92%88%E5%8F%98%E9%87%8F"></a><h4 id="const-e4bfaee9a5b0e68c87e99288e58f98e9878f-2" data-line="694" class="code-line">const 修饰指针变量</h4>
+<p data-line="695" class="code-line"><span id="const修饰指针变量"></span></p>
+<p data-line="697" class="code-line">前面对于 <kbd>const</kbd> 的特性提到过，它可以放在左值表达式的任意位置，而该特性对于指针变量来说，放在不同的位置都会有不同的含义</p>
+<ul>
+<li data-line="699" class="code-line">const int *p : 可以修改 <kbd>p</kbd> 指向另外一个变量在内存中的首地址，但是不可以根据 <kbd>p</kbd> 当前所指向的某个变量在内存中的首地址解引用来修改该变量的值</li>
+<li data-line="700" class="code-line">int const *p : 可以修改 <kbd>p</kbd> 指向另外一个变量在内存中的首地址，但是不可以根据 <kbd>p</kbd> 当前所指向的某个变量在内存中的首地址解引用来修改该变量的值</li>
+<li data-line="701" class="code-line">int * const p : 可以根据 <kbd>p</kbd> 当前所指向的某个变量在内存中的首地址解引用来修改该变量的值，但是不可以修改 <kbd>p</kbd> 指向另外一个变量在内存中的首地址</li>
+<li data-line="702" class="code-line">const int *const p : 不可以根据 <kbd>p</kbd> 当前所指向的某个变量在内存中的首地址解引用来修改该变量的值，并且还不可以修改 <kbd>p</kbd> 指向另外一个变量在内存中的首地址</li>
+</ul>
+<p data-line="704" class="code-line">把指针变量修饰为 <kbd>const</kbd> 常用于函数的形参部分，其目的用来限制当前函数上下文内，形参列表中的某个指针变量是要遵循某种规则进行该函数上下文逻辑的书写</p>
+<br/>
+<a for="toc-anchor" id="%E5%A4%9A%E7%BA%A7%E6%8C%87%E9%92%88"></a><h4 id="e5a49ae7baa7e68c87e99288-2" data-line="708" class="code-line">多级指针</h4>
+<p data-line="709" class="code-line"><span id="多级指针"></span></p>
+<p data-line="711" class="code-line">多级指针从一级指针开始都称为多级指针，那么多级指针是如何定义的？我们都知道一级指针是指向具体某个变量在内存中的首地址，而二级指针则为指向这个一级指针在内存中的首地址，三级指针则为指向这个二级指针在内存中的首地址，依次类推，来看以下代码则为定义了一个 <kbd>4级指针</kbd></p>
+<pre><code data-line="713" class="code-line language-c"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span> </span>{
+
+    <span class="hljs-keyword">int</span> a = <span class="hljs-number">10</span>;
+    <span class="hljs-keyword">int</span> *p = &amp;a;
+    <span class="hljs-keyword">int</span> **pp = &amp;p;
+    <span class="hljs-keyword">int</span> ***ppp = &amp;pp;
+    <span class="hljs-keyword">int</span> ****pppp = &amp;ppp;
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>,****pppp);
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p data-line="728" class="code-line">在这里，我们通过这个4级指针的解引用再复习一下步长的定义，首先这里指针 [<kbd>pppp</kbd>] 的类型则为 [<kbd>int ****</kbd>]，当我们使用了 <kbd>pppp</kbd> 这个指针名的时候，原有的类型需要先降一颗 <kbd>*</kbd>，即 <kbd>int ****</kbd> -&gt; <kbd>int ***</kbd> ，然后进行第一次解引用操作 <kbd>*pppp</kbd>，这次解引用操作依照上一次所得到的类型来决定步长，由于 <kbd>int ***</kbd> 也是一个指针类型，故为 <kbd>4 Bytes</kbd>，所以步长为 4，所以此次解引用是能够完整读取到指针 <kbd>ppp</kbd> 在内存中的完整内容的，那么在此次解引用完成后，由于使用了一个 <kbd>*</kbd> ，所以原有的类型还需要降一颗 <kbd>*</kbd>，即 <kbd>int ****</kbd> -&gt; <kbd>int ***</kbd> -&gt; <kbd>int **</kbd>，那么进行第二次解引用操作，<kbd>**pppp</kbd> ，此次解引用的步长则依据上一个步骤所得到的类型来决定，即 <kbd>int **</kbd> -&gt; <kbd>4 Bytes</kbd>，那么此次解引用操作后由于又使用了一颗 <kbd>*</kbd>，故原有的类型就变为 <kbd>int ****</kbd> -&gt; <kbd>int ***</kbd> -&gt; <kbd>int **</kbd> -&gt; <kbd>int *</kbd>，那么进行第三次解引用操作 <kbd>***pppp</kbd>，此次则依据 <kbd>int *</kbd> 来决定步长，即 4，于是此次解引用能够完整地读取到指针变量 <kbd>p</kbd> 在内存中的所有内容，那么在此次解引用操作结束后，还需要去掉一颗 <kbd>*</kbd>，即 <kbd>int ****</kbd> -&gt; <kbd>int ***</kbd> -&gt; <kbd>int **</kbd> -&gt; <kbd>int *</kbd> -&gt; <kbd>int</kbd>，那么进行第四次解引用操作 <kbd>****pppp</kbd> 的时候，则以 <kbd>int</kbd> 类型的长度作为步长，即能够完整地读取到变量 a 在内存中的所有内容，即 <kbd>10</kbd></p>
+<br/>
+<a for="toc-anchor" id="%E5%86%85%E5%AD%984%E5%8C%BA%E6%A8%A1%E5%9E%8B"></a><h3 id="e58685e5ad984e58cbae6a8a1e59e8b-2" data-line="732" class="code-line">内存4区模型</h3>
+<p data-line="733" class="code-line"><span id="内存4区模型"></span></p>
+<hr>
+<p data-line="737" class="code-line">内存在 <kbd>程序运行时</kbd> ，整体可以分为以下几个区域</p>
+<ul>
+<li data-line="739" class="code-line">
+<p data-line="739" class="code-line">静态存储区: 静态存储区即源程序还未加载到内存前 ( <kbd>运行前</kbd> ) 就已经通过编译器分配好具体每个内存段具体所需要分配的字节数，然后在程序正式运行时，内核系统会把刚刚通过编译器所分配的每个内存区的存储信息加载到相应的内存区中，它们的占用空间大小是固定的，就算在程序运行期间也不能随意修改</p>
+<ul>
+<li data-line="740" class="code-line">代码段 <kbd>.text</kbd> :
+<ul>
+<li data-line="741" class="code-line">该空间用于存储二进制化后的代码，存放 <kbd>CPU执行的机器指令</kbd></li>
+<li data-line="742" class="code-line">代码区是可共享的 <kbd>即另外的执行程序能够访问到它</kbd> ，使该内存区可用于共享的目在于，对频繁被执行的程序，只需要在内存中保有一份它的可执行二进制指令即可</li>
+<li data-line="743" class="code-line">代码区是只读的，使其只读的原因在于防止其它程序会 意外地/恶意地 修改了它的指令码，另外，在代码区还会规划局部变量的一些相关信息</li>
+</ul>
+</li>
+<li data-line="744" class="code-line">数据段 :
+<ul>
+<li data-line="745" class="code-line">.data
+<ul>
+<li data-line="746" class="code-line">存储 <kbd>值初始化为非0</kbd> 的 <kbd>全局变量</kbd> 和 <kbd>静态变量</kbd></li>
+<li data-line="747" class="code-line">在编译器进行 <kbd>链接</kbd> 的过程中，会把该段设定为 <kbd>读写权限</kbd></li>
+</ul>
+</li>
+<li data-line="748" class="code-line">.bss
+<ul>
+<li data-line="749" class="code-line"><kbd>存储未初始化 (包括0)</kbd> 的 <kbd>全局变量</kbd> 和 <kbd>静态变量</kbd>，再系统内核加载程序执行前，该段中的数据整体都会 <kbd>被内核初始化为 0/NULL </kbd></li>
+<li data-line="750" class="code-line">在编译器进行 <kbd>链接</kbd> 的过程中，会把该段设定为 <kbd>读写权限</kbd></li>
+</ul>
+</li>
+<li data-line="751" class="code-line">.rodata
+<ul>
+<li data-line="752" class="code-line">只读数据段，存储使用 <kbd>const关键字修饰的全局常量</kbd> 和 使用 <kbd>char 类型指针所修饰的字符串常量</kbd></li>
+<li data-line="753" class="code-line">在编译器进行 <kbd>链接</kbd> 的过程中，会把该段设定为 <kbd>只读权限</kbd></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li data-line="755" class="code-line">
+<p data-line="755" class="code-line">动态存储区：动态存储去即可以在程序运行时进行动态扩展的区域</p>
+<ul>
+<li data-line="756" class="code-line">
+<p data-line="756" class="code-line">stack:</p>
+<ul>
+<li data-line="757" class="code-line">栈由系统自动管理，自动分配，自动释放</li>
+<li data-line="758" class="code-line">栈中的内存地址由 <kbd>高地址向低地址延伸</kbd>，并且最遵循着 <kbd>FILO first in last out</kbd> 的存储原则</li>
+<li data-line="759" class="code-line">栈的大小在Windows下默认为 <kbd>1M ~ 10M</kbd>，而在Linux下默认为 <kbd>8M ~ 16M</kbd></li>
+<li data-line="760" class="code-line">关于 <kbd>stack</kbd> 和 <kbd>stack frame</kbd> 之间的关系，请查看 <a href="#%E5%87%BD%E6%95%B0" data-href="#%E5%87%BD%E6%95%B0">函数这一章节</a></li>
+</ul>
+</li>
+<li data-line="762" class="code-line">
+<p data-line="762" class="code-line">heap:</p>
+<ul>
+<li data-line="763" class="code-line">堆由开发人员进行管理和维护，对于堆空间的申请我们需要手动的分配和释放，如果在一个程序运行时向堆中申请了某块空间后并未主动释放，则该空间的生命周期会延续到程序的结束</li>
+<li data-line="764" class="code-line">堆空间的大小默认为 <kbd>1.3 G</kbd>，如果超出后还会在此基础上增加，理论上在硬件能够支持的范围内，堆的空间大小可认为无限大</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p data-line="766" class="code-line">下图以 <kbd>32位 Linux os</kbd> 为基础所展示的内存4区存储模型</p>
+<pre><code data-line="768" class="code-line language-c"><div>						+-------+----------------+  --&gt; <span class="hljs-number">4</span> Gigabyte	   		Top
+						|		|	   			 |	 		 		 		 |
+	  Kernel space ←----+		|    			 |					 		 |
+						|		|      			 |	 		 		 		 |
+						+-------+----------------+	--&gt; <span class="hljs-number">3</span> Gigabyte	 		 |
+								|			  |	 |					 		 |
+						+-------+     <span class="hljs-built_in">stack</span>   |	 |					 		 |
+						|		|			  v	 |					 		 |
+						|		+----------------+	 		 		 		 |
+						|       |				 |							 |
+						|		|	Stand Lib	 |					 		 |
+						|		|				 |					 		 |
+						|		+----------------+					 		 |
+						|		|	   		  ↑	 |	 		 		 		 |
+						|		|  			  |	 |					 		 |
+						|		|      		  |	 |	 		 		 		 |
+						|		|	   heap	  |	 |					 		 |
+						|		|	   		  |	 |	 		 		 		 |
+						|		|  			  |	 |					 		 |
+						|		|     		  |  |	 		 		 		 |
+		User space ←----+		+----------------+					 		 |
+						|		|     		 	 |					 		 |
+						|		|	  .bss		 +-----+	 		 		 |
+						|		|				 |	   |			 		 |
+						|		+----------------+	   +-&gt; Read &amp; Write		 |
+						|		|     	 	 	 |	   |					 |
+						|	 	|	  .data		 +-----+			 		 |
+						|	    |                |					 		 |
+						|		+----------------+			 		 		 |
+						|		|     			 |	   		 	 	 		 |
+						|		|	 .rodata	 +-----+			 		 |
+						|		|				 |	   |   			 		 |
+						|		+----------------+	   +-&gt; Read only 		 |
+						|		|				 |	   |			 		 |
+						+-------+     .text	 	 +-----+	 		 		 |
+								|				 |					 		 |
+								+----------------+	--&gt; <span class="hljs-number">0</span> Gigabyte     	    Low	
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E6%95%B0%E7%BB%84"></a><h3 id="e695b0e7bb84-2" data-line="810" class="code-line">数组</h3>
+<p data-line="811" class="code-line"><span id="数组"></span></p>
+<hr>
+<a for="toc-anchor" id="%E6%95%B0%E7%BB%84%E7%9A%84%E5%AE%9A%E4%B9%89"></a><h4 id="e695b0e7bb84e79a84e5ae9ae4b989-2" data-line="815" class="code-line">数组的定义</h4>
+<p data-line="816" class="code-line"><span id="数组的定义"></span></p>
+<p data-line="818" class="code-line">数组就是一段存储着多个相同类型数据的内存空间，默认定义下其存储在栈上，在这段内存空间中，数组的每个成员的内存地址都是连续且有序的，<kbd>成员于成员之间相互间隔了 1 个步长的偏移量</kbd>，如以下代码则为我们定义了一个 <kbd>int []</kbd> 类型的数组</p>
+<pre><code data-line="820" class="code-line language-c"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-keyword">int</span> arrary[<span class="hljs-number">3</span>] = {<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>};
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p data-line="829" class="code-line">对于上面代码中所定义的数组，其在内存的结构如下图</p>
+<pre><code data-line="831" class="code-line language-c"><div>TOP
+ ^                                        +----------------------------&gt;   +---------+------------+
+ |                                        |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                                        |                <span class="hljs-number">0x0000000B</span> &lt;----+---------+ <span class="hljs-number">0x00000008</span> |
+ |                                        |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                                        |                <span class="hljs-number">0x0000000A</span> &lt;----+---------+     ~      +---&gt; arrary[<span class="hljs-number">2</span>] == <span class="hljs-number">3</span>
+ |                                        |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                                        |                <span class="hljs-number">0x00000009</span> &lt;----+---------+ <span class="hljs-number">0x0000000B</span> |
+ |                                        |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0011</span>|            |
+ |                                        |                <span class="hljs-number">0x00000008</span> &lt;----+---------+------------+
+ |                                        |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                                        |                <span class="hljs-number">0x00000007</span> &lt;----+---------+ <span class="hljs-number">0x00000004</span> |
+ |   <span class="hljs-keyword">int</span> arrary[<span class="hljs-number">3</span>] = {<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>} &lt;------------+                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                                        |                <span class="hljs-number">0x00000006</span> &lt;----+---------+     ~      +---&gt; arrary[<span class="hljs-number">1</span>] == <span class="hljs-number">2</span>
+ |                                        |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                                        |                <span class="hljs-number">0x00000005</span> &lt;----+---------+ <span class="hljs-number">0x00000007</span> |
+ |                                        |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0010</span>|            |
+ |                                        |                <span class="hljs-number">0x00000004</span> &lt;----+---------+------------+
+ |                                        |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                                        |                <span class="hljs-number">0x00000003</span> &lt;----+---------+ <span class="hljs-number">0x00000000</span> |
+ |                                        |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                                        |                <span class="hljs-number">0x00000002</span> &lt;----+---------+     ~      +---&gt; arrary[<span class="hljs-number">0</span>] == <span class="hljs-number">1</span>
+ |                                        |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                                        |                <span class="hljs-number">0x00000001</span> &lt;--------------+ <span class="hljs-number">0x00000003</span> |
+ |                                        |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0001</span>|            |
+ v                                        +------------&gt;   <span class="hljs-number">0x00000000</span> &lt;----+---------+------------+
+LOW
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E6%95%B0%E7%BB%84%E5%92%8C%E6%8C%87%E9%92%88"></a><h4 id="e695b0e7bb84e5928ce68c87e99288-2" data-line="863" class="code-line">数组和指针</h4>
+<p data-line="864" class="code-line"><span id="数组和指针"></span></p>
+<p data-line="866" class="code-line">当我们定义好一个数组后，如 <a href="#%E6%95%B0%E7%BB%84%E7%9A%84%E5%AE%9A%E4%B9%89" data-href="#%E6%95%B0%E7%BB%84%E7%9A%84%E5%AE%9A%E4%B9%89">在上一小节</a> 的代码中所定义的数组变量 <kbd>arrary</kbd>，这个数组变量 <kbd>arrary</kbd> 在内存中所存放的数据并不是当前数组在内存中的一段内存 ( 整个数组本身 )，而是 <kbd>存放的当前数组中首元素在内存中的首地址</kbd>，也就意味着当我们当都使用这个数组名 <kbd>arrary</kbd> 的时候，获取到的则为当前数组首元素的地址，即 <kbd> arrary == &amp;arrary[0]</kbd></p>
+<p data-line="868" class="code-line">既然数组变量内部所存放的是当前数组首元素的地址，那是不是就和 <kbd>指针的定义</kbd> 是类似的了？是的，对于数组名来说，我们在 <kbd>大部分情况</kbd> 下可以把它看成是一个指向当前数组首元素的指针，具体来讲的话，这个指针是一个指针常量，即 <kbd>arrary == int * const arrary</kbd> ，也就是说我们可以根据 <kbd>arrary</kbd> 当前所指向的首元素在内存中的首地址解引用来修改该变量的值，但是不可以修改 <kbd>arrary</kbd> 指向另外一处内存地址</p>
+<p data-line="870" class="code-line">当然，上面强调了在 <kbd>大部分情况下</kbd> 我们是可以把数组名看操作是一个指向当前数组首元素的指针的，而在以下两种情况使用数组名的时候，它所代表的则为这一整个数组的本身，即这个数组在内存中所存储的一整段内容</p>
+<ul>
+<li data-line="872" class="code-line">sizeof: 当我们使用 <kbd>sizeof</kbd> 关键字引用于数组名的时候 <kbd>sizeof(arrary)</kbd>，所获取的长度并不是指针的长度 <kbd>4 Bytes</kbd>，而是获取的一整个数组所占用的内存段的长度</li>
+<li data-line="873" class="code-line">&amp;: 当我们通过该操作符对于数组名进行操作的时候 <kbd>&amp;arrary</kbd> ，所获取到的地址的类型并不是当前指向当前数组首元素首地址指针的类型 <kbd>int *</kbd>，而是代表着一整个数组的类型，意味着，其步长就不能按照原有指针类型的 <kbd>4 Bytes</kbd> 来计算了，而是要以当前一整个数组所占用的内存段的长度来计算了，也就是说当我们使用该算数表达式 <kbd>&amp;arrary + 1</kbd> ，返回的结果就不是当前数组第二个元素在内存中的首地址了，而是需要偏移过一整个数组的长度来计算
+<ul>
+<li data-line="874" class="code-line">当我们我们单独输出 <kbd>arrary</kbd> <kbd>即数组首元素的地址</kbd> 的时候和使用 <kbd>&amp;arrary</kbd> 所输出的地址是一样的，但这只是一个错觉，这两者间是两个完全不同的关系，首先 <kbd>arrary</kbd> 就代表着数组首元素的地址 <kbd>&amp;arrary[0]</kbd> 但是 <kbd>&amp;arrary</kbd> 代表着的却是一整个数组的地址，但是为什么 <kbd>&amp;arrary</kbd> 的结果和 <kbd>&amp;arrary[0]/arrary</kbd> 的结果是一样的呢？现在先抛出一个问题，数组的本身是跨越好 <kbd>n</kbd> 个存储单元的，怎么表示这几个存储单元组成的整体呢？如果你是编译器，你会怎么做？呃，取其第一个存储单位的值来代表会比较好点，没错，编译器是这么做的，所以两者的值会是相同的相同</li>
+</ul>
+</li>
+</ul>
+<p data-line="876" class="code-line">在单独使用一个定义好了的数组的数组名的时候，既然它是一个指向数组首元素地址的指针，那是不是意味着我们可以直接通过 <kbd>*</kbd> 操作对数组名进行解引用操作？答案是的，并且其也遵循在 <a href="#%E6%8C%87%E9%92%88%E7%9A%84%E7%B1%BB%E5%9E%8B" data-href="#%E6%8C%87%E9%92%88%E7%9A%84%E7%B1%BB%E5%9E%8B">指针步长</a> 这一小节中所强调的对于解引用时所需遵循的规律，还是拿最初所定义的 <kbd>arrary</kbd> 来说，<kbd>arrary</kbd> 作为一个数组变量，其类型为 <kbd>int []</kbd>，当我们使用这个数组名的时候，原来的类型就需要先去掉一个 <kbd>[]</kbd>，即 <kbd>int []</kbd> -&gt; <kbd>int</kbd>，然后我们再进行解引用操作，即 <kbd>*arrary</kbd>，这时候其步长就需要参考 <kbd>int</kbd> 类型，即 <kbd>4 Bytes</kbd>，那么数组首元素的类型也是 <kbd>int</kbd> 类型，即此次解引用操作 <kbd>*arrary</kbd> 是能够完整的读取到这个数组首元素在内存中所存储的内容的，当然这里所解引用的是数组首元素的内容，那么对于其它下标的内容我们同样可以通过偏移的方式来获取，因为前面说到数组中的每个元素之间都是相隔且连续的，如我们想取下标为 <kbd>1</kbd> 的元素的内容那么我们直接在首地址的基础上再往后偏移 <kbd>1</kbd> 位即可获取到，如: <kbd>*(arrary + 1)</kbd> 即为获取当前数组下标为 <kbd>1</kbd> 的元素的内容</p>
+<p data-line="878" class="code-line">我们都知道，<kbd>[n]</kbd> 是取数组下标为 <kbd>n</kbd> 的元素的内容，其实 <kbd>[]</kbd> 可以看作是一种语法糖的形式，其实它的实质也是通过对于数组名的偏移和解引用的操作来访问到具体某个下标的元素，即 <kbd>arrary[n]</kbd> 可以看作为 <kbd>*(arrary + n)</kbd> 的简写形式</p>
+<p data-line="880" class="code-line">虽然数组名其在大多数情况下都代表着一个指向当前数组首元素地址的指针，但是对于指针和数组我们是不能把它们混在一起的，数组名代表着指向数组首元素地址的指针这只是属于数组的一种特性，而数组本身是作为一段连续且有序的内存存储空间，对比指针来说，指针只是一个指向具体某个变量在内存的首地址的变量，其次，对于普通的指针来说，其做 <kbd>++</kbd> 操作是允许的，而数组名虽然也是存储着其首元素的内存地址，而做 <kbd>++</kbd> 操作的时候是不允许的，因为数组是一个 <kbd>指针常量</kbd>，最后，一个数组虽然只是声明，但是我们也能够对它进行解引用操作，因为一个数组一旦声明后编译器就能够为它初始化一段线性连续的内存用于存储，只是解引用后的结果可能是一个随机数罢了，而对于指针来说，我们只是声明的情况下我们对它解引用的时候是一种危险的操作，因为我们并未指定该指针的具体指向，故该指针可能是一个空指针抑或是编译器把这种指针初始化为了一个野指针</p>
+<br/>
+<a for="toc-anchor" id="%E6%95%B0%E7%BB%84%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96"></a><h4 id="e695b0e7bb84e79a84e5889de5a78be58c96-2" data-line="884" class="code-line">数组的初始化</h4>
+<p data-line="885" class="code-line"><span id="数组的初始化"></span></p>
+<p data-line="887" class="code-line">如果我们只是声明了一个数组而没有定义，那么当我们访问数组某个下标的元素的时候，只能够获取到该数组对应存储区中编译器所赋予的默认值，原因是因为我们没有进行 <kbd>数组的初始化操作</kbd> ，编译器帮我们进行了一次隐式初始化操作，而对于人为的进行数组的初始化操作，我们只能通过在定义数组的时候就需要进行，并且需要注意的是，不管是人为的进行初始化也好还是隐式进行初始化，一个数组一旦经历过初始化的过程就不能再改变这个数组其内部所存储的当前数组首元素的地址，原因是数组在初始化完成后，数组名是一个 <kbd>指针常量</kbd></p>
+<pre><code data-line="889" class="code-line language-c"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-comment">// init arrary</span>
+    <span class="hljs-keyword">int</span> arrary[<span class="hljs-number">3</span>] = {<span class="hljs-number">0</span>};
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E5%A4%9A%E7%BB%B4%E6%95%B0%E7%BB%84"></a><h4 id="e5a49ae7bbb4e695b0e7bb84-2" data-line="900" class="code-line">多维数组</h4>
+<p data-line="901" class="code-line"><span id="多维数组"></span></p>
+<p data-line="903" class="code-line">对于多维数组来说，不管是多少维的数组，我们都需要把所定义的多维数组名当成是一个一维数组来看，其实包括编译器也是这么认为的，只是这个一维数组名由原来是指向具体某个变量在内存中的首地址的指针变成了 <kbd>这个数一维数组名是指向下一维度数组在内存中的首地址的指针</kbd> ，但离不开的是，不管是一维数组也好还是多维数组，数组名总是一个指向当前数组首元素内存地址的指针</p>
+<p data-line="905" class="code-line">其实对于 <kbd>多维</kbd> 的概念是一种抽象形式，对于多维数组来说，其内存存放布局同样还是遵循着数组的规律，每个实质的元素之间的地址都是相间且连续的，而对于编译器来说，我们通过了一个 <kbd>多维</kbd> 的定义，把一个 <kbd>一维</kbd> 的数组划分了不同的维度去供我们或者运行时使用，我们先来上一个定义三维数组的代码，以带出更多需要重点关注的问题</p>
+<pre><code data-line="907" class="code-line language-c"><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span>{
+
+    <span class="hljs-keyword">int</span> arrary[<span class="hljs-number">4</span>][<span class="hljs-number">3</span>][<span class="hljs-number">2</span>] = 
+    {
+        {
+            { <span class="hljs-number">1</span>,<span class="hljs-number">2</span> }, { <span class="hljs-number">3</span>,<span class="hljs-number">4</span> }, { <span class="hljs-number">5</span>,<span class="hljs-number">6</span> }
+        },
+
+        {
+            { <span class="hljs-number">7</span>,<span class="hljs-number">8</span> }, { <span class="hljs-number">9</span>,<span class="hljs-number">10</span> }, { <span class="hljs-number">11</span>,<span class="hljs-number">12</span> }
+        },
+
+        { 
+            { <span class="hljs-number">13</span>,<span class="hljs-number">14</span> }, { <span class="hljs-number">15</span>,<span class="hljs-number">16</span> }, { <span class="hljs-number">17</span>,<span class="hljs-number">18</span> }
+        },
+
+        {
+            { <span class="hljs-number">19</span>,<span class="hljs-number">20</span> }, { <span class="hljs-number">21</span>,<span class="hljs-number">22</span> }, { <span class="hljs-number">23</span>,<span class="hljs-number">24</span> }
+        } 
+    };
+}
+</div></code></pre>
+<p data-line="931" class="code-line">我们定义了一个类型为 <kbd>int [4][3][2]</kbd> 三维数组 <kbd>arrary</kbd> , 但上面说到，不管多少维的数组也好，我们都需要从一维的角度去看待它，那么我们可以理解为，<kbd>arrary</kbd> 其实其本质为存放了 <kbd>4</kbd> 个 <kbd>int [3][2]</kbd> 数组类型的一维数组，事实也是如此，既然虽然它的 <kbd>arrary</kbd> 的类型可以表达为 <kbd>int [4][3][2]</kbd> ，但它同样也可表达成 <kbd>int [][3][2]</kbd>，除此之外，<kbd>arrary</kbd> 既然是一个一维数组，那么 <kbd>arrary</kbd> 也是一个指向当前数组首元素的地址的指针，即指向的当前数组下一维度类型为 <kbd>int [3][2]</kbd> 的数组，如下</p>
+<pre><code data-line="933" class="code-line language-c"><div>{
+    { <span class="hljs-number">1</span>,<span class="hljs-number">2</span> }, { <span class="hljs-number">3</span>,<span class="hljs-number">4</span> }, { <span class="hljs-number">5</span>,<span class="hljs-number">6</span> }
+}
+</div></code></pre>
+<p data-line="939" class="code-line"><kbd>arrary</kbd> 所指向的是一个类型为 <kbd>int [3][2]</kbd> 数组的首地址，对于它来说我们同样也需要把它当成是一个一维数组来看待，即该数组内部所存储的指向当前数组首元素的首地址的指针，即一个类型为 <kbd>int [2]</kbd> 的数组，如下</p>
+<pre><code data-line="941" class="code-line language-c"><div>{ <span class="hljs-number">1</span>,<span class="hljs-number">2</span> }
+</div></code></pre>
+<p data-line="945" class="code-line">对于它来说可能就非常的眼熟了，就是普通一维数组的定义方式，但是我们同样还需要进一步往下进行确认，即该类型为 <kbd>int [2]</kbd> 的数组其内部所存储的是当前数组首元素的首地址，即类型为 <kbd>int</kbd> 的元素，即 <kbd>1</kbd> 的首地址</p>
+<p data-line="947" class="code-line">通过上面的解析我们会发现一种规律，即 <kbd>int [4][3][2]</kbd> 指向了 <kbd>int [3][2]</kbd> 指向了 <kbd>int [2]</kbd> 指向了 <kbd>int</kbd>，所以我们可以理解为，一个多维数组在定义好后，这个多维数组所存储的地址其实为这个多维数组中，最低维度数组首元素的首地址，如上面的代码则为 三级数组 指向了 二级数组 指向了一级数组 指向了 实体元素，即最低维度数组首元素的首地址，其实我们对于所定义的这个类型为 <kbd>int [4][3][2]</kbd> 的三维数组 <kbd>arrary</kbd> 尝试解引用也是这个结果，首先 <kbd>arrary</kbd> 在使用的时候，要先去掉数组的一个维度，即 <kbd>int [4][3][2]</kbd> -&gt; <kbd>int [3][2]</kbd>，然后进行解引用操作 <kbd>*arrary</kbd> 的时候，解引用所需的步长参考这按照类型 <kbd>int [3][2]</kbd> 来决定，即 <kbd>24 Bytes</kbd>，那么在此次解引用操作结束后，由于使用了一次 <kbd>*</kbd> 操作符，故原有的类型还需要再降一维度，即 <kbd>int [4][3][2]</kbd> -&gt; <kbd>int [3][2]</kbd> -&gt; <kbd>int [2]</kbd>，那么在进行下一次解引用操作的时候 <kbd>**arrary</kbd> 就参考类型 <kbd>int [2]</kbd> 来决定此次解引用操作所需的步长，也就是 <kbd>8 Bytes</kbd>，那么在此次解引用操作结束后，数组再降一级维度，即 <kbd>int [4][3][2]</kbd> -&gt; <kbd>int [3][2]</kbd> -&gt; <kbd>int [2]</kbd> -&gt; <kbd>int</kbd> ，那么在最后一次解引用操作的时候，解引用所需的步长类型参考就按照 <kbd>int</kbd> 类型来，通过这样就能够拿到了最低维度数组首元素的完整数据了</p>
+<p data-line="949" class="code-line">最后，针对于刚刚所定义的多维数组再做一次巩固</p>
+<pre><code data-line="950" class="code-line language-c"><div>arrary				：第一个大组的首地址，在大多数情况下，其值位指向当前元素首元素的地址，在某些情况下代表着这整个三维数组 arrary
+&amp;arrary + <span class="hljs-number">1</span> 		：步长为整个三维数组的长度进行偏移一位
+arrary + <span class="hljs-number">1</span>			：第二大组的首地址
+arrary[<span class="hljs-number">0</span>] 			：第一个大组的内容
+&amp;arrary[<span class="hljs-number">0</span>] + <span class="hljs-number">1</span>		：第二大组的首地址
+arrary[<span class="hljs-number">0</span>] + <span class="hljs-number">1</span> 		：第一个大组的第二个小组的首地址
+arrary[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]		：第一个大组的第一个小组的内容
+&amp;arrary[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>] + <span class="hljs-number">1</span>	：第一个大组的第二个小组的首地址
+arrary[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>] + <span class="hljs-number">1</span>  	：第一个大组的第一个小组的第二个元素的首地址
+arrary[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]		：第一个大组的第一个小组的第二个元素的内容
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="%E6%8C%87%E9%92%88%E6%95%B0%E7%BB%84"></a><h4 id="e68c87e99288e695b0e7bb84-2" data-line="965" class="code-line">指针数组</h4>
+<p data-line="966" class="code-line"><span id="指针数组"></span></p>
+<p data-line="968" class="code-line">指针数组，即数组中的元素是其它变量在内存中的首地址，即我们需要取到实际值的时候需要做两次解引用操作，第一次解引用操作根据数组中某个元素的首地址获取到该元素内部所存放的其他变量在内存中的首地址，第二次解引用操作则是获取上一步所获取到的某个变量在内存中的首地址所映射到的完整的存储空间，即实际值，如下代码</p>
+<pre><code data-line="970" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span><span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span> </span>{
+
+	<span class="hljs-keyword">int</span> a = <span class="hljs-number">10</span>;
+	<span class="hljs-keyword">int</span> b = <span class="hljs-number">20</span>;
+
+	<span class="hljs-keyword">int</span> *arrary[<span class="hljs-number">2</span>] = { &amp;a,&amp;b };
+
+	<span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>, *arrary[<span class="hljs-number">0</span>]);
+	<span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>, **(arrary + <span class="hljs-number">1</span>));
+
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p data-line="988" class="code-line"><code>qwdqwd</code></p>
+</div>
+
+</body>
+</html>
