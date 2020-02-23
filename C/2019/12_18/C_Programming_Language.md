@@ -1140,6 +1140,9 @@ char *strs[] --> char **strs
 
 ---
 
+#### 字符串在 c 中的定义
+<span id="字符串在c中的定义"></span>
+
 字符串是一段 [[char]] 类型的连续存储空间，也就是一个 char 类型的数组，在 c 语言中，字符串并没有具体的 [[string]] 类型进行定义，而是使用类型 <kbd>char []</kbd> 或者是 [[char *]] 用于定义一个字符串的类型
 
 一个标准的字符串定义，尾元素的值必须为 [[\0]] 才能够构成一个字符串的定义，如下面的代码
@@ -1186,6 +1189,352 @@ int main(void){
 ```
 
 其实，不管是通过 [[char *]] 定义一个字符串也好还是通过一个 <kbd>char []</kbd>，其本质都是一样的， [[char *]] 在定义完成后始终指向字符串首元素的内存地址，并且后面字符的内存地址也是连续的存储空间，而数组本身也是一个常量指针，指向数组首元素的内存地址，但是对于数组或指针，它们之间在类型上还是存在的一些独有的特性，具体就看使用的时候进行取舍了
+
+<br/>
+
+#### c 标准库所提供的针对于字符串操作的 API
+<span id="c标准库所提供的针对于字符串操作的API"></span>
+
+#### size_t strlen(char const *str) --> <string.h>
+
+获取一个字符串真实有效长度（不包含 [[\0]] )
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(){
+
+    char *str = "Hello,World!";
+	size_t len = strlen(str);
+
+	printf("%d\n", len);
+
+    return 0;
+}
+```
+
+<br/>
+
+#### char *strstr(char *source_str, char *sub_str) --> <string.h>
+
+自左向右检索字符串 [[source_str]] 中，字符串 [[sub_str]] 第一次出现的位置，如果存在，则返回出现位置开始的地址，<span style = "color:red">该地址并不是一个新的地址，而是相对于字符串 [[source_str]] 首地址进行 n 位偏移的地址</span> ，如果不存在，则返回空指针
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void){
+
+    char *source_str = "Hello,World!";
+	char *sub_str = "Wo";
+
+	char *find_str = strstr(source_str, sub_str);
+
+	printf("%s\n", find_str);
+
+    return 0;
+}
+```
+
+```c
++---+
+| 0 |
++---+ <---+ 0x00ee7b3B
+| d |
++---+ <---+ 0x00ee7b3A
+| l |
++---+ <---+ 0x00ee7b39
+| r |
++---+ <---+ 0x00ee7b38
+| o |
++---+ <---+ 0x00ee7b37
+| W |
++---+ <---+ 0x00ee7b36 <----+ find_str
+| , |
++---+ <---+ 0x00ee7b35
+| o |
++---+ <---+ 0x00ee7b34
+| l |
++---+ <---+ 0x00ee7b33
+| l |
++---+ <---+ 0x00ee7b32                                     +---+
+| e |                                                      | o |
++---+ <---+ 0x00ee7b31                                     +---+ <---+ 0x00ee7b51
+| H |                                                      | W |
++---+ <---+ 0x00ee7b30 <----+ source_str                   +---+ <---+ 0x00ee7b50 <----+ sub_str
+```
+
+<br/>
+
+#### char *strchr(const char *source_str, int sub_char) --> <string.h>
+
+自左向右检索字符串 [[source_str]] 中，字符 [[sub_char]] 第一次出现的位置，如果存在，则返回出现位置开始的地址，<span style = "color:red">该地址并不是一个新的地址，而是相对于字符串 [[source_str]] 首地址进行 n 位偏移的地址</span> ，如果不存在，则返回空指针
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void){
+
+    char *source_str = "Hello,World!";
+	char sub_char = 'l';
+
+	char *find_str = strchr(source_str, sub_char);
+
+	printf("%s\n", find_str);
+
+    return 0;
+}
+```
+
+```c
++---+
+| 0 |
++---+ <---+ 0x00ee7b3B
+| d |
++---+ <---+ 0x00ee7b3A
+| l |
++---+ <---+ 0x00ee7b39
+| r |
++---+ <---+ 0x00ee7b38
+| o |
++---+ <---+ 0x00ee7b37
+| W |
++---+ <---+ 0x00ee7b36 
+| , |
++---+ <---+ 0x00ee7b35 
+| o |
++---+ <---+ 0x00ee7b34
+| l |
++---+ <---+ 0x00ee7b33
+| l |
++---+ <---+ 0x00ee7b32 <----+ find_str                                 
+| e |                                                      
++---+ <---+ 0x00ee7b31                                     +---+
+| H |                                                      | W |
++---+ <---+ 0x00ee7b30 <----+ source_str                   +---+ <---+ sub_char
+```
+
+<br/>
+
+#### char *strcpy(char *dest, const char *src) --> <string.h>
+
+把字符串 [[src]] 中的所有数据数据拷贝到字符串 [[dest]] 中 ( 字符指针 [[src]] 所指向的内存空间中存储的数据拷贝到字符指针 [[dest]] 所指向的内存空间中 )，并返回 [[dest]] 所指向的首地址
+
+该函数的使用是不太安全的，因为我们需要保证 [[dest]] 所指向的内存段的大小要满足于 [[src]] 所指向的内存段，就算 [[dest]] 所指向的内存段的大小小于 [[src]] 所指向的内存段，该函数还是会调用成功，但是可能会产生 [[野指针]] 的数据
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void){
+
+    char *str_source = "Hello,World!";
+	char str_cpy[32] = { 0 };
+
+	strcpy(str_cpy, str_source);
+
+	printf("source = %s\n",str_source);
+	printf("copy   = %s\n",str_cpy);
+
+    return 0;
+}
+```
+
+<br/>
+
+#### char *strncpy(char *dest, const char *src, size_t n) --> <string.h>
+
+把字符串 [[src]] 中的 [[n]] [[Bytes]] 的数据拷贝到字符串 [[dest]] 中 ( 字符指针 [[src]] 所指向的内存空间中存储的前 [[n]] [[Bytes]] 的数据拷贝到字符指针 [[dest]] 所指向的内存空间中 )，并返回 [[dest]] 所指向的首地址
+
+该函数较于 [[strcpy]] 函数是安全的，因为该函数在拷贝的过程中能够指定具体需要从 [[str]] 中拷贝 [[n]] 个 [[bytes]] 的数据，这样就能够减少发生 [[野指针]] 数据的可能
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void){
+
+    char *str_source = "Hello,World!";
+	char str_cpy[32] = { 0 };
+
+	strncpy(str_cpy, str_source, strlen(str_source));
+
+	printf("source = %s\n",str_source);
+	printf("copy   = %s\n",str_cpy);
+
+    return 0;
+}
+```
+
+<br/>
+
+#### char *strcat(char *dest, const char *src)
+
+把字符串 [[src]] 中的有效数据 ( 不包含 [[\0]] ) 全部追加写入到字符串 [[dest]] 所指向的内存空间当中，并在 [[dest]] 字符串有效数据的末尾添加 [[\0]] 字符，最后会返回 [[dest]] 所指向的首地址
+
+该函数是不安全的，因为我们需要保证 [[dest]] 所指向的内存段要有足够的空间去追加 [[src]] 所指向的内存空间里面的数据，就算 [[dest]] 所指向的内存段的大小并没有足够的空间去追加 [[src]] 所指向的内存空间段里面的数据，该函数还是会调用成功，但是可能会产生 [[野指针]] 的数据
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void){
+
+    char *str_source = "World!";
+	char str_dest[16] = "Hello,";
+	strcat(str_dest, str_source);
+
+	printf("%s\n", str_dest);
+    return 0;
+}
+```
+
+<br/>
+
+#### char *strncat(char *dest, const char *src, size_t n)
+
+把字符串 [[src]] 中前 [[n]] [[Bytes]] 的有效数据 ( 不包含 [[\0]] ) 追加写入到字符串 [[dest]] 所指向的内存空间当中，并在 [[dest]] 字符串有效数据的末尾添加 [[\0]] 字符，最后会返回 [[dest]] 所指向的首地址
+
+该函数较于 [[strcat]] 函数是安全的，因为该函数在调用的过程中能够决定具体需要从 [[str]] 中读取 [[n]] 个 [[bytes]] 的数据再追加到 [[dest]] 所指向的内存空间当中，这样就能够减少发生 [[野指针]] 数据的可能
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void){
+
+    char *str_source = "World!";
+	char str_dest[16] = "Hello,";
+	strcat(str_dest, str_source, strlen(str_source));
+
+	printf("%s\n", str_dest);
+    return 0;
+}
+```
+
+<br/>
+
+#### int strcmp(const char *str1, const char *str2)
+
+挨个比较 [[str1]] 字符串和 [[str2]] 字符串中每个字符的 [[ASCII 码]] 大小
+- 如果所有字符都是相同则返回 [[0]] 
+- 如果 [[str1]] 中的某个字符 [[>]] [[str2]] 中的某个字符则返回 [[1]]
+- 如果 [[str1]] 中的某个字符 [[<]] [[str2]] 中的某个字符则返回 [[-1]]
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void){
+
+    char *str1 = "abc";
+	char *str2 = "adc";
+	int result = strcmp(str1, str2);
+
+	printf("result = %d\n", result);
+
+    return 0;
+}
+```
+
+<br/>
+
+#### int strncmp(const char *s1, const char *s2, size_t n)
+
+挨个比较 [[str1]] 字符串和 [[str2]] 字符串中前 [[n]] 个字符的 [[ASCII 码]] 大小
+
+- 如果所有字符都是相同则返回 [[0]] 
+- 如果 [[str1]] 中的某个字符 [[>]] [[str2]] 中的某个字符则返回 [[1]]
+- 如果 [[str1]] 中的某个字符 [[<]] [[str2]] 中的某个字符则返回 [[-1]]
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void){
+
+    char *str1 = "abc";
+	char *str2 = "adc";
+	int result = strcmp(str1, str2, strlen(str1));
+
+	printf("result = %d\n", result);
+
+    return 0;
+}
+```
+
+<br/>
+
+#### char *strtok(char *str, const char *delim)
+
+根据字符串 [[delim]] 所给定的字符 ( <span style="color:red">可以给定字符串进行多字符匹配，需要注意的是，该函数至始至终都是按照一个字符一个字符去匹配的，而不会根据一串字符串</span> ) 去分割 [[str]] 字符串中的内容，并返回分割后前置的结果的首地址 ( <span style = "color:red">该地址并不是一个新的地址，而是相对于字符串 [[str]] 首地址进行 n 位偏移的地址</span> )，并且会在原有字符串 [[str]] 的基础上，形成分割的部分所映射的内存空间置为 [[\0]]，如果字符串 [[str]] 中没有任何内容以供分隔符 [[delim]] 做分割，则该函数会直接返回 [[str]] 所指向的首地址，举个例子，给定原始字符串为 [["Hello.World.NGPONG"]] 并使用 [["."]] 作为分隔符，则调用一次后的结果则为 [["Hello\0"]] ，而原始字符串的内容则变成 [["Hello\0World.NGPONG"]]
+
+该函数所对应的源文件中保有一个 [[静态变量]] ，该静态变量会保存在上一次调用成功该函数后，所分割的剩余的内容，比如说，给定原始字符串为 [["Hello.World.NGPONG"]] 并使用 [["."]] 作为分隔符，则调用一次后的结果则为 [["Hello\0"]]，而原始字符串的内容则变成 [["Hello\0World.NGPONG"]] ，而在该函数调用完成后，其内部的静态变量所存储的则为 [["World.NGPONG"]]，当我们对于参数 [[str]] 指定为 [[NULL]] 的时候，此次分割操作所需的字符串数据源则采纳上一次分割后所剩下的结果来充当，即 [["World.NGPONG"]]，我们可以采纳这一特性去循环的分割一个字符串中的所有内容，直至该函数的结果返回 [[NULL]] ( 当找不到任何分隔符 [[delim]] 在原始字符串中找不到任何数据进行分割的时候，则返回所传入的 [[str]] 所指向的首地址 ) ，则表示已经没有任何内容以供分割
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void){
+
+    char str[] = "He.ll.oW.or.ld!";
+
+	printf("%s\n", strtok(str, "."));
+
+	char *str_split = NULL;
+	while (1) {
+
+		str_split = strtok(NULL, ".");
+		if (str_split == NULL) {
+		
+			printf("end of strtok");
+			return;
+		}
+		printf("%s\n", str_split);
+	}
+
+    return 0;
+}
+```
+```c
++---+                                                           +---+
+| 0 |                                                           | 0 |
++---+ <---+ 0x00ee7b3F                                          +---+ <---+ 0x00ee7b3F
+| . |                                                           | 0 |
++---+ <---+ 0x00ee7b3E                                          +---+ <---+ 0x00ee7b3E
+| d |                                                           | d |
++---+ <---+ 0x00ee7b3D                                          +---+ <---+ 0x00ee7b3D
+| l |                                                           | l |
++---+ <---+ 0x00ee7b3C                                          +---+ <---+ 0x00ee7b3C
+| . |                                                           | 0 |
++---+ <---+ 0x00ee7b3B                                          +---+ <---+ 0x00ee7b3B
+| r |                                                           | r |
++---+ <---+ 0x00ee7b3A                                          +---+ <---+ 0x00ee7b3A
+| o |                                                           | o |
++---+ <---+ 0x00ee7b39                 +-+RESULT+->             +---+ <---+ 0x00ee7b39
+| . |                                                           | 0 |
++---+ <---+ 0x00ee7b38                                          +---+ <---+ 0x00ee7b38
+| W |                                                           | W |
++---+ <---+ 0x00ee7b37                                          +---+ <---+ 0x00ee7b37
+| o |                                                           | o |
++---+ <---+ 0x00ee7b36                                          +---+ <---+ 0x00ee7b36
+| . |                                                           | 0 |
++---+ <---+ 0x00ee7b35                                          +---+ <---+ 0x00ee7b35
+| l |                                                           | l |
++---+ <---+ 0x00ee7b34                                          +---+ <---+ 0x00ee7b34
+| l |                                                           | l |
++---+ <---+ 0x00ee7b33                                          +---+ <---+ 0x00ee7b33
+| . |                                                           | 0 |
++---+ <---+ 0x00ee7b32                                          +---+ <---+ 0x00ee7b32
+| e |                                                           | e |
++---+ <---+ 0x00ee7b31                                          +---+ <---+ 0x00ee7b31
+| H |                                                           | H |
++---+ <---+ 0x00ee7b30 <----+ str                               +---+ <---+ 0x00ee7b30 <----+ str
+                
+```
+
 
 <br/>
 
@@ -1563,38 +1912,6 @@ int main(void){
 ```
 
 以上面代码则为函数指针数组的定义和使用，我们发现函数指针数组的定义方式也是通过 [[( )]] 来把 <kbd>*invokers[3]</kbd> 结合为指针数组，而这种类型也是符合 [[指针数组]] 类型的定义，所以，函数指针数组其实就是一个指针数组，每个元素类型是 [[函数指针]] 的类型
-
-<br/>
-
-#### 关于系统提供给我们的API中，形参为 [[format]] 时需要注意的问题
-<span id="形参format"></span>
-
-当我们使用部分 c 标准库所提供出来的 [[API]] 时，特别是针对数据录入的API，经常会函数的形参看到类型为 [[char *]] 参数名为 [[fortmat]] 的格式，并且后面的列表通常跟着一个或者多个 [[可变参数]] ( <span style="color:red">实际上 c 语言中并没有内置可变参数 [[params]] 的标识符，其实现是通过函数形参地址的偏移来找到一个或多个由 [[caller]] 所录入的参数的</span> )，通常拥有该参数的函数功能可以通过 [[format]] 参数中所录入的 [[格式化模板]] ，然后把 [[fortmat]] 后面所跟随的可变参数依照所 [[format]] 中所指定的格式一一录入到一个新的字符串内，那么 <span style="color:red">这个新的字符串可能会直接返回给我们也可能会写入到文件或者某些在可变参数中所指定的内存区域当中去</span> ，这其实并不重要，我们需要明白的是在上面所提到的 [[格式化模板]] 的说话
-
-关于 [[格式化模板]] 其内置了很多标识符以供我们去使用，以下则为常用的一些格式化标识符
-
-- [[%%]]：对于 [[%]] 的转移，以使 [[%]] 不会被认定为一个转移连接符，而是作为一个普通字符进行处理
-- [[%d]]：标识一个 10 进制的 signed int 数值
-- [[%o]]：标识一个 8 进制的  signed int 数值
-- [[%x]]：标识一个 16 进制的 signed int 数值
-- [[%u]]：标识一个 10 进制的 unsigned int 数值
-- [[%p]]：标识一个内存地址，当然，内存地址也是 [[16进制]] 的数值，所以对于内存地址的格式化操作我们可以使用 [["%x"]] 也可以使用 [["%p"]]
-- [[%hd]]：标识一个 signed short 数值
-- [[%hu]]：标识一个 unsigned short 数值
-- [[%ld]]：标识一个 signed long 数值
-- [[%lu]]：标识一个 unsigned long 数值
-- [[%lld]]：标识一个 signed long long 数值
-- [[%llu]]：标识一个 unsigned long long 数值
-- [[%c]]：标识 一个 signed char 字符
-- [[%s]]：标识一个字符串，在 c 中，并没有标准字符串 [[string]] 的定义，所以对于格式化字符串操作而言，以 [['\0']] / [['\n']] 作为本次格式化的结束
-- [[%f]]：标识 一个 float 数值
-- [[%lf]]：标识 一个 double 数值
-- [[%(z)x.(m)yk]]
-    - [[k]]：格式符类型，为浮点类型，即 [[%f]] / [[%lf]]
-    - [[y]]：小数点后面共保留 [[y]] 位进行格式化，如果格式化后的长度不够 [[y]] ，默认情况下使用 [[0]] 进行补正
-    - [[m]]：指定 [[y]] 进行长度补正时所使用的数值
-    - [[x]]：整体输出保留 [[x]] 位进行格式化，并且对 [[x+1]] 位进行四舍五入，如果格式化后的长度不够 [[x]] ，默认情况下则使用 [[0]] 进行补正
-    - [[z]]：指定 [[x]] 进行长度补正时所使用的数值
 
 
 <br/>
@@ -2131,7 +2448,7 @@ int main(void){
 #### 文件指针
 <span id="文件指针"></span>
 
-文件指针区别于一般的指针，文件指针所指向的地址所映射的存储空间里面所存储的并不是具体某个文件的所有字节内容，而是关于具体某个文件的一些描述性信息，在 c 中，文件指针的类型通过 [[FILE]] 来定义，实际上他就是一个 struct 类型，其具具体结构图下面的代码
+文件指针区别于一般的指针，文件指针所指向的内存地址其实是在 [[heap]] 上 ( 这一特性是由于 [[fopen]] 函数所导致的 ) ，此外，文件指针所指向的地址所映射的存储空间里面所存储的并不是具体某个文件的所有字节内容，而是关于具体某个文件的一些描述性信息，在 c 中，文件指针的类型通过 [[FILE]] 来定义，实际上他就是一个 struct 类型，其具具体结构图下面的代码
 
 ```c
 typedef struct
@@ -2154,9 +2471,7 @@ typedef struct
 
 但有一点需要我们注意，[[FILE struct]] 中的有一个成员会 <span style="color:red">记录着当前文件中所操作的某个字符的位置</span> ，这个成员叫做 [[文件读写位置指针]] ，文件读写位置指针 在进行偏移的时候所需使用的步长都是使用 [[1 Bytes]] 作为标准，在还未进行过任何读写状态的时候，其起始位置为0，在对文件进行了 读取或写入 操作的时候，文件读写位置指针则会基于此次操作所到达的下标往后进一以保证下一次对于文件进行 读取或写入 操作的时候不会和已操作的位置重叠在一块，我们不管是对文件的读还是写操作，都离不开这个 [[文件读写位置指针]] 它对于当前文件的读写起到了标量的作用，举个例子，一个文本文件中有一段文本 [["abc"]]，当我们第一次通过 [[fgetc]] 函数读取后，文件读写位置指针的矢量就会向后加一，以方便下一次再调用 [[fgetc]] 函数读取到的内容为 [['b']] 而不是原来的 [['a']]
 
-对于文件读写位置指针，我们可以通过 [[fseek]] 函数来手动的调整其位置以保证下一次进行 读取或写入 操作的时候所获取到的数据是我们所预期的数据，这种操作也称之为 <span style="color:red">对文件的随机访问操作</spam>
-
-文件指针内部所存储的内存地址其实是在 [[heap]] 上，即 [[FILE *]] 内部所存储的地址，该地址能够映射到 [[FILE]] 类型结构体关于具体文件的描述信息，这一特性是由于 [[fopen]] 函数所导致的
+对于文件读写位置指针，我们可以通过 [[fseek]] 函数来手动的调整其位置以保证下一次进行 读取或写入 操作的时候所获取到的数据是我们所预期的数据，这种操作也称之为 <span style="color:red">对文件的随机访问操作</span> ，在 c 中，对于文件的随机读写操作时需要注意一个点，那就是当我们通过改变文件读写位置指针的位置去往已有数据的位置当中去写入数据的时候 ( 插入数据 ) ，所写入的数据并不是以追加的形式呈现，而是以覆盖的形式呈现，比如说一个文本文件中的内容为 [[111112222233333]] ，当我们把文件读写位置指针的位置移动至第 [[5]] 个，并且写入 [[BBBBB]] 的时候，文件最终的结果则为 [[11111BBBBB33333]] ，而不是 [[11111BBBBB2222233333]]
 
 <br/>
 
@@ -2179,10 +2494,10 @@ typedef struct
 - mode：打开文件的方式
     - [["r"]] / [["rb"]]：以 [[read only]] 的方式打开一个文本文件，若文件不存在则该函数返回空指针
     - [["w"]] / [["rw"]]：以 [[write only]] 方式打开文件，如果文件存在则删除给定文件并且创建一个新的文件，如果文件不存在则创建一个新的文件
-    - [["a"]] / [["ab"]]：以 [[append only]] 方式打开文件，在末尾添加内容，若文件不存在则创建文件
+    - [["a"]] / [["ab"]]：以 [[append only]] 方式打开文件，在末尾添加内容，若文件不存在则创建文件，[[append only]] 意味着只能够允许 [[write]] 的操作，而对于 [[read]] 的操作可能会导致失败
     - [["r+"]] / [["rb+"]]：以 [[read & write]] 的方式打开文件，如果文件不存在，则创建一个新的文件
     - [["w+"]] / [["wb+"]]：以 [[read & write]] 的方式打开文件，如果文件存在则删除给定文件并且创建一个新的文件，如果文件不存在则创建一个新的文件
-    - [["a"]] / [["ab+"]]：以 [[append & read & write]] 的方式打开文件，若文件不存在则创建文件，如果文件存在，则在末尾添加内容
+    - [["a+"]] / [["ab+"]]：以 [[append & read & write]] 的方式打开文件，若文件不存在则创建文件，如果文件存在，则在末尾添加内容
     - 参数的后缀为 [["b"]] 则为 [[二进制文件模式]] ，没有则为默认的 [[文本文件模式]] ，且只是在 [[Windows]] 有效，在 [[Linux]] 中用文本文件模式和二进制文件模式的结果是一样的
         - windows：所有的文本文件行都是 [[\r\n]] 作为结尾
             - 文本模式
@@ -2192,39 +2507,8 @@ typedef struct
                 - 以 [[二进制]] 方式打开文件，则读写都不会进行这样的转换
         - Linux：所有的文本文件行都是 [[\n]] 作为结尾
             - 在Unix/Linux平台下，文本模式与二进制模式没有区别，[[\r]] [[\n]] 作为两个字符原样输入输出
-    - 当我们使用追加 ( [["a"]] ) 的方式打开文件的时候，我们不能对文件进行任意位置读写操作
-    - 在 windows 下，当我们对文件进行了一次读取操作后再进行写入，则会出现错误 ( 也有可能不会出错，而且写入函数也返回调用成功，但是数据却没有写入 ) ， 解决这一错误的方式则为在写入前对重置一次 [[文件读写指针]] 的当前位置 ( [[fseek(FILE *,0,SEEK_CUR)]] ) 即可再次进行正常的写入操作，如下面的代码
 
-    ```c
-    #include <stdio.h>
-    #include <string.h>
-    #include <stdlib.h>
-    int main(void) {
 
-        FILE *fp = fopen("c:/Users/NGPONG/Desktop/test.txt", "r+");
-        if (fp == NULL) {
-        
-            perror("file pointer error");
-            return -1;
-        }
-
-        char str[6] = { 0 };
-        fgets(str, sizeof(str), fp);
-        printf("str = %s,file read&write pointer index = %d\n", str, ftell(fp));
-
-        /*
-        如果再次写入前没有进行文件读写位置指针的位置的重新矫正，则写入错误
-        */
-        fseek(fp, 0, SEEK_CUR);
-
-        fwrite("fffff", 1, 5, fp);
-        printf("file read&write pointer index = %d\n", ftell(fp));
-
-        fclose(fp);
-
-        return 0;
-    }
-    ```
 
 ```c
 #include<stdio.h>
@@ -2648,7 +2932,217 @@ int main(void) {
 }	
 ```
 
+<br/>
 
+#### int fseek(FILE *stream, long offset, int whence) --> <stdio.h>
+
+对文件指针 [[stream]] 所存储的 [[文件读写位置指针]] 的位置基于 [[whence]] 位置下进行 [[offset]] 偏移量的移动，如果成功返回 [[0]]，如果失败则返回 [[-1]]
+
+- [[offset]]：调整位置的偏移量 ( 矢量 ) ，当为正整数的时候，则是向后 ( [[+1]] ) 偏移 offset 位，当为负数的时候则为向后 ( [[-1]] ) 偏移 offset 位
+    - <span style = "color:red">文件读写位置指针的默认位置为0，并且也不能小于 0 </span> ，这意味着该参数只能够指定正整数的数字，当该参数小于0  的时候，该函数会调用失败，这时候文件读写位置指针的位置则会偏移至当前文件可读写数据的最末尾处，比如说一个文本文件仅有一段话 [[Helloworld]] ，当我们通过 [[fseek]] 函数去移动文件读写位置指针的位置，并指定偏移量小于 0 的话，则文件读写位置指针的位置下标就会偏移至跑 10 ( 可读写数据的最末尾处 )
+    - 这里的偏移量是以 [[Bytes]] 作为单位来衡量的，比如说指定 [[offset]] 为 [[10]]，那么其实就意味着是向后偏移 [[10 Bytes]]
+
+- 指定文件读写位置指针所基于的偏移位置，该参数通常使用三种不同的宏定义来指定
+    - SEEK_SET：基于文件开头位置
+    - SEEK_CUR：基于当前文件读写位置指针所在的位置
+    - SEEK_END：基于文件结尾位置
+
+```c
+#include <stdio.h>
+
+int main(void){
+
+    /*
+    AAAAABBBBBCCCCC
+    ↑
+    */
+    FILE *fp = fopen("c:/Users/NGPONG/Desktop/test.txt", "r");
+    if (fp == NULL) {
+
+        perror("fp error");
+        return -1;
+    }
+
+    char str[6] = { 0 };
+
+    /*
+    AAAAABBBBBCCCCC
+         ↑
+    */
+    fseek(fp, 5, SEEK_SET);
+
+    /*
+    AAAAABBBBBCCCCC
+              ↑
+    */
+    fread(str, sizeof(char), 5, fp);
+
+    printf("%s\n", str);
+
+    fclose(fp);
+    return 0;
+}
+```
+
+在 windows 下，当我们对文件进行了一次读取操作后再进行写入，则会出现错误 ( 也有可能不会出错，而且写入函数也返回调用成功，但是数据却没有写入 ) ， 解决这一错误的方式则为在写入前重置一次 [[文件读写位置指针]] 的当前位置 ( [[fseek(FILE *,0,SEEK_CUR)]] ) 即可再次进行正常的写入操作，如下面的代码
+
+```c
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+int main(void) {
+
+    FILE *fp = fopen("c:/Users/NGPONG/Desktop/test.txt", "r+");
+    if (fp == NULL) {
+    
+        perror("file pointer error");
+        return -1;
+    }
+
+    char str[6] = { 0 };
+    fgets(str, sizeof(str), fp);
+    printf("str = %s,file read&write pointer index = %d\n", str, ftell(fp));
+
+    /*
+    如果再次写入前没有进行文件读写位置指针的位置的重新矫正，则写入错误
+    */
+    fseek(fp, 0, SEEK_CUR);
+
+    fwrite("fffff", 1, 5, fp);
+    printf("file read&write pointer index = %d\n", ftell(fp));
+
+    fclose(fp);
+
+    return 0;
+}
+```
+
+<br/>
+
+#### long ftell(FILE *stream) --> <stdio.h>
+
+获取，计算并返回文件指针 [[stream]] 所存储的 [[文件读写位置指针]] 当前位置到文件起始位置之间的偏移量 ( <span style = "color:red">以字节为单位</span> )
+
+```c
+#include <stdio.h>
+
+int main(void){
+
+    /*
+    AAAAABBBBBCCCCC
+    ↑
+    */
+    FILE *fp = fopen("c:/Users/NGPONG/Desktop/test.txt", "r");
+    if (fp == NULL) {
+
+        perror("fp error");
+        return -1;
+    }
+
+    int fileSize = 0;
+
+    /*
+    AAAAABBBBBCCCCC
+                   ↑
+    */
+    fseek(fp, 0, SEEK_END);
+
+    fileSize = ftell(fp);
+
+    printf("file size = %d\n", fileSize);
+
+    fclose(fp);
+    return 0;
+}
+```
+
+<br/>
+
+#### void rewind(FILE *stream) --> <stdio.h>
+
+回卷文件指针 [[stream]] 所存储的 [[文件读写位置指针]] 的位置到文件起始位置
+
+```c
+#include <stdio.h>
+
+int main(void){
+
+    /*
+    AAAAABBBBBCCCCC
+    ↑
+    */
+    FILE *fp = fopen("c:/Users/NGPONG/Desktop/test.txt", "r");
+    if (fp == NULL) {
+
+        perror("fp error");
+        return -1;
+    }
+
+    char str[32] = { 0 };
+    /*
+    AAAAABBBBBCCCCC
+                   ↑
+    */
+    fread(str, sizeof(char), sizeof(str), fp);
+
+    printf("%s\n", str);
+    memset(str, 0, sizeof(str));
+
+    /*
+    AAAAABBBBBCCCCC
+    ↑
+    */
+    rewind(fp);
+
+    /*
+    AAAAABBBBBCCCCC
+         ↑
+    */
+    fread(str, sizeof(char), 5, fp);
+   
+    printf("%s\n", str);
+
+    fclose(fp);
+    return -1;
+}
+```
+
+<br/>
+
+#### int feof(FILE * stream) --> <stdio.h>
+
+判断文件指针 [[stream]] 所指向的文件中文件中，文件读写位置指针的位置是否已经到达文件的结尾，如果是的话则返回 [[1]] 不是的话则返回 [[0]]
+
+之前说到，文件指针其所存储的内存地址所映射的具体内容是一个描述文件信息的 [[struct]] ，而这个 [[struct]] 中有一个成员为 [[文件读写位置指针]] ，而该函数的实现机制是通过文件读写位置指针当前所在的位置去对比当前文件的有效数据的长度来判断是否已经到达文件末尾的
+
+在 c 语言中，<span style = "color:red">对于 [[任何文本文件]] 都会有一个结束标记，其值为 [[-1]] </span>，这个结束标记我们是不需要手动添加的，并且我们在文本中是看不到的，只有实际在 c 中通过代码读取文本文件的内容时才会发现它的存在，而 c 语言通过一个宏定义 [[EOF]] ( end of file ) 来表示这个值为 -1 的结束标记，但是关于 [[EOF]] 仅仅只是适用于 [[文本文件]] ，对于 [[二进制文件]] 就不能采用这一标准了，<span style="color:red">因为对于一个二进制文件来说 [[-1]] 是能够存在且为有效值的</span>，所以，如果需要准确的获取到当前所操作的文件指针的文件读写位置指针是否已经偏移至文件的结尾的时候，使用该函数更为合适
+
+```c
+#include <stdio.h>
+
+int main(void) {
+
+    FILE *fp = fopen("c:/Users/NGPONG/Desktop/test.txt", "r+");
+    if (fp == NULL) {
+
+        perror("fp errpr");
+        return -1;
+    }
+
+    while (1) {
+
+        char ch = fgetc(fp);
+        if (feof(fp)) {
+            
+            break;
+        }
+        printf("%c", ch);
+    }
+
+    fclose(fp);
+    return 0;
+}
+```
 
 
 <br/>
@@ -3293,11 +3787,41 @@ gcc helloworld.o -o helloworld.exe
     
 <br/>
 
-### 常用的API
-<span id="常用的API"></span>
+### 常用的API和需要注意的一些特殊的参数
+<span id="常用的API和需要注意的一些特殊的参数"></span>
 
 ---
 
-#### stdio.h
+#### 关于系统提供给我们的API中，形参为 [[format]] 时需要注意的问题
+<span id="形参format"></span>
+
+当我们使用部分 c 标准库所提供出来的 [[API]] 时，特别是针对数据录入的API，经常会函数的形参看到类型为 [[char *]] 参数名为 [[fortmat]] 的格式，并且后面的列表通常跟着一个或者多个 [[可变参数]] ( <span style="color:red">实际上 c 语言中并没有内置可变参数 [[params]] 的标识符，其实现是通过函数形参地址的偏移来找到一个或多个由 [[caller]] 所录入的参数的</span> )，通常拥有该参数的函数功能可以通过 [[format]] 参数中所录入的 [[格式化模板]] ，然后把 [[fortmat]] 后面所跟随的可变参数依照所 [[format]] 中所指定的格式一一录入到一个新的字符串内，那么 <span style="color:red">这个新的字符串可能会直接返回给我们也可能会写入到文件或者某些在可变参数中所指定的内存区域当中去</span> ，这其实并不重要，我们需要明白的是在上面所提到的 [[格式化模板]] 的说话
+
+关于 [[格式化模板]] 其内置了很多标识符以供我们去使用，以下则为常用的一些格式化标识符
+
+- [[%%]]：对于 [[%]] 的转移，以使 [[%]] 不会被认定为一个转移连接符，而是作为一个普通字符进行处理
+- [[%d]]：标识一个 10 进制的 signed int 数值
+- [[%o]]：标识一个 8 进制的  signed int 数值
+- [[%x]]：标识一个 16 进制的 signed int 数值
+- [[%u]]：标识一个 10 进制的 unsigned int 数值
+- [[%p]]：标识一个内存地址，当然，内存地址也是 [[16进制]] 的数值，所以对于内存地址的格式化操作我们可以使用 [["%x"]] 也可以使用 [["%p"]]
+- [[%hd]]：标识一个 signed short 数值
+- [[%hu]]：标识一个 unsigned short 数值
+- [[%ld]]：标识一个 signed long 数值
+- [[%lu]]：标识一个 unsigned long 数值
+- [[%lld]]：标识一个 signed long long 数值
+- [[%llu]]：标识一个 unsigned long long 数值
+- [[%c]]：标识 一个 signed char 字符
+- [[%s]]：标识一个字符串，在 c 中，并没有标准字符串 [[string]] 的定义，所以对于格式化字符串操作而言，以 [['\0']] / [['\n']] 作为本次格式化的结束
+- [[%f]]：标识 一个 float 数值
+- [[%lf]]：标识 一个 double 数值
+- [[%(z)x.(m)yk]]
+    - [[k]]：格式符类型，为浮点类型，即 [[%f]] / [[%lf]]
+    - [[y]]：小数点后面共保留 [[y]] 位进行格式化，如果格式化后的长度不够 [[y]] ，默认情况下使用 [[0]] 进行补正
+    - [[m]]：指定 [[y]] 进行长度补正时所使用的数值
+    - [[x]]：整体输出保留 [[x]] 位进行格式化，并且对 [[x+1]] 位进行四舍五入，如果格式化后的长度不够 [[x]] ，默认情况下则使用 [[0]] 进行补正
+    - [[z]]：指定 [[x]] 进行长度补正时所使用的数值
+
+
 
 
