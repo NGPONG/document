@@ -1531,9 +1531,76 @@ int main(void){
 | e |                                                           | e |
 +---+ <---+ 0x00ee7b31                                          +---+ <---+ 0x00ee7b31
 | H |                                                           | H |
-+---+ <---+ 0x00ee7b30 <----+ str                               +---+ <---+ 0x00ee7b30 <----+ str
-                
++---+ <---+ 0x00ee7b30 <----+ str                               +---+ <---+ 0x00ee7b30 <----+ str      
 ```
+
+<br/> 
+
+#### int atoi(const char *str)
+
+将字符串转换为整型，如果成功则返回转换成功后的数字，如果失败则返回 [[0]]
+
+该函数会整体扫描 [[str]] 字符串，并跳过空格字符，直到遇到数字或正负号才作为转换依据的开始，而遇到非数字或结束符 [[\0]] 才作为转换依据的结束
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+
+	char *str = "   1024a";
+
+	int i = atoi(str);
+
+	return 0;
+}
+```
+
+<br/> 
+
+#### int atof(const char *str)
+
+将字符串转换为浮点型，如果成功则返回转换成功后的数字，如果失败则返回 [[0]]
+
+该函数会整体扫描 [[str]] 字符串，并跳过空格字符，直到遇到数字或正负号才作为转换依据的开始，而遇到非数字或结束符 [[\0]] 才作为转换依据的结束
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+
+	char *str = "   1024a";
+
+	float i = atof(str);
+
+	return 0;
+}
+```
+
+<br/> 
+
+#### int atol(const char *str)
+
+将字符串转换为长整型，如果成功则返回转换成功后的数字，如果失败则返回 [[0]]
+
+该函数会整体扫描 [[str]] 字符串，并跳过空格字符，直到遇到数字或正负号才作为转换依据的开始，而遇到非数字或结束符 [[\0]] 才作为转换依据的结束
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+
+	char *str = "   1024a";
+
+	long i = atol(str);
+
+	return 0;
+}
+```
+
+
 
 
 <br/>
