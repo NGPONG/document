@@ -949,7 +949,11 @@ LOW
 #### 数组的初始化
 <span id="数组的初始化"></span>
 
-如果我们只是声明了一个数组而没有定义，那么当我们访问数组某个下标的元素的时候，只能够获取到该数组对应存储区中编译器所赋予的默认值，原因是因为我们没有进行 [[数组的初始化操作]] ，编译器帮我们进行了一次隐式初始化操作，而对于人为的进行数组的初始化操作，我们只能通过在定义数组的时候就需要进行，并且需要注意的是，不管是人为的进行初始化也好还是隐式进行初始化，一个数组一旦经历过初始化的过程就不能再改变这个数组其内部所存储的当前数组首元素的地址，原因是数组在初始化完成后，数组名是一个 [[指针常量]]
+如果我们只是声明了一个数组而没有定义，那么当我们访问数组某个下标的元素的时候，只能够获取到该数组对应存储区中编译器所赋予的默认值，原因是因为我们没有进行 [[数组的初始化操作]] ，编译器帮我们进行了一次隐式初始化操作
+
+而对于人为的进行数组的初始化操作，我们只能通过在定义数组的时候就需要进行，并且需要注意的是，不管是人为的进行初始化也好还是隐式进行初始化，一个数组一旦经历过初始化的过程就不能再改变这个数组其内部所存储的当前数组首元素的地址，原因是数组在初始化完成后，数组名是一个 [[指针常量]]
+
+需要注意的是，我们认为的对数组进行初始化操作，哪怕我们只是在当前初始化的过程中仅仅只是指定了初始化一个元素，编译器也会使没有指定初始化值的元素都赋上一个初始化值 [[0]]
 
 ```c
 int main(void){
@@ -1154,7 +1158,7 @@ int main(void){
 }
 ```
 
-以上代码则为我们定义了一个字符数组，并让字符数组的尾元素的值置为 [[\0]] 以构成字符串的定义，但是在 c 语言中对于字符串的赋值还有更简便的方式 --> [[""]]，通过 [[""]] 所填写的字符集则为一个标准的字符串定义，通常也称之为 [[字符串常量]]，其会内存中空间中自动开辟一块空间用于存储我们写录入的字符组，并会额外添加 [[1 Bytes]] 大小的内存单元以为该字符组的结尾添加一个 [[\0]] 标识符，并且返回这块内存空间的地址，其通常用来作为表达式的右值出现，并且它所返回的是一个地址，也就意味着我么能够使用  <kbd>char []</kbd> 或者是 [[char *]] 类型的定义来接收这个地址，比较特殊的是，所开辟的这块内存空间在内存中的具体位置会根据这类型的不同定义而不同
+以上代码则为我们定义了一个字符数组，并让字符数组的尾元素的值置为 [[\0]] 以构成字符串的定义，但是在 c 语言中对于字符串的赋值还有更简便的方式 --> [[""]]，通过 [[""]] 所填写的字符集则为一个标准的字符串定义，通常也称之为 [[字符串常量]]，其会内存中空间中自动开辟一块空间用于存储我们写录入的字符组，并会额外添加 [[1 Bytes]] 大小的内存单元以为该字符组的结尾添加一个 [[\0]] 标识符，最后返回这块内存空间的地址，其通常用来作为表达式的右值出现，并且它所返回的是一个地址，也就意味着我么能够使用  <kbd>char []</kbd> 或者是 [[char *]] 类型的定义来接收这个地址，比较特殊的是，所开辟的这块内存空间在内存中的具体位置会根据这类型的不同定义而不同
 
 - char [ ]
     - 因为字符串是内存中一段连续的char空间，所以理当我们是可以使用char数组来定义一个字符串变量
@@ -1195,6 +1199,56 @@ int main(void){
 #### c 标准库所提供的针对于字符串操作的 API
 <span id="c标准库所提供的针对于字符串操作的API"></span>
 
+#### int sprintf(char *str, const char *format, ...)
+##### <string.h>
+
+将 [format形参](#形参format) 所提供的格式化模板再结合所录入的可变参数 [[...]] 生成一个新的字符串，并把这个字符串的数据拷贝到字符指针 [[str]] 所指向的内存空间当中，如果成功返回 [[0]]，如果失败则返回 [[-1]]
+
+如果 [[str]] 所指向的内存段在保证内存空间充足的前体现下，该函数会在写入完成后在结尾添加 [[\0]] 字符串结束标识符
+
+```c
+#include <stdio.h>
+
+int main(void){
+
+	char *hello = "Hello";
+	char *world = "world";
+
+	char str[64] = { 0 };
+	sprintf(str, "%s,%s", hello, world);
+
+    printf("%s\n",str);
+
+    return 0;
+}
+```
+
+<br/>
+
+#### int sscanf(const char *str, const char *format, ...)
+##### <string.h>
+
+将 [format形参](#形参format) 所提供的格式化模式从字符指针 [[str]] 所指向的内存空间中取出数据，并依次写入到所指定的可变参数 [[...]] 所使用的内存空间当中，如果成功返回 [[0]]，如果失败则返回 [[-1]]
+
+```c
+#include <stdio.h>
+
+int main(void){
+
+    int a, b, c, d;
+	char *str = "1 + 2 + 3 = 6";
+
+	sscanf(str, "%d + %d + %d = %d", &a, &b, &c, &d);
+
+	printf("a = %d, b =%d, c = %d, d = %d\n", a, b, c, d);
+
+    return 0;
+}
+```
+
+<br/>
+
+
 #### size_t strlen(char const *str) --> <string.h>
 
 获取一个字符串真实有效长度（不包含 [[\0]] )
@@ -1216,7 +1270,8 @@ int main(){
 
 <br/>
 
-#### char *strstr(char *source_str, char *sub_str) --> <string.h>
+#### char *strstr(char *source_str, char *sub_str)
+##### <string.h>
 
 自左向右检索字符串 [[source_str]] 中，字符串 [[sub_str]] 第一次出现的位置，如果存在，则返回出现位置开始的地址，<span style = "color:red">该地址并不是一个新的地址，而是相对于字符串 [[source_str]] 首地址进行 n 位偏移的地址</span> ，如果不存在，则返回空指针
 
@@ -1267,7 +1322,8 @@ int main(void){
 
 <br/>
 
-#### char *strchr(const char *source_str, int sub_char) --> <string.h>
+#### char *strchr(const char *source_str, int sub_char)
+##### <string.h>
 
 自左向右检索字符串 [[source_str]] 中，字符 [[sub_char]] 第一次出现的位置，如果存在，则返回出现位置开始的地址，<span style = "color:red">该地址并不是一个新的地址，而是相对于字符串 [[source_str]] 首地址进行 n 位偏移的地址</span> ，如果不存在，则返回空指针
 
@@ -1318,7 +1374,8 @@ int main(void){
 
 <br/>
 
-#### char *strcpy(char *dest, const char *src) --> <string.h>
+#### char *strcpy(char *dest, const char *src)
+##### <string.h>
 
 把字符串 [[src]] 中的所有数据数据拷贝到字符串 [[dest]] 中 ( 字符指针 [[src]] 所指向的内存空间中存储的数据拷贝到字符指针 [[dest]] 所指向的内存空间中 )，并返回 [[dest]] 所指向的首地址
 
@@ -1344,7 +1401,8 @@ int main(void){
 
 <br/>
 
-#### char *strncpy(char *dest, const char *src, size_t n) --> <string.h>
+#### char *strncpy(char *dest, const char *src, size_t n)
+##### <string.h>
 
 把字符串 [[src]] 中的 [[n]] [[Bytes]] 的数据拷贝到字符串 [[dest]] 中 ( 字符指针 [[src]] 所指向的内存空间中存储的前 [[n]] [[Bytes]] 的数据拷贝到字符指针 [[dest]] 所指向的内存空间中 )，并返回 [[dest]] 所指向的首地址
 
@@ -1371,6 +1429,7 @@ int main(void){
 <br/>
 
 #### char *strcat(char *dest, const char *src)
+##### <string.h>
 
 把字符串 [[src]] 中的有效数据 ( 不包含 [[\0]] ) 全部追加写入到字符串 [[dest]] 所指向的内存空间当中，并在 [[dest]] 字符串有效数据的末尾添加 [[\0]] 字符，最后会返回 [[dest]] 所指向的首地址
 
@@ -1394,6 +1453,7 @@ int main(void){
 <br/>
 
 #### char *strncat(char *dest, const char *src, size_t n)
+##### <string.h>
 
 把字符串 [[src]] 中前 [[n]] [[Bytes]] 的有效数据 ( 不包含 [[\0]] ) 追加写入到字符串 [[dest]] 所指向的内存空间当中，并在 [[dest]] 字符串有效数据的末尾添加 [[\0]] 字符，最后会返回 [[dest]] 所指向的首地址
 
@@ -1417,6 +1477,7 @@ int main(void){
 <br/>
 
 #### int strcmp(const char *str1, const char *str2)
+##### <string.h>
 
 挨个比较 [[str1]] 字符串和 [[str2]] 字符串中每个字符的 [[ASCII 码]] 大小
 - 如果所有字符都是相同则返回 [[0]] 
@@ -1442,6 +1503,7 @@ int main(void){
 <br/>
 
 #### int strncmp(const char *s1, const char *s2, size_t n)
+##### <string.h>
 
 挨个比较 [[str1]] 字符串和 [[str2]] 字符串中前 [[n]] 个字符的 [[ASCII 码]] 大小
 
@@ -1468,6 +1530,7 @@ int main(void){
 <br/>
 
 #### char *strtok(char *str, const char *delim)
+##### <string.h>
 
 根据字符串 [[delim]] 所给定的字符 ( <span style="color:red">可以给定字符串进行多字符匹配，需要注意的是，该函数至始至终都是按照一个字符一个字符去匹配的，而不会根据一串字符串</span> ) 去分割 [[str]] 字符串中的内容，并返回分割后前置的结果的首地址 ( <span style = "color:red">该地址并不是一个新的地址，而是相对于字符串 [[str]] 首地址进行 n 位偏移的地址</span> )，并且会在原有字符串 [[str]] 的基础上，形成分割的部分所映射的内存空间置为 [[\0]]，如果字符串 [[str]] 中没有任何内容以供分隔符 [[delim]] 做分割，则该函数会直接返回 [[str]] 所指向的首地址，举个例子，给定原始字符串为 [["Hello.World.NGPONG"]] 并使用 [["."]] 作为分隔符，则调用一次后的结果则为 [["Hello\0"]] ，而原始字符串的内容则变成 [["Hello\0World.NGPONG"]]
 
@@ -1537,6 +1600,7 @@ int main(void){
 <br/> 
 
 #### int atoi(const char *str)
+##### <string.h>
 
 将字符串转换为整型，如果成功则返回转换成功后的数字，如果失败则返回 [[0]]
 
@@ -1559,6 +1623,7 @@ int main(void) {
 <br/> 
 
 #### int atof(const char *str)
+##### <string.h>
 
 将字符串转换为浮点型，如果成功则返回转换成功后的数字，如果失败则返回 [[0]]
 
@@ -1581,6 +1646,7 @@ int main(void) {
 <br/> 
 
 #### int atol(const char *str)
+##### <string.h>
 
 将字符串转换为长整型，如果成功则返回转换成功后的数字，如果失败则返回 [[0]]
 
@@ -1600,7 +1666,132 @@ int main(void) {
 }
 ```
 
+<br/>
 
+#### void *memset(void *ptr, int value, size_t n)
+##### <string.h>
+
+初始化指针 [[ptr]] 所指向的内存段中前 [[n]] 的 [[Bytes]] 的值为 [[value]]
+
+由于该函数是按 [[Bytes]] 来进行初始化我们所预设的值 [[value]]，故 [[value]] 的真实取值范围为 [[0 ~ 255]]，即 [[1111 1111]] ，举个例子，比如说我们设置 int 的类型 4 个字节的值为 63，那么这个 int 类型在内存中所真实存储的数据如下图
+
+```c
++---------+
+|0011 1111|
++---------+
+|0011 1111|
++---------+
+|0011 1111|
++---------+
+|0011 1111|
++---------+
+```
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void){
+
+ 	char str[8] = { 0 };
+	memset(str, 65, sizeof(str) - 1);
+
+	printf("%s\n", str);
+
+    return 0;
+}
+```
+
+<br/>
+
+#### void *memcpy(void *dest, const void *src, size_t n)
+##### <string.h>
+
+将 [[src]] 所指向的内存空间中的前 [[n]] 个 [[Bytes]] 的数据拷贝到 [[dest]] 所指向的内存空间中
+
+虽然该函数对于拷贝的效率比较高，但是对于 [[dest]] 和 [[src]] 所指向的内存空间中存在 <span style="color:red">重叠区域</span> 的问题时，该函数可能会出现错误
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void){
+
+    char *str_source = "Hello,World!";
+	char str_dest[64] = { 0 };
+
+	memcpy(str_dest, str_source, strlen(str_source));
+
+	printf("%s\n", str_dest);
+
+    return 0;
+}
+```
+
+<br/>
+
+#### void *memmove(void *dest, const void *src, size_t n)
+##### <string.h>
+
+将 [[src]] 所指向的内存空间中的前 [[n]] 个 [[Bytes]] 的数据拷贝到 [[dest]] 所指向的内存空间中
+
+该函数和 [[memcpy]] 的功能是一致的，但是该函数在对于 [[dest]] 和 [[src]] 所指向的内存空间中存在 <span style="color:red">重叠区域</span> 的问题时，该函数任然能够正常执行，而就效率而言，该函数任然要低于 [[memcpy]]
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void){
+
+    char *str_source = "Hello,World!";
+	char str_dest[64] = { 0 };
+
+	memmove(str_dest, str_source, strlen(str_source));
+
+	printf("%s\n", str_dest);
+
+    return 0;
+}
+```
+
+<br/>
+
+#### int memcmp(const void *buffer1, const void *buffer2, size_t n)
+##### <string.h>
+
+挨字节比较 [[buffer1]] 所指向的内存空间和 [[buffer2]] 所指向的内存空间中前 [[n]] 个字节的大小
+
+- 如果所有字节都相同，则返回 [[0]] 
+- 如果 [[buffer1]] 所指向的内存空间中的某个字节 [[>]] [[buffer2]] 所指向的内存空间中的某个字节，则返回 [[1]]
+- 如果 [[buffer1]] 所指向的内存空间中的某个字节 [[<]] [[buffer2]] 所指向的内存空间中的某个字节，则返回 [[-1]]
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(void){
+
+    /*
+	0000 0000
+	0000 0000
+	0000 0000
+	0001 1001
+	*/
+	int a = 25; 
+
+	/*
+	0000 0000
+	0000 0000
+	0000 0000
+	0011 1001
+	*/
+	int b = 57;
+
+	int result = memcmp(&a, &b, sizeof(int));
+
+    return 0;
+}
+```
 
 
 <br/>
@@ -1612,7 +1803,8 @@ int main(void) {
 
 前面在内存4区中说到，关于堆的管理由开发人员进行维护和释放，在 c 中，对于 [[heap]] 的管理操作由以下几个函数来完成
 
-#### void *malloc(size_t size) --> <corecrt_malloc.h>
+#### void *malloc(size_t size)
+##### <corecrt_malloc.h>
 
 该函数能够在堆中申请 [[size]] 个内存单元的存储空间，如果成功，则返回指向这段存储空间中的首地址的万能指针，意味着在这个首地址往后的 [[size]] 个 ( 包括首地址 ) 字节的地址都是成功申请且安全可用的，如果申请失败，则返回一个空指针
 
@@ -1647,7 +1839,8 @@ int main(void) {
 
 <br/>
 
-#### void free(void *ptr) --> <corecrt_malloc.h>
+#### void free(void *ptr)
+##### <corecrt_malloc.h>
 
 根据指向堆中所申请的一段存储空间的首地址 [[ptr]] 的指针释放掉其所对应申请的空间
 
@@ -1694,7 +1887,8 @@ int main(void){
 
 <br/>
 
-#### void *calloc(size_t nmemb, size_t size) --> <corecrt_malloc.h>
+#### void *calloc(size_t nmemb, size_t size)
+##### <corecrt_malloc.h>
 
 该函数能够在堆中申请 [[size]] 个内存单元的存储空间，如果成功，则返回指向这段存储空间中的首地址的万能指针，意味着在这个首地址往后的 [[size * nmemb]] 个 ( 包括首地址 ) 字节的地址都是成功申请且安全可用的，如果申请失败，则返回一个空指针
 
@@ -1723,7 +1917,8 @@ int main(void){
 
 <br/>
 
-#### void *realloc(void *ptr, size_t size) --> <corecrt_malloc.h>
+#### void *realloc(void *ptr, size_t size)
+##### <corecrt_malloc.h>
 
 该函数能够重新分配 [[ptr]] 在堆中可用内存空间的大小，如果重新申请成功，该函数则返回在堆中新分配的内存空间的首地址 ( 可能是原始 [[ptr]] 所指向的地址 ) ，如果申请失败，则返回 [[NULL]]
 
@@ -1761,6 +1956,7 @@ int main(void){
     return 0;
 }
 ```
+
 
 <br/>
 
@@ -2446,7 +2642,7 @@ int main(void){
 <br/>
 
 #### 在 c 语言中三种特殊的系统文件
-<span id="在 c 语言中三种特殊的系统文件"></span>
+<span id="在c语言中三种特殊的系统文件"></span>
 
 在 c 语言中，应用程序在启动的时候会默认的打开三种特殊的 [[系统文件]] ，这三种 [[系统文件]] 会分别映射到所对应的不同的 [[文件缓冲区]] 当中，而这些 [[文件缓冲区]] 又能够映射到不同的 [[I/O 设备]] 身上，所以以抽象概念上来说这三种系统文件是属于 [[设备文件]]
 
@@ -2454,7 +2650,7 @@ int main(void){
     - 标准输入 --> 标准输入流 ( 标准输入文件缓冲区 ) --> 键盘 
 - stdout：Standard Output
     - 标准输出 --> 标准输出流 ( 标准输出文件缓冲区 ) --> 屏幕
-- stdin：Standard Error
+- stderr：Standard Error
     - 标准错误 --> 标准错误流 ( 标准错误文件缓冲区 ) --> 屏幕
 
 以上三种特殊的系统文件在 c 中以 [[宏定义]] 的方式存在，即我们在 c 中可以直接通过关键字获取并操作对应缓冲区的内容，如果究其底层的话，这三种系统文件分别是以不同的 [[文件指针]] 的形式所存在的，在首次运行我们的应用程序时，os会基于 [[file descriptor]] ( linux下万物皆文件，包括输入输出设备 ) 的封装调用为相关的文件指针赋值，它们的生命周期会延续至程序的退出而关闭，当然，开发者可以在运行时可以手动的选择关闭它们
@@ -2545,7 +2741,8 @@ typedef struct
 #### 文件指针的具体使用
 <span id="文件指针的具体使用"></span>
 
-#### FILE *fopen(const char * filename, const char * mode) --> <stdio.h>
+#### FILE *fopen(const char * filename, const char * mode)
+##### <stdio.h>
 
 当调用该函数的时候，该函数会根据指定的模式 [[mode]] 和文件的具体位置 [[filename]] 去找到相关的文件并读取文件的描述信息
 
@@ -2600,7 +2797,8 @@ int main(void){
 
 <br/>
 
-#### int fclose(FILE * stream) --> <stdio.h>
+#### int fclose(FILE * stream)
+##### <stdio.h>
 
 关闭文件指针 [[stream]] 所指向的被打开的文件，并释放其所占用的内存
 
@@ -2628,7 +2826,8 @@ int main(void){
 
 <br/>
 
-#### int remove(const char *pathname) --> <stdio.h>
+#### int remove(const char *pathname)
+##### <stdio.h>
 
 删除指定路径 [[pathname]] 的文件，成功返回 [[0]]，失败返回 [[-1]]
 
@@ -2646,7 +2845,8 @@ int main(void){
 
 <br/>
 
-#### int rename(const char *oldpath, const char *newpath) --> <stdio.h>
+#### int rename(const char *oldpath, const char *newpath)
+##### <stdio.h>
 
 重命名文件，旧地址 [[oldpath]] 更改为新地址 [[newpath]]，成功返回 [[0]]，失败则返回 [[-1]]
 
@@ -2664,7 +2864,8 @@ int main(void){
 
 <br/>
 
-#### int stat(const char *path, struct stat *buf) --> <sys/types.h> / <sys/stat.h>
+#### int stat(const char *path, struct stat *buf)
+##### <sys/types.h> / <sys/stat.h>
 
 该函数能够获取指定路径 [[path]] 所对应的文件信息，如果调用成功，则把填充到类型为 [[struct stat]] 的结构体中去，并返回 [[0]]，如果调用失败，则返回 [[-1]]
 
@@ -2715,7 +2916,8 @@ int main(void){
 
 <br/>
 
-#### int fflush(FILE *stream) --> <stdio.h>
+#### int fflush(FILE *stream)
+##### <stdio.h>
 
 该函数能够立即刷新文件指针所指向的文件所开启的缓冲区，如果成功返回 [[0]]，如果失败则返回 [[-1]]
 
@@ -2745,9 +2947,10 @@ int main(void){
 
 <br/>
 
-#### int fprintf(FILE * stream, const char * format, ...) --> <stdio.h>
+#### int fprintf(FILE * stream, const char * format, ...)
+##### <stdio.h>
 
-将 [format形参](#形参format) 所提供的格式化模板再结合所录入的可变参数生成一个新的字符串的结果并写入到文件指针 [[stream]] 所指向的文件的缓冲区内，如果成功返回 [[0]]，如果失败则返回 [[-1]]
+将 [format形参](#形参format) 所提供的格式化模板再结合所录入的可变参数 [[...]] 生成一个新的字符串的结果并写入到文件指针 [[stream]] 所指向的文件的缓冲区内，如果成功返回 [[0]]，如果失败则返回 [[-1]]
 
 ```c
 #include <stdio.h>
@@ -2771,9 +2974,10 @@ int main(void){
 
 <br/>
 
-#### int fscanf(FILE * stream, const char * format, ...) --> <stdio.h>
+#### int fscanf(FILE * stream, const char * format, ...)
+##### <stdio.h>
 
-将 [format形参](#形参format) 所提供的格式化模式从文件指针 [[stream]] 所指向的文件的缓冲区内取出数据，并依次写入到所指定的可变参数所使用的内存空间当中，如果成功返回 [[0]]，如果失败则返回 [[-1]]
+将 [format形参](#形参format) 所提供的格式化模式从文件指针 [[stream]] 所指向的文件的缓冲区内取出数据，并依次写入到所指定的可变参数 [[...]] 所使用的内存空间当中，如果成功返回 [[0]]，如果失败则返回 [[-1]]
 
 ```c
 #include <stdio.h>
@@ -2800,7 +3004,8 @@ int main(void){
 
 <br/>
 
-####  char *fgets(char * source, int size, FILE *stream) --> <stdio.h>
+####  char *fgets(char * source, int size, FILE *stream)
+##### <stdio.h>
 
 从文件指针 [[stream]] 所指向的文件的缓冲区内获取 [[size]] 字节大小的数据，以文件中的 [['\n']] 作文本次函数调用的读取标识，把所读取到的内容填充至形参 [[souce]] 所指向的内存空间内并返回该内存空间的首地址，如果调用失败，则返回 [[NULL]]
 
@@ -2834,7 +3039,8 @@ int main(void) {
 
 <br/>
 
-#### int fputs(const char * str, FILE *stream) --> <stdio.h>
+#### int fputs(const char * str, FILE *stream)
+##### <stdio.h>
 
 将字符串 [[str]] 写入到文件指针 [[stream]] 所指向文件的缓冲区当中，如果成功返回 [[0]]，如果失败则返回 [[-1]]
 
@@ -2861,9 +3067,10 @@ int main(void) {
 
 <br/>
 
-#### int fgetc(FILE * stream) --> <stdio.h>
+#### int fgetc(FILE * stream)
+##### <stdio.h>
 
-从文件指针 [[stream]]  所指向文件的缓冲区中获取一个字符，如果成功则返回所获取到的字符的 [[ASCII]] 码值，如果函数调用失败，则返回 [[-1]] ，<span style="color:red">如果当前文件指针所指向的文件是一个文本文件的话，[[-1]] 的返回值也意味着当前文本文件中的所有的有效内容都已读取完毕</span>
+从文件指针 [[stream]] 所指向文件的缓冲区中获取一个字符，如果成功则返回所获取到的字符的 [[ASCII]] 码值，如果函数调用失败，则返回 [[-1]] ，<span style="color:red">如果当前文件指针所指向的文件是一个文本文件的话，[[-1]] 的返回值也意味着当前文本文件中的所有的有效内容都已读取完毕</span>
 
 ```c
 int main(void) {
@@ -2890,7 +3097,9 @@ int main(void) {
 
 <br/>
 
-#### int fputc(int ch, FILE * stream) --> <stdio.h>
+#### int fputc(int ch, FILE * stream)
+##### <stdio.h>
+
 将字符 [[ch]] 写入到文件指针 [[stream]] 所指向的文件的缓冲区内，如果成功返回 [[0]]，如果失败则返回 [[-1]]
 
 ```c
@@ -2919,7 +3128,8 @@ int main(void){
 
 <br/>
 
-#### size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream) --> <stdio.h>
+#### size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
+##### <stdio.h>
 
 把指针 [[ptr]] 所指向的内存空间中的数据划分为 [[nmemb]] 个数据块，每个数据块占用 [[size]] 字节大小 ，逐数据块写入到文件指针 [[stream]] 所指向的文件的缓冲区当中，如果成功，则返回实际写入的数据块的块数，即形参 [[nmemb]] 所录入的值，如果是败则返回 [[0]]
 
@@ -2961,7 +3171,8 @@ int write(void) {
 
 <br/>
 
-#### size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream) --> <stdio.h>
+#### size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
+##### <stdio.h>
 
 把文件指针中所指向的文件的缓冲区的数据划分为 [[nmemb]] 个数据块，每个数据块占用 [[size]] 字节大小 ，逐数据块写入到指针 [[ptr]] 所指向的内存空间当中，如果成功，则返回实际写入的数据块的块数，即形参 [[nmemb]] 所录入的值，如果 [[返回值 < nmemb & 返回值 > 0]] ，则代表当前所读取得是最后一行的数据，如果返回值为 [[0]] 则代表文件已经读取完毕抑或是当前函数调用失败
 
@@ -3001,7 +3212,8 @@ int main(void) {
 
 <br/>
 
-#### int fseek(FILE *stream, long offset, int whence) --> <stdio.h>
+#### int fseek(FILE *stream, long offset, int whence)
+##### <stdio.h>
 
 对文件指针 [[stream]] 所存储的 [[文件读写位置指针]] 的位置基于 [[whence]] 位置下进行 [[offset]] 偏移量的移动，如果成功返回 [[0]]，如果失败则返回 [[-1]]
 
@@ -3086,7 +3298,8 @@ int main(void) {
 
 <br/>
 
-#### long ftell(FILE *stream) --> <stdio.h>
+#### long ftell(FILE *stream)
+##### <stdio.h>
 
 获取，计算并返回文件指针 [[stream]] 所存储的 [[文件读写位置指针]] 当前位置到文件起始位置之间的偏移量 ( <span style = "color:red">以字节为单位</span> )
 
@@ -3125,7 +3338,8 @@ int main(void){
 
 <br/>
 
-#### void rewind(FILE *stream) --> <stdio.h>
+#### void rewind(FILE *stream)
+##### <stdio.h>
 
 回卷文件指针 [[stream]] 所存储的 [[文件读写位置指针]] 的位置到文件起始位置
 
@@ -3176,7 +3390,8 @@ int main(void){
 
 <br/>
 
-#### int feof(FILE * stream) --> <stdio.h>
+#### int feof(FILE * stream)
+##### <stdio.h>
 
 判断文件指针 [[stream]] 所指向的文件中文件中，文件读写位置指针的位置是否已经到达文件的结尾，如果是的话则返回 [[1]] 不是的话则返回 [[0]]
 
@@ -3854,13 +4069,10 @@ gcc helloworld.o -o helloworld.exe
     
 <br/>
 
-### 常用的API和需要注意的一些特殊的参数
-<span id="常用的API和需要注意的一些特殊的参数"></span>
+### 关于系统提供给我们的API中，形参为 [[format]] 时需要注意的问题
+<span id="形参format"></span>
 
 ---
-
-#### 关于系统提供给我们的API中，形参为 [[format]] 时需要注意的问题
-<span id="形参format"></span>
 
 当我们使用部分 c 标准库所提供出来的 [[API]] 时，特别是针对数据录入的API，经常会函数的形参看到类型为 [[char *]] 参数名为 [[fortmat]] 的格式，并且后面的列表通常跟着一个或者多个 [[可变参数]] ( <span style="color:red">实际上 c 语言中并没有内置可变参数 [[params]] 的标识符，其实现是通过函数形参地址的偏移来找到一个或多个由 [[caller]] 所录入的参数的</span> )，通常拥有该参数的函数功能可以通过 [[format]] 参数中所录入的 [[格式化模板]] ，然后把 [[fortmat]] 后面所跟随的可变参数依照所 [[format]] 中所指定的格式一一录入到一个新的字符串内，那么 <span style="color:red">这个新的字符串可能会直接返回给我们也可能会写入到文件或者某些在可变参数中所指定的内存区域当中去</span> ，这其实并不重要，我们需要明白的是在上面所提到的 [[格式化模板]] 的说话
 
@@ -3890,5 +4102,295 @@ gcc helloworld.o -o helloworld.exe
     - [[z]]：指定 [[x]] 进行长度补正时所使用的数值
 
 
+<br/>
+
+### 控制台
+<span id="控制台"></span>
+
+---
+
+[前面](#在c语言中三种特殊的系统文件) 提到过，一个应用程序在启动的时候会打开三种特殊的系统文件，当这三种特殊的系统文件被打开后同时也会开启相对应的 <span style="color:red">作为程序与设备之间进行数据沟通的桥梁</span> 的缓冲区，那么在 c 中，这三种系统文件将以宏定义文件指针的形式长存在当前程序运行时的内存当中，它们分别为 [[stdin]] [[stdout]] [[stderr]]，而对于操作控制台的API来说，其实就是针对这几种特殊系统文件的缓冲区 ( 即 [[stdin]] [[stdout]] [[stderr]] ) 进行读写操作
 
 
+#### int printf(char const* const format, ...)
+##### <stdio.h>
+
+将 [format形参](#形参format) 所提供的格式化模板再结合所录入的可变参数 [[...]] 生成一个新的字符串的结果并写入到文件指针 [[stdout]] 所指向的文件的缓冲区内，如果成功返回 [[0]]，如果失败则返回 [[-1]]
+
+```c
+#include <stdio.h>
+
+int main(void){
+
+    printf("Hello,World!");
+    return 0;
+}
+```
+
+<br/>
+
+#### int scanf(const char * format, ...)
+##### <stdio.h>
+
+将 [format形参](#形参format) 所提供的格式化模式从文件指针 [[stdin]] 所指向的文件的缓冲区内取出数据，以 [[\n]] 作为此次从 [[stdin]] 缓冲区中取出数据的结束标识符，取出的数据依次写入到所指定的可变参数 [[...]] 所使用的内存空间当中，如果成功返回 [[0]]，如果失败则返回 [[-1]]
+
+由于此操作是从 [[stdin]] 中取出数据，也就意味着在调用该函数时会有一个阻塞的过程等待着我们的 [[input]] 设备去录入即将要输入到缓冲区中的数据
+
+对于 [[scanf]] 函数来说，录入字符串是存在一定的安全隐患的，比如说用户所输入的数据长度是 10 位，但是我们用于接受从 [[stdin]] 中所采集到的数据的可变参数 <kbd>char []</kbd> 的长度只有 5 位，但是 [[scanf]] 函数也会把所所有数据录入的数据填充进长度仅有五位的字符数组当中，这也就意味着可能会产生 [[野指针]] 的数据，而对于编译器而言，它也认为使用它来录入字符串会存在安全性的问题，故可能在编译的过程中弹出 [[canf 4996]] 的错误，解决这一错误只需定义一个 [[#define _CRT_SECURE_NO_WARNINGS]] 的宏即可解决
+
+```c
+#include <stdio.h>
+
+int main(void){
+
+	int a;
+	scanf("%d", &a);
+	printf("%d\n", a);
+
+    return 0;
+}
+```
+
+<br/>
+
+#### int getchar()
+##### <stdio.h>
+
+从文件缓冲区 [[stdin]] 中读取所输入的一个 [[char]] 字符，以 [[\n]] 作为此次从 [[stdin]] 缓冲区中取出数据的结束标识符
+
+由于此操作是从 [[stdin]] 中取出数据，也就意味着在调用该函数时会有一个阻塞的过程等待着我们的 [[input]] 设备去录入即将要输入到缓冲区中的数据
+
+```c
+#include <stdio.h>
+
+int main(void){
+
+    char ch = getchar();
+    printf("%c\n",ch);
+
+    return 0;
+}
+```
+
+<br/>
+
+#### int putchar(int character)
+##### <stdio.h>
+
+将字符 [[character]] 写入到文件指针 [[stdout]] 所指向文件的缓冲区当中，如果成功返回 [[0]]，如果失败则返回 [[-1]]
+
+```c
+#include <stdio.h>
+
+int main(void){
+
+    putchar('o');
+    putchar('k');
+    putchar('\n');
+
+    return 0;
+}
+```
+
+<br/>
+
+#### char *gets(char *str)
+##### <stdio.h>
+
+从文件指针 [[stdin]] 所指向的文件的缓冲区内获取数据，以 [[\n]] 作为此次从 [[stdin]] 缓冲区中取出数据的结束标识符，把所读取到的内容填充至形参 [[str]] 所指向的内存空间内并返回该内存空间的首地址，如果调用失败，则返回 [[NULL]]
+
+该函数所给定的参数 [[str]] 必须为一个字符数组以保证写入权限，如果给定的是一个字符指针形式的字符串的话，该函数则会调用失败，因为该函数会逐地址写入所录入的字符
+
+由于此操作是从 [[stdin]] 中取出数据，也就意味着在调用该函数时会有一个阻塞的过程等待着我们的 [[input]] 设备去录入即将要输入到缓冲区中的数据
+
+在函数调用完成后，会根据所录入的数据的结尾添加字符串标识符 [[\0]] 
+
+对于 [[gets]] 函数来说，录入字符串是存在一定的安全隐患的，比如说用户所输入的数据长度是 10 位，但是我们用于接受从 [[stdin]] 中所采集到的数据的可变参数 <kbd>char []</kbd> 的长度只有 5 位，但是 [[gets]] 函数也会把所所有数据录入的数据填充进长度仅有五位的字符数组当中，这也就意味着可能会产生 [[野指针]] 的数据
+
+```c
+#include <stdio.h>
+
+int main(void){
+
+	char str[32] = { 0 };
+	gets(str);
+
+	printf("%s\n", str);
+
+    return 0;
+}
+```
+
+<br/>
+
+#### int puts(const char *str)
+##### <stdio.h>
+
+将字符串 [[str]] 写入到文件指针 [[stdout]] 所指向文件的缓冲区当中，并且所输出的字符串的最后一位会添加一个 [[\n]] 的字符，如果调用成功返回 [[0]]，如果失败则返回 [[-1]]
+
+```c
+#include <stdio.h>
+
+int main(void){
+
+    puts("Hello,World!");
+    return 0;
+}
+```
+
+<br/>
+
+#### int _getch()
+##### <conio.h>
+
+从文件缓冲区 [stdin] 中以 <span style = "color:red">无回显</span> 的方式读取所输入的一个 [[char]] 字符，无回显的方式意味着该函数不需要以 [[\n]] 作为此次从 [[stdin]] 缓冲区中取出数据的结束标识符，并且我们所键入的字符不会再输入到 [[stdout]] 中显示在控制台上
+
+由于此操作是从 [[stdin]] 中取出数据，也就意味着在调用该函数时会有一个阻塞的过程等待着我们的 [[input]] 设备去录入即将要输入到缓冲区中的数据
+
+```c
+#include <stdio.h>
+#include <conio.h>
+
+int main(void){
+
+    char ch = _getch();
+	printf("%c\n", ch);
+
+    return 0;
+}
+```
+
+<br/>
+
+#### int kbhit()
+##### <conio.h>
+
+以 <span style = "color:red">非阻塞</span> 的方式检查 [[stdin]] 中是否有新的数据写入，即检查是否有键盘得输入操作，如果有，则返回 [[1]]，如果没有，则返回 [[0]]
+
+```c
+#include <stdio.h>
+#include <conio.h>
+
+int main(){
+
+    while (1) {
+
+        if (kbhit()) {
+        
+            printf("%c", _getch());
+        }
+    }
+
+    return 0;
+}
+```
+
+<br/>
+
+### Windows.h
+<span id="Windows.h"></span>
+
+---
+
+#### int system(const char *command)
+
+执行系统命令 [[command]]，如果成功返回 [[0]]，如果失败则返回 [[-1]]
+
+该函数会形成阻塞，直至系统命令执行完成或关闭
+
+- [[command]]
+    - [[pause]]：控制台程序暂停，形成阻塞，直至用户下一次键入 [[\n]] 则恢复调用
+    - [[cls]]：清屏
+    - [[cmd]]：打开控制台终端
+    - [[mspaint]]：打开 Windows 画图 终端
+    - [[calc]]：打开计算器终端
+
+```c
+#include <Windows.h>
+
+int main(void){
+
+    system("pause");
+    return 0;
+}
+```
+
+<br/>
+
+#### int Sleep(long millisecond)
+
+当前上下文线程休眠 [[millisecond]] 毫秒，如果成功返回 [[0]]，如果失败则返回 [[-1]]
+
+```c
+#include <stdio.h>
+#include <Windows.h>
+
+int main(void){
+
+	Sleep(3000);
+	printf("%s\n", "Hello,World!");
+
+    return 0;
+}
+```
+
+<br/>
+
+### stdlib.h
+<span id="stdlib.h"></span>
+
+---
+
+#### void srand(int value)
+
+添加一个 <span style="color:red">随机数种子</span>，重置函数 [[rand]] 的随机数计数标识，如果在使用函数 [[rand]] 获取随机数之前没有添加随机数种子，则获取到的是一个伪随机数
+
+```c
+#include <stdlib>
+#include <time.h>
+
+int main(void){
+
+    srand(time(NULL));
+
+    return 0;
+}
+```
+
+<br/>
+
+#### int rand(void)
+
+获取一个随机数，如果在调用该函数前不进行随机数种子的种植操作 [[srand]] ，则该函数所获取到的随机数是一个伪随机数，伪随机数即不是真正的随机数，虽然每次调用该函数后获取到的随机数都不一样，但程序进行了重启后，我们会发现再次获取随机数的结果和重启前的结果是一模一样的，即不是真正的随机数
+
+```c
+#include <stdlib>
+#include <time.h>
+
+int main(void){
+
+    srand(time(NULL));
+	for (size_t i = 0; i < 10; i++) {
+
+		printf("%d\n", rand());
+	}
+
+    return 0;
+}
+```
+
+<br/>
+
+#### void exit(int code)
+
+退出当前进程，[[code]] 则为退出标识，是正常退出 [[0]] 还是异常退出 [[-1]]，在 [[main]] 函数调用完成后的也是通过该函数来退出进程，并且根据 [[main]] 函数的返回值来赋值 [[code]] 形参
+
+```c
+#include <stdlib.h>
+
+int main(void){
+
+    exit(0);
+    return 0;
+}
+```
