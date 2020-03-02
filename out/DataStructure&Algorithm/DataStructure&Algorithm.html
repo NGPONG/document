@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>DataStructure&Algorithm.md</title>
+
+<!-- official styles start -->
+<!-- markdown.css -->
+<link rel="stylesheet" type="text/css" href="data:text/css;base64,LyotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KICogIENvcHlyaWdodCAoYykgTWljcm9zb2Z0IENvcnBvcmF0aW9uLiBBbGwgcmlnaHRzIHJlc2VydmVkLgogKiAgTGljZW5zZWQgdW5kZXIgdGhlIE1JVCBMaWNlbnNlLiBTZWUgTGljZW5zZS50eHQgaW4gdGhlIHByb2plY3Qgcm9vdCBmb3IgbGljZW5zZSBpbmZvcm1hdGlvbi4KICotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSovCgpodG1sLCBib2R5IHsKCWZvbnQtZmFtaWx5OiB2YXIoLS12c2NvZGUtbWFya2Rvd24tZm9udC1mYW1pbHksIC1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgIlNlZ29lIFdQQyIsICJTZWdvZSBVSSIsICJVYnVudHUiLCAiRHJvaWQgU2FucyIsIHNhbnMtc2VyaWYpOwoJZm9udC1zaXplOiB2YXIoLS12c2NvZGUtbWFya2Rvd24tZm9udC1zaXplLCAxNHB4KTsKCXBhZGRpbmc6IDAgMjZweDsKCWxpbmUtaGVpZ2h0OiB2YXIoLS12c2NvZGUtbWFya2Rvd24tbGluZS1oZWlnaHQsIDIycHgpOwoJd29yZC13cmFwOiBicmVhay13b3JkOwp9CgojY29kZS1jc3Atd2FybmluZyB7Cglwb3NpdGlvbjogZml4ZWQ7Cgl0b3A6IDA7CglyaWdodDogMDsKCWNvbG9yOiB3aGl0ZTsKCW1hcmdpbjogMTZweDsKCXRleHQtYWxpZ246IGNlbnRlcjsKCWZvbnQtc2l6ZTogMTJweDsKCWZvbnQtZmFtaWx5OiBzYW5zLXNlcmlmOwoJYmFja2dyb3VuZC1jb2xvcjojNDQ0NDQ0OwoJY3Vyc29yOiBwb2ludGVyOwoJcGFkZGluZzogNnB4OwoJYm94LXNoYWRvdzogMXB4IDFweCAxcHggcmdiYSgwLDAsMCwuMjUpOwp9CgojY29kZS1jc3Atd2FybmluZzpob3ZlciB7Cgl0ZXh0LWRlY29yYXRpb246IG5vbmU7CgliYWNrZ3JvdW5kLWNvbG9yOiMwMDdhY2M7Cglib3gtc2hhZG93OiAycHggMnB4IDJweCByZ2JhKDAsMCwwLC4yNSk7Cn0KCmJvZHkuc2Nyb2xsQmV5b25kTGFzdExpbmUgewoJbWFyZ2luLWJvdHRvbTogY2FsYygxMDB2aCAtIDIycHgpOwp9Cgpib2R5LnNob3dFZGl0b3JTZWxlY3Rpb24gLmNvZGUtbGluZSB7Cglwb3NpdGlvbjogcmVsYXRpdmU7Cn0KCmJvZHkuc2hvd0VkaXRvclNlbGVjdGlvbiAuY29kZS1hY3RpdmUtbGluZTpiZWZvcmUsCmJvZHkuc2hvd0VkaXRvclNlbGVjdGlvbiAuY29kZS1saW5lOmhvdmVyOmJlZm9yZSB7Cgljb250ZW50OiAiIjsKCWRpc3BsYXk6IGJsb2NrOwoJcG9zaXRpb246IGFic29sdXRlOwoJdG9wOiAwOwoJbGVmdDogLTEycHg7CgloZWlnaHQ6IDEwMCU7Cn0KCmJvZHkuc2hvd0VkaXRvclNlbGVjdGlvbiBsaS5jb2RlLWFjdGl2ZS1saW5lOmJlZm9yZSwKYm9keS5zaG93RWRpdG9yU2VsZWN0aW9uIGxpLmNvZGUtbGluZTpob3ZlcjpiZWZvcmUgewoJbGVmdDogLTMwcHg7Cn0KCi52c2NvZGUtbGlnaHQuc2hvd0VkaXRvclNlbGVjdGlvbiAuY29kZS1hY3RpdmUtbGluZTpiZWZvcmUgewoJYm9yZGVyLWxlZnQ6IDNweCBzb2xpZCByZ2JhKDAsIDAsIDAsIDAuMTUpOwp9CgoudnNjb2RlLWxpZ2h0LnNob3dFZGl0b3JTZWxlY3Rpb24gLmNvZGUtbGluZTpob3ZlcjpiZWZvcmUgewoJYm9yZGVyLWxlZnQ6IDNweCBzb2xpZCByZ2JhKDAsIDAsIDAsIDAuNDApOwp9CgoudnNjb2RlLWxpZ2h0LnNob3dFZGl0b3JTZWxlY3Rpb24gLmNvZGUtbGluZSAuY29kZS1saW5lOmhvdmVyOmJlZm9yZSB7Cglib3JkZXItbGVmdDogbm9uZTsKfQoKLnZzY29kZS1kYXJrLnNob3dFZGl0b3JTZWxlY3Rpb24gLmNvZGUtYWN0aXZlLWxpbmU6YmVmb3JlIHsKCWJvcmRlci1sZWZ0OiAzcHggc29saWQgcmdiYSgyNTUsIDI1NSwgMjU1LCAwLjQpOwp9CgoudnNjb2RlLWRhcmsuc2hvd0VkaXRvclNlbGVjdGlvbiAuY29kZS1saW5lOmhvdmVyOmJlZm9yZSB7Cglib3JkZXItbGVmdDogM3B4IHNvbGlkIHJnYmEoMjU1LCAyNTUsIDI1NSwgMC42MCk7Cn0KCi52c2NvZGUtZGFyay5zaG93RWRpdG9yU2VsZWN0aW9uIC5jb2RlLWxpbmUgLmNvZGUtbGluZTpob3ZlcjpiZWZvcmUgewoJYm9yZGVyLWxlZnQ6IG5vbmU7Cn0KCi52c2NvZGUtaGlnaC1jb250cmFzdC5zaG93RWRpdG9yU2VsZWN0aW9uIC5jb2RlLWFjdGl2ZS1saW5lOmJlZm9yZSB7Cglib3JkZXItbGVmdDogM3B4IHNvbGlkIHJnYmEoMjU1LCAxNjAsIDAsIDAuNyk7Cn0KCi52c2NvZGUtaGlnaC1jb250cmFzdC5zaG93RWRpdG9yU2VsZWN0aW9uIC5jb2RlLWxpbmU6aG92ZXI6YmVmb3JlIHsKCWJvcmRlci1sZWZ0OiAzcHggc29saWQgcmdiYSgyNTUsIDE2MCwgMCwgMSk7Cn0KCi52c2NvZGUtaGlnaC1jb250cmFzdC5zaG93RWRpdG9yU2VsZWN0aW9uIC5jb2RlLWxpbmUgLmNvZGUtbGluZTpob3ZlcjpiZWZvcmUgewoJYm9yZGVyLWxlZnQ6IG5vbmU7Cn0KCmltZyB7CgltYXgtd2lkdGg6IDEwMCU7CgltYXgtaGVpZ2h0OiAxMDAlOwp9CgphIHsKCXRleHQtZGVjb3JhdGlvbjogbm9uZTsKfQoKYTpob3ZlciB7Cgl0ZXh0LWRlY29yYXRpb246IHVuZGVybGluZTsKfQoKYTpmb2N1cywKaW5wdXQ6Zm9jdXMsCnNlbGVjdDpmb2N1cywKdGV4dGFyZWE6Zm9jdXMgewoJb3V0bGluZTogMXB4IHNvbGlkIC13ZWJraXQtZm9jdXMtcmluZy1jb2xvcjsKCW91dGxpbmUtb2Zmc2V0OiAtMXB4Owp9CgpociB7Cglib3JkZXI6IDA7CgloZWlnaHQ6IDJweDsKCWJvcmRlci1ib3R0b206IDJweCBzb2xpZDsKfQoKaDEgewoJcGFkZGluZy1ib3R0b206IDAuM2VtOwoJbGluZS1oZWlnaHQ6IDEuMjsKCWJvcmRlci1ib3R0b20td2lkdGg6IDFweDsKCWJvcmRlci1ib3R0b20tc3R5bGU6IHNvbGlkOwp9CgpoMSwgaDIsIGgzIHsKCWZvbnQtd2VpZ2h0OiBub3JtYWw7Cn0KCnRhYmxlIHsKCWJvcmRlci1jb2xsYXBzZTogY29sbGFwc2U7Cn0KCnRhYmxlID4gdGhlYWQgPiB0ciA+IHRoIHsKCXRleHQtYWxpZ246IGxlZnQ7Cglib3JkZXItYm90dG9tOiAxcHggc29saWQ7Cn0KCnRhYmxlID4gdGhlYWQgPiB0ciA+IHRoLAp0YWJsZSA+IHRoZWFkID4gdHIgPiB0ZCwKdGFibGUgPiB0Ym9keSA+IHRyID4gdGgsCnRhYmxlID4gdGJvZHkgPiB0ciA+IHRkIHsKCXBhZGRpbmc6IDVweCAxMHB4Owp9Cgp0YWJsZSA+IHRib2R5ID4gdHIgKyB0ciA+IHRkIHsKCWJvcmRlci10b3A6IDFweCBzb2xpZDsKfQoKYmxvY2txdW90ZSB7CgltYXJnaW46IDAgN3B4IDAgNXB4OwoJcGFkZGluZzogMCAxNnB4IDAgMTBweDsKCWJvcmRlci1sZWZ0LXdpZHRoOiA1cHg7Cglib3JkZXItbGVmdC1zdHlsZTogc29saWQ7Cn0KCmNvZGUgewoJZm9udC1mYW1pbHk6IE1lbmxvLCBNb25hY28sIENvbnNvbGFzLCAiRHJvaWQgU2FucyBNb25vIiwgIkNvdXJpZXIgTmV3IiwgbW9ub3NwYWNlLCAiRHJvaWQgU2FucyBGYWxsYmFjayI7Cglmb250LXNpemU6IDFlbTsKCWxpbmUtaGVpZ2h0OiAxLjM1N2VtOwp9Cgpib2R5LndvcmRXcmFwIHByZSB7Cgl3aGl0ZS1zcGFjZTogcHJlLXdyYXA7Cn0KCnByZTpub3QoLmhsanMpLApwcmUuaGxqcyBjb2RlID4gZGl2IHsKCXBhZGRpbmc6IDE2cHg7Cglib3JkZXItcmFkaXVzOiAzcHg7CglvdmVyZmxvdzogYXV0bzsKfQoKcHJlIGNvZGUgewoJY29sb3I6IHZhcigtLXZzY29kZS1lZGl0b3ItZm9yZWdyb3VuZCk7Cgl0YWItc2l6ZTogNDsKfQoKLyoqIFRoZW1pbmcgKi8KCi52c2NvZGUtbGlnaHQgcHJlIHsKCWJhY2tncm91bmQtY29sb3I6IHJnYmEoMjIwLCAyMjAsIDIyMCwgMC40KTsKfQoKLnZzY29kZS1kYXJrIHByZSB7CgliYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDEwLCAxMCwgMTAsIDAuNCk7Cn0KCi52c2NvZGUtaGlnaC1jb250cmFzdCBwcmUgewoJYmFja2dyb3VuZC1jb2xvcjogcmdiKDAsIDAsIDApOwp9CgoudnNjb2RlLWhpZ2gtY29udHJhc3QgaDEgewoJYm9yZGVyLWNvbG9yOiByZ2IoMCwgMCwgMCk7Cn0KCi52c2NvZGUtbGlnaHQgdGFibGUgPiB0aGVhZCA+IHRyID4gdGggewoJYm9yZGVyLWNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuNjkpOwp9CgoudnNjb2RlLWRhcmsgdGFibGUgPiB0aGVhZCA+IHRyID4gdGggewoJYm9yZGVyLWNvbG9yOiByZ2JhKDI1NSwgMjU1LCAyNTUsIDAuNjkpOwp9CgoudnNjb2RlLWxpZ2h0IGgxLAoudnNjb2RlLWxpZ2h0IGhyLAoudnNjb2RlLWxpZ2h0IHRhYmxlID4gdGJvZHkgPiB0ciArIHRyID4gdGQgewoJYm9yZGVyLWNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuMTgpOwp9CgoudnNjb2RlLWRhcmsgaDEsCi52c2NvZGUtZGFyayBociwKLnZzY29kZS1kYXJrIHRhYmxlID4gdGJvZHkgPiB0ciArIHRyID4gdGQgewoJYm9yZGVyLWNvbG9yOiByZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMTgpOwp9Cg=="/>
+<!-- highlight.css -->
+<link rel="stylesheet" type="text/css" href="data:text/css;base64,LyoKaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2lzYWdhbGFldi9oaWdobGlnaHQuanMvbWFzdGVyL3NyYy9zdHlsZXMvdnMyMDE1LmNzcwoqLwovKgogKiBWaXN1YWwgU3R1ZGlvIDIwMTUgZGFyayBzdHlsZQogKiBBdXRob3I6IE5pY29sYXMgTExPQkVSQSA8bmxsb2JlcmFAZ21haWwuY29tPgogKi8KCgouaGxqcy1rZXl3b3JkLAouaGxqcy1saXRlcmFsLAouaGxqcy1zeW1ib2wsCi5obGpzLW5hbWUgewoJY29sb3I6ICM1NjlDRDY7Cn0KLmhsanMtbGluayB7Cgljb2xvcjogIzU2OUNENjsKCXRleHQtZGVjb3JhdGlvbjogdW5kZXJsaW5lOwp9CgouaGxqcy1idWlsdF9pbiwKLmhsanMtdHlwZSB7Cgljb2xvcjogIzRFQzlCMDsKfQoKLmhsanMtbnVtYmVyLAouaGxqcy1jbGFzcyB7Cgljb2xvcjogI0I4RDdBMzsKfQoKLmhsanMtc3RyaW5nLAouaGxqcy1tZXRhLXN0cmluZyB7Cgljb2xvcjogI0Q2OUQ4NTsKfQoKLmhsanMtcmVnZXhwLAouaGxqcy10ZW1wbGF0ZS10YWcgewoJY29sb3I6ICM5QTUzMzQ7Cn0KCi5obGpzLXN1YnN0LAouaGxqcy1mdW5jdGlvbiwKLmhsanMtdGl0bGUsCi5obGpzLXBhcmFtcywKLmhsanMtZm9ybXVsYSB7Cgljb2xvcjogI0RDRENEQzsKfQoKLmhsanMtY29tbWVudCwKLmhsanMtcXVvdGUgewoJY29sb3I6ICM1N0E2NEE7Cglmb250LXN0eWxlOiBpdGFsaWM7Cn0KCi5obGpzLWRvY3RhZyB7Cgljb2xvcjogIzYwOEI0RTsKfQoKLmhsanMtbWV0YSwKLmhsanMtbWV0YS1rZXl3b3JkLAouaGxqcy10YWcgewoJY29sb3I6ICM5QjlCOUI7Cn0KCi5obGpzLXZhcmlhYmxlLAouaGxqcy10ZW1wbGF0ZS12YXJpYWJsZSB7Cgljb2xvcjogI0JENjNDNTsKfQoKLmhsanMtYXR0ciwKLmhsanMtYXR0cmlidXRlLAouaGxqcy1idWlsdGluLW5hbWUgewoJY29sb3I6ICM5Q0RDRkU7Cn0KCi5obGpzLXNlY3Rpb24gewoJY29sb3I6IGdvbGQ7Cn0KCi5obGpzLWVtcGhhc2lzIHsKCWZvbnQtc3R5bGU6IGl0YWxpYzsKfQoKLmhsanMtc3Ryb25nIHsKCWZvbnQtd2VpZ2h0OiBib2xkOwp9CgovKi5obGpzLWNvZGUgewoJZm9udC1mYW1pbHk6J01vbm9zcGFjZSc7Cn0qLwoKLmhsanMtYnVsbGV0LAouaGxqcy1zZWxlY3Rvci10YWcsCi5obGpzLXNlbGVjdG9yLWlkLAouaGxqcy1zZWxlY3Rvci1jbGFzcywKLmhsanMtc2VsZWN0b3ItYXR0ciwKLmhsanMtc2VsZWN0b3ItcHNldWRvIHsKCWNvbG9yOiAjRDdCQTdEOwp9CgouaGxqcy1hZGRpdGlvbiB7CgliYWNrZ3JvdW5kLWNvbG9yOiB2YXIoLS12c2NvZGUtZGlmZkVkaXRvci1pbnNlcnRlZFRleHRCYWNrZ3JvdW5kLCByZ2JhKDE1NSwgMTg1LCA4NSwgMC4yKSk7Cgljb2xvcjogcmdiKDE1NSwgMTg1LCA4NSk7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7Cgl3aWR0aDogMTAwJTsKfQoKLmhsanMtZGVsZXRpb24gewoJYmFja2dyb3VuZDogdmFyKC0tdnNjb2RlLWRpZmZFZGl0b3ItcmVtb3ZlZFRleHRCYWNrZ3JvdW5kLCByZ2JhKDI1NSwgMCwgMCwgMC4yKSk7Cgljb2xvcjogcmdiKDI1NSwgMCwgMCk7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7Cgl3aWR0aDogMTAwJTsKfQoKCi8qCkZyb20gaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2lzYWdhbGFldi9oaWdobGlnaHQuanMvbWFzdGVyL3NyYy9zdHlsZXMvdnMuY3NzCiovCi8qCgpWaXN1YWwgU3R1ZGlvLWxpa2Ugc3R5bGUgYmFzZWQgb24gb3JpZ2luYWwgQyMgY29sb3JpbmcgYnkgSmFzb24gRGlhbW9uZCA8amFzb25AZGlhbW9uZC5uYW1lPgoKKi8KCi52c2NvZGUtbGlnaHQgLmhsanMtZnVuY3Rpb24sCi52c2NvZGUtbGlnaHQgLmhsanMtcGFyYW1zLAoudnNjb2RlLWxpZ2h0IC5obGpzLW51bWJlciwKLnZzY29kZS1saWdodCAuaGxqcy1jbGFzcyAgewoJY29sb3I6IGluaGVyaXQ7Cn0KCi52c2NvZGUtbGlnaHQgLmhsanMtY29tbWVudCwKLnZzY29kZS1saWdodCAuaGxqcy1xdW90ZSwKLnZzY29kZS1saWdodCAuaGxqcy1udW1iZXIsCi52c2NvZGUtbGlnaHQgLmhsanMtY2xhc3MsCi52c2NvZGUtbGlnaHQgLmhsanMtdmFyaWFibGUgewoJY29sb3I6ICMwMDgwMDA7Cn0KCi52c2NvZGUtbGlnaHQgLmhsanMta2V5d29yZCwKLnZzY29kZS1saWdodCAuaGxqcy1zZWxlY3Rvci10YWcsCi52c2NvZGUtbGlnaHQgLmhsanMtbmFtZSwKLnZzY29kZS1saWdodCAuaGxqcy10YWcgewoJY29sb3I6ICMwMGY7Cn0KCi52c2NvZGUtbGlnaHQgLmhsanMtYnVpbHRfaW4sCi52c2NvZGUtbGlnaHQgLmhsanMtYnVpbHRpbi1uYW1lIHsKCWNvbG9yOiAjMDA3YWNjOwp9CgoudnNjb2RlLWxpZ2h0IC5obGpzLXN0cmluZywKLnZzY29kZS1saWdodCAuaGxqcy1zZWN0aW9uLAoudnNjb2RlLWxpZ2h0IC5obGpzLWF0dHJpYnV0ZSwKLnZzY29kZS1saWdodCAuaGxqcy1saXRlcmFsLAoudnNjb2RlLWxpZ2h0IC5obGpzLXRlbXBsYXRlLXRhZywKLnZzY29kZS1saWdodCAuaGxqcy10ZW1wbGF0ZS12YXJpYWJsZSwKLnZzY29kZS1saWdodCAuaGxqcy10eXBlIHsKCWNvbG9yOiAjYTMxNTE1Owp9CgoudnNjb2RlLWxpZ2h0IC5obGpzLXNlbGVjdG9yLWF0dHIsCi52c2NvZGUtbGlnaHQgLmhsanMtc2VsZWN0b3ItcHNldWRvLAoudnNjb2RlLWxpZ2h0IC5obGpzLW1ldGEsCi52c2NvZGUtbGlnaHQgLmhsanMtbWV0YS1rZXl3b3JkIHsKCWNvbG9yOiAjMmI5MWFmOwp9CgoudnNjb2RlLWxpZ2h0IC5obGpzLXRpdGxlLAoudnNjb2RlLWxpZ2h0IC5obGpzLWRvY3RhZyB7Cgljb2xvcjogIzgwODA4MDsKfQoKLnZzY29kZS1saWdodCAuaGxqcy1hdHRyIHsKCWNvbG9yOiAjZjAwOwp9CgoudnNjb2RlLWxpZ2h0IC5obGpzLXN5bWJvbCwKLnZzY29kZS1saWdodCAuaGxqcy1idWxsZXQsCi52c2NvZGUtbGlnaHQgLmhsanMtbGluayB7Cgljb2xvcjogIzAwYjBlODsKfQoKCi52c2NvZGUtbGlnaHQgLmhsanMtZW1waGFzaXMgewoJZm9udC1zdHlsZTogaXRhbGljOwp9CgoudnNjb2RlLWxpZ2h0IC5obGpzLXN0cm9uZyB7Cglmb250LXdlaWdodDogYm9sZDsKfQo="/>
+<!-- official styles end -->
+
+<!-- third party styles start -->
+<!-- markdown-it-admonition.css -->
+<link rel="stylesheet" type="text/css" href="data:text/css;base64,QGZvbnQtZmFjZSB7CiAgZm9udC1mYW1pbHk6ICJNYXRlcmlhbCBJY29ucyI7CiAgZm9udC1zdHlsZTogbm9ybWFsOwogIGZvbnQtd2VpZ2h0OiA0MDA7CiAgc3JjOiBsb2NhbCgiTWF0ZXJpYWwgSWNvbnMiKSwgbG9jYWwoIk1hdGVyaWFsSWNvbnMtUmVndWxhciIpLCB1cmwoImRhdGE6YXBwbGljYXRpb24veC1mb250LXdvZmY7Y2hhcnNldD11dGYtODtiYXNlNjQsZDA5R1JnQUJBQUFBQUFmSUFBc0FBQUFBRERBQUFRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUJIVTFWQ0FBQUJDQUFBQURNQUFBQkNzUDZ6N1U5VEx6SUFBQUU4QUFBQVJBQUFBRlpXN2tvc1kyMWhjQUFBQVlBQUFBRFRBQUFDanRQNnl0Qm5iSGxtQUFBQ1ZBQUFBeGdBQUFRNHpSdHZsR2hsWVdRQUFBVnNBQUFBTHdBQUFEWVJ3WnNuYUdobFlRQUFCWndBQUFBY0FBQUFKQWVLQXp4b2JYUjRBQUFGdUFBQUFCSUFBQUE4T0dRQUFHeHZZMkVBQUFYTUFBQUFJQUFBQUNBRzVBZndiV0Y0Y0FBQUJld0FBQUFmQUFBQUlBRWZBRVJ1WVcxbEFBQUdEQUFBQVZjQUFBS0ZrQWhvQzNCdmMzUUFBQWRrQUFBQVlnQUFBSzJ2ejd3a2VKeGpZR1JnWU9CaWtHUFFZV0IwY2ZNSlllQmdZR0dBQUpBTVkwNW1laUpRRE1vRHlyR0FhUTRnWm9PSUFnQ0tJd05QQUhpY1kyQmtQc1E0Z1lHVmdZT3BrK2tNQXdORFA0Um1mTTFneE1qQndNREV3TXJNZ0JVRXBMbW1NRGd3Vkx5NHhLenpYNGNoaHJtSzRRcFFtQkVrQndBWnlneXdlSnpGa3IwTndqQVFoWitURVA2Q1JVZkhCRXdSVVdhUVRJQ3lRYnBNd1JDc2tBNVJVSU9OeEcwUm5uTnBLQUlWNHF6UGt1LzhjMzUzQUNZQVlySWpDV0N1TUFoMnB0ZjAvaGlMM3AvZ3lQVVdhM29zcWx0MEwxenU5cjcxejhkR3JKUnlrRm9hdVhRZDkzMkxqNXZoRytNanhHZVlJOE1LRVRPYk1wc2xmNUV5UDh0Zyt2SHVuNXI1MzlQdmx2WHphVmhSRlZRRFRQRVdLVlFSOTBLaG5uQzVFazY3dlVLTjRWdUZhc00vbGRBUmo0M0NDa0NzRWpwSlNvVlZnUnlVMEdWU0s2d1VwRkZDeDhsRmdYMEJpWHBSUFFCNG5FMlRUV2pjUmhUSDN4dHRwRGh4Tjd1eFBscDN1L0ZLN21vUlBpeGFmUmlqTm9zeFN3L0xVc0l3TmNhRUhQWmdnby9GbUVLTUNLV1U0a05PT2Z0UVNsaEU4YWxuSDBJeDlCcVduSG9vUFJyVFEwK21udTJiWFR1MnBQZEdNOUxNLzZjM2Z3RUNUTTRnQkJNWVFOcXh6THJaQWpxWVNscXUyVEFIWlFBMC9EUUpINkZ0enFHRG52YnQ0R2d3dnp3L25MOEVmSDhrVzBmc3VScWhnV1hablk3TTFwaWNhVUw3RHU1QkhlRHpNSWw4M2RBdDAxNndIMXFtdnRTTW81UjZZUkpIVFIvL0ZYc2ZmL25qL3RjLzVLOVA1ZCtuUDIyK2ZGSzV1N3YzSzM5U1czeStPdERLTzNMODV2RDA5UEQ5ejVYMTdhMk4xZzR0cWswMVJscVg3Z3lvRW1uc1dRdFZyNHJ0Wk1tdWtFYUZCWnh6ZWZrQ24xMWN5S01MWmdzaFJ3Z1RZTm9MTlhDQnoyamE3SHZaRzdoRHBQU05mb281dnMwa25LLzloYityTnB1KzhrSFBnay9BbzRrSzN0V3RUcFNFdHZrQTljK3dFNlVhVWR3aWVOa2FIZzU1dEJFdFJpRVB3MXMwK0Z0cnRUY2M5dHdvMmxoTWtuVjdQWkYvY3M2K3VVRlRtcFRHYkV4N3NRQ1BTTE90dEhTM0dSbHRxcDdTTnpWU0t6bDZhV25aVC9DWDVrNi92OU4zSGg4ZkhCd2ZmSlZqaHJDNk9nSDVka0l0L3RQc3ErZC9QRDVRejdHN2VmenExVEhGamRaVlBlL042dWxRM0puRFdTRTVqdW5zRnNWSWlGd0wvaHRmMVM1Z0ozQmZPY1V4ZkhLTG56cXBGcHlmWjljWCsvNVdCNmErWTBwSHB6a05yWU5WRHdNc2lrSyt5N1d1TENSZy9vRkhrQThWVDNyRGc1Wm5VNmt0enpJTnltVjBtNzRYZDVwZklHWHlGZVZFUVNTaGt6cUc3VEJCYTJPeFZSS2l0TFh2N2gzdXVmdFhuWHE3bHoydFovV25XYTlkeDlkQ2pEaEh6bXVWUUFUbG1sanI5ZFpFclV5ZFNvMkhiaS9iMXZYdHJPZUdDazIvOHMzWmxPOCt1ZUpUOEJWbHc1cEd3Mm9ZY2NkU2lISHF4MFJsYWJIcWROUjlqQUVUbDZQcmVKY1BCbm5mcFRMbk9ROEMzT1Y4QW1RR3pvdVYxaVpkZWI1U1NJb1ZjOFc4L2tjRHRrc1VINUZyVTYvYXFCcU5XY01FenhHNERBUTE0cVJRaGk5bVdVMHJ6ZXBLZXpiamZnQ3dRS3hWWXE1YWpSZ3BScXk0NUNxd2tKeWRjRWtiVGt2Uno4UDUvMlpwRFRONG5HTmdaR0JnQU9LYjZ2Ky94dlBiZkdYZ1ptRUFnZXVCMmtrSSt2OGJGZ2JtS2lDWGc0RUpKQW9BUHlBS2hRQjRuR05nWkdCZzF2bXZ3eEREd2dBQ1FKS1JBUlh3QXdBelpRSFFlSnhqWVFDQ0ZBWUdGZ2JTTVFBY1dBQ2RBQUFBQUFBQUFBd0FMZ0JnQUlRQW1BRFNBUWdCSWdFOEFWQUJvQUhlQWZ3Q0hIaWNZMkJrWUdEZ1o3QmdZR01BQVNZZzVnSkNCb2IvWUQ0REFBL2hBV1FBZUp4bGtidHV3a0FVUk1jODhnQXBRb21VSm9xMFRkSVF6RU9wVURva0tDTlIwQnV6QmlPL3RGNlFTSmNQeUhmbEU5S2x5eWVrejJDdUc4Y3I3NTQ3TTNkOUpRTzR4amNjbko1N3ZpZDJjTUhxeERXYzQwRzRUdjFKdUVGK0ZtNmlqUmZoTStvejRSYTZlQlZ1NHdadnZNRnBYTElhNDBQWVFRZWZ3alZjNFV1NFR2MUh1RUgrRlc3aTFta0tuNkhqM0FtM3NIQzZ3bTA4T3U4dHBTWkdlMWF2MVBLZ2dqU3hQZDh6SnRTR1R1aW55VkdhNi9VdThreFpsdWRDbXp4TUV6VjBCNlUwMDRrMjVXMzVmajJ5TmxDQlNXTTFwYXVqS0ZXWlNiZmF0KzdHMm16Yzd3ZWl1MzRhY3p6Rk5ZR0JoZ2ZMZmNWNmlRUDNBQ2tTYWozNDlBeFhTTjlJVDBqMTZKZXBPYjAxZG9pS2JOV3Qxb3ZpcHB6NnNWWVl3c1hnWDJyR1ZGSWtxN1BsMlBOckk2cVc2ZU9zaGoweGFTcTltcE5FWklXczhMWlVmT291TmtWWHhwL2Q1d29xZWJlWUlmNEQySjF5d1FCNG5HM0xPdzZBSUJBRTBCMzg0QitQQWtnRWErUXdOblltSHQrRXBYU2FsNWxrU0JCbm9QOG9DRlNvMGFDRlJJY2VBMFpNbUxGQVlTVzg4cm12dE1VakczUmlROUh2cGZ1c002eldObXRjNUgvaVBld2hhNTB0T3Q1UFMvUUJ4MkllU3dBQSIpIGZvcm1hdCgid29mZiIpOwp9CgouYWRtb25pdGlvbiB7CiAgYm94LXNoYWRvdzogMCAycHggMnB4IDAgcmdiYSgwLCAwLCAwLCAuMTQpLCAwIDFweCA1cHggMCByZ2JhKDAsIDAsIDAsIC4xMiksIDAgM3B4IDFweCAtMnB4IHJnYmEoMCwgMCwgMCwgLjIpOwogIHBvc2l0aW9uOiByZWxhdGl2ZTsKICBtYXJnaW46IDEuNTYyNWVtIDA7CiAgcGFkZGluZzogMCAxLjJyZW07CiAgYm9yZGVyLWxlZnQ6IC40cmVtIHNvbGlkIHJnYmEoNjgsIDEzOCwgMjU1LCAuOCk7CiAgYm9yZGVyLXJhZGl1czogLjJyZW07CiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgyNTUsIDI1NSwgMjU1LCAwLjA1KTsKICBvdmVyZmxvdzogYXV0bzsKfQoKLmFkbW9uaXRpb24+LmFkbW9uaXRpb24tdGl0bGUgewogIG1hcmdpbjogMCAtMS4ycmVtOwogIHBhZGRpbmc6IC44cmVtIDEuMnJlbSAuOHJlbSAzLjZyZW07CiAgYm9yZGVyLWJvdHRvbTogMXB4IHNvbGlkIHJnYmEoNjgsIDEzOCwgMjU1LCAuMik7CiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSg2OCwgMTM4LCAyNTUsIC4xKTsKICBmb250LXdlaWdodDogNzAwOwp9CgouYWRtb25pdGlvbj4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIHBvc2l0aW9uOiBhYnNvbHV0ZTsKICBsZWZ0OiAxLjJyZW07CiAgZm9udC1zaXplOiAxLjVyZW07CiAgY29sb3I6IHJnYmEoNjgsIDEzOCwgMjU1LCAuOCk7CiAgY29udGVudDogIlxFM0M5IjsKfQoKLmFkbW9uaXRpb24+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlIHsKICBmb250LWZhbWlseTogTWF0ZXJpYWwgSWNvbnM7CiAgZm9udC1zdHlsZTogbm9ybWFsOwogIGZvbnQtdmFyaWFudDogbm9ybWFsOwogIGZvbnQtd2VpZ2h0OiA0MDA7CiAgbGluZS1oZWlnaHQ6IDJyZW07CiAgdGV4dC10cmFuc2Zvcm06IG5vbmU7CiAgd2hpdGUtc3BhY2U6IG5vd3JhcDsKICBzcGVhazogbm9uZTsKICB3b3JkLXdyYXA6IG5vcm1hbDsKICBkaXJlY3Rpb246IGx0cjsKfQoKLmFkbW9uaXRpb24uc3VtbWFyeSwKLmFkbW9uaXRpb24uYWJzdHJhY3QsCi5hZG1vbml0aW9uLnRsZHIgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDAsIDE3NiwgMjU1LCAuOCk7Cn0KCi5hZG1vbml0aW9uLnN1bW1hcnk+LmFkbW9uaXRpb24tdGl0bGUsCi5hZG1vbml0aW9uLmFic3RyYWN0Pi5hZG1vbml0aW9uLXRpdGxlLAouYWRtb25pdGlvbi50bGRyPi5hZG1vbml0aW9uLXRpdGxlIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDE3NiwgMjU1LCAuMSk7CiAgYm9yZGVyLWJvdHRvbS1jb2xvcjogcmdiYSgwLCAxNzYsIDI1NSwgLjIpOwp9CgouYWRtb25pdGlvbi5zdW1tYXJ5Pi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSwKLmFkbW9uaXRpb24uYWJzdHJhY3Q+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlLAouYWRtb25pdGlvbi50bGRyPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSB7CiAgY29sb3I6IHJnYmEoMCwgMTc2LCAyNTUsIDEpOwogIDsKICBjb250ZW50OiAiXEU4RDIiOwp9CgouYWRtb25pdGlvbi5oaW50LAouYWRtb25pdGlvbi50aXAgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDAsIDE5MSwgMTY1LCAuOCk7Cn0KCi5hZG1vbml0aW9uLmhpbnQ+LmFkbW9uaXRpb24tdGl0bGUsCi5hZG1vbml0aW9uLnRpcD4uYWRtb25pdGlvbi10aXRsZSB7CiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgwLCAxOTEsIDE2NSwgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMCwgMTkxLCAxNjUsIC4yKTsKfQoKLmFkbW9uaXRpb24uaGludD4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUsCi5hZG1vbml0aW9uLnRpcD4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIGNvbG9yOiByZ2JhKDAsIDE5MSwgMTY1LCAxKTsKICBjb250ZW50OiAiXEU4MEUiOwp9CgouYWRtb25pdGlvbi5pbmZvLAouYWRtb25pdGlvbi50b2RvIHsKICBib3JkZXItbGVmdC1jb2xvcjogcmdiYSgwLCAxODQsIDIxMiwgLjgpOwp9CgouYWRtb25pdGlvbi5pbmZvPi5hZG1vbml0aW9uLXRpdGxlLAouYWRtb25pdGlvbi50b2RvPi5hZG1vbml0aW9uLXRpdGxlIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDE4NCwgMjEyLCAuMSk7CiAgYm9yZGVyLWJvdHRvbS1jb2xvcjogcmdiYSgwLCAxODQsIDIxMiwgLjIpOwp9CgouYWRtb25pdGlvbi5pbmZvPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSwKLmFkbW9uaXRpb24udG9kbz4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIGNvbG9yOiByZ2JhKDAsIDE4NCwgMjEyLCAxKTsKICA7CiAgY29udGVudDogIlxFODhFIjsKfQoKLmFkbW9uaXRpb24uc3VjY2VzcywKLmFkbW9uaXRpb24uY2hlY2ssCi5hZG1vbml0aW9uLmRvbmUgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDAsIDIwMCwgODMsIC44KTsKfQoKLmFkbW9uaXRpb24uc3VjY2Vzcz4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uY2hlY2s+LmFkbW9uaXRpb24tdGl0bGUsCi5hZG1vbml0aW9uLmRvbmU+LmFkbW9uaXRpb24tdGl0bGUgewogIGJhY2tncm91bmQtY29sb3I6IHJnYmEoMCwgMjAwLCA4MywgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMCwgMjAwLCA4MywgLjIpOwp9CgouYWRtb25pdGlvbi5zdWNjZXNzPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSwKLmFkbW9uaXRpb24uY2hlY2s+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlLAouYWRtb25pdGlvbi5kb25lPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSB7CiAgY29sb3I6IHJnYmEoMCwgMjAwLCA4MywgMSk7CiAgOwogIGNvbnRlbnQ6ICJcRTg3NiI7Cn0KCi5hZG1vbml0aW9uLnF1ZXN0aW9uLAouYWRtb25pdGlvbi5oZWxwLAouYWRtb25pdGlvbi5mYXEgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDEwMCwgMjIxLCAyMywgLjgpOwp9CgouYWRtb25pdGlvbi5xdWVzdGlvbj4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uaGVscD4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uZmFxPi5hZG1vbml0aW9uLXRpdGxlIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDEwMCwgMjIxLCAyMywgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMTAwLCAyMjEsIDIzLCAuMik7Cn0KCi5hZG1vbml0aW9uLnF1ZXN0aW9uPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSwKLmFkbW9uaXRpb24uaGVscD4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUsCi5hZG1vbml0aW9uLmZhcT4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIGNvbG9yOiByZ2JhKDEwMCwgMjIxLCAyMywgMSk7CiAgOwogIGNvbnRlbnQ6ICJcRTg4NyI7Cn0KCi5hZG1vbml0aW9uLndhcm5pbmcsCi5hZG1vbml0aW9uLmF0dGVudGlvbiwKLmFkbW9uaXRpb24uY2F1dGlvbiB7CiAgYm9yZGVyLWxlZnQtY29sb3I6IHJnYmEoMjU1LCAxNDUsIDAsIC44KTsKfQoKLmFkbW9uaXRpb24ud2FybmluZz4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uYXR0ZW50aW9uPi5hZG1vbml0aW9uLXRpdGxlLAouYWRtb25pdGlvbi5jYXV0aW9uPi5hZG1vbml0aW9uLXRpdGxlIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDI1NSwgMTQ1LCAwLCAuMSk7CiAgYm9yZGVyLWJvdHRvbS1jb2xvcjogcmdiYSgyNTUsIDE0NSwgMCwgLjIpOwp9CgouYWRtb25pdGlvbi5hdHRlbnRpb24+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlIHsKICBjb2xvcjogcmdiYSgyNTUsIDE0NSwgMCwgMSk7CiAgY29udGVudDogIlxFNDE3IjsKfQoKLmFkbW9uaXRpb24ud2FybmluZz4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUsCi5hZG1vbml0aW9uLmNhdXRpb24+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlIHsKICBjb2xvcjogcmdiYSgyNTUsIDE0NSwgMCwgMSk7CiAgY29udGVudDogIlxFMDAyIjsKfQoKLmFkbW9uaXRpb24uZmFpbHVyZSwKLmFkbW9uaXRpb24uZmFpbCwKLmFkbW9uaXRpb24ubWlzc2luZyB7CiAgYm9yZGVyLWxlZnQtY29sb3I6IHJnYmEoMjU1LCA4MiwgODIsIC44KTsKfQoKLmFkbW9uaXRpb24uZmFpbHVyZT4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uZmFpbD4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24ubWlzc2luZz4uYWRtb25pdGlvbi10aXRsZSB7CiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgyNTUsIDgyLCA4MiwgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMjU1LCA4MiwgODIsIC4yKTsKfQoKLmFkbW9uaXRpb24uZmFpbHVyZT4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUsCi5hZG1vbml0aW9uLmZhaWw+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlLAouYWRtb25pdGlvbi5taXNzaW5nPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSB7CiAgY29sb3I6IHJnYmEoMjU1LCA4MiwgODIsIDEpOwogIDsKICBjb250ZW50OiAiXEUxNEMiOwp9CgouYWRtb25pdGlvbi5kYW5nZXIsCi5hZG1vbml0aW9uLmVycm9yLAouYWRtb25pdGlvbi5idWcgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDI1NSwgMjMsIDY4LCAuOCk7Cn0KCi5hZG1vbml0aW9uLmRhbmdlcj4uYWRtb25pdGlvbi10aXRsZSwKLmFkbW9uaXRpb24uZXJyb3I+LmFkbW9uaXRpb24tdGl0bGUsCi5hZG1vbml0aW9uLmJ1Zz4uYWRtb25pdGlvbi10aXRsZSB7CiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgyNTUsIDIzLCA2OCwgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMjU1LCAyMywgNjgsIC4yKTsKfQoKLmFkbW9uaXRpb24uZGFuZ2VyPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSB7CiAgY29sb3I6IHJnYmEoMjU1LCAyMywgNjgsIDEpOwogIGNvbnRlbnQ6ICJcRTNFNyI7Cn0KCi5hZG1vbml0aW9uLmVycm9yPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSB7CiAgY29sb3I6IHJnYmEoMjU1LCAyMywgNjgsIDEpOwogIGNvbnRlbnQ6ICJcRTE0QyI7Cn0KCi5hZG1vbml0aW9uLmJ1Zz4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIGNvbG9yOiByZ2JhKDI1NSwgMjMsIDY4LCAxKTsKICBjb250ZW50OiAiXEU4NjgiOwp9CgouYWRtb25pdGlvbi5leGFtcGxlLAouYWRtb25pdGlvbi5zbmlwcGV0IHsKICBib3JkZXItbGVmdC1jb2xvcjogcmdiYSgwLCAxODQsIDIxMiwgLjgpOwp9CgouYWRtb25pdGlvbi5leGFtcGxlPi5hZG1vbml0aW9uLXRpdGxlLAouYWRtb25pdGlvbi5zbmlwcGV0Pi5hZG1vbml0aW9uLXRpdGxlIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDE4NCwgMjEyLCAuMSk7CiAgYm9yZGVyLWJvdHRvbS1jb2xvcjogcmdiYSgwLCAxODQsIDIxMiwgLjIpOwp9CgouYWRtb25pdGlvbi5leGFtcGxlPi5hZG1vbml0aW9uLXRpdGxlOmJlZm9yZSwKLmFkbW9uaXRpb24uc25pcHBldD4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUgewogIGNvbG9yOiByZ2JhKDAsIDE4NCwgMjEyLCAxKTsKICA7CiAgY29udGVudDogIlxFMjQyIjsKfQoKLmFkbW9uaXRpb24ucXVvdGUsCi5hZG1vbml0aW9uLmNpdGUgewogIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2JhKDE1OCwgMTU4LCAxNTgsIC44KTsKfQoKLmFkbW9uaXRpb24ucXVvdGU+LmFkbW9uaXRpb24tdGl0bGUsCi5hZG1vbml0aW9uLmNpdGU+LmFkbW9uaXRpb24tdGl0bGUgewogIGJhY2tncm91bmQtY29sb3I6IHJnYmEoMTU4LCAxNTgsIDE1OCwgLjEpOwogIGJvcmRlci1ib3R0b20tY29sb3I6IHJnYmEoMTU4LCAxNTgsIDE1OCwgLjIpOwp9CgouYWRtb25pdGlvbi5xdW90ZT4uYWRtb25pdGlvbi10aXRsZTpiZWZvcmUsCi5hZG1vbml0aW9uLmNpdGU+LmFkbW9uaXRpb24tdGl0bGU6YmVmb3JlIHsKICBjb2xvcjogcmdiYSgxNTgsIDE1OCwgMTU4LCAxKTsKICA7CiAgY29udGVudDogIlxFMjQ0IjsKfQ=="/>
+<!-- markdown-it-kbd.css -->
+<link rel="stylesheet" type="text/css" href="data:text/css;base64,LnZzY29kZS1saWdodCBrYmQsCi52c2NvZGUtZGFyayBrYmQsCi52c2NvZGUtaGlnaC1jb250cmFzdCBrYmQgewogIGRpc3BsYXk6IGlubGluZS1ibG9jazsKICBwYWRkaW5nOiAzcHggNXB4OwogIGZvbnQ6IDExcHggIlNGTW9uby1SZWd1bGFyIiwgQ29uc29sYXMsICJMaWJlcmF0aW9uIE1vbm8iLCBNZW5sbywgQ291cmllciwgbW9ub3NwYWNlOwogIGxpbmUtaGVpZ2h0OiAxMHB4OwogIHZlcnRpY2FsLWFsaWduOiBtaWRkbGU7CiAgYm9yZGVyOiBzb2xpZCAxcHggI2QxZDVkYTsKICBib3JkZXItYm90dG9tLWNvbG9yOiAjYzZjYmQxOwogIGJvcmRlci1yYWRpdXM6IDNweDsKICBib3gtc2hhZG93OiBpbnNldCAwIC0xcHggMCAjYzZjYmQxOwp9CgoudnNjb2RlLWxpZ2h0IGtiZCB7CiAgY29sb3I6ICM0NDRkNTY7CiAgYmFja2dyb3VuZC1jb2xvcjogI2ZhZmJmYzsKfQ=="/>
+<!-- third party styles end -->
+
+</head>
+<body class="markdown-body vscode-body vscode-light">
+<div class="content">
+    <a for="toc-anchor" id="*data-structure-%26-algorithm*"></a><h1 id="data-structure--algorithm-1" data-line="0" class="code-line"><em>Data Structure &amp; Algorithm</em></h1>
+<br/>
+<a for="toc-anchor" id="%E7%9B%AE%E5%BD%95"></a><h3 id="e79baee5bd95-1" data-line="4" class="code-line">目录</h3>
+<ul>
+<li data-line="6" class="code-line"><a href="#%E5%89%8D%E8%A8%80" data-href="#%E5%89%8D%E8%A8%80">开始</a></li>
+<li data-line="7" class="code-line"><a href="#arrary" data-href="#arrary">Arrary</a></li>
+<li data-line="8" class="code-line"><a href="#linkedlist" data-href="#linkedlist">Linked List</a></li>
+<li data-line="9" class="code-line"><a href="#stack%26queue" data-href="#stack%26queue">Stack &amp; Queue</a></li>
+<li data-line="10" class="code-line"><a href="#tree" data-href="#tree">Tree</a></li>
+</ul>
+<br/>
+<a for="toc-anchor" id="%E5%89%8D%E8%A8%80"></a><h3 id="e5898de8a880-1" data-line="14" class="code-line">前言</h3>
+<p data-line="16" class="code-line"><span id="前言"></span></p>
+<hr>
+<a for="toc-anchor" id="%E4%BB%80%E4%B9%88%E6%98%AF%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"></a><h4 id="e4bb80e4b988e698afe695b0e68daee7bb93e69e84-1" data-line="20" class="code-line">什么是数据结构</h4>
+<p data-line="22" class="code-line">数据是描述客观事物的符号，是计算机中可以操作的对象，是能被计算机识别，并输入给计算机处理的符号集合，而数据结构则为负责描述某一类数据具体的类型的一种结构，更具体来讲，<span style="color:red">数据结构是计算机存储、组织数据的方式，它是相互之间存在一种或多种特定关系的数据元素的集合</span>，通常情况下，精心选择的数据结构可以带来更高的运行或者存储效率</p>
+<br/>
+<a for="toc-anchor" id="%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9A%84%E5%88%86%E7%B1%BB"></a><h4 id="e695b0e68daee7bb93e69e84e79a84e58886e7b1bb-1" data-line="26" class="code-line">数据结构的分类</h4>
+<p data-line="28" class="code-line">按照视点的不同，我们把数据结构分为 <font color="red">逻辑结构</font> 和 <font color="red">物理结构</font></p>
+<ul>
+<li data-line="31" class="code-line">
+<p data-line="31" class="code-line">逻辑结构</p>
+<ul>
+<li data-line="33" class="code-line">集合结构</li>
+</ul>
+<p data-line="35" class="code-line">集合结构内的各个数据元素是平等的，他们共同属于同一个集合，需要注意的是，<font color = "red">虽然集合内的元素是处在同一个集合，但是它们之间并没有什么实际性的联系</font>，故该模型通常应用于数学模型结构，而在程序中通常不对于它展开额外的探讨</p>
+<p data-line="37" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-2-12-32-27.png" alt="" class="loading" id="image-hash-025e77f00744fccd1faa6bf1f0660e4a6446597773e0efe25fbc7c156191d5c6"></p>
+<ul>
+<li data-line="39" class="code-line">线性结构</li>
+</ul>
+<p data-line="41" class="code-line">线性结构中的数据元素之间是 <kbd>1 : 1</kbd> 的关系，即除开首元素和尾元素外，每个元素之间都能够找到其唯一的前驱和后继</p>
+<p data-line="43" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-2-12-32-45.png" alt="" class="loading" id="image-hash-0fae1c08b1ec6437f7fc41cce2b079128cfe14e2aca38f4d56fe86a34aeec011"></p>
+<ul>
+<li data-line="45" class="code-line">树形结构</li>
+</ul>
+<p data-line="47" class="code-line">树形结构中的数据元素之间是 <kbd>1 : n</kbd> 的关系，即除开根元素和叶子元素外，每个元素之间都能够找到唯一的前驱和多个后继</p>
+<p data-line="49" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-2-12-32-56.png" alt="" class="loading" id="image-hash-e37747f7732e05ed7c6ce7c3d28b92e1c6d687f270ee9e448f13c0c5aca553e0"></p>
+<ul>
+<li data-line="51" class="code-line">图形结构</li>
+</ul>
+<p data-line="53" class="code-line">树形结构中的数据元素之间是 <kbd>n : n</kbd> 的关系，即每个元素之间都可能会找到多个全驱和后继</p>
+<p data-line="55" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-2-12-33-8.png" alt="" class="loading" id="image-hash-a4930ec9b87f84c7b372c4c1d1548a738042731b454f807bf6b500d4025868b7"></p>
+</li>
+<li data-line="58" class="code-line">
+<p data-line="58" class="code-line">物理结构</p>
+<ul>
+<li data-line="60" class="code-line">顺序存储</li>
+</ul>
+<p data-line="62" class="code-line">顺序存储是把数据元素存放在地址连续的存储单元里，其数据的逻辑关系和物理关系是一致的</p>
+<p data-line="64" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-2-12-33-15.png" alt="" class="loading" id="image-hash-c19a1f4d1a6ae9094e42ef38193d930cfbba1e1fbf88d26bd6d4c3d73fc1a763"></p>
+<ul>
+<li data-line="66" class="code-line">链式存储结构</li>
+</ul>
+<p data-line="68" class="code-line">链式存储结构是把数据元素存放在任意的存储单元里，这组存储单元可以是连续的，也可以是不连续的，元素的存储关系并不能反映其逻辑关系，因此需要用一个指针存放数据元素的地址，这样通过地址就可以找到相关数据的位置</p>
+<p data-line="70" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-2-12-34-22.png" alt="" class="loading" id="image-hash-685fb51f265b43c5e58d7011b18987319a9caacab69822ce446cb7667fda4a2c"></p>
+</li>
+</ul>
+<br/>
+<a for="toc-anchor" id="%E4%BB%80%E4%B9%88%E6%98%AF%E7%AE%97%E6%B3%95"></a><h4 id="e4bb80e4b988e698afe7ae97e6b395-1" data-line="74" class="code-line">什么是算法</h4>
+<p data-line="76" class="code-line">算法是特定问题求解步骤的描述，在计算机中表现为指令的有限序列，算法是独立存在的一种解决问题的方法和思想，
+对于算法而言，语言并不重要，重要的是思想</p>
+<br/>
+<a for="toc-anchor" id="%E7%AE%97%E6%B3%95%E7%9A%84%E7%89%B9%E6%80%A7"></a><h4 id="e7ae97e6b395e79a84e789b9e680a7-1" data-line="81" class="code-line">算法的特性</h4>
+<ul>
+<li data-line="83" class="code-line">输入输出：算法具有零个或多个输入、至少有一个或多个输出</li>
+<li data-line="84" class="code-line">有穷性：指算法在执行有限的步骤之后，自动结束而不会出现无限循环，并且每一个步骤在可接受的时间内完成</li>
+<li data-line="85" class="code-line">确定性：算法的每一步骤都有确定的含义，不会出现二义性</li>
+<li data-line="86" class="code-line">可行性：算法的每一步都必须是可行的，也就是说，每一步都能通过执行有限次数完成</li>
+</ul>
+<br/>
+<a for="toc-anchor" id="%E7%AE%97%E6%B3%95%E5%92%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%8B%E9%97%B4%E7%9A%84%E8%81%94%E7%B3%BB"></a><h4 id="e7ae97e6b395e5928ce695b0e68daee7bb93e69e84e4b98be997b4e79a84e88194e7b3bb-1" data-line="91" class="code-line">算法和数据结构之间的联系</h4>
+<p data-line="93" class="code-line">算法是为了解决实际问题而设计，而数据结构只是静态的描述了数据元素之间的关系，它是算法需要处理问题的一种载体，即算法和数据结构之间是属于一种 <font color="red">相辅相成</font> 的关系，<font color="red">一个高效的应用程序需要在数据结构的基础上设计和选择算法</font></p>
+<br/>
+<a for="toc-anchor" id="arrary"></a><h3 id="arrary-1" data-line="98" class="code-line">Arrary</h3>
+<p data-line="100" class="code-line"><span id="Arrary"></span></p>
+<hr>
+<a for="toc-anchor" id="basic-arrary"></a><h4 id="basic-arrary-1" data-line="104" class="code-line">Basic Arrary</h4>
+<p data-line="106" class="code-line">作为基础数据类型的一种，其应用对我们来说再熟悉不过，在我们声明了一个数组后，<font color = "red">数组的每个成员的内存地址都是连续且有序的</font>，关于这点特性我们就能够总结出数组的优点和缺点</p>
+<ul>
+<li data-line="108" class="code-line">优点
+<ul>
+<li data-line="109" class="code-line">对于元素的随机访问效率更高，即每个元素之间仅通过地址的偏移就能够访问到其他元素的内容</li>
+<li data-line="110" class="code-line">对比链表，数组在预先知道预存数据总量的情况下，数组对比链表对于空间的开销更小</li>
+<li data-line="111" class="code-line">由于数组属于一种基础数据类型，我们对于数组的操作和使用就体验来说对于开发人员更为友好</li>
+</ul>
+</li>
+<li data-line="112" class="code-line">缺点
+<ul>
+<li data-line="113" class="code-line">
+<p data-line="113" class="code-line">如果在数组首元素和数组尾元素之间 ( 包括首元素但不包括尾元素 ) ，对于新元素的插入或者旧元素的删除操作，那么效率会非常低。假定声明了一个长度非常长的数组，因为元素与元素之间的内存地址是连续的，如果在这之中进行了插入操作，比如说在第一个元素的位置上插入一个其它的元素，这时候我们需要把第一个元素后面元素的都需要往后偏移一位，可想而知这个工程量带来了多少 <font color = "red">性能损失</font>，除了性能损失之外，在 c 中，如果当前操作在数组的长度已经达到最大阈值的基础下进行，那么我们还需要考虑 <font color="red">内存安全的问题</font>，还有一点的是，由于往后偏移我们无非就是遍历开始偏移位置的元素，逐元素往后复制一份，由于是赋值操作，所以还需要考虑到 <font color = "red">深浅拷贝的问题</font></p>
+</li>
+<li data-line="115" class="code-line">
+<p data-line="115" class="code-line">数组在声明的过程中就已经给定了一块线性连续的内存空间，如果在不知道预存数据量总量的情况下，那么在给定数据量小于数组所声明的大小的话，会出现对于内存空间使用的浪费的问题，那么在给定数据量大于数组所声明的大小的话，就会出现无法对数组长度在进行动态扩展的窘境</p>
+</li>
+<li data-line="117" class="code-line">
+<p data-line="117" class="code-line">与链表相比，在某种情况下对于数组的操作是不太安全的，因为对于数组的操作我们都需要通过地址的偏移来获取到指定内存的地址再拿到里面的数据，这就有可能会出现偏移过多导致访问到野指针的情况，而相对于链表，由于节点与节点之间是通过地址相连在一起，故我们是可以通过查看当前节点所存储的下一节点的指针是否为空的方式来判断所连接的下一节点是否是一个野指针的问题</p>
+</li>
+</ul>
+</li>
+</ul>
+<p data-line="119" class="code-line">关于数组的使用方式，在这篇博客中不进行展开，详情参考 <a href="https://github.com/NGPONG/document/blob/master/C/2019/12_18/C_Programming_Language.md" data-href="https://github.com/NGPONG/document/blob/master/C/2019/12_18/C_Programming_Language.md">这一章</a> 博客中对于数组使用方式的详解</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p data-line="123" class="code-line">对于 <kbd>Basic Arrary</kbd> 来说，虽然其本身存在着优点，但是不可否认的是，它也有许许多多的一些短板，对于这些短板，前辈们都想出了各式各样的数据结构来填补这些缺陷，但，对于数据结构来说永远没有 <kbd>Perfect</kbd> 这一单词，可能某个数据结构解决了一些根本性的问题，但是随之而来的又会产生一些新的问题</p>
+</div>
+<br/>
+<a for="toc-anchor" id="dynamic-arrary"></a><h4 id="dynamic-arrary-1" data-line="128" class="code-line">Dynamic Arrary</h4>
+<p data-line="130" class="code-line">动态数组属于对 <kbd>Basic Arrary</kbd> 的一项扩展内容，它在 <font color = "red">保持 <kbd>Basic Arrary</kbd> 本质不变的情况下，还解决掉了 <kbd>Basic Arrary</kbd> 无法进行动态扩展的短板</font></p>
+<pre><code data-line="132" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string.h&gt;</span></span>
+
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dynamicArrary</span> {</span>
+
+	<span class="hljs-keyword">void</span> **ptr_arrary;
+	<span class="hljs-keyword">int</span> length;
+};
+
+<span class="hljs-comment">/**
+ * @description: Checking the available length of an array
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">CheckArraryAvailableLength</span><span class="hljs-params">(struct dynamicArrary *arrary)</span> </span>{
+
+	<span class="hljs-keyword">if</span> (arrary-&gt;length == capacity) {
+
+		<span class="hljs-keyword">int</span> flag = ReallocArrary(&amp;arrary-&gt;ptr_arrary, arrary-&gt;length);
+		<span class="hljs-keyword">if</span> (!flag) {
+
+			<span class="hljs-built_in">printf</span>(<span class="hljs-string">"[Realloc complete]  struct address = %p, arrary adderss = %p\n"</span>, arrary, arrary-&gt;ptr_arrary);
+		}
+	}
+
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-comment">/**
+ * @description: Dynamically expand the length of an array
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">ReallocArrary</span><span class="hljs-params">(<span class="hljs-keyword">void</span> ***p_ptr_arrary, <span class="hljs-keyword">int</span> length)</span> </span>{
+
+	capacity += <span class="hljs-number">10</span>;
+	<span class="hljs-keyword">void</span> **arrary_new = <span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">void</span> *) * capacity);
+	<span class="hljs-keyword">if</span> (arrary_new == <span class="hljs-literal">NULL</span>) {
+
+		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+	}
+
+	<span class="hljs-built_in">printf</span>(<span class="hljs-string">"[Realloc]  address old = %p, address new = %p\n"</span>, *p_ptr_arrary, arrary_new);
+	<span class="hljs-comment">/*move the data from the old array to the new array*/</span>
+	<span class="hljs-built_in">memcpy</span>(arrary_new, *p_ptr_arrary, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">void</span> *) * length);
+
+	<span class="hljs-built_in">free</span>(*p_ptr_arrary);
+	*p_ptr_arrary = arrary_new;
+
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-comment">/**
+ * @description: Initialize a dynamic array
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function">struct dynamicArrary *<span class="hljs-title">InitDynamicArrary</span><span class="hljs-params">(<span class="hljs-keyword">int</span> m_capacity)</span> </span>{
+
+	<span class="hljs-keyword">if</span> (m_capacity &lt;= <span class="hljs-number">0</span>) {
+
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
+	}
+
+	capacity = m_capacity;
+
+	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dynamicArrary</span> *<span class="hljs-title">arrary</span> = <span class="hljs-title">malloc</span>(<span class="hljs-title">sizeof</span>(<span class="hljs-title">struct</span> <span class="hljs-title">dynamicArrary</span>));</span>
+	<span class="hljs-keyword">if</span> (arrary == <span class="hljs-literal">NULL</span>) {
+
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
+	}
+	<span class="hljs-built_in">memset</span>(arrary, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(struct dynamicArrary));
+
+	arrary-&gt;ptr_arrary = <span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">void</span> *) * m_capacity);
+	<span class="hljs-keyword">if</span> (arrary-&gt;ptr_arrary == <span class="hljs-literal">NULL</span>) {
+
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
+	}
+	<span class="hljs-built_in">memset</span>(arrary-&gt;ptr_arrary, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">void</span> *) * m_capacity);
+
+	<span class="hljs-built_in">printf</span>(<span class="hljs-string">"[Init dynamic arrary]  struct address = %p, arrary adderss = %p\n"</span>, arrary, arrary-&gt;ptr_arrary);
+
+	<span class="hljs-keyword">return</span> arrary;
+}
+
+<span class="hljs-comment">/**
+ * @description: Insert a new element into arrary
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">Insert</span><span class="hljs-params">(struct dynamicArrary *arrary, <span class="hljs-keyword">int</span> index, <span class="hljs-keyword">void</span> *value)</span> </span>{
+
+	<span class="hljs-keyword">if</span> (index &lt; <span class="hljs-number">0</span>) {
+
+		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+	}
+	<span class="hljs-keyword">if</span> (CheckArraryAvailableLength(arrary)) {
+
+		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+	}
+	<span class="hljs-keyword">if</span> (index &gt;= arrary-&gt;length) {
+
+		index = arrary-&gt;length;
+	}
+
+	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = arrary-&gt;length - <span class="hljs-number">1</span>; i &gt;= index; i--) {
+
+		<span class="hljs-built_in">memcpy</span>(arrary-&gt;ptr_arrary + i + <span class="hljs-number">1</span>, arrary-&gt;ptr_arrary + i, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">void</span> *));
+	}
+
+	<span class="hljs-comment">/*insert*/</span>
+	<span class="hljs-built_in">memcpy</span>(arrary-&gt;ptr_arrary + index, &amp;value, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">void</span> *));
+
+	arrary-&gt;length++;
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-comment">/**
+ * @description: Add a new element into arrary
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">Add</span><span class="hljs-params">(struct dynamicArrary *arrary, <span class="hljs-keyword">void</span> *value)</span> </span>{
+
+	<span class="hljs-keyword">if</span> (CheckArraryAvailableLength(arrary)) {
+
+		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+	}
+
+	<span class="hljs-built_in">printf</span>(<span class="hljs-string">"[Add]  arrary address = %p, value address = %p, arrary length = %d\n"</span>, arrary-&gt;ptr_arrary + arrary-&gt;length, value, arrary-&gt;length + <span class="hljs-number">1</span>);
+	<span class="hljs-built_in">memcpy</span>(arrary-&gt;ptr_arrary + arrary-&gt;length, &amp;value, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">void</span> *));
+	arrary-&gt;length++;
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-comment">/**
+ * @description: Remove element by postion
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">RemoveByPostion</span><span class="hljs-params">(struct dynamicArrary *arrary, <span class="hljs-keyword">int</span> index)</span> </span>{
+
+	<span class="hljs-keyword">if</span> (index &lt; <span class="hljs-number">0</span>) {
+
+		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+	}
+	<span class="hljs-keyword">if</span> (index &gt;= arrary-&gt;length) {
+
+		index = arrary-&gt;length;
+	}
+
+	<span class="hljs-built_in">printf</span>(<span class="hljs-string">"[Remove]  address = %p\n"</span>, *(arrary-&gt;ptr_arrary + index));
+	<span class="hljs-built_in">free</span>(*(arrary-&gt;ptr_arrary + index));
+
+	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = index + <span class="hljs-number">1</span>; i &lt; arrary-&gt;length; i++) {
+
+		<span class="hljs-built_in">printf</span>(<span class="hljs-string">"[Exchange]  address_exchanged = %p, address_exchanger = %p\n"</span>, arrary-&gt;ptr_arrary + i - <span class="hljs-number">1</span>, arrary-&gt;ptr_arrary + i);
+		*(arrary-&gt;ptr_arrary + i - <span class="hljs-number">1</span>) = *(arrary-&gt;ptr_arrary + i);
+		*(arrary-&gt;ptr_arrary + i) = <span class="hljs-literal">NULL</span>;
+	}
+
+	arrary-&gt;length--;
+
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-comment">/**
+ * @description: Remove element by value
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">RemoveByValue</span><span class="hljs-params">(struct dynamicArrary *arrary, <span class="hljs-keyword">void</span> *value, <span class="hljs-keyword">int</span> (*invoker)(<span class="hljs-keyword">void</span> *data_source, <span class="hljs-keyword">void</span> *data_compare))</span> </span>{
+
+	<span class="hljs-keyword">if</span> (arrary == <span class="hljs-literal">NULL</span> || invoker == <span class="hljs-literal">NULL</span>) {
+
+		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+	}
+
+	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; arrary-&gt;length; i++) {
+
+		<span class="hljs-keyword">if</span> (invoker(*(arrary-&gt;ptr_arrary + i), value)) {
+
+			RemoveByPostion(arrary, i);
+			<span class="hljs-keyword">break</span>;
+		}
+	}
+
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-comment">/**
+ * @description: Dispose dynamic arrary
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">DestoryArrary</span><span class="hljs-params">(struct dynamicArrary *arrary)</span> </span>{
+
+	<span class="hljs-keyword">if</span> (arrary == <span class="hljs-literal">NULL</span>) {
+		
+		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+	}
+
+	<span class="hljs-built_in">printf</span>(<span class="hljs-string">"are you sure destory arrary? [yes/no]\n"</span>);
+
+	<span class="hljs-keyword">char</span> str_CustomerInput[<span class="hljs-number">8</span>] = { <span class="hljs-number">0</span> };
+	fgets(str_CustomerInput, <span class="hljs-keyword">sizeof</span>(str_CustomerInput), <span class="hljs-built_in">stdin</span>);
+
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">strcmp</span>(str_CustomerInput, <span class="hljs-string">"yes\n"</span>)) {
+	
+		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+	}
+
+	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; arrary-&gt;length; i++) {
+
+		<span class="hljs-built_in">printf</span>(<span class="hljs-string">"[free]  element address = %p\n"</span>, *(arrary-&gt;ptr_arrary + i));
+		<span class="hljs-built_in">free</span>(*(arrary-&gt;ptr_arrary + i));
+	}
+
+	<span class="hljs-built_in">printf</span>(<span class="hljs-string">"[free]  arrary address = %p\n"</span>, arrary-&gt;ptr_arrary);
+	<span class="hljs-built_in">free</span>(arrary-&gt;ptr_arrary);
+
+	<span class="hljs-built_in">printf</span>(<span class="hljs-string">"[free]  struct address = %p\n"</span>, arrary);
+	<span class="hljs-built_in">free</span>(arrary);
+
+	capacity = <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="linked-list"></a><h3 id="linked-list-1" data-line="364" class="code-line">Linked List</h3>
+<hr>
+<p data-line="368" class="code-line"><span id="LinkedList"></span></p>
+<p data-line="370" class="code-line">链表是一种常用的数据结构，它由一系列的 <kbd>node</kbd> 通过指针的方式相互连接起来，以此形成一条数据链，而每个节点中主要是维护着两种重要的信息，它们分别是：</p>
+<ul>
+<li data-line="372" class="code-line">
+<p data-line="372" class="code-line"><kbd>Data：数据域</kbd></p>
+<p data-line="374" class="code-line">存放着当前节点所存储的信息数据</p>
+</li>
+<li data-line="376" class="code-line">
+<p data-line="376" class="code-line"><kbd>Pointer：指针域</kbd></p>
+<p data-line="378" class="code-line">存放着其它节点在内存中的首地址，即每一个节点都能够指向 上一个 / 下一个 节点的信息</p>
+</li>
+</ul>
+<br/>
+<a for="toc-anchor" id="%E9%93%BE%E8%A1%A8%E4%B8%8E%E6%95%B0%E7%BB%84"></a><h4 id="e993bee8a1a8e4b88ee695b0e7bb84-1" data-line="382" class="code-line">链表与数组</h4>
+<p data-line="384" class="code-line">对于链表来说，其通常用于和 <kbd>Arrary</kbd> 做对比，由于链表是通过节点与节点之间的连接来完成一条数据链的构造，故该特性能够解决掉 Arrary 本身所存在的许多缺点，但是相对的，更是由于这一特性，链表在解决了 Arrary 本身所存在的缺陷的同时却无法保留掉原有数组本身的 <kbd>优点</kbd>，即 链表 在解决了 Arrary 本身所存在的缺陷的同时又把 Arrary 身上的优点转换为了 链表 所带有的缺陷</p>
+<ul>
+<li data-line="386" class="code-line">
+<p data-line="386" class="code-line">优点</p>
+<ul>
+<li data-line="387" class="code-line">链表对比数组，在链表头至链表尾中删除或新增某个节点的时候效率会很高，因为我们只用改变当前位置上，前一个节点或者是后一个节点的指针指向即可完成插入或者是删除的操作</li>
+<li data-line="388" class="code-line">链表在建立的时候无需知道数据总量的大小，我们可以随时的对链表进行扩展和分配新的节点空间，这间接的解决了数组对于开辟空间较大而导致的内存浪费的问题</li>
+<li data-line="389" class="code-line">链表的操作对比数组来说是更为安全的，因为对于数组的操作我们都需要通过地址的偏移来获取到指定内存的地址再拿到里面的数据，这就有可能会出现偏移过多导致访问到野指针的情况，而相对于链表，由于节点与节点之间是通过地址相连在一起，故我们是可以通过查看当前节点所存储的下一节点的指针是否为空的方式来判断所连接的下一节点是否是一个野指针的问题</li>
+</ul>
+</li>
+<li data-line="391" class="code-line">
+<p data-line="391" class="code-line">缺点</p>
+<ul>
+<li data-line="392" class="code-line">对于元素的随机访问效率较低，因为节点与节点之间是通过指针的方式连接在一起，并且节点与节点之间的内存地址不是连续的，故我们无法做到像数组那样直接通过地址偏移就能访问到某个下标的元素，想访问某个下标的节点的信息我们只能去遍历这张链表，直到达到指定下标的节点</li>
+<li data-line="393" class="code-line">由于链表的本身需要由多种成员来构成 ( 指针域、数据域、…… )，即链表的使用在一定程度上增加了空间复杂度</li>
+<li data-line="394" class="code-line">链表在 c 语言中并不是语言标准的支持，故操作起来没有数组较为方便</li>
+</ul>
+</li>
+</ul>
+<br/>
+<a for="toc-anchor" id="%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E5%A4%B4%E8%8A%82%E7%82%B9%E5%92%8C%E5%B0%BE%E8%8A%82%E7%82%B9"></a><h4 id="e993bee8a1a8e4b8ade79a84e5a4b4e88a82e782b9e5928ce5b0bee88a82e782b9-1" data-line="398" class="code-line">链表中的头节点和尾节点</h4>
+<p data-line="400" class="code-line">什么是链表的头节点和尾节点？</p>
+<p data-line="402" class="code-line">一张链表在初始化完毕后，我们通常会额外添加两个特殊的节点，这两个节点仅仅只是维护了一个指针域，指针域指向这张链表的头节点和尾节点在内存中的首地址，而这两种特殊的节点就为链表的 <kbd>头节点</kbd> 和 <kbd>尾节点</kbd></p>
+<p data-line="404" class="code-line">为什么需要链表的头节点和尾节点？</p>
+<p data-line="406" class="code-line">先拿头节点来说，如果我们有一个地方能够存储一张链表的头结点的话，就能够对于这张链表起到一个标志位的作用，那么在后面，不管我们对这张链表进行如何操作，我们都可以恒定的知道这张链表起始节点的位置，假设我们对于一张链表遍历到某个节点的时候，这时候其实就已经改变了这张链表中具体某个节点位置的指向了，简而言之就是不在链表的起始位置上，这时候我们还需要对它进行重新遍历的话，那么这个头节点的标志位就起到了标志性的作用，对于一张合格的链表数据结构的定义来说，<font color="red">头节点的存在是必须的</font></p>
+<p data-line="408" class="code-line">而尾节点的作用在于能够快速的获取到链表尾部节点的位置，以方便对链表进行节点扩展的操作，如果没有尾节点，那么我们想要为一个链表新增节点成员的话，那么我们就需要从头到尾遍历一次整张链表，直至拿到最后一个节点的信息我们才能进行新增节点的操作</p>
+<br/>
+<a for="toc-anchor" id="singly-linked-list"></a><h4 id="singly-linked-list-1" data-line="412" class="code-line">Singly Linked List</h4>
+<p data-line="414" class="code-line">单链表的存储模型</p>
+<pre><code data-line="415" class="code-line language-c"><div>  Head                                                                  Tail
++-------+                                                             +-------+
+|Pointer|                                                             |Pointer|
++---+---+                                                             +---+---+
+    |                                                                     |
+    |                                                                     |
+    v                                                                     v
+ <span class="hljs-number">0xAAAA</span>   +---&gt;<span class="hljs-number">0xBBBB</span>   +---&gt;<span class="hljs-number">0xCCCC</span>   +---&gt;<span class="hljs-number">0xDDDD</span>   +---&gt;<span class="hljs-number">0xEEEE</span>   +---&gt;<span class="hljs-number">0xFFFF</span>
+ +----+   |    +----+   |    +----+   |    +----+   |    +----+   |    +----+
+ |Data|   |    |Data|   |    |Data|   |    |Data|   |    |Data|   |    |Data|
+ +----+   |    +----+   |    +----+   |    +----+   |    +----+   |    +----+
+ |Next+---+    |Next+---+    |Next+---+    |Next+---+    |Next+---+    |Next+----&gt; <span class="hljs-literal">NULL</span>
+ +----+        +----+        +----+        +----+        +----+        +----+
+</div></code></pre>
+<p data-line="431" class="code-line">单链表的实现</p>
+<pre><code data-line="433" class="code-line language-c"><div><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">node</span> {</span>
+
+	<span class="hljs-keyword">void</span> *data;
+	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">node</span> *<span class="hljs-title">next</span>;</span>
+} <span class="hljs-keyword">node_t</span>;
+
+<span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list</span> {</span>
+
+	<span class="hljs-keyword">node_t</span> *head;
+	<span class="hljs-keyword">node_t</span> *tail;
+	<span class="hljs-keyword">int</span> size;
+} <span class="hljs-keyword">list_t</span>;
+
+
+<span class="hljs-comment">/**
+ * @description: Initialize a singly linked list
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-keyword">list_t</span> *Create() {
+
+	<span class="hljs-keyword">list_t</span> *<span class="hljs-built_in">list</span> = <span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">list_t</span>));
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">list</span> == <span class="hljs-literal">NULL</span>) {
+	
+		perror(<span class="hljs-string">"heap out"</span>);
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
+	}
+	<span class="hljs-built_in">memset</span>(<span class="hljs-built_in">list</span>, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">list_t</span>));
+
+	<span class="hljs-keyword">return</span> <span class="hljs-built_in">list</span>;
+}
+
+<span class="hljs-comment">/**
+ * @description: Add a new node into singly linked list
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">AddNode</span><span class="hljs-params">(<span class="hljs-keyword">list_t</span> *<span class="hljs-built_in">list</span>, <span class="hljs-keyword">void</span> *data)</span> </span>{
+
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">list</span> == <span class="hljs-literal">NULL</span>) {
+	
+		<span class="hljs-keyword">return</span>;
+	}
+
+	<span class="hljs-comment">// create a new node</span>
+	<span class="hljs-keyword">node_t</span> *node = <span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">node_t</span>));
+	<span class="hljs-keyword">if</span> (node == <span class="hljs-literal">NULL</span>) {
+	
+		perror(<span class="hljs-string">"heap error"</span>);
+		<span class="hljs-keyword">return</span>;
+	}
+	node-&gt;data = data;
+	node-&gt;next = <span class="hljs-literal">NULL</span>;
+
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">list</span>-&gt;head == <span class="hljs-literal">NULL</span>) {
+	
+		<span class="hljs-built_in">list</span>-&gt;head = <span class="hljs-built_in">list</span>-&gt;tail = node;
+	}
+	<span class="hljs-keyword">else</span> {
+	
+		<span class="hljs-built_in">list</span>-&gt;tail-&gt;next = node;
+		<span class="hljs-built_in">list</span>-&gt;tail = node;
+	}
+
+	<span class="hljs-built_in">list</span>-&gt;size++;
+}
+
+<span class="hljs-comment">/**
+ * @description: foreach singly linked list
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">ForeachAllNode</span><span class="hljs-params">(<span class="hljs-keyword">list_t</span> *<span class="hljs-built_in">list</span>,<span class="hljs-keyword">void</span> (*invoker)(<span class="hljs-keyword">node_t</span> *))</span> </span>{
+
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">list</span> == <span class="hljs-literal">NULL</span> || <span class="hljs-built_in">list</span>-&gt;head == <span class="hljs-literal">NULL</span>) {
+
+		<span class="hljs-keyword">return</span>;
+	}
+
+	<span class="hljs-keyword">node_t</span> *current = <span class="hljs-built_in">list</span>-&gt;head;
+	<span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) {
+
+		invoker(current);
+
+		<span class="hljs-keyword">if</span> ((current = current-&gt;next) == <span class="hljs-literal">NULL</span>) {
+			
+			<span class="hljs-built_in">printf</span>(<span class="hljs-string">"foreach ended******************************************\n"</span>);
+			<span class="hljs-built_in">printf</span>(<span class="hljs-string">"head address = %p\n"</span>, <span class="hljs-built_in">list</span>-&gt;head);
+			<span class="hljs-built_in">printf</span>(<span class="hljs-string">"tail address = %p\n"</span>, <span class="hljs-built_in">list</span>-&gt;tail);
+			<span class="hljs-built_in">printf</span>(<span class="hljs-string">"list address = %p\n"</span>, <span class="hljs-built_in">list</span>);
+			<span class="hljs-built_in">printf</span>(<span class="hljs-string">"list size = %d\n\n"</span>, <span class="hljs-built_in">list</span>-&gt;size);
+			<span class="hljs-keyword">break</span>;
+		}
+	}
+}
+
+<span class="hljs-comment">/**
+ * @description: Insert a new node in singly linked list by postion
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Insert</span><span class="hljs-params">(<span class="hljs-keyword">list_t</span> *<span class="hljs-built_in">list</span>, <span class="hljs-keyword">int</span> index, <span class="hljs-keyword">void</span> *data)</span> </span>{
+
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">list</span> == <span class="hljs-literal">NULL</span>) {
+	
+		<span class="hljs-keyword">return</span>;
+	}
+
+	<span class="hljs-keyword">node_t</span> *node = <span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">node_t</span>));
+	<span class="hljs-keyword">if</span> (node == <span class="hljs-literal">NULL</span>) {
+	
+		<span class="hljs-keyword">return</span>;
+	}
+
+	node-&gt;data = data;
+	node-&gt;next = <span class="hljs-literal">NULL</span>;
+
+	<span class="hljs-keyword">if</span> (index &lt; <span class="hljs-number">0</span>) {
+	
+		<span class="hljs-keyword">return</span>;
+	}
+	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (index == <span class="hljs-number">0</span>) {
+
+		node-&gt;next = <span class="hljs-built_in">list</span>-&gt;head;
+		<span class="hljs-built_in">list</span>-&gt;head = node;
+	}
+	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (index &gt; <span class="hljs-built_in">list</span>-&gt;size - <span class="hljs-number">1</span>) {
+	
+		<span class="hljs-built_in">list</span>-&gt;tail-&gt;next = node;
+		<span class="hljs-built_in">list</span>-&gt;tail = node;
+	}
+	<span class="hljs-keyword">else</span> {
+	
+		<span class="hljs-keyword">node_t</span> *node_bef = <span class="hljs-built_in">list</span>-&gt;head;
+		<span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; index - <span class="hljs-number">1</span>; i++) {
+
+			node_bef = node_bef-&gt;next;
+		}
+
+		<span class="hljs-keyword">node_t</span> *node_aft = node_bef-&gt;next;
+		node_bef-&gt;next = node;
+		node-&gt;next = node_aft;
+	}
+
+	<span class="hljs-built_in">list</span>-&gt;size++;
+}
+
+<span class="hljs-comment">/**
+ * @description: Delete node in singly linked list by postion
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Delete</span><span class="hljs-params">(<span class="hljs-keyword">list_t</span> *<span class="hljs-built_in">list</span>, <span class="hljs-keyword">int</span> index)</span> </span>{
+
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">list</span> == <span class="hljs-literal">NULL</span> || <span class="hljs-built_in">list</span>-&gt;head == <span class="hljs-literal">NULL</span> || <span class="hljs-built_in">list</span>-&gt;tail == <span class="hljs-literal">NULL</span>) {
+
+		<span class="hljs-keyword">return</span>;
+	}
+
+	<span class="hljs-keyword">if</span> (index &lt; <span class="hljs-number">0</span>) {
+
+		<span class="hljs-keyword">return</span>;
+	}
+	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (index == <span class="hljs-number">0</span>) {
+	
+		<span class="hljs-keyword">node_t</span> *head = <span class="hljs-built_in">list</span>-&gt;head;
+		<span class="hljs-built_in">printf</span>(<span class="hljs-string">"delete and free %p\n"</span>, head);
+
+		<span class="hljs-built_in">list</span>-&gt;head = <span class="hljs-built_in">list</span>-&gt;head-&gt;next;
+		<span class="hljs-keyword">if</span> (<span class="hljs-built_in">list</span>-&gt;size == <span class="hljs-number">1</span>) {
+
+			<span class="hljs-built_in">list</span>-&gt;tail = <span class="hljs-built_in">list</span>-&gt;head;
+		}
+		<span class="hljs-built_in">free</span>(head);
+	}
+	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (index &gt;= <span class="hljs-built_in">list</span>-&gt;size - <span class="hljs-number">1</span>) {
+	
+		<span class="hljs-keyword">node_t</span> *node_current = <span class="hljs-built_in">list</span>-&gt;head;
+		<span class="hljs-keyword">if</span> (node_current-&gt;next == <span class="hljs-literal">NULL</span>) {
+		
+			<span class="hljs-built_in">printf</span>(<span class="hljs-string">"delete and free %p\n"</span>, node_current);
+			<span class="hljs-built_in">free</span>(node_current);
+			<span class="hljs-built_in">list</span>-&gt;head = <span class="hljs-literal">NULL</span>;
+			<span class="hljs-built_in">list</span>-&gt;tail = <span class="hljs-literal">NULL</span>;
+			<span class="hljs-built_in">list</span>-&gt;size--;
+			<span class="hljs-keyword">return</span>;
+		}
+
+
+		<span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) {
+
+			<span class="hljs-keyword">if</span> (node_current-&gt;next == <span class="hljs-built_in">list</span>-&gt;tail) {
+				
+				<span class="hljs-keyword">break</span>;
+			}
+
+			node_current = node_current-&gt;next;
+		}
+
+		<span class="hljs-keyword">node_t</span> *tail = <span class="hljs-built_in">list</span>-&gt;tail;
+		<span class="hljs-built_in">printf</span>(<span class="hljs-string">"delete and free %p\n"</span>, tail);
+		<span class="hljs-built_in">list</span>-&gt;tail = node_current;
+		<span class="hljs-built_in">list</span>-&gt;tail-&gt;next = <span class="hljs-literal">NULL</span>;
+		<span class="hljs-built_in">free</span>(tail);
+	}
+	<span class="hljs-keyword">else</span> {
+	
+		<span class="hljs-keyword">node_t</span> *node_aft = <span class="hljs-built_in">list</span>-&gt;head;
+		<span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; index - <span class="hljs-number">1</span>; i++) {
+
+			node_aft = node_aft-&gt;next;
+		}
+
+		<span class="hljs-keyword">node_t</span> *node_prev = node_aft-&gt;next-&gt;next;
+		
+		<span class="hljs-built_in">printf</span>(<span class="hljs-string">"delete and free %p\n"</span>, node_aft-&gt;next);
+		<span class="hljs-built_in">free</span>(node_aft-&gt;next);
+
+		node_aft-&gt;next = node_prev;
+	}
+
+
+	<span class="hljs-built_in">list</span>-&gt;size--;
+}
+
+<span class="hljs-comment">/**
+ * @description: Reverse singly linked list
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Reverse_List</span><span class="hljs-params">(<span class="hljs-keyword">list_t</span> *<span class="hljs-built_in">list</span>)</span> </span>{
+
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">list</span> == <span class="hljs-literal">NULL</span>) {
+	
+		<span class="hljs-keyword">return</span>;
+	}
+
+	<span class="hljs-keyword">node_t</span> *prev = <span class="hljs-literal">NULL</span>;
+	<span class="hljs-keyword">node_t</span> *next = <span class="hljs-literal">NULL</span>;
+	<span class="hljs-keyword">node_t</span> *current = <span class="hljs-built_in">list</span>-&gt;head;
+	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-built_in">list</span>-&gt;size; i++) {
+
+		next = current-&gt;next;
+
+		current-&gt;next = prev;
+
+		<span class="hljs-comment">// move</span>
+		prev = current;
+		current = next;
+	}
+
+	<span class="hljs-keyword">node_t</span> *temp = <span class="hljs-built_in">list</span>-&gt;head;
+	<span class="hljs-built_in">list</span>-&gt;head = <span class="hljs-built_in">list</span>-&gt;tail;
+	<span class="hljs-built_in">list</span>-&gt;tail = temp;
+}
+
+<span class="hljs-comment">/**
+ * @description: Dispose singly linked list
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Free</span><span class="hljs-params">(<span class="hljs-keyword">list_t</span> *<span class="hljs-built_in">list</span>)</span> </span>{
+
+	<span class="hljs-keyword">node_t</span> *current = <span class="hljs-built_in">list</span>-&gt;head;
+	<span class="hljs-keyword">node_t</span> *next_temp;
+	<span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) {
+
+		<span class="hljs-keyword">if</span> ((next_temp = current-&gt;next) == <span class="hljs-literal">NULL</span>) {
+
+			<span class="hljs-built_in">printf</span>(<span class="hljs-string">"free node address = %p, Data address = %p\n"</span>, <span class="hljs-built_in">list</span>-&gt;tail, <span class="hljs-built_in">list</span>-&gt;tail-&gt;data);
+			<span class="hljs-built_in">free</span>(<span class="hljs-built_in">list</span>-&gt;tail-&gt;data);
+			<span class="hljs-built_in">free</span>(<span class="hljs-built_in">list</span>-&gt;tail);
+			<span class="hljs-keyword">break</span>;
+		}
+
+		<span class="hljs-built_in">printf</span>(<span class="hljs-string">"free node address = %p, Data address = %p\n"</span>, current, current-&gt;data);
+		<span class="hljs-built_in">free</span>(current-&gt;data);
+		<span class="hljs-built_in">free</span>(current);
+
+		current = next_temp;
+	}
+
+	<span class="hljs-built_in">printf</span>(<span class="hljs-string">"free list address = %p\n"</span>, <span class="hljs-built_in">list</span>);
+	<span class="hljs-built_in">free</span>(<span class="hljs-built_in">list</span>);
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="doubly-linked-list"></a><h4 id="doubly-linked-list-1" data-line="722" class="code-line">Doubly linked list</h4>
+<p data-line="724" class="code-line">双链表的存储模型</p>
+<pre><code data-line="726" class="code-line language-c"><div>            Head                                                                      Tail
+          +-------+                                                                 +-------+
+          |Pointer|                                                                 |Pointer|
+          +---+---+                                                                 +---+---+
+              |                                                                         |
+              |                                                                         |
+              v                                                                         v
+           <span class="hljs-number">0xAAAA</span>&lt;--+ +--&gt;<span class="hljs-number">0xBBBB</span>&lt;--+ +--&gt;<span class="hljs-number">0xCCCC</span>&lt;--+ +--&gt;<span class="hljs-number">0xDDDD</span>&lt;--+ +--&gt;<span class="hljs-number">0xEEEE</span>&lt;--+ +--&gt;<span class="hljs-number">0xFFFF</span>
+           +----+   | |   +----+   | |   +----+   | |   +----+   | |   +----+   | |   +----+
+<span class="hljs-literal">NULL</span> &lt;-----+Last|   +-----+Last|   +-----+Last|   +-----+Last|   +-----+Last|   +-----+Last|
+           +----+     |   +----+     |   +----+     |   +----+     |   +----+     |   +----+
+           |Data|     |   |Data|     |   |Data|     |   |Data|     |   |Data|     |   |Data|
+           +----+     |   +----+     |   +----+     |   +----+     |   +----+     |   +----+
+           |Next+-----+   |Next+-----+   |Next+-----+   |Next+-----+   |Next+-----+   |Next+----&gt; <span class="hljs-literal">NULL</span>
+           +----+         +----+         +----+         +----+         +----+         +----+
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="singly-circular-linked-list"></a><h4 id="singly-circular-linked-list-1" data-line="746" class="code-line">Singly Circular linked list</h4>
+<p data-line="748" class="code-line">单向循环链表的存储模型</p>
+<pre><code data-line="750" class="code-line language-c"><div>     Head                                                                 Tail
+   +-------+                                                          	 +-------+
+   |Pointer|                                                          	 |Pointer|
+   +---+---+                                                             +---+---+
+       |                                                                     |
+       |                                                                     |
+       v                                                                     v
++--&gt;<span class="hljs-number">0xAAAA</span>   +---&gt;<span class="hljs-number">0xBBBB</span>   +---&gt;<span class="hljs-number">0xCCCC</span>   +---&gt;<span class="hljs-number">0xDDDD</span>   +---&gt;<span class="hljs-number">0xEEEE</span>   +---&gt;<span class="hljs-number">0xFFFF</span>
+|	+----+   |    +----+   |    +----+   |    +----+   |    +----+   |    +----+
+|	|Data|   |    |Data|   |    |Data|   |    |Data|   |    |Data|   |    |Data|
+|	+----+   |    +----+   |    +----+   |    +----+   |    +----+   |    +----+
+|	|Next+---+    |Next+---+    |Next+---+    |Next+---+    |Next+---+    |Next+----+
+|	+----+        +----+        +----+        +----+        +----+        +----+    |
+|                                                                                   |
+|                                                                                   |
++-----------------------------------------------------------------------------------+
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="doubly-circular-linked-list"></a><h4 id="doubly-circular-linked-list-1" data-line="771" class="code-line">Doubly Circular linked list</h4>
+<p data-line="773" class="code-line">双向循环链表的存储模型</p>
+<pre><code data-line="775" class="code-line language-c"><div>+--------------------------------------------------------------------------------------------+
+|                                                                                            |
+|                                                                                            |
+| 	   Head                                                                      Tail        |
+|	 +-------+                                                                 +-------+     |
+|	 |Pointer|                                                                 |Pointer|     |
+|	 +---+---+                                                                 +---+---+     |
+| 	     |                                                                         |         |
+|	     |                                                                         |         |
+| 	     v                                                                         v         |
+| +--&gt;<span class="hljs-number">0xAAAA</span>&lt;--+ +--&gt;<span class="hljs-number">0xBBBB</span>&lt;--+ +--&gt;<span class="hljs-number">0xCCCC</span>&lt;--+ +--&gt;<span class="hljs-number">0xDDDD</span>&lt;--+ +--&gt;<span class="hljs-number">0xEEEE</span>&lt;--+ +--&gt;<span class="hljs-number">0xFFFF</span>&lt;-----+
+| |   +----+   | |   +----+   | |   +----+   | |   +----+   | |   +----+   | |   +----+
++-----+Last|   +-----+Last|   +-----+Last|   +-----+Last|   +-----+Last|   +-----+Last|
+  |	  +----+     |   +----+     |   +----+     |   +----+     |   +----+     |   +----+
+  |	  |Data|     |   |Data|     |   |Data|     |   |Data|     |   |Data|     |   |Data|
+  |	  +----+     |   +----+     |   +----+     |   +----+     |   +----+     |   +----+
+  |	  |Next+-----+   |Next+-----+   |Next+-----+   |Next+-----+   |Next+-----+   |Next+---+
+  |	  +----+         +----+         +----+         +----+         +----+         +----+   |
+  |                                                                                       |
+  |                                                                                       |
+  |                                                                                       |
+  |                                                                                       |
+  +---------------------------------------------------------------------------------------+
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="stack-%26-queue"></a><h3 id="stack--queue-1" data-line="803" class="code-line">Stack &amp; Queue</h3>
+<p data-line="805" class="code-line"><span id = "Stack&Queue"></span></p>
+<hr>
+<p data-line="809" class="code-line">把 <kbd>Stack</kbd> 和 <kbd>Queue</kbd> 放在一起的原因是因为两者的实现的是非常的相似</p>
+<p data-line="811" class="code-line">对于 Stack 来说其实现需要遵循 <kbd>FILO</kbd> 原则</p>
+<p data-line="813" class="code-line">对于 Queue 来说其实现需要遵循 <kbd>FIFO</kbd> 原则</p>
+<br/>
+<a for="toc-anchor" id="stack-%E7%9A%84%E5%AD%98%E5%82%A8%E6%A8%A1%E5%9E%8B"></a><h4 id="stack-e79a84e5ad98e582a8e6a8a1e59e8b-1" data-line="817" class="code-line">Stack 的存储模型</h4>
+<pre><code data-line="819" class="code-line language-c"><div>BOTTOM
+   ↑
+   +
+   +------------------+
+   |		          |
+   |  +------------+  |
+   |  |     A      |  |
+   |  +------------+  |
+   |		          |
+   |  +------------+  |
+   |  |     B      |  |
+   |  +------------+  |
+   |		          |
+   |   ^           +  |
+   |   +           v  |
+   | PUSH         POP |
+   +                  +
+   ↓
+  TOP
+
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="queue-%E7%9A%84%E5%AD%98%E5%82%A8%E6%A8%A1%E5%9E%8B"></a><h4 id="queue-e79a84e5ad98e582a8e6a8a1e59e8b-1" data-line="844" class="code-line">Queue 的存储模型</h4>
+<pre><code data-line="846" class="code-line language-c"><div>   BACK &lt;--------------------------------&gt; FONT
+
+        +--------------------------------+
+         +---+   +---+ +---+ +---+   +---+
+PUSH +--&gt;+ E |   | D | | C | | B |   | A +---&gt; POP
+         +---+   +---+ +---+ +---+   +---+
+        +--------------------------------+
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="stack-%E7%9A%84%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"></a><h4 id="stack-e79a84e585b7e4bd93e5ae9ee78eb0-1" data-line="858" class="code-line">Stack 的具体实现</h4>
+<p data-line="860" class="code-line">在这篇 Blog 中，我并不打算对 <kbd>Queue</kbd> 的存储结构进行实现，因为二者实现起来相似度还是挺高，故本 Blog 中只是针对 Stack 进行了一个实现，下面代码中则为实现了一个 <font color = "red">顺序存储</font> 的字符栈</p>
+<pre><code data-line="862" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> MAX_LENGTH 0x400</span>
+
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Stack</span> {</span>
+
+	<span class="hljs-keyword">char</span> *s_data;
+	<span class="hljs-keyword">int</span> s_size;
+};
+
+<span class="hljs-comment">/**
+ * @description: Initialize an char stack
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function">struct Stack *<span class="hljs-title">Init_Stack</span><span class="hljs-params">()</span> </span>{
+
+	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Stack</span> *<span class="hljs-title">stack</span> = <span class="hljs-title">malloc</span>(<span class="hljs-title">sizeof</span>(<span class="hljs-title">struct</span> <span class="hljs-title">Stack</span>));</span>
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">stack</span> == <span class="hljs-literal">NULL</span>) {
+
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
+	}
+
+	<span class="hljs-built_in">stack</span>-&gt;s_data = <span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">char</span>) * MAX_LENGTH);
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">stack</span>-&gt;s_data == <span class="hljs-literal">NULL</span>) {
+	
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
+	}
+
+	<span class="hljs-built_in">stack</span>-&gt;s_size = <span class="hljs-number">0</span>;
+	<span class="hljs-built_in">memset</span>(<span class="hljs-built_in">stack</span>-&gt;s_data, <span class="hljs-number">0x0</span>, <span class="hljs-keyword">sizeof</span>(struct Stack));
+
+	<span class="hljs-keyword">return</span> <span class="hljs-built_in">stack</span>;
+}
+
+<span class="hljs-comment">/**
+ * @description: Push an new element into stack
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">Push</span><span class="hljs-params">(struct Stack *<span class="hljs-built_in">stack</span>, <span class="hljs-keyword">char</span> data)</span> </span>{
+
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">stack</span> == <span class="hljs-literal">NULL</span> || <span class="hljs-built_in">stack</span>-&gt;s_size == MAX_LENGTH) {
+
+		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+	}
+
+	*(<span class="hljs-built_in">stack</span>-&gt;s_data + <span class="hljs-built_in">stack</span>-&gt;s_size) = data;
+	<span class="hljs-built_in">stack</span>-&gt;s_size++;
+	
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-comment">/**
+ * @description: Pop an element into stack
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">Pop</span><span class="hljs-params">(struct Stack *<span class="hljs-built_in">stack</span>)</span> </span>{
+
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">stack</span> == <span class="hljs-literal">NULL</span> || <span class="hljs-built_in">stack</span>-&gt;s_size == <span class="hljs-number">0</span>) {
+	
+		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+	}
+
+	<span class="hljs-keyword">char</span> value = *(<span class="hljs-built_in">stack</span>-&gt;s_data + (<span class="hljs-built_in">stack</span>-&gt;s_size - <span class="hljs-number">1</span>));
+	*(<span class="hljs-built_in">stack</span>-&gt;s_data + (<span class="hljs-built_in">stack</span>-&gt;s_size - <span class="hljs-number">1</span>)) = <span class="hljs-number">0</span>;
+	<span class="hljs-built_in">stack</span>-&gt;s_size--;
+	<span class="hljs-keyword">return</span> value;
+}
+
+<span class="hljs-comment">/**
+ * @description: Dispose an char stack
+ * @param {type} 
+ * @return: 
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">Destory</span><span class="hljs-params">(struct Stack *<span class="hljs-built_in">stack</span>)</span> </span>{
+
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">stack</span> == <span class="hljs-literal">NULL</span> || <span class="hljs-built_in">stack</span>-&gt;s_data == <span class="hljs-literal">NULL</span>) {
+	
+		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+	}
+
+	<span class="hljs-built_in">free</span>(<span class="hljs-built_in">stack</span>-&gt;s_data);
+	<span class="hljs-built_in">free</span>(<span class="hljs-built_in">stack</span>);
+
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="tree"></a><h3 id="tree-1" data-line="953" class="code-line">Tree</h3>
+<hr>
+<p data-line="957" class="code-line"><span id = "Tree"></span></p>
+</div>
+
+</body>
+</html>
