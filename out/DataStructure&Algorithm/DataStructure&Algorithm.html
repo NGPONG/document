@@ -47,89 +47,190 @@
 <li data-line="33" class="code-line">集合结构</li>
 </ul>
 <p data-line="35" class="code-line">集合结构内的各个数据元素是平等的，他们共同属于同一个集合，需要注意的是，<font color = "red">虽然集合内的元素是处在同一个集合，但是它们之间并没有什么实际性的联系</font>，故该模型通常应用于数学模型结构，而在程序中通常不对于它展开额外的探讨</p>
-<p data-line="37" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-2-12-32-27.png" alt="" class="loading" id="image-hash-025e77f00744fccd1faa6bf1f0660e4a6446597773e0efe25fbc7c156191d5c6"></p>
+<pre><code data-line="37" class="code-line language-c"><div>+------------------------------+
+| +-----+             +-----+  |
+| |     |   +-----+   |     |  |
+| |  A  |   |     |   |  C  |  |
+| |     |   |  B  |   |     |  |
+| +-----+   |     |   +-----+  |
+|   +-----+ +-----+  +-----+   |
+|   |     |          |     |   |
+|   |  F  |  +-----+ |  D  |   |
+|   |     |  |     | |     |   |
+|   +-----+  |  E  | +-----+   |
+|            |     |           |
+|   +-----+  +-----+ +-----+   |
+|   |     |  +-----+ |     |   |
+|   |  G  |  |     | |  H  |   |
+|   |     |  |  I  | |     |   |
+|   +-----+  |     | +-----+   |
+|            +-----+           |
++------------------------------+
+
+</div></code></pre>
 <ul>
-<li data-line="39" class="code-line">线性结构</li>
+<li data-line="60" class="code-line">线性结构</li>
 </ul>
-<p data-line="41" class="code-line">线性结构中的数据元素之间是 <kbd>1 : 1</kbd> 的关系，即除开首元素和尾元素外，每个元素之间都能够找到其唯一的前驱和后继</p>
-<p data-line="43" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-2-12-32-45.png" alt="" class="loading" id="image-hash-0fae1c08b1ec6437f7fc41cce2b079128cfe14e2aca38f4d56fe86a34aeec011"></p>
+<p data-line="62" class="code-line">线性结构中的数据元素之间是 <kbd>1 : 1</kbd> 的关系，即除开首元素和尾元素外，每个元素之间都能够找到其唯一的前驱和后继</p>
+<pre><code data-line="64" class="code-line language-c"><div>+---+      +---+      +---+      +---+
+| A +-----&gt;+ B +-----&gt;+ C +-----&gt;+ D |
++---+      +---+      +---+      +-+-+
+                                   |
+                                   |
+                                   v
+                      +---+      +-+-+
+                      | F +&lt;-----+ E |
+                      +---+      +---+
+</div></code></pre>
 <ul>
-<li data-line="45" class="code-line">树形结构</li>
+<li data-line="76" class="code-line">树形结构</li>
 </ul>
-<p data-line="47" class="code-line">树形结构中的数据元素之间是 <kbd>1 : n</kbd> 的关系，即除开根元素和叶子元素外，每个元素之间都能够找到唯一的前驱和多个后继</p>
-<p data-line="49" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-2-12-32-56.png" alt="" class="loading" id="image-hash-e37747f7732e05ed7c6ce7c3d28b92e1c6d687f270ee9e448f13c0c5aca553e0"></p>
+<p data-line="78" class="code-line">树形结构中的数据元素之间是 <kbd>1 : n</kbd> 的关系，即除开根元素和叶子元素外，每个元素之间都能够找到唯一的前驱和多个后继</p>
+<pre><code data-line="80" class="code-line language-C"><div>              +---+
+              | A |
+              +-+-+
+                |
+                |
+        +-------------------+
+        |         |         |
+        |         |         |
+        v         v         v
+      +-+-+     +-+-+     +-+-+
+      | B |     | C |     | D |
+      +-+-+     +---+     +-+-+
+        |                   |
+        |                   |
+  +-----------+             |
+  |     |     |             |
+  v     v     v             |
++-+-+ +-+-+ +-+-+         +-+-+
+| E | | F | | G |         | H |
++---+ +---+ +---+         +---+
+
+</div></code></pre>
 <ul>
-<li data-line="51" class="code-line">图形结构</li>
+<li data-line="104" class="code-line">图形结构</li>
 </ul>
-<p data-line="53" class="code-line">树形结构中的数据元素之间是 <kbd>n : n</kbd> 的关系，即每个元素之间都可能会找到多个全驱和后继</p>
-<p data-line="55" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-2-12-33-8.png" alt="" class="loading" id="image-hash-a4930ec9b87f84c7b372c4c1d1548a738042731b454f807bf6b500d4025868b7"></p>
+<p data-line="106" class="code-line">树形结构中的数据元素之间是 <kbd>n : n</kbd> 的关系，即每个元素之间都可能会找到多个全驱和后继</p>
+<pre><code data-line="108" class="code-line language-c"><div>+---------------------------------+
+|                                 v
+|                      +---+    +-+-+
+|       +-------------&gt;+ E |    | F |
+|       |              +-+-+    +-+-+
+|     +-+-+              |        |
++-----+ A +------+       |        |
+      +-+-+      |       +---+----+
+        ^        |           |
+        |        |           |
+        |        v           v
+      +-+-+    +-+-+       +-+-+
+      | B +---&gt;+ C +&lt;------+ G |
+      +-+-+    +-+-+       +---+
+        |        ^
+        |        |
+        v        |
+      +-+-+      |
+      | D +------+
+      +---+
+</div></code></pre>
 </li>
-<li data-line="58" class="code-line">
-<p data-line="58" class="code-line">物理结构</p>
+<li data-line="131" class="code-line">
+<p data-line="131" class="code-line">物理结构</p>
 <ul>
-<li data-line="60" class="code-line">顺序存储</li>
+<li data-line="133" class="code-line">顺序存储</li>
 </ul>
-<p data-line="62" class="code-line">顺序存储是把数据元素存放在地址连续的存储单元里，其数据的逻辑关系和物理关系是一致的</p>
-<p data-line="64" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-2-12-33-15.png" alt="" class="loading" id="image-hash-c19a1f4d1a6ae9094e42ef38193d930cfbba1e1fbf88d26bd6d4c3d73fc1a763"></p>
+<p data-line="135" class="code-line">顺序存储是把数据元素存放在地址连续的存储单元里，其数据的逻辑关系和物理关系是一致的</p>
+<pre><code data-line="137" class="code-line language-c"><div> +----------------------------&gt;   +---------+------------|
+ |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                <span class="hljs-number">0x0000000B</span> &lt;----+---------+ <span class="hljs-number">0x00000008</span> |
+ |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                <span class="hljs-number">0x0000000A</span> &lt;----+---------+     ~      |
+ |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                <span class="hljs-number">0x00000009</span> &lt;----+---------+ <span class="hljs-number">0x0000000B</span> |
+ |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0011</span>|            |
+ |                <span class="hljs-number">0x00000008</span> &lt;----+---------+------------|
+ |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                <span class="hljs-number">0x00000007</span> &lt;----+---------+ <span class="hljs-number">0x00000004</span> |
+ |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                <span class="hljs-number">0x00000006</span> &lt;----+---------+     ~      |
+ |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                <span class="hljs-number">0x00000005</span> &lt;----+---------+ <span class="hljs-number">0x00000007</span> |
+ |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0010</span>|            |
+ |                <span class="hljs-number">0x00000004</span> &lt;----+---------+------------|
+ |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                <span class="hljs-number">0x00000003</span> &lt;----+---------+ <span class="hljs-number">0x00000000</span> |
+ |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                <span class="hljs-number">0x00000002</span> &lt;----+---------+     ~      |
+ |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0000</span>|            |
+ |                <span class="hljs-number">0x00000001</span> &lt;--------------+ <span class="hljs-number">0x00000003</span> |
+ |                                |<span class="hljs-number">0000</span> <span class="hljs-number">0001</span>|            |
+ +------------&gt;   <span class="hljs-number">0x00000000</span> &lt;----+---------+------------+
+</div></code></pre>
 <ul>
-<li data-line="66" class="code-line">链式存储结构</li>
+<li data-line="165" class="code-line">链式存储结构</li>
 </ul>
-<p data-line="68" class="code-line">链式存储结构是把数据元素存放在任意的存储单元里，这组存储单元可以是连续的，也可以是不连续的，元素的存储关系并不能反映其逻辑关系，因此需要用一个指针存放数据元素的地址，这样通过地址就可以找到相关数据的位置</p>
-<p data-line="70" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-2-12-34-22.png" alt="" class="loading" id="image-hash-685fb51f265b43c5e58d7011b18987319a9caacab69822ce446cb7667fda4a2c"></p>
+<p data-line="167" class="code-line">链式存储结构是把数据元素存放在任意的存储单元里，这组存储单元可以是连续的，也可以是不连续的，元素的存储关系并不能反映其逻辑关系，因此需要用一个指针存放数据元素的地址，这样通过地址就可以找到相关数据的位置</p>
+<pre><code data-line="169" class="code-line language-c"><div><span class="hljs-number">0xAAAA</span>   +---&gt;<span class="hljs-number">0xBBBB</span>   +---&gt;<span class="hljs-number">0xCCCC</span>   +---&gt;<span class="hljs-number">0xDDDD</span>   +---&gt;<span class="hljs-number">0xEEEE</span>   +---&gt;<span class="hljs-number">0xFFFF</span>
++----+   |    +----+   |    +----+   |    +----+   |    +----+   |    +----+
+|Data|   |    |Data|   |    |Data|   |    |Data|   |    |Data|   |    |Data|
++----+   |    +----+   |    +----+   |    +----+   |    +----+   |    +----+
+|Next+---+    |Next+---+    |Next+---+    |Next+---+    |Next+---+    |Next+----&gt; <span class="hljs-literal">NULL</span>
++----+        +----+        +----+        +----+        +----+        +----+
+</div></code></pre>
 </li>
 </ul>
 <br/>
-<a for="toc-anchor" id="%E4%BB%80%E4%B9%88%E6%98%AF%E7%AE%97%E6%B3%95"></a><h4 id="e4bb80e4b988e698afe7ae97e6b395-1" data-line="74" class="code-line">什么是算法</h4>
-<p data-line="76" class="code-line">算法是特定问题求解步骤的描述，在计算机中表现为指令的有限序列，算法是独立存在的一种解决问题的方法和思想，
+<a for="toc-anchor" id="%E4%BB%80%E4%B9%88%E6%98%AF%E7%AE%97%E6%B3%95"></a><h4 id="e4bb80e4b988e698afe7ae97e6b395-1" data-line="180" class="code-line">什么是算法</h4>
+<p data-line="182" class="code-line">算法是特定问题求解步骤的描述，在计算机中表现为指令的有限序列，算法是独立存在的一种解决问题的方法和思想，
 对于算法而言，语言并不重要，重要的是思想</p>
 <br/>
-<a for="toc-anchor" id="%E7%AE%97%E6%B3%95%E7%9A%84%E7%89%B9%E6%80%A7"></a><h4 id="e7ae97e6b395e79a84e789b9e680a7-1" data-line="81" class="code-line">算法的特性</h4>
+<a for="toc-anchor" id="%E7%AE%97%E6%B3%95%E7%9A%84%E7%89%B9%E6%80%A7"></a><h4 id="e7ae97e6b395e79a84e789b9e680a7-1" data-line="187" class="code-line">算法的特性</h4>
 <ul>
-<li data-line="83" class="code-line">输入输出：算法具有零个或多个输入、至少有一个或多个输出</li>
-<li data-line="84" class="code-line">有穷性：指算法在执行有限的步骤之后，自动结束而不会出现无限循环，并且每一个步骤在可接受的时间内完成</li>
-<li data-line="85" class="code-line">确定性：算法的每一步骤都有确定的含义，不会出现二义性</li>
-<li data-line="86" class="code-line">可行性：算法的每一步都必须是可行的，也就是说，每一步都能通过执行有限次数完成</li>
+<li data-line="189" class="code-line">输入输出：算法具有零个或多个输入、至少有一个或多个输出</li>
+<li data-line="190" class="code-line">有穷性：指算法在执行有限的步骤之后，自动结束而不会出现无限循环，并且每一个步骤在可接受的时间内完成</li>
+<li data-line="191" class="code-line">确定性：算法的每一步骤都有确定的含义，不会出现二义性</li>
+<li data-line="192" class="code-line">可行性：算法的每一步都必须是可行的，也就是说，每一步都能通过执行有限次数完成</li>
 </ul>
 <br/>
-<a for="toc-anchor" id="%E7%AE%97%E6%B3%95%E5%92%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%8B%E9%97%B4%E7%9A%84%E8%81%94%E7%B3%BB"></a><h4 id="e7ae97e6b395e5928ce695b0e68daee7bb93e69e84e4b98be997b4e79a84e88194e7b3bb-1" data-line="91" class="code-line">算法和数据结构之间的联系</h4>
-<p data-line="93" class="code-line">算法是为了解决实际问题而设计，而数据结构只是静态的描述了数据元素之间的关系，它是算法需要处理问题的一种载体，即算法和数据结构之间是属于一种 <font color="red">相辅相成</font> 的关系，<font color="red">一个高效的应用程序需要在数据结构的基础上设计和选择算法</font></p>
+<a for="toc-anchor" id="%E7%AE%97%E6%B3%95%E5%92%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%8B%E9%97%B4%E7%9A%84%E8%81%94%E7%B3%BB"></a><h4 id="e7ae97e6b395e5928ce695b0e68daee7bb93e69e84e4b98be997b4e79a84e88194e7b3bb-1" data-line="197" class="code-line">算法和数据结构之间的联系</h4>
+<p data-line="199" class="code-line">算法是为了解决实际问题而设计，而数据结构只是静态的描述了数据元素之间的关系，它是算法需要处理问题的一种载体，即算法和数据结构之间是属于一种 <font color="red">相辅相成</font> 的关系，<font color="red">一个高效的应用程序需要在数据结构的基础上设计和选择算法</font></p>
 <br/>
-<a for="toc-anchor" id="arrary"></a><h3 id="arrary-1" data-line="98" class="code-line">Arrary</h3>
-<p data-line="100" class="code-line"><span id="Arrary"></span></p>
+<a for="toc-anchor" id="arrary"></a><h3 id="arrary-1" data-line="204" class="code-line">Arrary</h3>
+<p data-line="206" class="code-line"><span id="Arrary"></span></p>
 <hr>
-<a for="toc-anchor" id="basic-arrary"></a><h4 id="basic-arrary-1" data-line="104" class="code-line">Basic Arrary</h4>
-<p data-line="106" class="code-line">作为基础数据类型的一种，其应用对我们来说再熟悉不过，在我们声明了一个数组后，<font color = "red">数组的每个成员的内存地址都是连续且有序的</font>，关于这点特性我们就能够总结出数组的优点和缺点</p>
+<a for="toc-anchor" id="basic-arrary"></a><h4 id="basic-arrary-1" data-line="210" class="code-line">Basic Arrary</h4>
+<p data-line="212" class="code-line">作为基础数据类型的一种，其应用对我们来说再熟悉不过，在我们声明了一个数组后，<font color = "red">数组的每个成员的内存地址都是连续且有序的</font>，关于这点特性我们就能够总结出数组的优点和缺点</p>
 <ul>
-<li data-line="108" class="code-line">优点
+<li data-line="214" class="code-line">优点
 <ul>
-<li data-line="109" class="code-line">对于元素的随机访问效率更高，即每个元素之间仅通过地址的偏移就能够访问到其他元素的内容</li>
-<li data-line="110" class="code-line">对比链表，数组在预先知道预存数据总量的情况下，数组对比链表对于空间的开销更小</li>
-<li data-line="111" class="code-line">由于数组属于一种基础数据类型，我们对于数组的操作和使用就体验来说对于开发人员更为友好</li>
+<li data-line="215" class="code-line">对于元素的随机访问效率更高，即每个元素之间仅通过地址的偏移就能够访问到其他元素的内容</li>
+<li data-line="216" class="code-line">对比链表，数组在预先知道预存数据总量的情况下，数组对比链表对于空间的开销更小</li>
+<li data-line="217" class="code-line">由于数组属于一种基础数据类型，我们对于数组的操作和使用就体验来说对于开发人员更为友好</li>
 </ul>
 </li>
-<li data-line="112" class="code-line">缺点
+<li data-line="218" class="code-line">缺点
 <ul>
-<li data-line="113" class="code-line">
-<p data-line="113" class="code-line">如果在数组首元素和数组尾元素之间 ( 包括首元素但不包括尾元素 ) ，对于新元素的插入或者旧元素的删除操作，那么效率会非常低。假定声明了一个长度非常长的数组，因为元素与元素之间的内存地址是连续的，如果在这之中进行了插入操作，比如说在第一个元素的位置上插入一个其它的元素，这时候我们需要把第一个元素后面元素的都需要往后偏移一位，可想而知这个工程量带来了多少 <font color = "red">性能损失</font>，除了性能损失之外，在 c 中，如果当前操作在数组的长度已经达到最大阈值的基础下进行，那么我们还需要考虑 <font color="red">内存安全的问题</font>，还有一点的是，由于往后偏移我们无非就是遍历开始偏移位置的元素，逐元素往后复制一份，由于是赋值操作，所以还需要考虑到 <font color = "red">深浅拷贝的问题</font></p>
+<li data-line="219" class="code-line">
+<p data-line="219" class="code-line">如果在数组首元素和数组尾元素之间 ( 包括首元素但不包括尾元素 ) ，对于新元素的插入或者旧元素的删除操作，那么效率会非常低。假定声明了一个长度非常长的数组，因为元素与元素之间的内存地址是连续的，如果在这之中进行了插入操作，比如说在第一个元素的位置上插入一个其它的元素，这时候我们需要把第一个元素后面元素的都需要往后偏移一位，可想而知这个工程量带来了多少 <font color = "red">性能损失</font>，除了性能损失之外，在 c 中，如果当前操作在数组的长度已经达到最大阈值的基础下进行，那么我们还需要考虑 <font color="red">内存安全的问题</font>，还有一点的是，由于往后偏移我们无非就是遍历开始偏移位置的元素，逐元素往后复制一份，由于是赋值操作，所以还需要考虑到 <font color = "red">深浅拷贝的问题</font></p>
 </li>
-<li data-line="115" class="code-line">
-<p data-line="115" class="code-line">数组在声明的过程中就已经给定了一块线性连续的内存空间，如果在不知道预存数据量总量的情况下，那么在给定数据量小于数组所声明的大小的话，会出现对于内存空间使用的浪费的问题，那么在给定数据量大于数组所声明的大小的话，就会出现无法对数组长度在进行动态扩展的窘境</p>
+<li data-line="221" class="code-line">
+<p data-line="221" class="code-line">数组在声明的过程中就已经给定了一块线性连续的内存空间，如果在不知道预存数据量总量的情况下，那么在给定数据量小于数组所声明的大小的话，会出现对于内存空间使用的浪费的问题，那么在给定数据量大于数组所声明的大小的话，就会出现无法对数组长度在进行动态扩展的窘境</p>
 </li>
-<li data-line="117" class="code-line">
-<p data-line="117" class="code-line">与链表相比，在某种情况下对于数组的操作是不太安全的，因为对于数组的操作我们都需要通过地址的偏移来获取到指定内存的地址再拿到里面的数据，这就有可能会出现偏移过多导致访问到野指针的情况，而相对于链表，由于节点与节点之间是通过地址相连在一起，故我们是可以通过查看当前节点所存储的下一节点的指针是否为空的方式来判断所连接的下一节点是否是一个野指针的问题</p>
-</li>
-</ul>
+<li data-line="223" class="code-line">
+<p data-line="223" class="code-line">与链表相比，在某种情况下对于数组的操作是不太安全的，因为对于数组的操作我们都需要通过地址的偏移来获取到指定内存的地址再拿到里面的数据，这就有可能会出现偏移过多导致访问到野指针的情况，而相对于链表，由于节点与节点之间是通过地址相连在一起，故我们是可以通过查看当前节点所存储的下一节点的指针是否为空的方式来判断所连接的下一节点是否是一个野指针的问题</p>
 </li>
 </ul>
-<p data-line="119" class="code-line">关于数组的使用方式，在这篇博客中不进行展开，详情参考 <a href="https://github.com/NGPONG/document/blob/master/C/2019/12_18/C_Programming_Language.md" data-href="https://github.com/NGPONG/document/blob/master/C/2019/12_18/C_Programming_Language.md">这一章</a> 博客中对于数组使用方式的详解</p>
+</li>
+</ul>
+<p data-line="225" class="code-line">关于数组的使用方式，在这篇博客中不进行展开，详情参考 <a href="https://github.com/NGPONG/document/blob/master/C/2019/12_18/C_Programming_Language.md" data-href="https://github.com/NGPONG/document/blob/master/C/2019/12_18/C_Programming_Language.md">这一章</a> 博客中对于数组使用方式的详解</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-<p data-line="123" class="code-line">对于 <kbd>Basic Arrary</kbd> 来说，虽然其本身存在着优点，但是不可否认的是，它也有许许多多的一些短板，对于这些短板，前辈们都想出了各式各样的数据结构来填补这些缺陷，但，对于数据结构来说永远没有 <kbd>Perfect</kbd> 这一单词，可能某个数据结构解决了一些根本性的问题，但是随之而来的又会产生一些新的问题</p>
+<p data-line="229" class="code-line">对于 <kbd>Basic Arrary</kbd> 来说，虽然其本身存在着优点，但是不可否认的是，它也有许许多多的一些短板，对于这些短板，前辈们都想出了各式各样的数据结构来填补这些缺陷，但，对于数据结构来说永远没有 <kbd>Perfect</kbd> 这一单词，可能某个数据结构解决了一些根本性的问题，但是随之而来的又会产生一些新的问题</p>
 </div>
 <br/>
-<a for="toc-anchor" id="dynamic-arrary"></a><h4 id="dynamic-arrary-1" data-line="128" class="code-line">Dynamic Arrary</h4>
-<p data-line="130" class="code-line">动态数组属于对 <kbd>Basic Arrary</kbd> 的一项扩展内容，它在 <font color = "red">保持 <kbd>Basic Arrary</kbd> 本质不变的情况下，还解决掉了 <kbd>Basic Arrary</kbd> 无法进行动态扩展的短板</font></p>
-<pre><code data-line="132" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<a for="toc-anchor" id="dynamic-arrary"></a><h4 id="dynamic-arrary-1" data-line="234" class="code-line">Dynamic Arrary</h4>
+<p data-line="236" class="code-line">动态数组属于对 <kbd>Basic Arrary</kbd> 的一项扩展内容，它在 <font color = "red">保持 <kbd>Basic Arrary</kbd> 本质不变的情况下，还解决掉了 <kbd>Basic Arrary</kbd> 无法进行动态扩展的短板</font></p>
+<pre><code data-line="238" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string.h&gt;</span></span>
 
@@ -358,52 +459,52 @@
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="linked-list"></a><h3 id="linked-list-1" data-line="364" class="code-line">Linked List</h3>
+<a for="toc-anchor" id="linked-list"></a><h3 id="linked-list-1" data-line="470" class="code-line">Linked List</h3>
 <hr>
-<p data-line="368" class="code-line"><span id="LinkedList"></span></p>
-<p data-line="370" class="code-line">链表是一种常用的数据结构，它由一系列的 <kbd>node</kbd> 通过指针的方式相互连接起来，以此形成一条数据链，而每个节点中主要是维护着两种重要的信息，它们分别是：</p>
+<p data-line="474" class="code-line"><span id="LinkedList"></span></p>
+<p data-line="476" class="code-line">链表是一种常用的数据结构，它由一系列的 <kbd>node</kbd> 通过指针的方式相互连接起来，以此形成一条数据链，而每个节点中主要是维护着两种重要的信息，它们分别是：</p>
 <ul>
-<li data-line="372" class="code-line">
-<p data-line="372" class="code-line"><kbd>Data：数据域</kbd></p>
-<p data-line="374" class="code-line">存放着当前节点所存储的信息数据</p>
+<li data-line="478" class="code-line">
+<p data-line="478" class="code-line"><kbd>Data：数据域</kbd></p>
+<p data-line="480" class="code-line">存放着当前节点所存储的信息数据</p>
 </li>
-<li data-line="376" class="code-line">
-<p data-line="376" class="code-line"><kbd>Pointer：指针域</kbd></p>
-<p data-line="378" class="code-line">存放着其它节点在内存中的首地址，即每一个节点都能够指向 上一个 / 下一个 节点的信息</p>
-</li>
-</ul>
-<br/>
-<a for="toc-anchor" id="%E9%93%BE%E8%A1%A8%E4%B8%8E%E6%95%B0%E7%BB%84"></a><h4 id="e993bee8a1a8e4b88ee695b0e7bb84-1" data-line="382" class="code-line">链表与数组</h4>
-<p data-line="384" class="code-line">对于链表来说，其通常用于和 <kbd>Arrary</kbd> 做对比，由于链表是通过节点与节点之间的连接来完成一条数据链的构造，故该特性能够解决掉 Arrary 本身所存在的许多缺点，但是相对的，更是由于这一特性，链表在解决了 Arrary 本身所存在的缺陷的同时却无法保留掉原有数组本身的 <kbd>优点</kbd>，即 链表 在解决了 Arrary 本身所存在的缺陷的同时又把 Arrary 身上的优点转换为了 链表 所带有的缺陷</p>
-<ul>
-<li data-line="386" class="code-line">
-<p data-line="386" class="code-line">优点</p>
-<ul>
-<li data-line="387" class="code-line">链表对比数组，在链表头至链表尾中删除或新增某个节点的时候效率会很高，因为我们只用改变当前位置上，前一个节点或者是后一个节点的指针指向即可完成插入或者是删除的操作</li>
-<li data-line="388" class="code-line">链表在建立的时候无需知道数据总量的大小，我们可以随时的对链表进行扩展和分配新的节点空间，这间接的解决了数组对于开辟空间较大而导致的内存浪费的问题</li>
-<li data-line="389" class="code-line">链表的操作对比数组来说是更为安全的，因为对于数组的操作我们都需要通过地址的偏移来获取到指定内存的地址再拿到里面的数据，这就有可能会出现偏移过多导致访问到野指针的情况，而相对于链表，由于节点与节点之间是通过地址相连在一起，故我们是可以通过查看当前节点所存储的下一节点的指针是否为空的方式来判断所连接的下一节点是否是一个野指针的问题</li>
-</ul>
-</li>
-<li data-line="391" class="code-line">
-<p data-line="391" class="code-line">缺点</p>
-<ul>
-<li data-line="392" class="code-line">对于元素的随机访问效率较低，因为节点与节点之间是通过指针的方式连接在一起，并且节点与节点之间的内存地址不是连续的，故我们无法做到像数组那样直接通过地址偏移就能访问到某个下标的元素，想访问某个下标的节点的信息我们只能去遍历这张链表，直到达到指定下标的节点</li>
-<li data-line="393" class="code-line">由于链表的本身需要由多种成员来构成 ( 指针域、数据域、…… )，即链表的使用在一定程度上增加了空间复杂度</li>
-<li data-line="394" class="code-line">链表在 c 语言中并不是语言标准的支持，故操作起来没有数组较为方便</li>
-</ul>
+<li data-line="482" class="code-line">
+<p data-line="482" class="code-line"><kbd>Pointer：指针域</kbd></p>
+<p data-line="484" class="code-line">存放着其它节点在内存中的首地址，即每一个节点都能够指向 上一个 / 下一个 节点的信息</p>
 </li>
 </ul>
 <br/>
-<a for="toc-anchor" id="%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E5%A4%B4%E8%8A%82%E7%82%B9%E5%92%8C%E5%B0%BE%E8%8A%82%E7%82%B9"></a><h4 id="e993bee8a1a8e4b8ade79a84e5a4b4e88a82e782b9e5928ce5b0bee88a82e782b9-1" data-line="398" class="code-line">链表中的头节点和尾节点</h4>
-<p data-line="400" class="code-line">什么是链表的头节点和尾节点？</p>
-<p data-line="402" class="code-line">一张链表在初始化完毕后，我们通常会额外添加两个特殊的节点，这两个节点仅仅只是维护了一个指针域，指针域指向这张链表的头节点和尾节点在内存中的首地址，而这两种特殊的节点就为链表的 <kbd>头节点</kbd> 和 <kbd>尾节点</kbd></p>
-<p data-line="404" class="code-line">为什么需要链表的头节点和尾节点？</p>
-<p data-line="406" class="code-line">先拿头节点来说，如果我们有一个地方能够存储一张链表的头结点的话，就能够对于这张链表起到一个标志位的作用，那么在后面，不管我们对这张链表进行如何操作，我们都可以恒定的知道这张链表起始节点的位置，假设我们对于一张链表遍历到某个节点的时候，这时候其实就已经改变了这张链表中具体某个节点位置的指向了，简而言之就是不在链表的起始位置上，这时候我们还需要对它进行重新遍历的话，那么这个头节点的标志位就起到了标志性的作用，对于一张合格的链表数据结构的定义来说，<font color="red">头节点的存在是必须的</font></p>
-<p data-line="408" class="code-line">而尾节点的作用在于能够快速的获取到链表尾部节点的位置，以方便对链表进行节点扩展的操作，如果没有尾节点，那么我们想要为一个链表新增节点成员的话，那么我们就需要从头到尾遍历一次整张链表，直至拿到最后一个节点的信息我们才能进行新增节点的操作</p>
+<a for="toc-anchor" id="%E9%93%BE%E8%A1%A8%E4%B8%8E%E6%95%B0%E7%BB%84"></a><h4 id="e993bee8a1a8e4b88ee695b0e7bb84-1" data-line="488" class="code-line">链表与数组</h4>
+<p data-line="490" class="code-line">对于链表来说，其通常用于和 <kbd>Arrary</kbd> 做对比，由于链表是通过节点与节点之间的连接来完成一条数据链的构造，故该特性能够解决掉 Arrary 本身所存在的许多缺点，但是相对的，更是由于这一特性，链表在解决了 Arrary 本身所存在的缺陷的同时却无法保留掉原有数组本身的 <kbd>优点</kbd>，即 链表 在解决了 Arrary 本身所存在的缺陷的同时又把 Arrary 身上的优点转换为了 链表 所带有的缺陷</p>
+<ul>
+<li data-line="492" class="code-line">
+<p data-line="492" class="code-line">优点</p>
+<ul>
+<li data-line="493" class="code-line">链表对比数组，在链表头至链表尾中删除或新增某个节点的时候效率会很高，因为我们只用改变当前位置上，前一个节点或者是后一个节点的指针指向即可完成插入或者是删除的操作</li>
+<li data-line="494" class="code-line">链表在建立的时候无需知道数据总量的大小，我们可以随时的对链表进行扩展和分配新的节点空间，这间接的解决了数组对于开辟空间较大而导致的内存浪费的问题</li>
+<li data-line="495" class="code-line">链表的操作对比数组来说是更为安全的，因为对于数组的操作我们都需要通过地址的偏移来获取到指定内存的地址再拿到里面的数据，这就有可能会出现偏移过多导致访问到野指针的情况，而相对于链表，由于节点与节点之间是通过地址相连在一起，故我们是可以通过查看当前节点所存储的下一节点的指针是否为空的方式来判断所连接的下一节点是否是一个野指针的问题</li>
+</ul>
+</li>
+<li data-line="497" class="code-line">
+<p data-line="497" class="code-line">缺点</p>
+<ul>
+<li data-line="498" class="code-line">对于元素的随机访问效率较低，因为节点与节点之间是通过指针的方式连接在一起，并且节点与节点之间的内存地址不是连续的，故我们无法做到像数组那样直接通过地址偏移就能访问到某个下标的元素，想访问某个下标的节点的信息我们只能去遍历这张链表，直到达到指定下标的节点</li>
+<li data-line="499" class="code-line">由于链表的本身需要由多种成员来构成 ( 指针域、数据域、…… )，即链表的使用在一定程度上增加了空间复杂度</li>
+<li data-line="500" class="code-line">链表在 c 语言中并不是语言标准的支持，故操作起来没有数组较为方便</li>
+</ul>
+</li>
+</ul>
 <br/>
-<a for="toc-anchor" id="singly-linked-list"></a><h4 id="singly-linked-list-1" data-line="412" class="code-line">Singly Linked List</h4>
-<p data-line="414" class="code-line">单链表的存储模型</p>
-<pre><code data-line="415" class="code-line language-c"><div>  Head                                                                  Tail
+<a for="toc-anchor" id="%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E5%A4%B4%E8%8A%82%E7%82%B9%E5%92%8C%E5%B0%BE%E8%8A%82%E7%82%B9"></a><h4 id="e993bee8a1a8e4b8ade79a84e5a4b4e88a82e782b9e5928ce5b0bee88a82e782b9-1" data-line="504" class="code-line">链表中的头节点和尾节点</h4>
+<p data-line="506" class="code-line">什么是链表的头节点和尾节点？</p>
+<p data-line="508" class="code-line">一张链表在初始化完毕后，我们通常会额外添加两个特殊的节点，这两个节点仅仅只是维护了一个指针域，指针域指向这张链表的头节点和尾节点在内存中的首地址，而这两种特殊的节点就为链表的 <kbd>头节点</kbd> 和 <kbd>尾节点</kbd></p>
+<p data-line="510" class="code-line">为什么需要链表的头节点和尾节点？</p>
+<p data-line="512" class="code-line">先拿头节点来说，如果我们有一个地方能够存储一张链表的头结点的话，就能够对于这张链表起到一个标志位的作用，那么在后面，不管我们对这张链表进行如何操作，我们都可以恒定的知道这张链表起始节点的位置，假设我们对于一张链表遍历到某个节点的时候，这时候其实就已经改变了这张链表中具体某个节点位置的指向了，简而言之就是不在链表的起始位置上，这时候我们还需要对它进行重新遍历的话，那么这个头节点的标志位就起到了标志性的作用，对于一张合格的链表数据结构的定义来说，<font color="red">头节点的存在是必须的</font></p>
+<p data-line="514" class="code-line">而尾节点的作用在于能够快速的获取到链表尾部节点的位置，以方便对链表进行节点扩展的操作，如果没有尾节点，那么我们想要为一个链表新增节点成员的话，那么我们就需要从头到尾遍历一次整张链表，直至拿到最后一个节点的信息我们才能进行新增节点的操作</p>
+<br/>
+<a for="toc-anchor" id="singly-linked-list"></a><h4 id="singly-linked-list-1" data-line="518" class="code-line">Singly Linked List</h4>
+<p data-line="520" class="code-line">单链表的存储模型</p>
+<pre><code data-line="521" class="code-line language-c"><div>  Head                                                                  Tail
 +-------+                                                             +-------+
 |Pointer|                                                             |Pointer|
 +---+---+                                                             +---+---+
@@ -417,8 +518,8 @@
  |Next+---+    |Next+---+    |Next+---+    |Next+---+    |Next+---+    |Next+----&gt; <span class="hljs-literal">NULL</span>
  +----+        +----+        +----+        +----+        +----+        +----+
 </div></code></pre>
-<p data-line="431" class="code-line">单链表的实现</p>
-<pre><code data-line="433" class="code-line language-c"><div><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">node</span> {</span>
+<p data-line="537" class="code-line">单链表的实现</p>
+<pre><code data-line="539" class="code-line language-c"><div><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">node</span> {</span>
 
 	<span class="hljs-keyword">void</span> *data;
 	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">node</span> *<span class="hljs-title">next</span>;</span>
@@ -705,9 +806,9 @@
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="doubly-linked-list"></a><h4 id="doubly-linked-list-1" data-line="722" class="code-line">Doubly linked list</h4>
-<p data-line="724" class="code-line">双链表的存储模型</p>
-<pre><code data-line="726" class="code-line language-c"><div>            Head                                                                      Tail
+<a for="toc-anchor" id="doubly-linked-list"></a><h4 id="doubly-linked-list-1" data-line="828" class="code-line">Doubly linked list</h4>
+<p data-line="830" class="code-line">双链表的存储模型</p>
+<pre><code data-line="832" class="code-line language-c"><div>            Head                                                                      Tail
           +-------+                                                                 +-------+
           |Pointer|                                                                 |Pointer|
           +---+---+                                                                 +---+---+
@@ -724,9 +825,9 @@
            +----+         +----+         +----+         +----+         +----+         +----+
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="singly-circular-linked-list"></a><h4 id="singly-circular-linked-list-1" data-line="746" class="code-line">Singly Circular linked list</h4>
-<p data-line="748" class="code-line">单向循环链表的存储模型</p>
-<pre><code data-line="750" class="code-line language-c"><div>     Head                                                                 Tail
+<a for="toc-anchor" id="singly-circular-linked-list"></a><h4 id="singly-circular-linked-list-1" data-line="852" class="code-line">Singly Circular linked list</h4>
+<p data-line="854" class="code-line">单向循环链表的存储模型</p>
+<pre><code data-line="856" class="code-line language-c"><div>     Head                                                                 Tail
    +-------+                                                          	 +-------+
    |Pointer|                                                          	 |Pointer|
    +---+---+                                                             +---+---+
@@ -744,9 +845,9 @@
 +-----------------------------------------------------------------------------------+
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="doubly-circular-linked-list"></a><h4 id="doubly-circular-linked-list-1" data-line="771" class="code-line">Doubly Circular linked list</h4>
-<p data-line="773" class="code-line">双向循环链表的存储模型</p>
-<pre><code data-line="775" class="code-line language-c"><div>+--------------------------------------------------------------------------------------------+
+<a for="toc-anchor" id="doubly-circular-linked-list"></a><h4 id="doubly-circular-linked-list-1" data-line="877" class="code-line">Doubly Circular linked list</h4>
+<p data-line="879" class="code-line">双向循环链表的存储模型</p>
+<pre><code data-line="881" class="code-line language-c"><div>+--------------------------------------------------------------------------------------------+
 |                                                                                            |
 |                                                                                            |
 | 	   Head                                                                      Tail        |
@@ -771,15 +872,15 @@
   +---------------------------------------------------------------------------------------+
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="stack-%26-queue"></a><h3 id="stack--queue-1" data-line="803" class="code-line">Stack &amp; Queue</h3>
-<p data-line="805" class="code-line"><span id = "Stack&Queue"></span></p>
+<a for="toc-anchor" id="stack-%26-queue"></a><h3 id="stack--queue-1" data-line="909" class="code-line">Stack &amp; Queue</h3>
+<p data-line="911" class="code-line"><span id = "Stack&Queue"></span></p>
 <hr>
-<p data-line="809" class="code-line">把 <kbd>Stack</kbd> 和 <kbd>Queue</kbd> 放在一起的原因是因为两者的实现的是非常的相似</p>
-<p data-line="811" class="code-line">对于 Stack 来说其实现需要遵循 <kbd>FILO</kbd> 原则</p>
-<p data-line="813" class="code-line">对于 Queue 来说其实现需要遵循 <kbd>FIFO</kbd> 原则</p>
+<p data-line="915" class="code-line">把 <kbd>Stack</kbd> 和 <kbd>Queue</kbd> 放在一起的原因是因为两者的实现的是非常的相似</p>
+<p data-line="917" class="code-line">对于 Stack 来说其实现需要遵循 <kbd>FILO</kbd> 原则</p>
+<p data-line="919" class="code-line">对于 Queue 来说其实现需要遵循 <kbd>FIFO</kbd> 原则</p>
 <br/>
-<a for="toc-anchor" id="stack-%E7%9A%84%E5%AD%98%E5%82%A8%E6%A8%A1%E5%9E%8B"></a><h4 id="stack-e79a84e5ad98e582a8e6a8a1e59e8b-1" data-line="817" class="code-line">Stack 的存储模型</h4>
-<pre><code data-line="819" class="code-line language-c"><div>BOTTOM
+<a for="toc-anchor" id="stack-%E7%9A%84%E5%AD%98%E5%82%A8%E6%A8%A1%E5%9E%8B"></a><h4 id="stack-e79a84e5ad98e582a8e6a8a1e59e8b-1" data-line="923" class="code-line">Stack 的存储模型</h4>
+<pre><code data-line="925" class="code-line language-c"><div>BOTTOM
    ↑
    +
    +------------------+
@@ -798,22 +899,21 @@
    +                  +
    ↓
   TOP
-
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="queue-%E7%9A%84%E5%AD%98%E5%82%A8%E6%A8%A1%E5%9E%8B"></a><h4 id="queue-e79a84e5ad98e582a8e6a8a1e59e8b-1" data-line="844" class="code-line">Queue 的存储模型</h4>
-<pre><code data-line="846" class="code-line language-c"><div>   BACK &lt;--------------------------------&gt; FONT
+<a for="toc-anchor" id="queue-%E7%9A%84%E5%AD%98%E5%82%A8%E6%A8%A1%E5%9E%8B"></a><h4 id="queue-e79a84e5ad98e582a8e6a8a1e59e8b-1" data-line="949" class="code-line">Queue 的存储模型</h4>
+<pre><code data-line="951" class="code-line language-c"><div>   BACK &lt;----------------------------------&gt; FONT
 
-        +--------------------------------+
+         +-------------------------------+
          +---+   +---+ +---+ +---+   +---+
 PUSH +--&gt;+ E |   | D | | C | | B |   | A +---&gt; POP
          +---+   +---+ +---+ +---+   +---+
-        +--------------------------------+
+         +-------------------------------+
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="stack-%E7%9A%84%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"></a><h4 id="stack-e79a84e585b7e4bd93e5ae9ee78eb0-1" data-line="858" class="code-line">Stack 的具体实现</h4>
-<p data-line="860" class="code-line">在这篇 Blog 中，我并不打算对 <kbd>Queue</kbd> 的存储结构进行实现，因为二者实现起来相似度还是挺高，故本 Blog 中只是针对 Stack 进行了一个实现，下面代码中则为实现了一个 <font color = "red">顺序存储</font> 的字符栈</p>
-<pre><code data-line="862" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> MAX_LENGTH 0x400</span>
+<a for="toc-anchor" id="stack-%E7%9A%84%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"></a><h4 id="stack-e79a84e585b7e4bd93e5ae9ee78eb0-1" data-line="963" class="code-line">Stack 的具体实现</h4>
+<p data-line="965" class="code-line">在这篇 Blog 中，我并不打算对 <kbd>Queue</kbd> 的存储结构进行实现，因为二者实现起来相似度还是挺高，故本 Blog 中只是针对 Stack 进行了一个实现，下面代码中则为实现了一个 <font color = "red">顺序存储</font> 的字符栈</p>
+<pre><code data-line="967" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> MAX_LENGTH 0x400</span>
 
 <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Stack</span> {</span>
 
@@ -901,9 +1001,9 @@ PUSH +--&gt;+ E |   | D | | C | | B |   | A +---&gt; POP
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="tree"></a><h3 id="tree-1" data-line="953" class="code-line">Tree</h3>
+<a for="toc-anchor" id="tree"></a><h3 id="tree-1" data-line="1058" class="code-line">Tree</h3>
 <hr>
-<p data-line="957" class="code-line"><span id = "Tree"></span></p>
+<p data-line="1062" class="code-line"><span id = "Tree"></span></p>
 </div>
 
 </body>
