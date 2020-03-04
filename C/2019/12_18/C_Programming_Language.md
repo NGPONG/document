@@ -3971,7 +3971,7 @@ gcc helloworld.o -o helloworld.exe
                                                                        
     int a = ~2 ----------> ~ 0000 0010
                                  |
-                              ~RESULT 
+                               RESULT 
                                  |
                                  v                          
                              1111 1101 --INVERSE--> 1| 0000 0010 --COMPLEMENT--> 1| 0000 0011 --REAL--> int a = -3
@@ -3985,7 +3985,7 @@ gcc helloworld.o -o helloworld.exe
     int a = 147 & 61 ---->  1001 0011 
                           & 0011 1101
                                 |
-                             &RESULT 
+                              RESULT 
                                 |
                                 v   
                             0001 0001 --REAL--> int a = 17;
@@ -4002,7 +4002,7 @@ gcc helloworld.o -o helloworld.exe
     int a = 147 | 61 ---->  1001 0011 
                           | 0011 1101
                                 |
-                             |RESULT 
+                              RESULT 
                                 |
                                 v 
                             1011 1111 --REAL--> int a = 191
@@ -4020,7 +4020,7 @@ gcc helloworld.o -o helloworld.exe
     int a = 147 ^ 61 ---->  1001 0011 
                           ^ 0011 1101
                                 |
-                             ^RESULT 
+                              RESULT 
                                 |
                                 v 
                             1010 1110 --REAL--> int a = 174
@@ -4061,7 +4061,13 @@ gcc helloworld.o -o helloworld.exe
     - 左移运算的结果，相当于 <span style="color:red">原值 * 2^n ( 移动位 )</span> 的结果
 
     ```c
-    int a = 7 << 2 ----> 0000 0111 << 2 --RESULT--> 0001 1100 -->REAL--> int a = 28
+    int a = 7 << 2 ----> 0000 0111 
+                      <<     2
+                             |
+                           RESULT 
+                             |
+                             v 
+                         0001 1100 --REAL--> int a = 28
     ```
 
 <br/>
@@ -4073,7 +4079,13 @@ gcc helloworld.o -o helloworld.exe
     - 右移运算的结果，如果原值位非负数，相当于 <span style="color:red">原值 / 2^n ( 移动位 )</span> 的结果
 
     ```c
-    int a = 138 >> 2 ----> 1000 1010 << 2 --RESULT--> 0010 0010 -->REAL--> int a = 34
+    int a = 138 >> 2 ----> 1000 1010 
+                        >>     2
+                               |
+                             RESULT 
+                               |
+                               v 
+                           0010 0010 --REAL--> int a = 34
     ```
     
 <br/>
