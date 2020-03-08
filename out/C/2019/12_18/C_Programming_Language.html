@@ -2210,17 +2210,17 @@ arrary[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>][<
 <p data-line="2440" class="code-line">经过刚刚上面所说，我们发现内存对齐前和内存对齐后无非就是改变了 int 类型数据在内存中的首地址就能带来很高的效益，没错，内存对齐的主要思想就是能把一个数据的首地址按照一定的规则合理分配到某个地址上以增加 CPU 的读取效率，那么这个规则是什么样的？</p>
 <p data-line="2442" class="code-line">首先再开始前，需要明白两个概念</p>
 <ul>
-<li data-line="2443" class="code-line">对齐模数 : 每个特定平台上的编译器都有自己的默认 <kbd>对齐模数</kbd> ，<kbd>GCC</kbd> 中默认为 [4]， <kbd>MSVC</kbd> 中默认为 <kbd>8</kbd> ，该值通常呈 <kbd>2^</kbd> 进行变更，我们可以通过以下两个语句对 <kbd>对齐模数</kbd> 进行变更或查看
+<li data-line="2443" class="code-line">对齐模数 : 每个特定平台上的编译器都有自己的默认 对齐模数 ，<kbd>GCC</kbd> 中默认为 [4]， <kbd>MSVC</kbd> 中默认为 <kbd>8</kbd> ，该值通常呈 <kbd>2^</kbd> 进行变更，我们可以通过以下两个语句对 对齐模数 进行变更或查看
 <ul>
 <li data-line="2444" class="code-line">#pragma pack(n) : 修改对齐模数为 <kbd>n</kbd></li>
-<li data-line="2445" class="code-line">#pragma pack(show) : 查看当前对齐模数，<kbd>仅需编译即可</kbd></li>
+<li data-line="2445" class="code-line">#pragma pack(show) : 查看当前对齐模数，<font color = "red">仅需编译即可</font></li>
 </ul>
 </li>
-<li data-line="2446" class="code-line">对齐单位 : <kbd>对齐模数</kbd> 和当前结构体中 <kbd>最大长度成员的字节数</kbd> 两者间进行对比 ( 如果成员为数组，则取的是数组具体类型的单位，比如说某个成员为 <kbd>int [4]</kbd> 的类型，则使用它的 <kbd>int</kbd> 类型作为对比项 ) ，<kbd>取长度更小的那个作为对齐单位</kbd></li>
+<li data-line="2446" class="code-line">对齐单位 : 对齐模数 和当前结构体中 <font color = "red">最大长度成员的字节数</font> 两者间进行对比 ( 如果成员为数组，则取的是数组具体类型的单位，比如说某个成员为 <kbd>int [4]</kbd> 的类型，则使用它的 <kbd>int</kbd> 类型作为对比项 ) ，<font color = "red">取长度更小的那个作为对齐单位</font></li>
 </ul>
-<p data-line="2448" class="code-line">首先，结构体中第一个成员在内存中的首地址并无规定，即它的 <kbd>offset</kbd> 为 <kbd>0</kbd>，我们可以理解为从 <kbd>0</kbd> 开始，但并不一定是从 <kbd>0</kbd> 地址开始，而 <kbd>首成员具体所占用的字节长度视下一个成员而定</kbd> ，如果只有一个成员，那么该结构体的大小就是该成员的大小，而该成员所占用的内存空间的长度也就是该成员具体类型的长度</p>
-<p data-line="2450" class="code-line">第一个成员以后的每个成员在内存中的首地址所在的位置，亦或者说往后成员相对于当前结构体的 <kbd>offset</kbd> 都是 <kbd>当前成员的大小 ( 如果为数组，仅取数组最低维度的元素的类 ）</kbd> 和 <kbd>当前结构体的对齐单位 </kbd> 进行对比 ( 如果所对比的成员的类型是一个 struct，则需要从该结构体内部的成员开始逐个对比，包括对齐单位也是获取的当前结构体成员的对齐单位，而不是取的包括当前结构体成员的结构体的对齐单位 ) ，取更小那个的整数倍作为该成员的首地址， <kbd>如有需要，编译器会在成员与成员之前填充空的字节</kbd></p>
-<p data-line="2452" class="code-line">在最后，该结构体还需要进行二次偏移，结构体的总大小会偏移为当前结构体的 <kbd>对齐单位</kbd> 的整数倍，具体至结构体中每个成员的 <kbd>真实字节大小</kbd> 的总和的近似值，比如说该结构体的 <kbd>对齐单位</kbd> 为 <kbd>4</kbd> ，结构体中所有成员的这真实字节长度为 <kbd>14</kbd> ，则结构体的总大小会偏移至 <kbd>16(4的整数倍)</kbd>， <kbd>如有需要编译器会在最末一个成员之后加上填充空的字节</kbd></p>
+<p data-line="2448" class="code-line">首先，结构体中第一个成员在内存中的首地址并无规定，即它的 <kbd>offset</kbd> 为 <kbd>0</kbd>，我们可以理解为从 <kbd>0</kbd> 开始，但并不一定是从 <kbd>0</kbd> 地址开始，而 <font color = "red">首成员具体所占用的字节长度视下一个成员而定</font> ，如果只有一个成员，那么该结构体的大小就是该成员的大小，而该成员所占用的内存空间的长度也就是该成员具体类型的长度</p>
+<p data-line="2450" class="code-line">第一个成员以后的每个成员在内存中的首地址所在的位置，亦或者说往后成员相对于当前结构体的 <kbd>offset</kbd> 都是 <font color = "red">当前成员的大小 ( 如果为数组，仅取数组最低维度的元素的类</font>  和 <font color = "red">当前结构体的对齐单位</font> 进行对比 ( 如果所对比的成员的类型是一个 struct，则需要从该结构体内部的成员开始逐个对比，包括对齐单位也是获取的当前结构体成员的对齐单位，而不是取的包括当前结构体成员的结构体的对齐单位 ) ，取更小那个的整数倍作为该成员的首地址，<font color = "red">如有需要，编译器会在成员与成员之前填充空的字节</font></p>
+<p data-line="2452" class="code-line">在最后，该结构体还需要进行二次偏移，结构体的总大小会偏移为当前结构体的 <kbd>对齐单位</kbd> 的整数倍，具体至结构体中每个成员的 <font color = "red">真实字节大小</font> 的总和的近似值，比如说该结构体的 <kbd>对齐单位</kbd> 为 <kbd>4</kbd> ，结构体中所有成员的这真实字节长度为 <kbd>14</kbd> ，则结构体的总大小会偏移至 <kbd>16(4的整数倍)</kbd>，<font color = "red">如有需要编译器会在最末一个成员之后加上填充空的字节</font></p>
 <pre><code data-line="2455" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">pragma</span> pack(4)</span>
 
 <span class="hljs-comment">/*

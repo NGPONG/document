@@ -1071,8 +1071,10 @@ int Destory(struct Stack *stack) {
 	1. *n = 0* 时称为 <font color = "red">空树</font>
 
 	2. *n > 0* 是称为 <font color = "red">非空树</font>，在任意一颗 非空树 中：
-	 - 有且只有一个特定的称为根 ( *Root* ) 的节点；
-	 - 当 n > 1 时，其余节点可分为 [[m]] ( *m > 0* ) 个 <font color = "red"> 互不相交</font> 的有限集 *T1、T2、……、Tm*，其中每一个集合本身又是一棵树 并且称为子树 ( *SubTree* )
+
+	 	2.1 有且只有一个特定的称为根 ( *Root* ) 的节点；
+		 
+	 	2.2 当 n > 1 时，其余节点可分为 [[m]] ( *m > 0* ) 个 <font color = "red"> 互不相交</font> 的有限集 *T1、T2、……、Tm*，其中每一个集合本身又是一棵树 并且称为子树 ( *SubTree* )
 	
 	<br/>
 
@@ -1126,7 +1128,6 @@ int Destory(struct Stack *stack) {
 - 如果将树中结点的各子树看成从左至右是有次序的，不能互换的，则称该树为 <font color= "red">有 序树</font> ，否则称为 <font color="red">无序树</font> ; 
 - <font color="red">森林</font> ( *Forest* ) 是 [[m]] ( *m > 0* ) 棵互不相交的树的集合，对树中每个结点而言，其 子树的集合即为森林
 
-
   ![2020-3-4-17-19-45.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-4-17-19-45.png)
 
 
@@ -1136,9 +1137,7 @@ int Destory(struct Stack *stack) {
 
 上面所展示的树形结构是从 <font color="red">人的逻辑概念上所看到的树形结构</font>，而对于开发人员而言，这种逻辑上的数据结构是难以操作和构造的，作为数据结构存储的两大分支无非就是 **顺序存储** 和 **链式存储**，而对于不进行过任何处理的树形结构来说显然是不满足这两种分支的存储模型的，所以我们必须把逻辑上的树形结构转换为一个真实的、具体的数据结构，简而言之，就是 <font color="red">把一颗复杂的树转换为一颗能够处理的树</font>，这种转换方式也称为 <font color = "red">树的表示法</font>
 
-!!! INFO PS
-
-	以下所展示的几种表示法以下图这种原始树形结构作为模型：
+!!! INFO PS : 以下所展示的几种表示法以下图这种原始树形结构作为模型
 
 	![2020-3-4-18-23-36.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-4-18-23-36.png)
 
@@ -1184,4 +1183,74 @@ int Destory(struct Stack *stack) {
 ![2020-3-4-19-49-30.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-4-19-49-30.png)
 
 
+<br/>
 
+### Binary Tree
+
+---
+
+<span id = "Binary_Tree"></span>
+
+对于在某个阶段下都是两种结果的情形，比如：开和关、0和1、真和假、上和下、对与错，正面与反面等，都适合用树状结构来建模，而这种树是一种很特殊的树状结构，叫做二叉树
+
+前面在孩子兄弟表示法中稍微提到了 <font color = "red">二叉树</font> 的概念，对于 二叉树 来说，由于其毎个结点至多只能有左孩子和右孩子，那么在这种情况下，二叉树所面对的变化就少很多了，因此很多相关性质和算法都是以 二叉树 作为模型基准所研究了出来的
+
+!!! INFO 二叉树的定义
+
+	二叉树 ( *Binary Tree* ) 是 [[n]] ( *n >= 0* ) 个节点的有限集合，该集合或者为空集 ( 称为 <font color = "red">空二叉树</font> )，或者由一个根结点和两裸互不相交的、分别称为根节点的 <font color = "red">左子树</font> 和 <font color = "red">右子树</font> 的二叉树组成
+
+	*Binary-Tree*
+	
+	![2020-3-8-1-57-31.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-8-1-57-31.png)
+
+
+<br/>
+
+#### 二叉树的特点和基本形态
+
+*二叉树的特点：*
+- 每个结点 <font color = "red">最多有两棵子树</font>，所以二叉树中不存在度大于 [[2]] 的结点，注意，不是只有两棵子树，而是最多有，<font color = "red">没有子树</font> 或者 <font color = "red">有一棵子树</font> 都是可以的
+
+- <font color = "red">左子树和右子树是有顺序的</font>，次序不能任意颠倒
+
+- 即使树中某结点只有一棵子树，也要区分它是 <font color = "red">左子树</font> 还是 <font color = "red">右子树</font>
+
+*二叉树具有的五种基本形态：*
+
+- 空二叉树
+- 只有一个根节点
+- 根节点只有左子树
+- 根节点只有右子树
+- 根节点既有左子树又有右子树
+
+<br/>
+
+#### 特殊的二叉树
+
+上面所提到的是二叉树的基本形态，但是对于二叉树来说，它是多变的，即可能在某种形态之下有着它一定的研究价值，我们把这些具有特殊形态的树都统称为 特殊的二叉树
+
+1. 斜树
+
+	> 所有的结点都只有左子树的二叉树树叫 <font color = "red">左斜树</font>，所有结点都是只有右子树的二叉树叫 <font color = "red">右斜树</font>，这两者统称为斜树
+
+	斜树有很明显的特点，就是 <font color = "red">每一层都只有一个结点</font>，<font color = "red">结点的个数与二叉树的深度相同</font>
+
+	有人会想，斜树的表现形式不是和线性表是一样的吗？对的，其实线性表结构就可以理解为是树的一种极其特殊的表现形式
+
+	![2020-3-8-13-17-55.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-8-13-17-55.png)
+
+2. 满二叉树
+	
+	> 在一棵二又树中，如果所有分支结点都存在左子树和右子树，并且所有叶子都在同一层上，这样的二叉树树称为满二叉树
+
+	单是每个结点都存在左右子树，不能算是满二叉树，因此，满二叉树的特点有：
+	- <font color = "red">所有的叶子都在同一层上</font>，做到整棵树的平衡
+	- <font color = "red">叶子只能出现在最下一层</font>，出现在其他层就不可能达成平衡
+	- 非叶子结点的度一定是 [[2]]
+	- 在同样深度的二叉树中，满二叉树的结点个数最多，叶子数最多
+
+	 ![2020-3-8-14-0-6.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-8-14-0-6.png)
+
+3. 完全二叉树
+
+	> 
