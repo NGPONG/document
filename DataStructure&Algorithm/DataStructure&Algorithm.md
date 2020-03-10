@@ -1,14 +1,13 @@
 # *Data Structure & Algorithm*
 
-<br/>
-
 ### 目录
 
 - [开始](#前言)
-- [Arrary](#Arrary)
-- [Linked List](#LinkedList)
-- [Stack & Queue](#Stack&Queue)
-- [Tree](#Tree)
+- [Arrary](#arrary)
+- [Linked List](#linkedlist)
+- [Stack & Queue](#stackqueue)
+- [Tree](#tree)
+- [Binary Tree](#binary_tree)
 
 <br/>
 
@@ -59,7 +58,7 @@
     
     - 线性结构
 
-    线性结构中的数据元素之间是 [[1 : 1]] 的关系，即除开首元素和尾元素外，每个元素之间都能够找到其唯一的前驱和后继
+    线性结构中的数据元素之间是 $1 : 1$ 的关系，即除开首元素和尾元素外，每个元素之间都能够找到其唯一的前驱和后继
 
     ```c
     +---+      +---+      +---+      +---+
@@ -75,7 +74,7 @@
 
     - 树形结构
 
-    树形结构中的数据元素之间是 [[1 : n]] 的关系，即除开根元素和叶子元素外，每个元素之间都能够找到唯一的前驱和多个后继
+    树形结构中的数据元素之间是 $1 : n$ 的关系，即除开根元素和叶子元素外，每个元素之间都能够找到唯一的前驱和多个后继
 
     ```C
                     +---+
@@ -102,7 +101,7 @@
 
     - 图形结构
 
-    树形结构中的数据元素之间是 [[n : n]] 的关系，即每个元素之间都可能会找到多个全驱和后继
+    树形结构中的数据元素之间是 $n : n$ 的关系，即每个元素之间都可能会找到多个全驱和后继
 
     ```c
     +---------------------------------+
@@ -232,7 +231,7 @@
 
 #### Dynamic Arrary
 
-动态数组属于对 [[Basic Arrary]] 的一项扩展内容，它在 <font color = "red">保持 [[Basic Arrary]] 本质不变的情况下，还解决掉了 [[Basic Arrary]] 无法进行动态扩展的短板</font>
+动态数组属于对 $Basic Arrary$ 的一项扩展内容，它在 <font color = "red">保持 Basic Arrary 本质不变的情况下，还解决掉了 Basic Arrary 无法进行动态扩展的短板</font>
 
 ```c
 #include <stdio.h>
@@ -466,19 +465,19 @@ int DestoryArrary(struct dynamicArrary *arrary) {
 
 <br/>
 
+<span id="linkedlist"></span>
+
 ### Linked List
 
 ---
 
-<span id="LinkedList"></span>
+链表是一种常用的数据结构，它由一系列的 $node$ 通过指针的方式相互连接起来，以此形成一条数据链，而每个节点中主要是维护着两种重要的信息，它们分别是：
 
-链表是一种常用的数据结构，它由一系列的 [[node]] 通过指针的方式相互连接起来，以此形成一条数据链，而每个节点中主要是维护着两种重要的信息，它们分别是：
-
-- [[Data：数据域]] 
+- $Data$：数据域 
 
     存放着当前节点所存储的信息数据
     
-- [[Pointer：指针域]]
+- $Pointer$：指针域
 
     存放着其它节点在内存中的首地址，即每一个节点都能够指向 上一个 / 下一个 节点的信息
 
@@ -486,7 +485,7 @@ int DestoryArrary(struct dynamicArrary *arrary) {
 
 #### 链表与数组
 
-对于链表来说，其通常用于和 [[Arrary]] 做对比，由于链表是通过节点与节点之间的连接来完成一条数据链的构造，故该特性能够解决掉 Arrary 本身所存在的许多缺点，但是相对的，更是由于这一特性，链表在解决了 Arrary 本身所存在的缺陷的同时却无法保留掉原有数组本身的 [[优点]]，即 链表 在解决了 Arrary 本身所存在的缺陷的同时又把 Arrary 身上的优点转换为了 链表 所带有的缺陷
+对于链表来说，其通常用于和 $Arrary$ 做对比，由于链表是通过节点与节点之间的连接来完成一条数据链的构造，故该特性能够解决掉 Arrary 本身所存在的许多缺点，但是相对的，更是由于这一特性，链表在解决了 Arrary 本身所存在的缺陷的同时却无法保留掉原有数组本身的 <font color = "red">优点</font>，即 链表 在解决了 Arrary 本身所存在的缺陷的同时又把 Arrary 身上的优点转换为了 链表 所带有的缺陷
 
 - 优点
     - 链表对比数组，在链表头至链表尾中删除或新增某个节点的时候效率会很高，因为我们只用改变当前位置上，前一个节点或者是后一个节点的指针指向即可完成插入或者是删除的操作
@@ -504,7 +503,7 @@ int DestoryArrary(struct dynamicArrary *arrary) {
 
 什么是链表的头节点和尾节点？
 
-一张链表在初始化完毕后，我们通常会额外添加两个特殊的节点，这两个节点仅仅只是维护了一个指针域，指针域指向这张链表的头节点和尾节点在内存中的首地址，而这两种特殊的节点就为链表的 [[头节点]] 和 [[尾节点]]
+一张链表在初始化完毕后，我们通常会额外添加两个特殊的节点，这两个节点仅仅只是维护了一个指针域，指针域指向这张链表的头节点和尾节点在内存中的首地址，而这两种特殊的节点就为链表的 <font color = "red">头节点</font> 和 <font color = "red">尾节点</font>
 
 为什么需要链表的头节点和尾节点？
 
@@ -905,17 +904,18 @@ NULL <-----+Last|   +-----+Last|   +-----+Last|   +-----+Last|   +-----+Last|   
 
 <br/>
 
-### Stack & Queue
+<span id = "stackqueue"></span>
 
-<span id = "Stack&Queue"></span>
+### Stack & Queue
 
 ---
 
-把 [[Stack]] 和 [[Queue]] 放在一起的原因是因为两者的实现的是非常的相似
 
-对于 Stack 来说其实现需要遵循 [[FILO]] 原则
+把 $Stack$ 和 $Queue$ 放在一起的原因是因为两者的实现的是非常的相似
 
-对于 Queue 来说其实现需要遵循 [[FIFO]] 原则
+对于 $Stack$ 来说其实现需要遵循 $FILO$ 原则
+
+对于 $Queue$ 来说其实现需要遵循 $FIFO$ 原则
 
 <br/>
 
@@ -961,7 +961,7 @@ PUSH +-->+ E |   | D | | C | | B |   | A +---> POP
 
 #### Stack 的具体实现
 
-在这篇 Blog 中，我并不打算对 [[Queue]] 的存储结构进行实现，因为二者实现起来相似度还是挺高，故本 Blog 中只是针对 Stack 进行了一个实现，下面代码中则为实现了一个 <font color = "red">顺序存储</font> 的字符栈
+在这篇 Blog 中，我并不打算对 $Queue$ 的存储结构进行实现，因为二者实现起来相似度还是挺高，故本 Blog 中只是针对 $Stack$ 进行了一个实现，下面代码中则为实现了一个 <font color = "red">顺序存储</font> 的字符栈
 
 ```c
 #define MAX_LENGTH 0x400
@@ -1057,24 +1057,24 @@ int Destory(struct Stack *stack) {
 
 <br/>
 
+<span id = "Tree"></span>
+
 ### Tree
 
 ---
 
-<span id = "Tree"></span>
-
-上面所讨论都是 [[1 : 1]] 的线性结构，可现实中，还有很多 [[1 : n]] 成员排列方式的情况需要处理，针对这种情况我们采用 [[树形结构]] 去描绘成员 ( 数据 ) 之间的逻辑关系更为合适
+上面所讨论都是 $1 : 1$ 的线性结构，可现实中，还有很多 $1 : n$ 成员排列方式的情况需要处理，针对这种情况我们采用 <font color = "red">树形结构</font> 去描绘成员 ( 数据 ) 之间的逻辑关系更为合适
 
 !!! INFO 树的定义
-	树 ( *Tree* ) 是 [[n]] ( *n >= 0* ) 个节点的有限集
+	树 ( $Tree$ ) 是 $n$ ( $n \geq 0$ ) 个节点的有限集
 		
-	1. *n = 0* 时称为 <font color = "red">空树</font>
+	1. $n = 0$ 时称为 <font color = "red">空树</font>
 
-	2. *n > 0* 是称为 <font color = "red">非空树</font>，在任意一颗 非空树 中：
+	2. $n > 0$ 是称为 <font color = "red">非空树</font>，在任意一颗 非空树 中：
 
-	 	2.1 有且只有一个特定的称为根 ( *Root* ) 的节点；
+	 	2.1 有且只有一个特定的称为根 ( $Root$ ) 的节点；
 		 
-	 	2.2 当 n > 1 时，其余节点可分为 [[m]] ( *m > 0* ) 个 <font color = "red"> 互不相交</font> 的有限集 *T1、T2、……、Tm*，其中每一个集合本身又是一棵树 并且称为子树 ( *SubTree* )
+	 	2.2 当 $n > 1$ 时，其余节点可分为 $m$ ( $m > 0$ ) 个 <font color = "red"> 互不相交</font> 的有限集 $T_1,T_2,\ldots,T_m$，其中每一个集合本身又是一棵树 并且称为子树 ( $SubTree$ )
 	
 	<br/>
 
@@ -1095,8 +1095,8 @@ int Destory(struct Stack *stack) {
 #### 节点的分类
 
 树的节点包含一个数据元素及若干指向其子树的分支
- - 节点拥有的子树数称为 <font color = "red">节点的度</font> ( *Degree* ) ;
- - 度为 0 的节点称为 <font color="red">叶节点</font> ( *Leaf* ) 或终端节点 ;
+ - 节点拥有的子树数称为 <font color = "red">节点的度</font> ( $Degree$ ) ;
+ - 度为 0 的节点称为 <font color="red">叶节点</font> ( $Leaf$ ) 或终端节点 ;
  - 度不为 0 的节点 称为非终端节点或 <font color = "red">分支节点</font>，除根节点之外，分支节点也称为 <font color="red">内部节点</font> ;
  - 树 内各节点的度的最大值则为 <font color="red">树的度</font> ;
  
@@ -1107,11 +1107,11 @@ int Destory(struct Stack *stack) {
 
 #### 节点间的关系
 
-- 节点的子树的根称为该节点的 <font color="red">孩子</font> ( *Child* ) ;
-- 相应地，该节点称为孩子的 <font color="red">双亲 </font> ( *Parent* ) ;
-- 同一个 双亲 的 孩子 之间互称 <font color="red">兄弟</font> ( *Sibling* ) ;
-- 根到该节点所经分支上的所有节点都称为该节点的 <font color="red">祖先</font> ( *ancestor* ) ;
-- 以某节点为根的子树中的任一节点都称为节点的 <font color="red">子孙</font> ( *Offspring* )
+- 节点的子树的根称为该节点的 <font color="red">孩子</font> ( $Child$ ) ;
+- 相应地，该节点称为孩子的 <font color="red">双亲 </font> ( $Parent$ ) ;
+- 同一个 双亲 的 孩子 之间互称 <font color="red">兄弟</font> ( $Sibling$ ) ;
+- 根到该节点所经分支上的所有节点都称为该节点的 <font color="red">祖先</font> ( $ancestor$ ) ;
+- 以某节点为根的子树中的任一节点都称为节点的 <font color="red">子孙</font> ( $Offspring$ )
 
   ![2020-3-4-17-11-50.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-4-17-11-50.png)
 
@@ -1119,14 +1119,14 @@ int Destory(struct Stack *stack) {
 
 #### 树的其它相关概念
 
-- <font color="red">节点的层次</font> ( *Level* ) 从根开始定义起，根为第一层，根的孩子为第二层，若某结 点在第1层，则其子树的根就在第 *1 + 1* 层 ;
+- <font color="red">节点的层次</font> ( $Level$ ) 从根开始定义起，根为第一层，根的孩子为第二层，若某结 点在第1层，则其子树的根就在第 *1 + 1* 层 ;
 
-- 双亲在局一层的节点互为 <font color="red">堂兄弟</font> ( *Cousins* ) ;
+- 双亲在局一层的节点互为 <font color="red">堂兄弟</font> ( $Cousins$ ) ;
 
-- 树中结点的最大层次称为 <font color = "red">树 的深度</font> ( *Depth* ) 或 高度 ;
+- 树中结点的最大层次称为 <font color = "red">树 的深度</font> ( $Depth$ ) 或 高度 ;
 
 - 如果将树中结点的各子树看成从左至右是有次序的，不能互换的，则称该树为 <font color= "red">有 序树</font> ，否则称为 <font color="red">无序树</font> ; 
-- <font color="red">森林</font> ( *Forest* ) 是 [[m]] ( *m > 0* ) 棵互不相交的树的集合，对树中每个结点而言，其 子树的集合即为森林
+- <font color="red">森林</font> ( $Forest$ ) 是 $m$ ( $m > 0$ ) 棵互不相交的树的集合，对树中每个结点而言，其 子树的集合即为森林
 
   ![2020-3-4-17-19-45.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-4-17-19-45.png)
 
@@ -1135,7 +1135,7 @@ int Destory(struct Stack *stack) {
 
 #### 树的表示法
 
-上面所展示的树形结构是从 <font color="red">人的逻辑概念上所看到的树形结构</font>，而对于开发人员而言，这种逻辑上的数据结构是难以操作和构造的，作为数据结构存储的两大分支无非就是 **顺序存储** 和 **链式存储**，而对于不进行过任何处理的树形结构来说显然是不满足这两种分支的存储模型的，所以我们必须把逻辑上的树形结构转换为一个真实的、具体的数据结构，简而言之，就是 <font color="red">把一颗复杂的树转换为一颗能够处理的树</font>，这种转换方式也称为 <font color = "red">树的表示法</font>
+上面所展示的树形结构是从 <font color="red">人的逻辑概念上所看到的树形结构</font>，而对于开发人员而言，这种逻辑上的数据结构是难以操作和构造的，作为数据结构存储的两大分支无非就是 *顺序存储* 和 *链式存储*，而对于不进行过任何处理的树形结构来说显然是不满足这两种分支的存储模型的，所以我们必须把逻辑上的树形结构转换为一个真实的、具体的数据结构，简而言之，就是 <font color="red">把一颗复杂的树转换为一颗能够处理的树</font>，这种转换方式也称为 <font color = "red">树的表示法</font>
 
 !!! INFO PS : 以下所展示的几种表示法以下图这种原始树形结构作为模型
 
@@ -1146,9 +1146,9 @@ int Destory(struct Stack *stack) {
 
 *双亲表示法*
 
-我们以一组连续的空间去存储一棵树中的所有节点，每个节点除了维护了一个该节点所指示的 <font color="red">数据域</font> ( *Data* ) 外，还附设一个指示器去维护该节点的双亲节点在连续空间所处的下标 ( 如果没有则为 -1 ) ，我们称它为 <font color = "red">双亲域</font> ( *Parent* )
+我们以一组连续的空间去存储一棵树中的所有节点，每个节点除了维护了一个该节点所指示的 <font color="red">数据域</font> ( $Data$ ) 外，还附设一个指示器去维护该节点的双亲节点在连续空间所处的下标 ( 如果没有则为 $-1$ ) ，我们称它为 <font color = "red">双亲域</font> ( $Parent$ )
 
-这样的存储结构，我们可以根据节点的 *Parent* 指针很容易找到它的双亲节点，所用的时间复杂度为 [[O(1)]] ,直到 *Parent* 为 -1 时，则表示找到了树节点的根。可如果我们要知道结点的孩子是什么，对不起，请遍历整个结构才行 ; 其实解决这一问题也很简单，我们为何不能维护一个 <font color = "red">长子域</font> ( *FirstChild* ) 的指示器来记录该节点最左边孩子的下标，抑或是维护一个 <font color = "red">兄弟域</font> ( *RightSib* ) 来记录当前节点右边兄弟的下标呢？答案当然是可以的，数据结构的具体模型视具体情况而进行定义
+这样的存储结构，我们可以根据节点的 $Parent$ 指针很容易找到它的双亲节点，所用的时间复杂度为 $O(1)$ ,直到 $Parent$ 为 -1 时，则表示找到了树节点的根。可如果我们要知道结点的孩子是什么，对不起，请遍历整个结构才行 ; 其实解决这一问题也很简单，我们为何不能维护一个 <font color = "red">长子域</font> ( $FirstChild$ ) 的指示器来记录该节点最左边孩子的下标，抑或是维护一个 <font color = "red">兄弟域</font> ( $RightSib$ ) 来记录当前节点右边兄弟的下标呢？答案当然是可以的，数据结构的具体模型视具体情况而进行定义
 
 下图则为双亲表示法的数据结构模型：
 
@@ -1158,9 +1158,9 @@ int Destory(struct Stack *stack) {
 
 *孩子表示法*
 
-我们以一组连续的空间去存储一棵树中的所有节点，每个节点除了维护了一个该节点所指示的 <font color="red">数据域</font> ( *Data* ) 外，还维护了一个 <font color = "red">孩子域</font> ( *FirstChild* ) 的指针指向了当前节点下的所有孩子节点，旗下的所有孩子节点以单链表存储结构的形式连接起来，<font color = "red">即 孩子域 指向了存储其下所有孩子节点的单链表在内存中的首地址</font>
+我们以一组连续的空间去存储一棵树中的所有节点，每个节点除了维护了一个该节点所指示的 <font color="red">数据域</font> ( $Data$ ) 外，还维护了一个 <font color = "red">孩子域</font> ( $FirstChild$ ) 的指针指向了当前节点下的所有孩子节点，旗下的所有孩子节点以单链表存储结构的形式连接起来，<font color = "red">即 孩子域 指向了存储其下所有孩子节点的单链表在内存中的首地址</font>
 
-为此我们除了需要设计数组中的元素的存储结构以外，还需设置单链表中的节点的数据结构，即附设一个指示器指示当前孩子节点在数组存储结构位置中的下标 ( *Child* ) 和指向当前孩子的兄弟节点的 指针域 ( *Next* )
+为此我们除了需要设计数组中的元素的存储结构以外，还需设置单链表中的节点的数据结构，即附设一个指示器指示当前孩子节点在数组存储结构位置中的下标 ( $Child$ ) 和指向当前孩子的兄弟节点的 指针域 ( $Next$ )
 
 这样的结构对于我们要査找某个节点的某个孩子，或者找某个节点的兄弟，只需要査找这个节点的孩子单链表即可 ; 对于遍而整棵树也是很方便的，对头结点的数组循环即可完成遍历
 
@@ -1176,7 +1176,7 @@ int Destory(struct Stack *stack) {
 
 孩子兄弟表示法是一种最为常用的一种表示法，它的好处在于能够把一颗复杂的树转换为一颗 <font color = "red">二叉树</font>，对于二叉树的定义我们在下面的节点会提到，现在先聊下孩子兄弟表示法的具体表示方式
 
-我们对树形结构进行观察后发现，任意一棵树它的节点的第一个孩子如果存在就是唯一的，它的右兄弟如果存在也是唯一的，因此我们大可对该节点所代表的元素结构进行一个构想，首要也是必须的就是 <font color = "red">数据域</font> ( *Data* )，其次还维护了两个 <font color = "red">指针域</font> 分别指向了当前节点的第一个孩子节点在内存中的首地址 ( *LPointer / FirstChild* ) 和当前节点右边兄弟节点在内存中的首地址 ( *RPointer / RightSib* )
+我们对树形结构进行观察后发现，任意一棵树它的节点的第一个孩子如果存在就是唯一的，它的右兄弟如果存在也是唯一的，因此我们大可对该节点所代表的元素结构进行一个构想，首要也是必须的就是 <font color = "red">数据域</font> ( $Data$ )，其次还维护了两个 <font color = "red">指针域</font> 分别指向了当前节点的第一个孩子节点在内存中的首地址 ( $LPointer$ / $FirstChild$ ) 和当前节点右边兄弟节点在内存中的首地址 ( $RPointer$ / $RightSib$ )
 
 下图则为孩子兄弟表示法的数据结构模型：
 
@@ -1185,11 +1185,11 @@ int Destory(struct Stack *stack) {
 
 <br/>
 
+<span id = "binary_tree"></span>
+
 ### Binary Tree
 
 ---
-
-<span id = "Binary_Tree"></span>
 
 对于在某个阶段下都是两种结果的情形，比如：开和关、0和1、真和假、上和下、对与错，正面与反面等，都适合用树状结构来建模，而这种树是一种很特殊的树状结构，叫做二叉树
 
@@ -1197,7 +1197,7 @@ int Destory(struct Stack *stack) {
 
 !!! INFO 二叉树的定义
 
-	二叉树 ( *Binary Tree* ) 是 [[n]] ( *n >= 0* ) 个节点的有限集合，该集合或者为空集 ( 称为 <font color = "red">空二叉树</font> )，或者由一个根结点和两裸互不相交的、分别称为根节点的 <font color = "red">左子树</font> 和 <font color = "red">右子树</font> 的二叉树组成
+	二叉树 ( *Binary Tree* ) 是 $n$ ( $n \geq 0$ ) 个节点的有限集合，该集合或者为空集 ( 称为 <font color = "red">空二叉树</font> )，或者由一个根结点和两裸互不相交的、分别称为根节点的 <font color = "red">左子树</font> 和 <font color = "red">右子树</font> 的二叉树组成
 
 	*Binary-Tree*
 	
@@ -1209,7 +1209,7 @@ int Destory(struct Stack *stack) {
 #### 二叉树的特点和基本形态
 
 *二叉树的特点：*
-- 每个结点 <font color = "red">最多有两棵子树</font>，所以二叉树中不存在度大于 [[2]] 的结点，注意，不是只有两棵子树，而是最多有，<font color = "red">没有子树</font> 或者 <font color = "red">有一棵子树</font> 都是可以的
+- 每个结点 <font color = "red">最多有两棵子树</font>，所以二叉树中不存在度大于 $2$ 的结点，注意，不是只有两棵子树，而是最多有，<font color = "red">没有子树</font> 或者 <font color = "red">有一棵子树</font> 都是可以的
 
 - <font color = "red">左子树和右子树是有顺序的</font>，次序不能任意颠倒
 
@@ -1231,7 +1231,8 @@ int Destory(struct Stack *stack) {
 
 1. 斜树
 
-	> 所有的结点都只有左子树的二叉树树叫 <font color = "red">左斜树</font>，所有结点都是只有右子树的二叉树叫 <font color = "red">右斜树</font>，这两者统称为斜树
+	!!! INFO Description
+		所有的结点都只有左子树的二叉树树叫 <font color = "red">左斜树</font>，所有结点都是只有右子树的二叉树叫 <font color = "red">右斜树</font>，这两者统称为斜树
 
 	斜树有很明显的特点，就是 <font color = "red">每一层都只有一个结点</font>，<font color = "red">结点的个数与二叉树的深度相同</font>
 
@@ -1241,16 +1242,427 @@ int Destory(struct Stack *stack) {
 
 2. 满二叉树
 	
-	> 在一棵二又树中，如果所有分支结点都存在左子树和右子树，并且所有叶子都在同一层上，这样的二叉树树称为满二叉树
+	!!! INFO Description
+		在一棵二又树中，如果所有分支结点都存在左子树和右子树，并且所有叶子都在同一层上，这样的二叉树树称为满二叉树
 
 	单是每个结点都存在左右子树，不能算是满二叉树，因此，满二叉树的特点有：
 	- <font color = "red">所有的叶子都在同一层上</font>，做到整棵树的平衡
 	- <font color = "red">叶子只能出现在最下一层</font>，出现在其他层就不可能达成平衡
-	- 非叶子结点的度一定是 [[2]]
+	- 非叶子结点的度一定是 $2$
 	- 在同样深度的二叉树中，满二叉树的结点个数最多，叶子数最多
 
 	 ![2020-3-8-14-0-6.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-8-14-0-6.png)
 
 3. 完全二叉树
 
-	> 
+	!!! INFO Description
+
+		对一棵具有 $n$ 个结点的二叉树 <font color = "red">按层序编号</font>，如果编号为 $i$ ( $i \leq 1 \leq n$ ) 的结点与同样深度的 <font color = "red">满二叉树</font> 中编号为 $i$ 的结点在二叉树中位置完全相同，则这棵二叉树称为 <font color = "red">完全二叉树</font>
+
+	完全二叉树是一种有些理解难度的特殊二叉树，首先要从字面上区分，"完全" 和 ＂满＂ 的差异，满二叉树是一颗完全二叉树，但是完全二叉树不一定是满的 ; 其次，完全二叉树的所有结点与同样深度的满二叉树，它们 <font color = "red">按层序编号相同的结点</font> 相对应对应的
+
+	对于完全二叉树的定义，上面所说的话可能过于抽象，但这里也给出一种较为直观的区分完全二叉树的方式：心中默默给二叉树中的毎个结点按照满二叉树的结构逐层顺序编号，如果编号
+	出现空档，就说明不是完全二叉树，否则就是
+
+	这里我可以总结一些完全二叉树的特点：
+	- 叶子结点只能出现在 <font color = "red">最下两层</font>
+	- 最下层的叶子一定 <font color = "red">集中在左部连续位置</font>
+	- 倒数二层若有叶子结点，一定 <font color = "red">都在右部连续位置</font>
+	- 如果结点度为 $1$，则该结点 <font color = "red">只有左孩子</font>，即不存在只有右子树的情况
+	- 同样结点数的二叉树，完全二叉数的 <font color = "red">深度最小</font>
+
+	![2020-3-8-21-53-43.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-8-21-53-43.png)
+
+	
+
+<br/>
+
+#### 二叉树的性质
+
+- 在二叉树的第 $i$ 层上至多有 $2^{i-1}$ 个结点 ( $i\geq$ 1)
+
+- 深度为 $k$ 的二叉树至多有 $2^k-1$ 个结点 ( $k\geq1$ )
+
+- 
+  二叉树 $T$ ; 结点总数 $n$ ; 分支线总数 $k$ ; 终端结点数 $n_0$ ; 度为 1 的结点数 $n_1$ ; 度为 2 的结点数 $n_2$ ; 
+  - $n_0=n_2+1$
+  - $n=n_0+n_1+n_2$
+  - $k=n-1=n_1+2n_2$
+
+- 具有 $n$ 个结点的 <font color = "red">完全二叉树</font> 的深度为 $⌊\log(2^n)⌋+1$ ( $⌊x⌋$ 表示为大于 $x$ 的最大整数 )
+
+- 如果对一颗具有 $n$ 个结点的完全二叉树 ( 其深度为 $⌊\log(2^n)⌋+1$ ) 的结点按层序编号 ( 从第 $1$ 层到第 $⌊\log(2^n)⌋+1$ 层，每层从左到右 )，对任意节点 $i$ ( $1 \leq i \leq n$ ) 有：
+	- 如果 $i=1$，则结点 $i$ 为二叉树的根，无双亲 ; 如果 $i>1$，则其双亲是节点 $⌊i/2⌋$
+	- 如果 $2i>n$，则结点 $i$ 无左孩子 ( 结点 $i$ 为叶子节点 ) ； 否则其左孩子是结点 $2i$
+	- 如果 $2i+1>n$，则结点 $i$ 无右孩子 ; 否则其右孩子是结点 $2i+1$
+  
+	![2020-3-8-23-12-26.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-8-23-12-26.png)
+
+
+<br/>
+
+#### 二叉树的存储结构
+
+*二叉树顺序存储结构*
+
+<font color = "red">顺序存储</font> 对树这种 $1:n$ 的关系结构实现起来是比较困难的，但是二叉树是一种特殊的树，由于它的特殊性，使得用顺序存储结构也可以实现
+
+二叉树的顺序存储结构就是 <font color = "red">用一维数组存储二叉树中的结点</font>，<font color = "red">并且结点的存储位置 ( 数组的下标 ) 要能体现结点之间的逻辑关系</font>，比如双亲与孩子的关系，左右兄弟的关系等，如下图所示，一颗 <font color = "red">完全二叉树</font> 在使用顺序存储后的结构模型
+
+![2020-3-8-23-42-35.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-8-23-42-35.png)
+
+需要注意的是，上图特指出使用的是 <font color = "red">完全二叉树</font> 进行顺序存储结构进行存储，由于 完全二叉树 的特性，我们对 完全二叉树 使用顺序存储是很容易能够拿到各结点之间的逻辑关系的，而对于一般的二叉树而言，尽管层序编号并不能够反映这颗二叉树中各结点之间的直接逻辑关系，但是我们同样也可以将其按 完全二叉树 进行编号，只不过把不存在的节点需要 <font color ="red">特别批注出来</font> 而已
+
+针对于刚刚所说到的 <font color = "red">一般的二叉树使用顺序存储结构</font>，我们不妨考利一种特殊情况，一颗深度为 $k$ 的右斜树只有 $k$ 个结点，但是按照刚刚所说的按照 完全二叉树 进行编号的方式却需要分配出 $2^k-1$个存储单元空间，这显然是对于存储空间是一种极度浪费的情况，所以，<font color = "red">顺序存储结构一般只用于完全二叉树</font>
+
+![2020-3-8-23-53-59.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-8-23-53-59.png)
+
+<br/>
+
+*二叉树链表*
+
+既然顺序存储适用性不强，我们就要考虑 <font color = "red">链式存储结构</font>
+
+二叉树的毎个结点至多只有两个孩子，所以为它设计一个数据域 $Data$ 和 两个指针域 $lchild$ / $rchild$ 是比较自然的想法，同样的，我们称这样的链表叫做二叉链表
+
+通过二叉链表存储结构的方式，我们能够非常方便的得知某个结点的 <font color = "red">左孩子</font> 和 <font color = "red">右孩子</font> 的位置，如有需要，我们同样可以再加多一个指针域 $parent$ 去获取当前结点的双亲位置，这种方式也称之为 <font color = "red">三叉链表</font>
+
+```c
+typedef char ElementType_t;
+
+typedef struct binary_node {
+
+	ElementType_t data;
+	struct binary_node *parent;	/* Extension */
+	struct binary_node *left;  	/* Left sub tree */
+	struct binary_node *right; 	/* Right sub tree */
+} Binary_Tree;
+```
+
+![2020-3-9-0-19-46.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-9-0-19-46.png)
+
+
+<br/>
+
+#### 二叉树的遍历
+
+二叉树的遍历次序不同于 <font color = "red">线性结构</font>，最多也就是从头至尾、循环、双向等简单的遍历方式，树的结点之间不存在 <font color = "red">唯一的前驱和后继</font> 关系，在访问一个结点后，下一个被访问的结点面临着不同的选择，由于选择方式的不同，遍历的次序就完全不同了
+
+!!! INFO Description
+
+	二叉树的遍历 ( $Traversing binary-tree$ ) 是指从根结点出发，按照某种 <font color = "red">次序</font> 依次访同二叉树中所有结点，使得每个结点都被访问一次且仅被访问一次
+
+<br/>
+
+*前序遍历*
+
+规则是若二又树为空，用空操作返回，否则先访问根结点，然后前序遍历左子树，再前序遍历右子树，如下图所示，其遍历顺序则为：$ABDGHCEIF$
+
+```c
+int Preorder_Traverse_BinaryTree(Binary_Tree *tree) {
+
+	if (tree == 0x0)
+		return -1;
+
+	printf("[*] Traverse Binary-tree: Value = %c, Address = %p\n", tree->data, tree);
+	Preorder_Traverse_BinaryTree(tree->left);
+	Preorder_Traverse_BinaryTree(tree->right);
+
+	return 0;
+}
+```
+
+![2020-3-9-0-39-1.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-9-0-39-1.png)
+
+<br/>
+
+*中序遍历*
+
+规则是若树为空，则空操作返回，否则从根结点开始 ( 注意并不是先访问根結点 )，中序遍历根结点的左子树，然后是访问根结点，最后中序遍历右子树，如下图所示，其遍历顺序则为：$GDHBAEICF$
+
+```C
+int Middorder_Traverse_BinaryTree(Binary_Tree *tree) {
+
+	if (tree == 0x0)
+		return -1;
+
+	Middorder_Traverse_BinaryTree(tree->left);
+	printf("[*] Traverse Binary-tree: Value = %c, Address = %p\n", tree->data, tree);
+	Middorder_Traverse_BinaryTree(tree->right);
+
+	return 0;
+}
+```
+
+![2020-3-9-0-45-37.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-9-0-45-37.png)
+
+<br/>
+
+*后序遍历*
+
+规则是若树为空，则空操作返回，否则从左到右先叶子后结点的方式遍历访问左右子树，最后是访问根结点，如下图所示，其遍历顺序则为：$GHDB1EFCA$
+
+```c
+int Postorder_Traverse_BinaryTree(Binary_Tree *tree) {
+
+	if (tree == 0x0)
+		return -1;
+
+	Postorder_Traverse_BinaryTree(tree->left);
+	Postorder_Traverse_BinaryTree(tree->right);
+	printf("[*] Traverse Binary-tree: Value = %c, Address = %p\n", tree->data, tree);
+
+	return 0;
+}
+```
+
+![2020-3-9-0-48-36.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-9-0-48-36.png)
+
+<br/>
+
+*遍历结果的推理*
+
+- 已知前序遍历序列和中序遍历序列，可以唯一确定一棵二叉树
+  - 前序：$ABCDEF$
+  - 中序：$CBAEDF$
+- 已知后序遍历序列和中序遍历序列，可以唯一确定一棵二叉树
+  - 前序：$ABCDEFG$
+  - 中序：$BDCAFEG$
+- 已知前序遍历序列和后序遍历序列，不可以唯一确定一棵二叉树
+
+!!! INFO
+
+	关于推理过程请查看 《大话数据结构》 6.8.6 章节
+
+<br/>
+
+#### 二叉树的建立
+
+二叉树的建立同样需要采用遍历的方式去创建，对于存在空子数的结点我们在遍历的过程中需要通过一个 <font color = "red">额外的标识符</font> 来确定，在下面的代码中，提供了两种 <font color = "red">不同的遍历次序</font> 来构造一棵二叉树
+
+<br/>
+
+*后序遍历*
+
+```c
+/* 
+ *                                (A)
+ *                                 |
+ *                 o---------------+---------------o
+ *                 |                               |
+ *                (B)                             (C)
+ *                 |                               |
+ *          o------+-----o                  o------+-----o
+ *          |            |                  |            |
+ *         (D)          (E)                (F)          (G)
+ *          |            |                  |            |
+ *      o---+---o    o---+---o          o---+---o    o---+---o
+ *      |       |    |       |          |       |    |       |
+ *     (H)     (I)  (J)     (K)        (L)     (M)  (N)     (O)
+ *
+ *
+ * Don't direct Postorder create binary-tree, but we can find the last
+ * node is root, and previous node is right-child for root, and pre-previous
+ * node is left-child for root..... So, we can create binary tree like this.
+ */
+static size_t index_Postorder = 0;
+static ElementType_t Perfect_BinaryTree_data[] = { 'A',																		 /* ROOT */
+											'B', 'D', 'H', '#', '#', 'I', '#', '#', 'E', 'J', '#', '#', 'K', '#', '#',		 /* LEFT */
+											'C', 'F', 'L', '#', '#', 'M', '#', '#', 'G', 'N', '#', '#', 'O', '#', '#' };	 /* RIGHT */
+Binary_Tree *Postorder_Create_BinaryTree(Binary_Tree *parent) {
+
+	ElementType_t ch = Perfect_BinaryTree_data[index_Postorder++];
+	if (ch == '#') {
+
+		return NULL;
+	}
+	else {
+
+		Binary_Tree *tree = (Binary_Tree *)malloc(sizeof(struct binary_node));
+		if (tree == 0x0) {
+
+			return -1;
+		}
+		memset(tree, 0, sizeof(struct binary_node));
+
+		tree->left = Postorder_Create_BinaryTree(tree);
+		tree->right = Postorder_Create_BinaryTree(tree);
+
+		tree->data = ch;
+		tree->parent = parent;
+		printf("[+] Create Binary-node: Node-Value = %c, Node-Address = %p, Parent-Address = %p\n",
+			tree->data,
+			tree,
+			tree->parent);
+
+		return tree;
+	}
+}
+```
+
+<br/>
+
+*前序遍历*
+
+```c
+/* 
+ *                                (A)
+ *                                 |
+ *                 o---------------+---------------o
+ *                 |                               |
+ *                (B)                             (C)
+ *                 |                               |
+ *          o------+-----o                  o------+-----o
+ *          |            |                  |            |
+ *         (D)          (E)                (F)          (G)
+ *          |                               |            |
+ *      o---+                           o---+            +---o
+ *      |                               |                    |
+ *     (H)                             (I)                  (J)
+ *      |
+ *      +-----o
+ *            |
+ *           (K)
+ *
+ * Inorder create binary-tree can complete the
+ * construction of the tree under the model that
+ * does not know the tree
+ *
+ * We use scanf function to complete the data field entry.
+ * When the received character is '#', it proves that the current
+ * node belongs to an NULL state
+ */
+static size_t index_Preorder = 0;
+static ElementType_t Binary_Tree_Data[] = {
+	'A','B','D','H','#','K','#','#','#','E','#','#',
+	'C','F','I','#','#','#','G','#','J','#','#' };
+int Preorder_Create_BinaryTree(Binary_Tree **tree, Binary_Tree *parent) {
+
+	ElementType_t ch = Binary_Tree_Data[index_Preorder++];
+	if (ch == '#') {
+
+		return -1;
+	}
+	else {
+
+		*tree = (Binary_Tree *)malloc(sizeof(Binary_Tree));
+		if (*tree == 0x0) {
+
+			return -1;
+		}
+		memset(*tree, 0, sizeof(Binary_Tree));
+
+		(*tree)->data = ch;
+		(*tree)->parent = parent;
+		printf("[+] Create Binary-node: Node-Value = %c, Node-Address = %p, Parent-value = %c, Parent-Address = %p\n",
+			(*tree)->data,
+			*tree,
+			(*tree)->parent == NULL ? '-' : (*tree)->parent->data,
+			(*tree)->parent);
+
+		Preorder_Create_BinaryTree(&(*tree)->left, *tree);
+		Preorder_Create_BinaryTree(&(*tree)->right, *tree);
+	}
+
+	return 0;
+}
+```
+
+<br/>
+
+#### 线索二叉树
+
+对于上面的所构造的二叉树中都存在着一个问题，那就是：<font color = "red">空指针域并未得到充分地利用</font>
+
+设：一张有 $n$ 个结点的二叉链表，每个结点有指向左右孩子的指针域，也就是说一张二叉链表中总共有 $2n$ 个指针域，而 $n$ 个结点的二叉树一共有 $n-1$ 条分支线，也就是说，一张二叉链表中总共有 $2n-(n-1)=n+1$ 个空指针域，如下图所示
+
+![2020-3-9-16-43-5.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-9-16-43-5.png)
+
+上图中所存在的空指针域不存储任何数据，白白浪费着 $(n+1) \times 4=k(Bytes)$ 的存储空间 ; 另一方面，在已有一张已经构造好的二叉树的前提下，我们是不能够知道每个节点的前驱和后继分别对应着谁的 ( <font color = "red">在某个次序下所遍历的结果作为前驱和后继的判断标准</font> ) ，除非我们对这张二叉链表在进行一次遍历
+
+综上所述，<font color = "red">线索二叉树</font> 就是为了解决以上问题所存在，我们不妨让某个结点的空指针域指向当前结点的前驱或后继，比如说规定结点中的 $lchild$ 成员如果是一个空指针域，则该成员指向当前结点的前驱，反之 $rchild$ 则指向当前结点的后继，但这里还存在着一个问题，如果某个结点是不存在空指针域的，那么我们要如何区分当前结点的 $lchild$ / $rchild$ 到底是指向当前结点下的 左 / 右 孩子，还是指向当前结点的 前驱 / 后继 呢？在这个基础上，我们还可以对于结点的内部构造新增两个成员分别为 $lflag$ / $rflag$ 用于标识当前结点的 $lchild$ / $rchild$ 到底是指向 左 / 右 孩子，还是指向当前结点的 前驱 / 后继 ，比如说当 $lflag$ / $rflag$ 为 $1$ 时，则标志着当前结点的 $lchild$ / $rchild$ 指向的是当前结点的 前驱 / 后继，反之则指向的是当前结点的 左 / 右 孩子
+
+!!! INFO Description
+
+	我们把这种指向前驱和后继的指针称为 <font color = "red">线索</font>，加上线索的二叉链表称为 <font color ="red">线索链表</font>，相应的二叉树就称为 <font color = "red">线索二叉树</font> ( $Threaded$ $Binary-Tree$)，而我们把一颗二叉树以某种次序进行遍历使其转换为线索二叉树的过程又称为 <font color = "red">二叉树的线索化</font>
+
+下图则为一颗进行过线索化的二叉树的结构体现 ( 以中序遍历作为某个结点前驱和后继的判断标准 )：
+
+![2020-3-9-17-12-44.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-9-17-12-44.png)
+
+对于上图这颗线索二叉树 ( 以中序遍历作为某个结点前驱和后继的判断标准 ) 的指针域的指向来看，我们会发现二叉树线索化的是指其实就是把一颗二叉树转换为一张 <font color  ="red">双向链表</font>，如下图所示：
+
+![2020-3-9-17-15-41.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-9-17-15-41.png)
+
+<br/>
+
+#### 树、森林与二叉树之间的转换
+
+在前面提到过，我们对于树形结构的探究通常都采用 <font color  ="red">孩子兄弟表示法</font> 来将一颗复杂的树转化为二叉树进行存储，而借助二叉链表的特性，树和二叉树之间是可以进行相互转换的
+
+从物理结构来看，树和二叉树是相同的，只是采用了不同的解释方式，因此，只要我们设定一定的规则，用二叉树来表示树，甚至表示森林都是可以的，森林与二叉树也可以互相进行转换
+
+<br/>
+
+*树转换为二叉树*
+
+1. 加线：把所有兄弟节点之间加一条连接线
+2. 去线：对树中毎个结点，只保留它与第一个孩子结点的连线，删除它与其他孩子结点之间的连线
+3. 层次调整：以树的根结点为轴心，将整棵树顺时针旋转一定的角度，使之结构层次分明，注意第一个孩子是二叉树结点的左孩子，兄弟转换过来的孩子是结点的右孩子
+
+	![2020-3-9-17-32-35.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-9-17-32-35.png)
+
+<br/>
+
+*森林转换为二叉树*
+
+1. 把每颗树转换为二叉树
+2. 第一颗二叉树不动，从第二棵二叉树开始，依次把后一棵二叉树的根结点作为前一棵二叉树的根结点的右孩子，用线连接起来，当所有的二又树连接起来后就得到了由森林转换来的二叉树
+
+	![2020-3-9-17-37-5.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-9-17-37-5.png)
+
+<br/>
+
+*二叉树转换为树*
+
+1. 加线：若某结点 $K$ 的左孩子结点存在，则将这个左孩子的 $n$ 个右孩子结点都作结点 $K$ 的孩子，并用线连接起来 
+2. 去线：删除原二叉树中所有结点与其右孩子结点的连接线
+3. 层次调整：使之结构层次分明
+
+	![2020-3-9-17-49-18.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-9-17-49-18.png)
+
+<br/>
+
+*二叉树转换为森林*
+
+!!! INFO
+	判断一棵二叉树能够转换成一棵树还是森林，标准很简单，那就是只要看这棵二叉树树的根结点有没有右孩子，有就是森林，没有就是一棵树
+
+1. 分离：从根结点开始的 $n$ 个右孩子若存在，则连线刪除，得到多颗分离后的二叉树
+2. 拼接：将每棵分离后的二叉树转换为树即可
+
+	![2020-3-9-17-55-48.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-9-17-55-48.png)
+
+
+<br/>
+
+#### 赫夫曼树
+
+*赫夫曼树的定义*
+
+- 从树中一个结点到另一个结点之间的分支构成两个结点之间的 <font color = "red">路径</font>
+- 路径上的分支数目称作 <font color = "red">路径长度</font>
+- <font color = "red">树的路径长度</font> 就是从树根到毎一结点的路径长度之和
+- 如果考虑到带 <font color = "red">权</font> 的结点
+ 	- 结点的 <font color = "red">带权的路径长度</font> 为从该结点到树根之间的路径长度与结点上权的乘积
+ 	- <font color = "red">树的带权路径长度</font> 为树中所有叶子结点的带权路径长度之和
+- 假设有 $n$ 个权值 $\{w_1,w_2,\ldots,w_n\}$ 构造一棵有 $n$ 个叶子结点的二叉树，每个叶子结点带权 $w_k$，每个叶子的路径长度为 $lk$，我们通常记作，则其中带权路径长度 $WPL$ 最小的二叉树称作赫夫曼树
+
+<br/>
+
+*如何构造一颗赫夫曼树*
+
+1. 根据给定的 $n$ 个权值 $\{w_1,w_2,\ldots,w_n\}$ 构成 $n$ 棵二叉树的集合 $F=\{T_1,T_2,\ldots,T_n\}$，其中每棵二叉树 $T_i$ 中只有一个带权为 $w_i$，其左右树均为空
+2. 在 $F$ 中选取两棵根结点的权值最小的树作为左右子树构造一棵新的二叉树树 $K$，且置 $K$ 的权值为其左右子树上根结点的权值之和
+3. 在 $F$ 中删除这两棵树，同时将新得到的二叉树 $K$ 加入 $F$ 中
+4. 重复 $2$ 和 $3$ 步骤，直到 $F$ 只含一颗树为止，这棵树便为 <font color = "red">赫夫曼树</font>
