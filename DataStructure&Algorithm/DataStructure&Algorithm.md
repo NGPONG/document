@@ -1211,7 +1211,7 @@ int Destory(struct Stack *stack) {
 *二叉树的特点：*
 - 每个结点 <font color = "red">最多有两棵子树</font>，所以二叉树中不存在度大于 $2$ 的结点，注意，不是只有两棵子树，而是最多有，<font color = "red">没有子树</font> 或者 <font color = "red">有一棵子树</font> 都是可以的
 
-- <font color = "red">左子树和右子树是有顺序的</font>，次序不能任意颠倒
+- <font color = "red">左子树和右子树是有顺序的</font>，次序不能任意颠倒，即二叉树是一颗 <font color = "red">有序树</font>
 
 - 即使树中某结点只有一棵子树，也要区分它是 <font color = "red">左子树</font> 还是 <font color = "red">右子树</font>
 
