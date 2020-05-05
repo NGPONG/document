@@ -1731,6 +1731,40 @@ int main(void) {
 }
 ```
 
+<br/> 
+
+#### int toupper(char _ch)
+##### <ctype.h>
+
+将字符 [[_ch]] 转换大写并返回转换后字符
+
+```c
+#include <stdio.h>
+#include <ctype.h>
+
+int main(void) {
+    char _ch = toupper('a');
+	return 0;
+}
+```
+
+<br/> 
+
+#### int tolower(char _ch)
+##### <ctype.h>
+
+将字符 [[_ch]] 转换小写并返回转换后字符
+
+```c
+#include <stdio.h>
+#include <ctype.h>
+
+int main(void) {
+    char _ch = tolower('a');
+	return 0;
+}
+```
+
 <br/>
 
 #### void *memset(void *ptr, int value, size_t n)
@@ -4308,7 +4342,7 @@ int main(void){
 
 从文件指针 [[stdin]] 所指向的文件的缓冲区内获取数据，以 [[\n]] 作为此次从 [[stdin]] 缓冲区中取出数据的结束标识符，把所读取到的内容填充至形参 [[str]] 所指向的内存空间中，如果调用成功则返回这段内存空间的首地址，如果调用失败，则返回 [[NULL]]
 
-该函数会从 [[stdin]] 中获取到本次所录入的一整段字符串 ( 包括 [[\n]] )，但是在把该字符再写入到 [[str]] 所指向的内存空间当中前会先删除掉所获取到的，该字符串结尾的 [[\n]] 字符
+该函数会从 [[stdin]] 中获取到本次所录入的一整段字符串 ( 包括 [[\n]] )，但是在把该字符再写入到 [[str]] 所指向的内存空间当中前会先删除掉所获取到的该字符串结尾的 [[\n]] 字符
 
 该函数所给定的参数 [[str]] 必须为一个字符数组以保证写入权限，如果给定的是一个字符指针形式的字符串的话，该函数则会调用失败，因为该函数会逐地址写入所录入的字符
 
