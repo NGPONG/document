@@ -1,4 +1,5 @@
 {
     "vsicons.presets.angular": true,
-    "editor.wordWrap": "on"
+    "editor.wordWrap": "on",
+    "editor.fontFamily": "微软雅黑"
 }
