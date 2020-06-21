@@ -2,7 +2,5 @@ body {
   font-family: Microsoft YaHei, cordova, Verdana, Geneva, Tahoma, sans-serif;
   font-size: 14px;
   line-height: 1.6;
-  background-color: white;
-  padding: 20px;        
-  color: #333;
+  padding: 20px; 
 }

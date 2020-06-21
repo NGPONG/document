@@ -66,6 +66,7 @@
     - [文件缓冲区](#文件缓冲区)
     - [文件指针](#文件指针)
     - [C 标准库中的文件操作](#C_标准库中的文件操作)
+    - [Linux 系统库中的文件操作](#linux_系统库中的文件操作)
 - [特殊的关键字](#特殊的关键字)
     - [typedef](#typedef)
     - [register](#register)
@@ -498,27 +499,25 @@ int main(void){
 在程序编译的过程中，就已经为我们所定义的变量按照变量的数据类型所对应的字节大小规划好了它们所属的内存空间，举个例子，比如说我们定义了一个占用内存空间为 [[4 Bytes]] 的 [[int]] 类型的变量，其存储的值为 [[0x87654321]] ，那么它在内存空间中就有相应的、连续的 [[4个内存单元]] 的存储空间，如下图
 
 ```c
-
-                8765 4321 Bit      TOP
-               +---------+          ^
-               |         |          |
-               |1000 0111|          |
-               |         |          |
-0x00000004<----+---------+          |
-               |         |          |
-               |0110 0101|          |
-               |         |          |
-0x00000003<----+---------+          |
-               |         |          |
-               |0100 0011|          |
-               |         |          |
-0x00000002<----+---------+          |
-               |         |          |
-               |0010 0001|          |
-               |         |          |
-0x00000001<----+---------+          v
-                                   LOW
-
+                             8765 4321 Bit       TOP
+                            +-----------+         ^
+                            |           |         |
+                            | 1000 0111 |         |
+                            |           |         |
+0x00000004<-----------------------------+         |
+                            |           |         |
+                            | 0110 0101 |         |
+                            |           |         |
+0x00000003<-----------------------------+         |
+                            |           |         |
+                            | 0100 0011 |         |
+                            |           |         |
+0x00000002<-----------------------------+         |
+                            |           |         |
+                            | 0010 0001 |         |
+                            |           |         |
+0x00000001<-----------------+-----------+         v
+                                                 LOW
 ```
 
 通过上图我们可以总结出几点结论
@@ -1044,7 +1043,7 @@ LOW
 
 如果我们只是声明了一个数组而没有定义，那么当我们访问数组某个下标的元素的时候，只能够获取到该数组对应存储区中编译器所赋予的默认值，原因是因为我们没有进行 [[数组的初始化操作]] ，编译器帮我们进行了一次隐式初始化操作
 
-而对于人为的进行数组的初始化操作，我们只能通过在定义数组的时候就需要进行，并且需要注意的是，不管是人为的进行初始化也好还是隐式进行初始化，一个数组一��经历过初始化的过程就不能再改变这个数组其内部所存储的当前数组首元素的地址，原因是数组在初始化完成后，数组名是一个 [[指针常量]]
+而对于人为的进行数组的初始化操作，我们只能通过在定义数组的时候就需要进行，并且需要注意的是，不管是人为的进行初始化也好还是隐式进行初始化，一个数组一�����经历过初始化的过程就不能再改变这个数组其内部所存储的当前数组首元素的地址，原因是数组在初始化完成后，数组名是一个 [[指针常量]]
 
 需要注意的是，我们认为的对数组进行初始化操作，哪怕我们只是在当前初始化的过程中仅仅只是指定了初始化一个元素，编译器也会使没有指定初始化值的元素都赋上一个初始化值 [[0]]
 
@@ -2552,7 +2551,7 @@ struct Postion {
 };
 ```
 
-在上面的代码中，我们声明了一个结构体类型 [[struct Person]] ，该结构体中有两个类型的成员分别为 [[char]] 和 [[int]]，按道理来说该结构体类型所占用的总字节应该为 [[5 Bytes]]，然��实际上的结果却为 [[8 Bytes]]，这个就是发生了 [[内存对齐]]
+在上面的代码中，我们声明了一个结构体类型 [[struct Person]] ，该结构体中有两个类型的成员分别为 [[char]] 和 [[int]]，按道理来说该结构体类型所占用的总字节应该为 [[5 Bytes]]�������实际上的结果却为 [[8 Bytes]]，这个就是发生了 [[内存对齐]]
 
 那么内存对齐到底有什么用呢？
 
@@ -2907,15 +2906,17 @@ typedef struct
 
 虽然 [[FILE]] 结构体内部的成员涵盖了某个文件的许多描述信息，但是在 c 中，使用文件指针操作其所指向的文件的时候都需要通过 c 标准库中所给定的文件操作函数来完成，而不是直接访问这个结构体内部成员的信息
 
-回到刚刚所说到那个 [[FILE]] 结构体身上，可以看出，这个结构体所存放的信息是关于一个具体文件的实际描述性的信息，而 c 标准库所提供的关于文件的操作函数就是通过形参中所指定的文件指针的成员 **[[fd]] ( 文件描述符 )**{style="color:red"}  ( 记录着当前文件指针所指向的文件的 [[inode]] 节点，而操作系统则能够通过这个唯一的 [[inode]] 节点去索引到磁盘中的具体的扇区信息  ) 去找到具体某个文件，然后再对它实行针对当前函数功能的操作 ~~在编写源程序时，开发人员其实不必关心 [[FILE]] 内部的成语那具体细节~~
+回到刚刚所说到那个 [[FILE]] 结构体身上，可以看出，这个结构体所存放的信息是关于一个具体文件的实际描述性的信息，而 c 标准库所提供的关于文件的操作函数就是通过形参中所指定的文件指针的成员 **[[fd]] ( 文件描述符 )**{style="color:red"}  ( 指向了当前所操作文件的 [[inode]] 节点，而操作系统则能够通过这个唯一的 [[inode]] 节点去索引到磁盘中的具体的扇区信息  ) 去找到具体某个文件，然后再对它实行针对当前函数功能的操作，~~在编写源程序时，开发人员其实不必关心 [[FILE]] 内部的成语那具体细节~~
 
-但有一点需要我们注意，在 [[FILE]] 的内部会有一种成员会 **记录着当前文件中所操作的某个字符的位置**{style="color:red"}，他们是 [[read_cur_ptr]] [[wite_cur_ptr]] ，在下文中，我们把它们统称为 **文件读写位置指针**{style="color:red"} ; 文件读写位置指针在进行指针偏移的操作时所使用的步长都是使用 [[1 Bytes]] 作为标准，在还未进行过任何读写状态的时候，其起始位置为0，在对文件进行了 读取或写入 操作的时候，文件读写位置指针则会基于此次操作所到达的下标往后进一以保证下一次对于文件进行 读取或写入 操作的时候不会和已操作的位置重叠在一块，我们不管是对文件的读还是写操作，都离不开这个 [[文件读写位置指针]] 它对于当前文件的读写起到了标量的作用，举个例子，一个文本文件中有一段文本 [["abc"]]，当我们第一次通过 [[fgetc]] 函数读取后，文件读写位置指针的矢量就会向后加一，以方便下一次再调用 [[fgetc]] 函数读取到的内容为 [['b']] 而不是原来的 [['a']]
+我们可以理解为每个文件描述符都能够指向一个对应的文件，但并不意味着同一个文件就只能被一个文件描述符所指向，也就是说我们是可以通过一些 **linux 系统 I/O 库**{style="color:red"} 中所提供的 [[API]] 去使多个不同的描述符去指向同一个被打开的文件的，内核对于每个 [[inode]] 节点来说都维护了一个连接计数 ( 这点和 **硬链接计数**{style="color:red"} 有点像，但是硬链接计数所真的对象是以整个操作系统为视角，而现在这个文件描述符的计数的视角仅仅只是以当前源程序为视角 ) ，当在当前可执行程序中打开 ( [[open()]] ) 一个新的文件，则这个文件所对应的 [[inode]] 编号所维护的文件描述符链接计数则为 [[1]]，后续如果由描述符去指向这个文件 ( [[inode]] ) 时，则所对应的文件描述符链接计数则会 [[+1]]，那么相应的，当我们关闭 ( [[close()]] ) 了一个对应的文件描述符，则这个文件描述符所指向的 [[inode]] 编号所维护的文件描述符链接计数则会 [[-1]]，**仅当某一个文件在当前所执行的程序中再没有任何文件描述符所指向时，这个文件才是真正意义上的在当前所运行的可执行程序中被关闭掉了**{style="color:red"}
+
+[前面](#Kernel_Space) 稍微提到过内核中的 **进程管理模块**{style="color:red"}，在进程管理模块中存在一块区域，即 **PCB进程控制块**{style="color:red"}，其实质是一个结构体，在 PCB 中存在着一张 **文件描述符表**{style="color:red"}，它负责记录当前进程所打开的 ( [[fopen]] ) 文件的文件描述符 fd，默认情况下，这张表的长度为 [[1024]]，每当当前进程新打开一个文件 ( [[open()]] ) 时，都会在文件描述符表的空闲位置中存入所操作的文件的 [[inode]] 编号，而对应 [[inode]] 编号所维护的文件描述符链接计数则初始化为 [[1]]，最后返回这个 [[inode]] 编号相对于文件描述符表的下标，而这个下标则为 **文件描述符表 [[fd]]**{style="color:red"}，相对，在一个文件被关闭释放 ( [[fclose]] ) 的时候，这个文件所对应的文件描述符 fd 也随之从这个表中移除，而对应文件的文件描述符链接计数则为 [[-1]]，仅当在某个可执行程序中所打开的文件的文件描述符链接计数为 [[0]] 时，这个文件才真正意义上的从当前可执行文件中被关闭，前面一直所强调的，一个应用程序在运行时所打开的三个系统设备文件 ( stdin, stdout, stderr ) 的文件描述符 fd 则总会占用着这张文件描述符表的前三个下标序列之中
+
+有一点需要我们注意，在 [[FILE]] 的内部会有一种成员会 **记录着当前文件中所操作的某个字符的位置**{style="color:red"}，他们是 [[read_cur_ptr]] [[wite_cur_ptr]] ，在下文中，我们把它们统称为 **文件读写位置指针**{style="color:red"} ; 文件读写位置指针在进行指针偏移的操作时所使用的步长都是使用 [[1 Bytes]] 作为标准，在还未进行过任何读写状态的时候，其起始位置为0，在对文件进行了 读取或写入 操作的时候，文件读写位置指针则会基于此次操作所到达的下标往后进一以保证下一次对于文件进行 读取或写入 操作的时候不会和已操作的位置重叠在一块，我们不管是对文件的读还是写操作，都离不开这个 [[文件读写位置指针]] 它对于当前文件的读写起到了标量的作用，举个例子，一个文本文件中有一段文本 [["abc"]]，当我们第一次通过 [[fgetc]] 函数读取后，文件读写位置指针的矢量就会向后加一，以方便下一次再调用 [[fgetc]] 函数读取到的内容为 [['b']] 而不是原来的 [['a']]
 
 对于文件读写位置指针，我们可以通过 [[fseek]] 函数来手动的调整其位置以保证下一次进行 读取或写入 操作的时候所获取到的数据是我们所预期的数据，这种操作也称之为 **对文件的随机访问操作**{style="color:red"} ，在 c 中，对于文件的随机读写操作时需要注意一个点，那就是当我们通过改变文件读写位置指针的位置去往已有数据的位置当中去写入数据的时候 ( 插入数据 ) ，所写入的数据并不是以追加的形式呈现，而是以覆盖的形式呈现，比如说一个文本文件中的内容为 [[111112222233333]] ，当我们把文件读写位置指针的位置移动至第 [[5]] 个，并且写入 [[BBBBB]] 的时候，文件最终的结果则为 [[11111BBBBB33333]] ，而不是 [[11111BBBBB2222233333]]
 
-再聊到文件描述符 [[fd]] ; [前面](#Kernel_Space) 稍微提到过内核中的 **进程管理模块**{style="color:red"}，在进程管理模块中存在一块区域，即 **PCB进程控制块**{style="color:red"}，其实质是一个结构体，在 PCB 中存在着一张 **文件描述符表**{style="color:red"}，它负责记录当前进程所打开的 ( [[fopen]] ) 文件的文件描述符 fd，默认情况下，这张表的长度为 [[1024]]，每当当前进程新打开一个文件时，都会将所返回的文件的文件描述符 fd 插入到这张表中的空闲位置，那么相对的，在一个文件被关闭释放 ( [[fclose]] ) 的时候，这个文件所对应的文件描述符 fd 也随之从这个表中移除，而前面一直所强调的，一个应用程序在运行时所打开的三个系统设备文件 ( stdin, stdout, stderr ) 的文件描述符 fd 则总会占用着这张文件描述符表的前三个下标序列之中
-
-C 标准库和 linux 系统 I/O 库，两者之间到底是什么样的关系？就本节对于文件指针的存储结构的刨析其实已经非常的明朗了，C 标准库就是属于 linux 系统 I/O 的一种上层封装，而文件指针中的成员 文件描述符 [[fd]] 就是属于 C 标准库完成对 linux 系统 I/O 库系统调用的开门钥匙
+最后，C 标准库和 linux 系统 I/O 库，两者之间到底是什么样的关系？就本节对于文件指针的存储结构的刨析其实已经非常的明朗了，C 标准库就是属于 linux 系统 I/O 的一种上层封装，而文件指针中的成员 文件描述符 [[fd]] 就是属于 C 标准库完成对 linux 系统 I/O 库系统调用的开门钥匙
 
 <br/>
 
@@ -3615,15 +3616,15 @@ int main(void) {
 #### int open(const char *filename, int mode, ...)
 ##### <sys/stat.h> <fcntl.h>
 
-当调用该函数的时候，该函数会根据指定的模式 [[mode]] 和文件的具体位置 [[filename]] 去操作具体的文件，如果成功，则将当前文件的 [[inode]] 编号插入至当前运行内存的 **PCB 进程管理模块**{style="color:red"} 的 **文件描述符表**{style="color:red"} 内进行维护并返回所在 **文件描述符表**{style="color:red"} 的下标，如果调用失败，则该函数会返回 [[-1]]
+当调用该函数的时候，该函数会根据指定的模式 [[mode]] 和文件的具体位置 [[filename]] 去操作具体的文件，如果成功，则将当前文件的 [[inode]] 编号插入至当前运行内存的 **PCB 进程管理模块**{style="color:red"} 的 **文件描述符表**{style="color:red"} 内进行维护，对应文件的文件描述符链接计数初始化为 [[1]]，最后返回所在 **文件描述符表**{style="color:red"} 的下标，即文件描述符 [[fd]]，如果调用失败，则该函数会返回 [[-1]]
 
 该函数并不会把文件的内容一次性全部加载到内存中，仅仅只会将所需操作的文件的 [[inode]] 编号维护在 **文件描述符表**{style="color:red"} 中，并返回其下标去交由开发人员维护其生命周期
 
 linux 系统 I/O 库相较 C 标准库存在非常大一种特点即是，linux 系统 I/O 库对于文件的操作，在默认情况下并不会为其开启相应的文件缓冲区
 
-- filename：具体文件的路径 ( 绝对路径 / 相对路径 )
+- [[filename]] : 具体文件的路径 ( 绝对路径 / 相对路径 )
 
-- mode：打开文件的方式
+- [[mode]] : 打开文件的方式
     
     该参数由宏定义的方式进行存在，其值为十六进制数对于 [[open]] 函数的调用，该参数 **必须指定 1 或 多个**{style="color:red"}，对于指定的多个参数，使用 **异或操作符**{style="color:red"} 进行分割
     - [[O_RDONLY]]：以 [[read only]] 的方式打开一个文件，默认情况下若文件不存在则返回 [[-1]]
@@ -3638,8 +3639,8 @@ linux 系统 I/O 库相较 C 标准库存在非常大一种特点即是，linux 
     - [[O_NONBLOCK]]：以不可阻断的方式打开文件，也就是无论有无数据读取或等待，都会立即返回进程之中，通常用于映射非阻塞式的 I/O 设备文件操作
     - [[O_SYNC]]：以同步的方式打开文件
 
-- ...：指定新建文件的权限
-
+- [[...]] : 指定新建文件的权限
+coc#_select_confirm()
     仅当当前操作为新建文件时候 [[O_CREAT]] 才需指定当前参数，对于指定的多种权限，使用 **异或操作符**{style="color:red"} 进行分割
     - [[S_IRWXU]]：所有者具有可读、可写及可执行的权限
     - [[S_IRUSR]]：所有者具有可读取的权限
@@ -3654,10 +3655,502 @@ linux 系统 I/O 库相较 C 标准库存在非常大一种特点即是，linux 
     - [[S_IWOTH]]：其他用户具有可写入的权限
     - [[S_IXOTH]]：其他用户具有可执行的权限
 
+```c
+#include <sys/stat.h> 
+#include <fcntl.h>
+
+int main(void){
+  int _fd = open("text", O_RDONLY);
+  if (_fd == -1) {
+    perror("E");
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
+}
+```
+
 <br/>
 
+#### int close(int fd)
+##### <unistd.h>
+
+释放文件描述符 [[fd]] 在文件描述符表中所占用的空间，并且所对应文件的文件描述符链接计数 [[-1]]
+
+由于 [[PCB 文件描述符表]] 存在限制，当每次使用 [[open]] 函数所打开的文件且不调用 [[close]] 关闭时，则可能会在下一次打开 [[open]] 的时候就打开失败了 ( 返回 [[-1]] )
+
+需要说明的是,当一个进程终止时，内核对该进程所有尚未关闭的文件描述符调用 [[close]] 关闭，所以即使用户程序不调用 [[close]]，在终止时内核也会自动关闭它打开的所有文件
+
+```c
+#include <unistd.h>
+
+int main(void){
+  int _fd = open("text", O_RDONLY);
+  if (_fd == -1) {
+    perror("E");
+    return EXIT_FAILURE;
+  }
+
+  close(_fd);
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### long lseek(int fd, long offset, int whence)
+##### <unistd.h>
+
+对文件描述符 [[fd]] 所指向文件的 [[文件读写位置指针]] 的位置基于 [[whence]] 位置下进行 [[offset]] 偏移量的移动，如果成功返回 [[偏移后的]]，如果失败则返回 [[-1]]
+
+- [[offset]] : 调整位置的偏移量 ( 矢量 ) ，当为正整数的时候，则是向后 ( [[+1]] ) 偏移 offset 位，当为负数的时候则为向后 ( [[-1]] ) 偏移 offset 位
+    - **文件读写位置指针的默认位置为 [[0]]，并且也不能小于 [[0]]**{style="color:red"}，这意味着该参数只能够指定正整数的数字，当该参数小于0  的时候，该函数会调用失败，即文件读写位置指针的位置保持无法改变
+    - 这里的偏移量是以 [[Bytes]] 作为单位来衡量的，比如说指定 [[offset]] 为 [[10]]，那么其实就意味着是向后偏移 [[10 Bytes]]
+
+- [[whence]] : 指定文件读写位置指针所基于的偏移位置，该参数通常使用三种不同的宏定义来指定
+    - [[SEEK_SET]] : 基于文件开头位置
+    - [[SEEK_CUR]] : 基于当前文件读写位置指针所在的位置
+    - [[SEEK_END]] : 基于文件结尾位置
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+
+int main(void) {
+  /** 
+   * AAAAABBBBBCCCCC
+   * ^
+   */
+  int _fd = open("text", O_RDONLY);
+  if (_fd == -1) {
+    perror("E");
+    return EXIT_FAILURE;
+  }
+  
+  /** 
+   * AAAAABBBBBCCCCC
+   *      ^
+   */
+  lseek(_fd, 5, SEEK_SET);
+  char str[5] = { 0 };
+  
+  /** 
+   * AAAAABBBBBCCCCC
+   *           ^
+   */
+  read(_fd, str, 5);
+  printf("%s\n", str);
+
+  memset(str, 0, sizeof(str));
+
+  /** 
+   * AAAAABBBBBCCCCC
+   *                ^
+   */
+  read(_fd, str, sizeof(str));
+  printf("%s\n",str);
+
+  close(_fd);
+  return EXIT_SUCCESS;
+}
+
+```
+
+<br/>
+
+#### long read(int fd, const void *buf, size_t size)
+##### <unistd.h>
+
+从文件描述符 [[fd]] 所指向的文件中读取 [[size]] 个 [[bytes]] 的数据并放入缓冲区 [[buf]] 当中，如果返回 [[> 0]] 则为所读取到的字节数，如果返回 [[= 0]] 则文件独取完毕，如果返回 [[-1]] 则文件读取失败
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+
+int main(void) {
+  int _fd = open("/home/ngpong/code/C/C-Study-03/file_02/text", O_RDONLY);
+  if (_fd == -1) {
+    return EXIT_FAILURE;
+  }
+
+  char buf[5] = { 0 };
+  int _size = read(_fd, buf, sizeof(buf));
+
+  printf("%s\n",buf);
+
+  close(_fd);
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### long write(int fd, const void *buf, size_t size)
+##### <unistd.h>
+
+将 [[buf]] 缓冲区中的 [[size]] 个 [[bytes]] 的数据写入到文件描述符 [[fd]] 所指向的文件当中，如果成功则返回所写入的字节数，如果失败则返回 [[-1]]
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+
+int main(void) {
+  int _fd = open("/home/ngpong/code/C/C-Study-03/file_02/text", O_RDONLY);
+  if (_fd == -1) {
+    return EXIT_FAILURE;
+  }
+
+  char buf[5] = { 0 };
+  int _size = write(_fd, buf, sizeof(buf));
+
+  close(_fd);
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int stat/lstat(const char *filename, struct stat *buf)
+##### <sys/stat.h>
+
+依据所指定的路径 [[filename]] 去查看文件的状态信息，并把结果写入至 [[buf]] 缓冲区中，如果成功则返回 [[0]]，如果失败则返回 [[-1]]
+
+[[stat]] 和 [[lstat]] 函数普通使用并无区别，唯一区别仅为当需要查看的文件为 [[链接文件]] 时 ; [[stat]] 函数所查看的是链接文件所指向的文件的详细信息 ; [[lstat]] 函数所查看的是链接文件本身的详细信息
+
+- [[buf]] : 用于存储所查看文件详细信息的缓冲区，其类型为 [[struct stat]]，其结构如下
+    ```c
+    struct stat {
+        dev_t       st_dev;              /* File device number */
+        ino_t        st_ino;              /* File serial number */
+        mode_t    st_mode;          /* File type and permissions (16 bit) */
+        nlink_t        st_nlink;         /* Link count */
+        uid_t           st_uid;           /* User ID of the file's owner.	*/
+        gid_t      st_gid;                /* Group ID of the file's owner.	*/
+        dev_t     st_rdev;              /* Device number, if device */
+        off_t           st_size;          /* Size of file, in bytes */
+        blksize_t     st_blksize;     /* Optimal block size for I/O */
+        blkcnt_t      st_blocks;     /* Number 512-byte blocks allocated */
+        time_t        st_atime;       /* Time of last access */
+        time_t        st_mtime;      /* Time of last modification */
+        time_t        st_ctime;       /* Nsecs of last status change */
+	};
+    ```
+
+    在这里，我们需要关注一点的是该结构体的 [[st_mode]] 成员，它是用来表示当前文件的文件类型和访问权限，是一个 [[int]] 类型的正整数，即 [[16 bit]] 的存储数据，系统库的设计者把这 [[16 bit]] 分为不同的段用于表示不同的信息，并且每一个段中都提供了值类型为 **8进制**{style="color:red"} 的宏定义让开发者更方便的获取到每一个段中所表示的信息
+
+    -  [[0 ~ 2 bit]] : 其它人权限
+        
+        [[st_mode]] 存在某 [[1 bit]] 与与下宏定义 ( 除了掩码 ) 一致，则认为拥有这种权限
+       -  [[S_IROTH]]  0000004 : 读权限
+       - [[S_IWOTH]] 0000002 :   写权限
+	   - [[S_IXOTH]] 0000001 : 执行权限
+	   - [[S_IRWXO]] 0000007 : 掩码，用于过滤中除其他人权限以外的信息 ( 与 [[st_mode]] 进行一次 **按位与运算**{style="color:red"} 所得到的结果即为筛选后的结果 )
+
+        ```c
+        #include <stdio.h>
+        #include <sys/stat.h>
+
+        void main(void) {
+          struct stat _s;
+          if (stat("./text", &_s)) {
+            perror("E");
+            return;
+          }
+
+          if (_s.st_mode & S_IROTH) {
+            printf("other read permission\n");
+          }
+          if (_s.st_mode & S_IWOTH) {
+            printf("other write permission\n");
+          }
+          if (_s.st_mode & S_IXOTH) {
+            printf("other execute perssion\n");
+          }
+
+          int oth_perssion = _s.st_mode & S_IRWXO;
+        }
+        ```
+
+    -  [[3 ~ 5 bit]] : 所属组权限
+        
+        [[st_mode]] 存在某 [[1 bit]] 与与下宏定义 ( 除了掩码 ) 一致，则认为拥有这种权限
+	    - [[S_IRGRP]] 0000040 : 读权限
+	    - [[S_IWGRP]] 0000020 : 写权限
+	    - [[S_IXGRP]] 0000010 :  执行权限
+	    - [[S_IRWXG]] 0000070 : 掩码，用于过滤中除其他人权限以外的信息 ( 与 [[st_mode]] 进行一次 **按位与运算**{style="color:red"} 所得到的结果即为筛选后的结果 )
+        ```c
+        #include <stdio.h>
+        #include <sys/stat.h>
+
+        void main(void) {
+            struct stat _s;
+            if (stat("./text", &_s)) {
+              perror("E");
+              return;
+            }
+
+            if (_s.st_mode & S_IRGRP) {
+              printf("group read permission\n");
+            }
+            if (_s.st_mode & S_IWGRP) {
+              printf("group write permission\n");
+            }
+            if (_s.st_mode & S_IXGRP) {
+              printf("group execute perssion\n");
+            }
+
+            int grp_perssion = _s.st_mode & S_IRWXU;
+        }
+        ```
+    - [[6 ~ 8 bit]] : 文件所有者权限
+        
+        [[st_mode]] 存在某 [[1 bit]] 与与下宏定义 ( 除了掩码 ) 一致，则认为拥有这种权限
+        - [[S_IRUSR]] 0000400 : 读权限
+	    - [[S_IWUSR]] 0000200 : 写权限
+	    - [[S_IXUSR]] 0000100 : 执行权限
+	    - [[S_IRWXU]] 0000700 : 掩码，用于过滤中除其他人权限以外的信息 ( 与 [[st_mode]] 进行一次 **按位与运算**{style="color:red"} 所得到的结果即为筛选后的结果 )
+        ```c
+        #include <stdio.h>
+        #include <sys/stat.h>
+
+        void main(void) {
+            struct stat _s;
+            if (stat("./text", &_s)) {
+              perror("E");
+              return;
+            }
+
+            if (_s.st_mode & S_IRUSR) {
+              printf("user read permission\n");
+            }
+            if (_s.st_mode & S_IWUSR) {
+              printf("user write permission\n");
+            }
+            if (_s.st_mode & S_IXUSR) {
+              printf("user execute perssion\n");
+            }
+
+            int usr_perssion = _s.st_mode & S_IRWXU;
+        }
+        ```
+    -  [[12 ~ 15 bit]] : 文件类型
+
+        如果 [[st_mode]] 最高位的 [[4 bit]] 和一下宏定义一致，则认为当前文件是属于这种类型的文件
+	    - [[__S_IFSOCK]] 0140000 : 套接字
+	    - [[__S_IFLNK]] 0120000 : 符号链接（软链接）
+	    - [[__S_IFREG]] 0100000 : 普通文件
+	    - [[__S_IFBLK]] 0060000 : 块设备
+	    - [[__S_IFDIR]] 0040000 : 目录
+	    - [[__S_IFCHR]] 0020000 : 字符设备
+	    - [[__S_IFIFO]] 0010000 : 管道
+	    - [[__S_IFMT]] 0170000 : 掩码，用于过滤中除其他人权限以外的信息 ( 与 [[st_mode]] 进行一次 **按位与运算**{style="color:red"} 所得到的结果即为筛选后的结果 )
+
+        ```c
+        #include <stdio.h>
+        #include <sys/stat.h>
+
+        void main(void) {
+          struct stat _s;
+          if (stat("./text", &_s)) {
+            perror("E");
+            return;
+          }
+        
+          switch (_s.st_mode & __S_IFMT) {
+          case __S_IFREG:
+            printf("ref file\n");
+            break;
+          case __S_IFDIR:
+            printf("dir file\n");
+            break;
+          case __S_IFBLK:
+            printf("blk file\n");
+            break;
+          case __S_IFCHR:
+            printf("chr file\n");
+            break;
+          case __S_IFSOCK:
+            printf("sock file\n");
+            break;
+          case __S_IFLNK:
+            printf("lnk file\n");
+            break;
+          case __S_IFIFO:
+            printf("ifo file\n");
+            break;
+          defult:
+            printf("unknown file\n");
+            break;
+          }
+        }
+        ```
+
+        系统库内置了几种宏函数也可以完成文件类型的判断，当然，宏函数内部的实现还是围绕着匹配最高位的 [[4 bit]] 去识别文件的类型去进行展开的，只是宏函数为我们做了一层封装
+        - [[S_ISLNK(mode)]] : 是否为链接文件
+        - [[S_ISBLK(mode)]] : 是否为块设备
+        - [[S_ISCHR(mode)]] : 是否为字符设备
+        - [[S_ISREG(mode)]] : 是否为普通文件
+        - [[S_ISDIR(mode)]] : 是否为目录文件
+        - [[S_ISSOCK(mode)]] :是否为套接字
+        - [[S_ISFIFO(mode)]] :是否为管道
+
+        ```c
+        #include <stdio.h>
+        #include <sys/stat.h>
+
+        void main(void) {
+          struct stat _s;
+          if (stat("./text", &_s)) {
+            perror("E");
+            return;
+          }
+
+          if (S_ISLNK(_s.st_mode)) {
+            printf("lnk file\n");
+          } else if (S_ISBLK(_s.st_mode)) {
+            printf("blk file\n");
+          } else if (S_ISCHR(_s.st_mode)) {
+            printf("chr file\n");
+          } else if (S_ISREG(_s.st_mode)) {
+            printf("reg file\n");
+          } else if (S_ISDIR(_s.st_mode)) {
+            printf("dir file\n");
+          } else if (S_ISSOCK(_s.st_mode)) {
+            printf("sock file\n");
+          } else if (S_ISFIFO(_s.st_mode)) {
+            printf("fifo file\n");
+          } else {
+            printf("unknown file\n");
+          }
+        }
+        ```
 
 
+<br/>
+
+#### DIR *opendir(const char *dir_name)
+##### <sys/types.h> <unistd.h> <dirent.h>
+
+依据所指定的目录文件路径 [[dir_name]] 去打开一个目录文件，如果成功，则返回 [[DIR]] 类型的指针，如果失败，则返回 [[NULL]]
+
+当函数成功调用，所返回的 [[DIR]] 类型的指针其内部就会有建立出一个数组，它存储着当前目录文件下所有深度为 [[1]] 的文件，而数组中的元素我们也通常也称之为 **目录项**{style="color:red"}，每当我们通过 [[readdir]] 去读取一个 [[DIR]] 指针内部的目录项的时候，每一次成功的读取都会使当前 DIR 指针内部的读取计数自增一，以便下一次进行读取的时候所拿到的结果是一个新的目录项的结果
+
+[[DIR]] 类型有 [[typedef]] 所定义，其所引用的类型为 [[__dirstream]]，该类型存在于 [[glibc]] 标准库之中，由 [[gcc]] 在为源程序进行编译时所自动链接的库之一，简而言之，该类型并不存在于当前编译单元之中，其存在透过 [[typedef]] 所定义的结构体的特性并在 [[link]] 阶段使其存在扩展至了其它的编译单元之中
+
+```c
+#include <sys/types.h>
+#include <unistd.h>
+#include <dirent.h>
+
+int main(void) {
+  DIR *root = opendir("./");
+  if (root == NULL) {
+    perror("E");
+    return;
+  }
+
+  return 0;
+}
+```
+
+<br/>
+
+#### struct dirent *readdir (DIR *dir)
+##### <sys/types.h> <unistd.h> <dirent.h>
+
+依据已打开的 [[DIR]] 指针去读取其内部的 **目录项**{style="color:red"}，如果成功则返回当前所读取到的类型为 [[dirent]] 的目录项指针，否则返回 [[NULL]]
+
+- [[dirent]] : 用于存储所查看目录项信息的结构体，其结构如下
+    ```c
+    struct dirent
+    {
+        ino_t d_ino;                            /* Inode number */
+        off_t d_off;                             /* Current position offset in the directory stream */
+        signed short int d_reclen;     /* Length of d_name */
+        unsigned char d_type;          /* File type */
+        char d_name[256];	             /* File name */
+    };
+    ```
+    其中，[[d_type]] 成员系统库内置了以下宏定义提供给外部进行判断使用
+
+    - DT_BLK : 块设备
+    - DT_CHR : 字符设备
+    - DT_DIR : 目录
+    - DT_LNK : 软连接
+    - DT_FIFO : 管道
+    - DT_REG : 普通文件
+    - DT_SOCK : 套接字
+    - DT_UNKNOWN : 未知
+
+
+```c
+#include <sys/types.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <string.h>
+
+DIR *root = opendir(path);
+if (root == NULL) {
+  perror("E");
+  return;
+}
+
+struct dirent *item = NULL;
+while ((item = readdir(root)) != NULL) {
+  /* Dont't process unless directory file */
+  if (item->d_type == DT_DIR &&
+         ((strcmp(item->d_name, ".") == 0) || (strcmp(item->d_name, "..") == 0))) {
+        continue;
+  }
+
+  switch (item->d_type) {
+  case DT_DIR:
+    /* do */
+    break;
+  case DT_REG:
+    /* do */
+    break;
+  default:
+    /* do */
+    break;
+  }
+}
+closedir(root);
+```
+
+<br/>
+
+#### int closedir (DIR *dir)
+##### <sys/types.h> <unistd.h> <dirent.h>
+
+关闭所打开的文件目录 [[dir]]，如果成功则返回 [[0]]，失败则返回 [[-1]]
+
+由于每一个成功打开 ( [[opendir]] ) 的文件目录其内部所维护的目录项数组存放于堆中，所以我们要保证每一个打开的文件目录在使用完毕后都需要对其进行关闭，否则可能会发生内存泄漏的问题
+
+```c
+#include <sys/types.h>
+#include <unistd.h>
+#include <dirent.h>
+
+int main(void) {
+  DIR *root = opendir("./");
+  if (root == NULL) {
+    perror("E");
+    return;
+  }
+
+  closedir(root);
+
+  return 0;
+}
+```
 
 <br/>
 
@@ -3672,6 +4165,10 @@ linux 系统 I/O 库相较 C 标准库存在非常大一种特点即是，linux 
 该关键字能够给系统现有的数据类型起别名 ( 新的数据类型 ) ，需要注意的是，我们不能给一个已经经过了 [[typedef]] 定义的新的数据类型使用该关键字再次进行定义
 
 通常使用 [[typedef]] 定义过的新类型约定俗成使用 [[_t]] 进行结尾
+
+[[typedef]] 所引用的数据类型如果是 **结构体类型**{style="color:red"}，则可以在当前编译单元之中不存在的，这个不存在的结构体类型可以在编译器进行 [[link]] 阶段时把它扩展至其它的编译单元之中，这里注意的是，是编译器在进行 [[link]] 阶段时才能保有这一特性，也就是说我们要保证这个 [[typedef]] 所定义的新的数据类型在进行定义的时候其存在形式是以指针的形式而存在，并且就算使用这个指针，我们也无法获取当前类型实例里面的具体成员信息，因为仅有指针类型，编译器在进行 [[compile]] 阶段时才能够恒定知道其所占用的具体内存大小，并且由于 [[typedef]] 所引用的类型在当前编译单元之内是不存在的 ( 会在 [[link]] 阶段扩展至其它的编译单元之中 )，所以就算我们能够使用这个指针类型也无法获取其内部的成员信息，否则回在 [[compile]] 阶段时候出错
+
+对于重复定义的 [[typedef]] 语法上是允许的，但是不能允许定义使用了相同名字但是却引用的不同类型的 [[typedef]]，重复仅只是所引用的类型和所定义的类型名是一致的基础上才能进行开展
 
 Struct
 ```c
@@ -3869,7 +4366,7 @@ int main(void){
 #### volatile
 <span id="volatile"></span>
 
-该关键字能够防止编译器对重复使用的变量进行优化，主要集中在硬件领域开发用的较多，举个例子，跑马灯的控制通常都有一个变量作为标识，比如说 [[int flag = 0]] ， 当它等于 [[0]] 时就代表亮了，等于 [[1]] 时就代表熄灭，而硬件在使用的过程当中，因为跑马灯需要重复的关闭和开启，所以这个变量 [[flag]] 会进行重复的赋值，这时候编译器查看到这个变量存在多次赋值的性质的时候，就自动的帮我把程序在中间运行过程中对于该变量 [[flag]] 所赋值的代码都删除掉，而当我们加了这个关键字之后，就能够防止编译器对于此处所进行的优化
+该关键字能够防止编译器对重复使用的变量进行优化，主要集中在硬件领域开发用的较多，举个例子，跑马灯的控制通常都有一个变量作为标识，比如说 [[int flag = 0]] ， 当它等于 [[0]] 时就代表亮了，等于 [[1]] 时就代表熄灭，而硬件在使用的过程当中，因为跑马灯需要重复的关闭和开启，所以这个变量 [[flag]] 会进行重复的赋值，这时候编译器查看到这个变量存在多次赋值的性质的时候，就自动的帮我把程序在中间运行过程中对于该变量 [[flag]] 所赋值的代码都删除掉，而当我们加了这个关键字之后，��能够防止编译器对于此处所进行的优化
 
 ```c
 #include <stdio.h>
@@ -3914,7 +4411,7 @@ int main(void){
     - 汇编文件的后缀通常以 [[.s]] 作为结尾
 
 - 汇编 ( 汇编器 $as$ )
-    - 将 **汇编文件**{style="color:red"} 中的汇编指令翻译为二进制编码，并整合为 **二进制文件**{style="color:red"}
+    - 将 **汇编��件**{style="color:red"} 中的汇编指令翻译为二进制编码，并整合为 **二进制文件**{style="color:red"}
     - 二进制文件的后缀通常以 [[.o]] 作为结尾
 
 - 链接 ( 链接器 $ld$ )
@@ -4285,10 +4782,10 @@ gcc -g source.c -o source
 - 通过 **链接器**{style="color:red"} [[gcc --shared]]  将一个二进制文件链接为共享库，在进行库的链接时，我们需要生成符合共享库命名规范的目标文件
 
 共享库的使用：
-- 我们只需要在编译源程序的时候，通过参数 [[-L]] [[-l]] 来指定静态库的路径和共享库名即可，那么在编译器进行编译时，则会把我们所指定的共享库中的 **符号链接**{style="color:red"} 含纳在当前执行代码之中
+- 我们只需要在编译源程序的时候，通过参数 [[-L]] [[-l]] 来指定动态库的路径和共享库名即可，那么在编译器进行编译时，则会把我们所指定的共享库中的 **符号链接**{style="color:red"} 含纳在当前执行代码之中
 
 动态载入器 ( $dynamic linker$ )：
-- 动态载入器即为链接了共享库的可执行程序在第一次启动时，用于寻找其所链接到的共享库的路径的工具，它由多种不同的对象所组成，就 [[ELF]] 格式的可执行程序而言，动态载入器由 [[ld-linux.so*]] 来充当，如果动态载入器在以下路径中都无法显示的找到共享库的路径，则可执行文件在启动时就会出错
+- 动态载入器即为链接了共享库的可执行程序在第一次启动时，用于寻找其所链接到的共享库的路径的工具，它由多种不同的对象所组成，就 [[ELF]] 格式的可执行程序而言，动态载入器由 [[ld-linux.so]] 来充当，如果动态载入器在以下路径中都无法显示的找到共享库的路径，则可执行文件在启动时就会出错
   1. [[ELF]] 文件的 [[DT_RPATH]] 段
   2. 环境变量 [[LD_LIBRARY_PATH]]
   3. [[/etc/ld.so.cache]]
