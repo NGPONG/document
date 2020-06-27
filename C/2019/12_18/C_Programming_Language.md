@@ -2,6 +2,7 @@
 
 <br/>
 
+
 ## 目录
 
 - [变量](#变量)
@@ -88,6 +89,7 @@
   - [Console](#Console.h)
   - [Windows.h](#Windows.h)
   - [stdlib.h](#stdlib.h)
+- [进程与线程](#进程与线程)
 
 <br/>
 
@@ -1041,7 +1043,7 @@ LOW
 #### 数组的初始化
 <span id="数组的初始化"></span>
 
-如果我们只是声明了一个数组而没有定义，那么当我们访问数组某个下标的元素的时候，只能够获取到该数组对应存储区中编译器所赋予的默认值，原因是因为我们没有进行 [[数组的初始化操作]] ，编译器帮我们进行了一次隐式初始化操作
+如果我们只是声明了一个数组而没有定义，那么当我们访问数组某个下标的元素的时候，只能够获取到该数组对应存储区中��译器所赋予的默认值，原因是因为我们没有进行 [[数组的初始化操作]] ，编译器帮我们进行了一次隐式初始化操作
 
 而对于人为的进行数组的初始化操作，我们只能通过在定义数组的时候就需要进行，并且需要注意的是，不管是人为的进行初始化也好还是隐式进行初始化，一个数组一�����经历过初始化的过程就不能再改变这个数组其内部所存储的当前数组首元素的地址，原因是数组在初始化完成后，数组名是一个 [[指针常量]]
 
@@ -2810,7 +2812,7 @@ int main(void){
 - stderr：Standard Error
     - 标准错误 --> 标准错误流 ( 标准错误文件缓冲区 ) --> 屏幕
 
-以上三种特殊的系统文件以 **文件指针**{style="color:red"} 的形式存在与 c 标准库之中，对于引入了 c 标准库的源程序可以直接通过关键字获取并操作对应缓冲区的内容，在可执行程序的首次运行时，os 会基于 [[file descriptor]] ( **linux下万物皆文件，包括输入输出设备**{style="color:red"} ) 的封装调用为相关的文件指针赋值，它们的生命周期会延续至程序的退出而关闭，当然，开发者可以在运行时可以手动的选择关闭它们，以下代码截至头文件 [[stdio.h]] 之中，它展示了这三种特殊系统文件在 c 标准库中的存在形式
+以上三种特殊的系统文件以 **文件指针**{style="color:red"} 的形式存在于 [[libc]] 之中，对于引入了 [[libc]] 的源程序可以直接通过关键字获取并操作对应缓冲区的内容，在可执行程序的首次运行时，os 会基于 [[file descriptor]] ( **linux下万物皆文件，包括输入输出设备**{style="color:red"} ) 的封装调用为相关的文件指针赋值，它们的生命周期会延续至程序的退出而关闭，当然，开发者可以在运行时可以手动的选择关闭它们，以下代码截至头文件 [[stdio.h]] 之中，它展示了这三种特殊系统文件在 c 标准库中的存在形式
 ```c
 /* Standard streams.  */
 extern FILE *stdin;     /* Standard input stream.  */
@@ -2818,7 +2820,7 @@ extern FILE *stdout;    /* Standard output stream.  */
 extern FILE *stderr;    /* Standard error output stream.  */
 ```
 
-相较于 linux 系统 I/O 库而言，它们的存在则由文件的文件描述符来进行定义，在一个可执行程序运行时，这三种特殊的系统文件总是会最优先先被加载出来，即占用了 [[PCB 文件描述符表]] 最初始三个下标的序列，以下代码截至头文件 [[unistd.h]] 之中，它直观的展示了这三种特殊系统文件在 linux 系统 I/O 库中的不一样的存在形式
+相较于 系统调用 而言，它们的存在则由文件的文件描述符来进行定义，在一个可执行程序运行时，这三种特殊的系统文件总是会最优先先被加载出来，即占用了 [[PCB 文件描述符表]] 最初始三个下标的序列，以下代码截至头文件 [[unistd.h]] 之中，它直观的展示了这三种特殊系统文件在 linux 系统 I/O 库中的不一样的存在形式
 
 ```c
 /* Standard file descriptors.  */
@@ -2827,9 +2829,7 @@ extern FILE *stderr;    /* Standard error output stream.  */
 #define	STDERR_FILENO	2	/* Standard error output.  */
 ```
 
-需要补充一点的是，我们无需把 C 标准库 和 linux 系统库分开来看，因为本身 C 标准库就是属于 linux 系统库调用的更上一层的封装形式，即其最终的调用还是落定在 linux 系统库之中
-
-此外，这三种系统文件不是与计算机的外部存储进行沟通的，而是和计算机的 **I/O 设备**{style="color:red"} 进行沟通，既然所沟通的对象并不是外部存储设备，那么为什么又要把他们称之为存储在外部存储概念上的 文件 呢？ 以 [[Linux]] 作为背景，在 linux 下万物皆可称之为文件 ( 因为在底层上 Linux 把 文件 和 设备 统一起来用 [[inode]] 来管理) ，包括输入输出设备，而在这里， [[stdin]] , [[stdout]] , [[stderr]] 都不是映射到一个系统上真实存在的文件，以抽象概念来说，默认情况 ( 也可以通过 [[pipeline]] 技术重定向 [[I/O]] 的位置 ) 下它们映射到的是我们的键盘和看得见的屏幕 ( console )
+需要补充一点的是，这三种系统文件不是与计算机的外部存储进行沟通的，而是和计算机的 **I/O 设备**{style="color:red"} 进行沟通，既然所沟通的对象并不是外部存储设备，那么为什么又要把他们称之为存储在外部存储概念上的 文件 呢？ 以 [[Linux]] 作为背景，在 linux 下万物皆可称之为文件 ( 因为在底层上 Linux 把 文件 和 设备 统一起来用 [[inode]] 来管理) ，包括输入输出设备，而在这里， [[stdin]] , [[stdout]] , [[stderr]] 都不是映射到一个系统上真实存在的文件，以抽象概念来说，默认情况 ( 也可以通过 [[pipeline]] 技术重定向 [[I/O]] 的位置 ) 下它们映射到的是我们的键盘和看得见的屏幕 ( console )
 
 在这里可能会有疑问，上面对于三种在应用程序启动的过程中就为应用程序所绑定的三种东西时称为 [[stream]] ，时又称之为 [[文件]] ，其实不管是哪种说法，都是正确的，首先它们的确是一种以流的形式所存在，都映射到逻辑概念上的数据流，但是以 os ( linux ) 的目光来看待，它们的确是文件，而我们与文件在进行沟通的时候，两者之间中间有个桥梁，那就是 [[stream]]，即 [[stream]] 是基于 [[文件]] 所存在的，关于文件缓冲区的内容会在 [下一章](#文件缓冲区) 进行详解
 
@@ -2846,10 +2846,11 @@ extern FILE *stderr;    /* Standard error output stream.  */
 
 那么，什么是文件缓冲区？
 
+在开始说明之前，需要强调的是，[这里](#文件缓冲区) 所指的文件缓冲区的概念，包括 [上面](#在c语言中三种特殊的系统文件) 所提到的，都是仅在 [[libc]] 之中存在的，由于 [[gcc]] 在对源程序执行 [[link]] 阶段时都会默认的为我们链接至 [[glibc]] 库，故对于一个 c 程序而言我们默认它对于文件的 I/O 操作都会依赖于文件缓冲区而进行，但是，**系统调用是不会依赖于文件缓冲区的，不可否认的是，[[libc]] 中的文件 I/O 操作最终还是会落定在系统调用身上，只是 [[libc]] 在其上层为我们提供了一层缓冲区以提升读写的性能**{style="color:red"}，简而言之，文件缓冲区的内容由用户态所提供，并由它最终同步到内核态去完成文件的 I/O 操作
+
 文件缓冲区的概念就是缓冲区这个概念跟深一步的解答了，前面说到，缓冲区其更深一次的解答其实是需要映射到具体的物理设备的，我们可以认为，一切关乎到 I/O 操作的文件 ( 需要注意， [[文件]] 不单指以外部存储作为媒介存储在 OS 上的文件，还包括其余的外部 I/O 设备 ) 都有或即将有一个属于自己的缓冲区，那么，为什么它们需要这么一块缓冲区？前面说到，缓冲区是用于临时存放输入输出数据的内存区域，它们这些 I/O 设备关于输入输出的数据为什么不可以以更直接的方式和 CPU 进行沟通，而是又通过一层文件缓冲区，把其对应的输入输出数据存放在里面，CPU 在去里面读取，然后进行计算。在这里，我认为使用 [[HDD]] 来解释是最为合适的，首先我们要明白 HDD 的构造，其内部由多个盘片组成，盘片通过中心圆向外扩散划分了多条磁道，而磁道又通过从盘片圆形外部扩散至中心圆的一条条直线划分了扇区 ( 一个扇区的大小为 [[512 Bytes]] ) ，这些扇区用于存放我们的计算机所产生的数据，那么通过什么来读取这些扇区的数据呢？通过一条 [[震臂]] 还有一块 [[磁头]] 去完成，振臂通过不断地左右伸缩，盘片又通过转动，来完成磁头的寻道工作 ( 找到扇片 ) ，其实简而言之说了这么多，也就是想表明磁盘的 [[I/O操作]] 其实就是一个 [[机械式物理的过程]] ，那么对于时间而言，这种一次寻道 ( 物理访问 ) 的工作是极其消耗时间 ( 对比电的速度 ) 的，为此，我们对于某个存储在 HDD 上的 I/O 操作 ( 拷贝数据等等 ) ，就需要使用到一个 [[文件缓冲区]] （ 默认情况下 os 会为它申请一个 [[4096 Bytes]] 的大小 ） ，当我们需要从 HDD 上读取数据的时候，HDD 就会尽可能地把数据写入到缓冲区里面去，直到缓冲区被填满了后再由程序读取出来进行其他的操作 ( 不一定是缓冲区填满后才进行读取，但是大部分情况下是如此 ) ，对于写入操作的话也是如此，程序也会尽可能地把数据写入到其所对应的缓冲区里面去，直至缓冲区满了或到了适当的时候再写回到 HDD 里面去，回过头来， [[文件缓冲区]] 肯定不单指的是硬盘，像键盘也有属于自己的缓冲区 ( stdin ) ，包括屏幕也有自己的缓冲区（ 抽象上来说为 stdout ），其工作原理和使用缓冲区的原因也是大同小异
 
-这里还要提及一个 [[文件指针]] 的概念 ( [后面](#文件指针) 会讲到 )，在 c 中，我们对于一个文件的 [[I/O 操作]] 都由一个指向文件描述信息 [[文件指针]] 来完成，这个文件指针的类型为 [[FILE *]]，而 [[FILE]] 其实就是用于描述文件信息的结构体类型，前面说到，一切关乎到 [[I/O 读写]] 的文件都有或即将有一个属于自己的缓冲区，那么我们可以理解为，每个成功定义的 [[FILE *]] 的都有一块属于自己的缓冲区
-
+这里还要提及一个 [[文件指针]] 的概念 ( [后面](#文件指针) 会讲到 )，在 [[libc]] 中，我们对于一个文件的 [[I/O 操作]] 都由一个指向文件描述信息 [[文件指针]] 来完成，这个文件指针的类型为 [[FILE *]]，而 [[FILE]] 其实就是用于描述文件信息的结构体类型，前面说到，一切关乎到 [[I/O 读写]] 的文件都有或即将有一个属于自己的缓冲区，那么我们可以理解为，每个成功定义的 [[FILE *]] 的都有一块属于自己的缓冲区
 
 关于这个把 [[文件缓冲区上的数据刷新到具体媒介身上]] 的工作我们会把它称为 [[文件缓冲区的刷新]]，文件缓冲区的刷新其实就是把文件缓冲区中的数据拉出来，并清空当前缓冲区里面的数据，再把从文件缓冲区上取出来的数据交由适当的媒介，那么什么时候才会刷新这个文件缓冲区？前面说到，缓冲区的刷新会在适当的时候进行刷新，这种刷新机制是os以默认的设定下来帮我们自动完成的，当然我们可以认为的进行刷新，人为的刷新就需要使用到 c 中的函数 [[fflush]] 函数来完成，这里讨论的是 os 自动的帮我们刷新缓冲区的机制，关于这种刷新的机制其实还有具体的刷新的方式来区分，我们把它归纳为以下几种类别
 
@@ -2861,23 +2862,17 @@ extern FILE *stderr;    /* Standard error output stream.  */
 最后，我们再看一下文件缓冲区模型图
 
 ```c
-								  INPUT/OUTPUT
-									   ↑
-									   |
-						+--------------+--------------+
-						|							  |
-						|	  +-----------------+	  |
-		+---------+		|	  |	buffer			|	  |		+---------+
-		|		  |		|	  |	+----+			|	  |		|		  |
-		|		  +-----+------>	 +----------------+-----> 		  |
-		|		  |			  |	+----+ 8192 Byte|	  		|		  |
-		+---------+			  |					|			+---------+
-		     |				  +-----------------+			 	 |
-			 ↓				  		   |					 	 ↓
-		需要使用到I/O				   ↓					  I/O FILE
-		数据的地方，可				 Memory
-		能是我们的程序
-		也可能是其它东西
+                                           memory
+                                      +---------------+
+                                      |               |
+                                      |   8192 Bytes  |
+                 +--------+           |   +--------+  |       +---------+
++-------+        |        |           |   |        |  |       |         |          +--------+
+|process+------> |  libc  | +-----------> | buffer | +------> | sys_exc | +------> |  file  |
++-------+        |        |           |   |        |  |       |         |          +--------+
+                 +--------+           |   +--------+  |       +---------+
+                                      |               |
+                                      +---------------+
 ```
 
 <br/>
@@ -5471,3 +5466,296 @@ int main(void){
 }
 ```
 
+<br/>
+
+### 进程与线程
+<span id="进程与线程"></span>
+
+---
+
+#### task_struct
+<span id="task_struct"></span>
+
+在 linux 源代码中，一共出现了三个概念，其分别是 `task`, `process`, `thread`，其实不管哪个都好，其在术语上都属于 `task_struct` 的结构体的实例
+
+关于 `stack_struct` 中具体的成员多达数百个，下面仅暂时了一些关键性的成员信息
+
+```c
+struct task_struct {
+    /**
+     * You can easily guess this one when we talk about processes. 
+     * Process can be in different states. Namely interruptible, uninterruptible,
+     * zombie, stopped etc.
+    */
+    volatile long state;
+
+    /* this is related to debugging a process. To trace system calls carried out by a process. */
+    unsigned int ptrace;	
+
+    /* Nice value for specifying process priority */
+    int static_prio;	
+
+    /**
+     * The programmer can specify the cpu core where he wants the process to
+     * run - or allowed to run - this is where cpu affinity is set
+    */
+    int nr_cpus_allowed;	
+
+    /**
+     * As we know that task_struct fields can point to other structures (ie: similar to task_struct), 
+     * this mm field points to another structure called mm_struct. This is the memory description 
+     * for a particular process. Basically the physical memory pages and memory address space 
+     * allocated to the process
+    */
+    struct mm_struct *mm;	
+
+    /**
+     * These fields are used to hold signals and exit codes when the process exits. 
+     * This will let the parent process know how the child died
+    */
+    int exit_code;
+    int exit_signal;	
+
+    /* The signal that is sent when the parent dies */
+    int pdeath_signal;	
+
+    /* This is again another structure pointing to parent process, and any children this process has */
+    struct task_struct	*parent;
+    struct task_struct	*children;
+
+    /**
+     * user time, system time, collective user time spent by process and its children, 
+     * total system time spent by process and children
+    */
+    u64 utime;
+    u64 stime;
+    u64 cutime;
+    u64 cstime;
+   
+    /* user id variables available to the process */
+    kuid_t  loginuid;	
+
+    /* open file information - again another structure */
+    struct files_struct *files;	
+
+    /* handlers related to certain signals, signals that are pending etc. */
+    struct signal_struct  *signal;	
+
+    /* process identifier */
+    int pid;
+
+    /* group identifier, usually it is the PID of the parent process */
+    int pgid;
+
+    /* thread group identifier */
+    int tgid
+}
+```
+
+<br/>
+
+ #### 什么是进程
+<span id="什么是进程"></span>
+
+**进程是操作系统资源分配的最小单位**{style="color:red"}
+
+进程其本质上是动态的，它会随着CPU执行指令而不断变化；linux 内核从设计上去保证每个进程都有自己的权利和权限，**一个进程所产生的问题不会影响系统中运行的其他进程，这是因为每个进程都有自己隔离的地址空间**{style="color:red"}
+
+进程其实就是一个 `task_struct` 结构体的实例，这个结构体中拥有一个成员用于标识针对于当前操作系统而言的唯一身份标识 **`PID`**，**`PID`** 由内核所分配，并在一个进程在退出时对其进行释放以供重用
+
+在 linux 中任何一个进程的创建，都需要依赖于一个父级进程 ( 上帝进程除外，即 **`PID == 1`** ) ，正如我们所编写的程序，在启动后其父级进程就是作为 **`caller`** 的终端，即 **`bash`**，**那么一个进程除了会拥有一个 `PID` 去标识它在这个操作系统中的唯一身份外，还拥有一个 `PPID` ( 父进程的 `PID` ) 用于标识当前进程的父级依赖关系**{style="color:red"}
+
+不可否认的是，进程其地址空间是以父进程作为模型而 clone 出来的，其中拷贝了包括沿用用户态的众多信息如父进程的地址空间, 页表, 堆, 栈 ( 堆栈仅仅只是使用父进程中所衍生出来的虚拟内存地址， ) 等等，但并不意味着子进程的内核态也会从父进程中进行延伸，虽然子进程在用户态中的众多数据都会从其父进程中 clone 出来，但需要注意的是，这里所延伸出来的方式是以 `copy` 的形式而进行，也就是说也许子进程和父进程的地址空间的信息看似是相同的，其实实际上二者毫不相干，这同样也符合一个进程在操作系统中的设计理念
+
+对于任何进程 ( 除了上帝进程 ) 的创建都需要依赖于一个父进程的调用，这种关系向下延伸可以蔓延为一颗树的关系，通常我们也称它为 **`进程树`**，我们可以使用命令 **`pstree`** 去查看这棵树的具体内容
+
+<br/>
+
+ #### 进程的创建
+<span id="进程的创建"></span>
+
+在一个进程在被真正被创建出来之前，需要经历两次系统调用
+
+其一则为 **`clone()`**，该系统调用以旧 ( 父 ) 进程作为模型 ( 包括了父进程的地址空间还有 **`Page Table`** 的信息 ) 并 clone 出一个新的子进程，即生成了属于它的 **`task_struct`**  ( 在这里，内核已经为该进程创建了 **`kernel mode`** )，顺带的会校验当前系统的资源负载，最后会设置其独一无二的 **`PID`** 和与之相关联的父进程的 **`PPID`**
+
+其二则为 **`execve()`**，该系统调用能够将新进程中的可执行文件替换为新进程所对应的二进制文件，并使用一个或者多个物理内存页去拷贝新进程的地址空间, **`Page Table`** 和用户态中的内容替换至子进程当中 ( 原有新进程所 clone 至旧进程的地址空间数据回收释放 )
+
+当这两个系统调用完毕后，一个新进程真正意义上的被创建出来，当一个新进程被创建出来后，会设置其信号为 **`pending`** 并等待任务调度器 **`scheduler`** 的调度；在这里要扩充一点的是，新进程的信号并不会继承自旧进程当中，假设父进程中尚有几个还未执行的信号还未发生时，子进程对其继承将会引起错乱
+
+对于 **`Page Table`** 的拷贝是及其麻烦且对于时间开销非常之大的事情，因为这些页表可能存在于物理内存中，也有可能再当前进程的可执行映像中，还有一些可能在swap文件中，要找到它们实属一件较为困难的工作，但是针对于某些子进程来说，它所需要完成的事情可能并不需要涉及到一些内存的写入操作，这时候就不需要在进行 **`Page Table`** 的拷贝工作了，这种技术也称为 **`COW`** ( $Copy$ $On$ $Write$ )，在未发生写入操作之前，父进程和子进程都会沿用一块共享的虚拟内存空间以保证新进程创建时的执行效率和时间开销，以下这段话摘自这篇 [文章](https://www.tldp.org/LDP/tlk/)  当中
+
+> Cloning a process's virtual memory is rather tricky. A new set of vm_area_struct data structures must be generated together with their owning mm_struct data structure and the cloned process's page tables. None of the process's virtual memory is copied at this point. That would be a rather difficult and lengthy task for some of that virtual memory would be in physical memory, some in the executable image that the process is currently executing and possibly some would be in the swap file. Instead Linux uses a technique called ``copy on write`` which means that virtual memory will only be copied when one of the two processes tries to write to it. Any virtual memory that is not written to, even if it can be, will be shared between the two processes without any harm occuring. The read only memory, for example the executable code, will always be shared. For copy on write to work, the writeable areas have their page table entries marked as read only and the vm_area_struct data structures describing them are marked as copy on write. When one of the processes attempts to write to this virtual memory a page fault will occur. It is at this point that Linux will make a copy of the memory and fix up the two processes' page tables and virtual memory data structures.
+
+<br/>
+
+ #### 什么是线程
+<span id="什么是线程"></span>
+
+**进程是CPU的最小调度单位**{style="color:red"}
+
+不得不提的是，在 linux 下其实本并没有线程，只是为了迎合开发者口味，搞了个 **`轻量级进程`** 出来，他就是所谓的 **`Thread`**；在 linux 中，一个 **`Thread`** 会被当作是一个 **`Process`** 来看待，它同样也是一个 **`task_struct`** 结构体的实例，也拥有一个 **`PID`** 来作为当前操作系统而言的唯一身份标识 **`PID`**，**`kernel`** 并不针对线程去提供针对性的调度
+
+线程的创建同样需要依赖于一个父级进程，这个父级进程也可能是作为源程序所启动的第一个进程所派生下来的子进程也可能是第一个进程本身，但无论如何，线程的创建往往都需要依赖于一个进程，但是不管该线程的创建是往下延续到多少层级的进程派生，其父进程 **`PPID`** 始终都是源程序所启动的第一个进程的 **`PID`**，我们可以理解为当前源程序的最上级进程的 **`PID`**，那么相对的，对于线程来说区分它到底是属于哪个进程往下的派生通过一个属性 **`TGID`** 来确定，属于同一进程下派生出来的线程其 **`TGID`** 都为派生者的 **`PID`**，它们是属于一种平级的关系
+
+需要扩充的是，同一进程下的所有线程在调用 **`getpid()`** 时所获取到的 **`PID`** 是一样的， 因为对于多线程的程序来说，**`getpid()`** 系统调用获取的实际上是 **`TGID`**，因此隶属同一进程的多个线程看起来 **`PID`** 相同
+
+线程的创建过程和进程一致，也是以父进程作为模型 **`clone`** 出来的，但是该系统调用区别于进程的创建，**`clone`** 是共享的 **`clone`**，这个共享，是地址空间 ,**`Page Table`**, 堆 ,栈 的共享，这里需要区别与进程，线程是真正意义上的虚拟内存共享，这就是为什么线程会被称为 **`轻量级线程`** 的原因；不可否认的是，线程的创建的确是免去了进程创建需要拷贝地址空间和页表的工作，也就是在一定程度上，线程创建的时间开销是小于进程的，但，这并不是绝对的，并不意味着线程和进程在创建上的时间开销是呈几何倍的差距，实际只有很小，关于这点在后面的节点还会提到
+
+**由于线程和其父线程是共享一段地址空间的关系，故一个线程出现的错误会导致延伸当前线程的主线程 ( 进程 ) 也会随同崩溃**{style="color:red"}
+
+<br/>
+
+ #### 线程模型
+<span id="线程模型"></span>
+
+线程模型大体上可以分为以下几种
+
+1. **`1 : 1`**
+    
+    Linux 2.6 默认使用 **`NPTL`** 线程库就是属于 1 : 1  的线程模型，即一个用户线程对应一个内核线程，内核负责每个线程的调度，可以调度到其他处理器上面
+    - 优点
+      - 实现简单
+    - 缺点
+      - 对用户线程的大部分操作都会映射到内核线程上，引起用户态和内核态的频繁切换
+      - 内核为每个线程都映射调度实体，如果系统出现大量线程，会对系统性能有影响
+2. **`n : 1`**
+
+    顾名思义，n : 1 线程模型中，多个用户线程对应到同一个内核线程上，线程的创建、调度、同步的所有细节全部由进程的用户空间线程库来处理
+    - 优点
+      - 用户线程的很多操作对内核来说都是透明的，不需要用户态和内核态的频繁切换。使线程的创建、调度、同步等非常快
+    - 缺点
+      - 由于多个用户线程对应到同一个内核线程，如果其中一个用户线程阻塞，那么该其他用户线程也无法执行
+      - 内核并不知道用户态有哪些线程，无法像内核线程一样实现较完整的调度、优先级等
+3. **`n : n`**
+
+    n : 1 线程模型是非常轻量的，问题在于多个用户线程对应到固定的一个内核线程，而 n : n 线程模型解决了这一问题；**`m`** 个用户线程对应到 **`n`** 个内核线程上，通常 **`m > n`** ，由IBM主导的 **`NGPT`** 采用了多对多的线程模型，不过现在已废弃
+    - 优点
+      - 兼具多对一模型的轻量
+      - 由于对应了多个内核线程，则一个用户线程阻塞时，其他用户线程仍然可以执行
+      - 由于对应了多个内核线程，则可以实现较完整的调度、优先级等
+    - 缺点
+      - 实现复杂
+
+以下这段话介绍了关于 Linux 2.6 默认使用的 **`NPTL`** 线程库
+
+> POSIX (portable operating system interface) is a set of standards governing operating systems(based on unix). There needs to be a standard for interoperability.  There is a standard for programming interface, for shell and for almost everything in the operating system. Similarly, there is a standard for threads as well.  The initial thread implementation in Linux, did not fully comply with POSIX standard.
+
+> There were some major reasons why Linux initial thread implementation did not comply with POSIX. One main reason is PID. Earlier implementation of threads had different PID numbers(similar to how processes had different PIDs).
+>
+> To fix these issues in the thread implementation, Red Hat started something called NPTL(Native Posix Thread Library), which later on was included in the Linux kernel (starting from 2.6 version of the kernel). The library function to create threads was also included in the GNU C library. The library function is called as pthread_create.
+>
+> Although you can use clone system call to create a thread, it is recommended to use pthread_create. This is for portability reasons (It is not necessary that a variant of Unix will have clone() system call available. However, the pthread_create library can still be used, as it will take care of the underlying system call and other complexities).
+
+<br/>
+
+ #### 再聊 PID PGID TGID PPID
+<span id="再聊-pid-pgid-tgid"></span>
+
+对于每个进程而言，他都拥有着以下信息用于标识当前进程的所属单位，我们可以通过一些命令行工具，如 : **`pstree`**, **`ps`**, **`htop`** 去查看它
+
+- **`PID`**
+  -  一个进程在当前操作系统的唯一标识
+- **`PGID`**
+  - 进程组ID，一个进程组下有多个进程，并且仅有一个主进程 ( 父进程 )，它的 **`PID == PGID`**，除了主进程，在该进程组下的所有进程都属于主进程的子进程，它们的 **`PID != PGID`**
+- **`TGID`**
+  - 线程组ID，每个进程都能够以当前进程作为主线程并向下衍生出子线程，作为主线程而言，它的 **`PID == TGID`**，除了主线程，在该线程组下的所有线程都属于主线程的子线程，他们的 **`PID != TGID`**
+- **`PPID`**
+  - 子进程的父进程 **`PID`**
+
+```c
+USER VIEW
+ <-- PID 43 --> <----------------- PID 42 ----------------->
+                     +---------+
+                     | process |
+                    _| pid=42  |_
+                  _/ | tgid=42 | \_ (new thread) _
+       _ (fork) _/   +---------+                  \
+      /                                        +---------+
++---------+                                    | process |
+| process |                                    | pid=44  |
+| pid=43  |                                    | tgid=42 |
+| tgid=43 |                                    +---------+
++---------+
+ <-- PID 43 --> <--------- PID 42 --------> <--- PID 44 --->
+                     KERNEL VIEW
+```
+
+<br/>
+
+#### 线程与进程的开销
+<span id="线程与进程的开销"></span>
+
+*Creation*
+
+不可否认的是，创建一个线程的时间开销的确会比创建一个进程要小，原因是因为线程共享了大部分地址空间的数据，而对于进程来说存在一个较大的问题既是 **` 地址空间的拷贝`**，在早期来看，两者之间的差别的确是呈几何倍增长，在 《现代操作系统》 中有一句话谈到
+
+> 创建一个线程较创建一个进程要快10~100倍
+
+针对于进程在创建时，对地址空间的拷贝所消耗的时间拥有 **`COW`** 的优化，并且还提供了一系列的池技术的支持，所以，就现在的眼光来看，其实二者之间的区别其实在内核开发者的努力之下已经缩短的非常之小了
+
+在这个 [网站](https://computing.llnl.gov/tutorials/pthreads/#WhyPthreads) 中有详细的对比数据，如果除去测试结果中的 销毁时间, Context-switch 的时间，真实的二者创建的时间开销接近于 **`1 : 1`**
+
+*Context switch*
+
+进程的 **`Context switch`** 需要分为直接开销和间接开销 : 
+
+对于直接开销来说，它需要经历以下几个过程 ( 其中，刷新 **`TLB`** 所导致的 **`Page Table`** 的重读，还有 **`CR3`** 寄存器的更换是非常消耗时间的过程 )
+
+1. 切换页表全局目录
+2. 切换内核态堆栈
+3. 切换硬件上下文 ( 进程恢复前，必须装入寄存器的数据统称为硬件上下文 )
+    - **``ip ( instruction pointer )``** : 指向当前执行指令的下一条指令
+    - **``bp ( base pointer )``** : 用于存放执行中的函数对应的栈帧的栈底地址
+    - **``sp ( stack poinger )``** : 用于存放执行中的函数对应的栈帧的栈顶地址
+    - **``CR3``** : 页目录基址寄存器，保存页目录表的物理地址
+    - ......
+4. 刷新 **`TLB`**
+5. 系统调度器的代码执行
+
+而对于间接开销来说，主要指的是虽然切换到一个新进程后，由于各种缓存并不热，速度运行会慢一些；此外如果进程始跨CPU访问的话，之前已经热缓存起来的 **`TLB`** ,**`L1`**, **`L2`**, **`L3`** 也因为运行的进程已经变了，所以以局部性原理 cache 起来的代码和数据也都没有用了，导致新进程穿透到内存的 I/O 会变多
+
+反观线程的 **`Context switch`**
+
+虽然对于线程来说其已经和其父线程 ( 进程 ) 已经共享了较多的内核态上的数据，但是为了保证切换后的一致性，故其在进行 **`Context switch`** 时同样需要经历页表的切换, 刷新 **`TLB`** 还有 **`CR3`** 寄存器的更换的过程，所以实际上线程和进程的上下文切换所需的时间开销差别和 **`Creation`** 一样，是不大的 ( 线程还是会优于进程一点 ) ，在这片 [文章](https://zhuanlan.zhihu.com/p/79772089) 中详细的介绍了二者之间的测试结果和测试方式
+
+
+<br/>
+
+#### 选择进程还是线程？
+<span id="选择进程还是线程"></span>
+
+
+
+ #### 进程的使用
+<span id="进程的使用"></span>
+
+![2020-06-28-00-23-03](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-06-28-00-23-03.png)
+
+<!-- 讲进程和线程的创建用到 -->
+<!-- 因为要拷贝tables和cow mapping.但是其实差别真的很细微，这些在内核开发者的努力下已经变的很小了。 -->
+
+<!-- 轻量级进程和进程一样，都有自己独立的task_struct进程描述符，也都有自己独立的pid。从操作系统视角看，调度上和进程没有什么区别，都是在等待队列的双向链表里选择一个task_struct切到运行态而已，只不过轻量级进程和普通进程的区别是可以共享同一内存地址空间、代码段、全局变量、同一打开文件集合而已。
+
+取而代之的是，在Linux中线程仅仅是一个与其他进程共享某些特定资源的进程，每个线程有独立的 task_struct。
+
+普通进程需要深拷贝虚拟内存、文件描述符、信号处理等；而轻量级进程之所以“轻量”，是因为其只需要浅拷贝虚拟内存等大部分信息，多个轻量级进程共享一个进程的资源。
+
+
+
+
+
+
+再来说说contex switch的cost吧。线程的context switch是要比process小一些，因为线程共享了大部分的memory和tables，当switch的时候这些东西已经在缓存中了。
+但是其实差别也很细微。但是在multiprocessor的系统中不共享memory其实是会比共享memory要有一点优势的，因为当任务在不同的processor中运行的时候，同步memory带来的损耗是不可忽视的。
+
+线程事实上只在短线程的情况下比进程有显著的性能差异. 但非短线程不可的应用场景其实非常有限.
+
+最近正在看操作系统，下面内容摘自：《现代操作系统第三版》在许多系统中
+    若多个线程都是CPU密集型的，那么并不能获得性能上的增强，如果存在大量的计算与大量的I/O处理，拥有多个线程允许这些活动彼此重叠进行，从而加快应用程序执行的速度。在多CPU系统中，多线程是有益的，在这样的操作系统中，真正的并行有了实现的可能。
+
+
+多线程的优点：
+方便高效的内存共享 - 多进程下内存共享比较不便，且会抵消掉多进程编程的好处
+较轻的上下文切换开销 - 不用切换地址空间，不用更改CR3寄存器，不用清空TLB。 
+
+-->
