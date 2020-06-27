@@ -5724,7 +5724,9 @@ USER VIEW
 #### 选择进程还是线程？
 <span id="选择进程还是线程"></span>
 
+开发习惯，windows linux
 
+线程与进程的区别
 
  #### 进程的使用
 <span id="进程的使用"></span>
