@@ -5476,9 +5476,9 @@ int main(void){
 #### task_struct
 <span id="task_struct"></span>
 
-在 linux 源代码中，一共出现了三个概念，其分别是 `task`, `process`, `thread`，其实不管哪个都好，其在术语上都属于 `task_struct` 的结构体的实例
+在 linux 源代码中，一共出现了三个概念，其分别是 **`task`**, **`process`**, **`thread`**，其实不管哪个都好，其在术语上，都属于一份独一无二的 **`task_struct`** 的结构体的实例，其中，一个进程所所分配的内存的内核态中存在一个 **`PCB 进程控制模块`**，而所谓的 task_struct 结构体的实例则被置放在这里面
 
-关于 `stack_struct` 中具体的成员多达数百个，下面仅暂时了一些关键性的成员信息
+关于 **`stack_struct`** 中具体的成员多达数百个，下面仅暂时了一些关键性的成员信息
 
 ```c
 struct task_struct {
@@ -5565,7 +5565,9 @@ struct task_struct {
 
 在 linux 中任何一个进程的创建，都需要依赖于一个父级进程 ( 上帝进程除外，即 **`PID == 1`** ) ，正如我们所编写的程序，在启动后其父级进程就是作为 **`caller`** 的终端，即 **`bash`**，**那么一个进程除了会拥有一个 `PID` 去标识它在这个操作系统中的唯一身份外，还拥有一个 `PPID` ( 父进程的 `PID` ) 用于标识当前进程的父级依赖关系**{style="color:red"}
 
-不可否认的是，进程其地址空间是以父进程作为模型而 clone 出来的，其中拷贝了包括沿用用户态的众多信息如父进程的地址空间, 页表, 堆, 栈 ( 堆栈仅仅只是使用父进程中所衍生出来的虚拟内存地址， ) 等等，但并不意味着子进程的内核态也会从父进程中进行延伸，虽然子进程在用户态中的众多数据都会从其父进程中 clone 出来，但需要注意的是，这里所延伸出来的方式是以 `copy` 的形式而进行，也就是说也许子进程和父进程的地址空间的信息看似是相同的，其实实际上二者毫不相干，这同样也符合一个进程在操作系统中的设计理念
+不可否认的是，进程其地址空间是以父进程作为模型而 clone 出来的，其中拷贝了包括沿用用户态的众多信息如父进程的地址空间, 页表, 堆, 栈 ( 堆栈仅仅只是使用父进程中所衍生出来的虚拟内存地址， ) 等等，但并不意味着子进程的内核态也会从父进程中进行延伸，比如内核态中的 **`PCB 进程控制模块`**，由于每一个进程都独属一份 **`task_struct`** 的实例，那么理当其内核态也属于是一个新的并且是仅针对于当前进程的
+
+虽然子进程在用户态中的众多数据都会从其父进程中 clone 出来，但需要注意的是，这里所延伸出来的方式是以 **`copy`** 的形式而进行，也就是说也许子进程和父进程的地址空间的信息看似是相同的，其实实际上二者毫不相干，因为所延生出来的仅仅只是一个虚拟内存的地址，而具体的，这个新进程所使用的新的物理内存页会重新映射一遍这些虚拟内存地址，这同样也符合一个进程在操作系统中的设计理念
 
 对于任何进程 ( 除了上帝进程 ) 的创建都需要依赖于一个父进程的调用，这种关系向下延伸可以蔓延为一颗树的关系，通常我们也称它为 **`进程树`**，我们可以使用命令 **`pstree`** 去查看这棵树的具体内容
 
@@ -5585,6 +5587,94 @@ struct task_struct {
 对于 **`Page Table`** 的拷贝是及其麻烦且对于时间开销非常之大的事情，因为这些页表可能存在于物理内存中，也有可能再当前进程的可执行映像中，还有一些可能在swap文件中，要找到它们实属一件较为困难的工作，但是针对于某些子进程来说，它所需要完成的事情可能并不需要涉及到一些内存的写入操作，这时候就不需要在进行 **`Page Table`** 的拷贝工作了，这种技术也称为 **`COW`** ( $Copy$ $On$ $Write$ )，在未发生写入操作之前，父进程和子进程都会沿用一块共享的虚拟内存空间以保证新进程创建时的执行效率和时间开销，以下这段话摘自这篇 [文章](https://www.tldp.org/LDP/tlk/)  当中
 
 > Cloning a process's virtual memory is rather tricky. A new set of vm_area_struct data structures must be generated together with their owning mm_struct data structure and the cloned process's page tables. None of the process's virtual memory is copied at this point. That would be a rather difficult and lengthy task for some of that virtual memory would be in physical memory, some in the executable image that the process is currently executing and possibly some would be in the swap file. Instead Linux uses a technique called ``copy on write`` which means that virtual memory will only be copied when one of the two processes tries to write to it. Any virtual memory that is not written to, even if it can be, will be shared between the two processes without any harm occuring. The read only memory, for example the executable code, will always be shared. For copy on write to work, the writeable areas have their page table entries marked as read only and the vm_area_struct data structures describing them are marked as copy on write. When one of the processes attempts to write to this virtual memory a page fault will occur. It is at this point that Linux will make a copy of the memory and fix up the two processes' page tables and virtual memory data structures.
+
+<br/>
+
+ #### 进程的状态
+<span id="进程的状态"></span>
+
+进程运行时的生命周期内会呈现着不同的状态，了解这些状态对于系统问题的排查将会起到非常重要的作用
+
+```text
+                                      Receive SIGKILL signal
+                                                ^
+                                                |       +--------+
+                                         +------+------>+ Reaped |
+                                         |              +----+---+
+                                   +-----+----+              ^                  +---------+
++----------------------------------+Stopped(T)|              |                  |Zombie(Z)|
+|                                  +-----+----+              +                  +----+----+
+|                                        ^           Dynamic run error               ^
+|         Receives the SIGSTOP signal <--+                   |                       +--> Process finishes with exit() system call
+|                                        +----------------+  |  +--------------------+
+|                                                         |  |  |
+|                               Waiting for resource      |  |  |  Waiting for event toggled or wake up signal
+|                           (I/O operation to complete)   |  |  |    (like a certain amount of time to pass)
+|                                        ^                |  |  |                    ^
+|   +----------------------+             |             +--+--+--+-+                  |                        +------------------------+
+|   |Interruptible Sleep(S)+<------------+-------------+Running(R)+------------------+----------------------->+Uninterruptible Sleep(D)|
+|   +----------+-----------+                           +-+------+-+                                           +------------+-----------+
+|              |                                         ^      |                                                          |
+|              |                                         |      |                                                          |
+|              |                                         |      |                                                          |
+|              |                           cpu scheduler |      | context switch                                           |
+|              |                                         |      |                                                          |
+|              |                                         |      v                                                          |
+|              |                                      +--+------+-+                                                        |
+|              +-----------------+------------------->+Runnable(R)+<------------------------+------------------------------+
+|                                |                    +-----+-----+                         |
+|                                v                          ^                               v
+|                   Operation complete and ready            |              Event happened or receive a signal
+|                                                           |
++------------------------+----------------------------------+
+                         |
+                         v
+              Receive SIGCONT signal
+```
+
+- **`Runnable(R)`** : 就绪状态
+
+    就绪状态的状态标志 **`state`** 的值为 **`TASK_RUNNING`**
+    
+    此时，程序已被挂入运行队列，处于准备运行状态，一旦获得 CPU 使用权，即可进入 **`Running(R)`**
+- **`Running(R)`** : 运行状态
+  
+  当进程属于正在 **`Running(R)`** 时，其 **`state`** 的值并不发生改变，仍然为 **`TASK_RUNNING`**，并在当前运行的时间片结束后，返回至 **`Runnable(R)`**
+- **`Interruptible Sleep(S)`** : 可中断等待状态
+
+    状态标志 **`state`** 的值为 **`TASK_INTERRUPTIBL`**
+    
+    当处在 **`Running(R)`** 的进程尝试着等待某个事件的触发而进入到 **`Interruptible Sleep(S)`**，一旦事件被触发或者接收到 唤醒信号，进程会立即结束等待并进入 **`Runnable(R)`**
+- **`Uninterruptible Sleep(D)`** : 不可中断等待状态
+
+    状态标志 **`state`** 的值为 **`TASK_UNINTERRUPTIBL`**
+    
+    当处在 **`Running(R)`** 的进程尝试着等待某个资源的准备完成和有效时则进入到 **`TASK_UNINTERRUPTIBL`**，一旦某个资源准备完成，进程会立即结束等待并进入 **`Runnable(R)`**，需要注意的是，当前状态无法被信号或者中断所唤醒，只有当它申请的资源有效时才能被唤醒，所发送的信号仅当其被唤醒时才开始检查
+
+    当某个进程正尝试去处理某些数据时，却接收到了 **`SIGKILL`** 信号而导致进程的终止，这显然是不合理的，故 linux 中使用这一状态的进程来表示这一情景，举个例子，比如当进程需要对磁盘进行读写，而此刻正在DMA中进行着数据到内存的拷贝，如果这时进程休眠被打断 ( **`SIGKILL`** ) 那么很可能会出现问题，所以这时我们就需要这个进程是处在一个不可被打断的状态下才能够保证安全性
+- **`Stopped(T)`** : 挂起状态
+
+    状态标志 **`state`** 的值为 **`TASK_STOPPED`**
+    
+    当处在 **`Runnable(R)`** 的进程收到一个 **`SIGSTOP`** 信号后，就进入 **`Stopped(T)`**
+    
+    当再当前状态中收到 **`SIGCONT`** 信号时，又会恢复至 **`Runnable(R)`**
+
+    当再当前状态中收到 **`SIGKILL`** 信号时，则当前进程完全移除并自动回收
+- **`Zombie(Z)`** : 终止状态
+  
+  状态标志 **`state`** 的值为 **`TASK_DEAD`**
+  
+  进程因完成了 **`exit()`** 的系统调用，并且其所占用的资源需要父进程进行回收时所产生的状态；除了 **`task_struct`** 的以及少数资源外，系统对它不再予以理睬，所以这种状态也叫做 **`僵死状态`**，即进程成为了 **`僵尸进程`**
+
+<br/>
+
+ #### 特殊的进程
+<span id="特殊的进程"></span>
+
+僵尸进程
+
+孤儿进程
 
 <br/>
 
