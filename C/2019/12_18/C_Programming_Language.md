@@ -90,6 +90,17 @@
   - [Windows.h](#Windows.h)
   - [stdlib.h](#stdlib.h)
 - [进程与线程](#进程与线程)
+  - [task struct](#task_struct)
+  - [什么是进程](#什么是进程)
+  - [进程的创建](#进程的创建)
+  - [进程的状态](#进程的状态)
+  - [特殊的进程](#特殊的进程)
+  - [什么是线程](#什么是线程)
+  - [线程模型](#线程模型)
+  - [再聊 PID PGID TGID PPID](#再聊-pid-pgid-tgid)
+  - [线程与进程的开销](#线程与进程的开销)
+  - [选择进程还是线程？](#选择进程还是线程)
+  - [进程的使用](#进程的使用)
 
 <br/>
 
@@ -909,7 +920,7 @@ int main(void) {
 
 Kernel Space 通常是以功能模块进行划分，具体能够细分为:
 - 内存管理模块
-- 进程管理模块
+- 进程管理模块 ( **`PCB`** )
 - 设备驱动管理模块
 - VFS 虚拟文件系统
 
@@ -4311,7 +4322,7 @@ int main(void) {
 
 <br/>
 
-#### int fcntl(int _fd_, int cmd, ...)
+#### int fcntl(int fd, int cmd, ...)
 ##### <sys/types.h> <unistd.h> <fcntl.h>
 
 一个功能强大的 [[API]]，其内置了众多针对于文件进行控制的功能
@@ -5177,7 +5188,7 @@ gcc -g source.c -o source
 
 ---
 
-## *Console*
+### *Console*
 <span id="Console.h"></span>
 
 [前面](#在c语言中三种特殊的系统文件) 提到过，一个应用程序在启动的时候会打开三种特殊的系统文件，当这三种特殊的系统文件被打开后同时也会开启相对应的 **作为程序与设备之间进行数据沟通的桥梁**{style="color:red"} 的缓冲区，那么在 c 中，这三种系统文件将以宏定义文件指针的形式长存在当前程序运行时的内存当中，它们分别为 [[stdin]] [[stdout]] [[stderr]]，而对于操作控制台的API来说，其实就是针对这几种特殊系统文件的缓冲区 ( 即 [[stdin]] [[stdout]] [[stderr]] ) 进行读写操作
@@ -5361,7 +5372,7 @@ int main(){
 <br/>
 <br/>
 
-## *Windows.h*
+### *Windows.h*
 <span id="Windows.h"></span>
 
 #### int system(const char *command)
@@ -5409,7 +5420,7 @@ int main(void){
 <br/>
 <br/>
 
-## *stdlib.h*
+### *stdlib.h*
 <span id="stdlib.h"></span>
 
 #### void srand(int value)
@@ -5596,15 +5607,15 @@ struct task_struct {
 进程运行时的生命周期内会呈现着不同的状态，了解这些状态对于系统问题的排查将会起到非常重要的作用
 
 ```text
-                                      Receive SIGKILL signal
-                                                ^
-                                                |       +--------+
-                                         +------+------>+ Reaped |
-                                         |              +----+---+
-                                   +-----+----+              ^                  +---------+
-+----------------------------------+Stopped(T)|              |                  |Zombie(Z)|
-|                                  +-----+----+              +                  +----+----+
-|                                        ^           Dynamic run error               ^
+                                  Receive SIGKILL signal          Parent process recycles resources
+                                            ^                                    ^
+                                            |           +--------+               |
+                                         +--+---------->+ Reaped +<--------------+---+
+                                         |              +--------+                   |
+                                   +-----+----+                                 +----+----+
++----------------------------------+Stopped(T)|              +----------------->+Zombie(Z)|
+|                                  +-----+----+              |                  +----+----+
+|                                        ^                   +-> Dynamic run error   ^
 |         Receives the SIGSTOP signal <--+                   |                       +--> Process finishes with exit() system call
 |                                        +----------------+  |  +--------------------+
 |                                                         |  |  |
@@ -5665,16 +5676,30 @@ struct task_struct {
   
   状态标志 **`state`** 的值为 **`TASK_DEAD`**
   
-  进程因完成了 **`exit()`** 的系统调用，并且其所占用的资源需要父进程进行回收时所产生的状态；除了 **`task_struct`** 的以及少数资源外，系统对它不再予以理睬，所以这种状态也叫做 **`僵死状态`**，即进程成为了 **`僵尸进程`**
+  进程因完成了 **`exit()`** 的系统调用亦或者异常结束，并且其所占用的资源需要父进程进行回收时所产生的状态；除了 **`task_struct`** 的以及少数资源外，系统对它不再予以理睬，所以这种状态也叫做 **`僵死状态`**，即进程成为了 **`僵尸进程`**
 
 <br/>
 
  #### 特殊的进程
 <span id="特殊的进程"></span>
 
-僵尸进程
+*Orphan*
 
-孤儿进程
+当一个子进程的直接父进程因一些特殊原因而被结束 ( 如 : 调用了 **`exit()`** 系统调用亦或者异常结束 )，那么这个子进程就会被认作为一个孤儿进程；**`kernel`** 会将这个孤儿进程转交给 **`init`** 或 **`systemd`** 进程进行收养，并也通过它们来完成对这个孤儿进程的资源回收工作
+
+<br/>
+
+*Zombie*
+
+当一个进程在触发了一次  **`exit()`** 的系统调用亦或者异常结束后，那么其所占用的系统资源则处于一个等待父进程进行资源回收的状态，如果父进程并没有显式的该已经 **`"死亡"`** 的进程进行资源回收 ( **`wait()`** / **`waitpid()`** )，则这个进程就会被认作为一个僵尸进程
+
+僵尸进程会一直占用着这些未被回收的资源，并且无法通过 **`SIGKILL`** 信号进行强制结束，仅当以下两种途径才能够真正意义上的结束掉这个僵尸进程 : 
+1. 当其直接父进程的结束 ( 调用了 **`exit()`** 亦或者异常结束 )，这个僵尸进程又会被认作为 **`Orphan process`**，即被 **`init`** 或 **`systemd`** 进程收养为子进程，并由它们来完成对僵尸进程的资源释放工作
+2. 直接父进程显式的调用了 **`wait()`** / **`waitpid()`** 进行僵尸子进程的资源回收
+
+<br/>
+
+*Daemon(computing)*
 
 <br/>
 
@@ -5837,4 +5862,76 @@ USER VIEW
  #### 进程的使用
 <span id="进程的使用"></span>
 
+#### int fork()
+##### <unistd.h>
+
+创建一个子进程
+
+当函数的成功调用，则创建出一个子进程，并且由于子进程是从父进程的基础上 **`clone`** 出来的，故这时候子进程和父进程各自执行对应地址空间视角的代码段下问
+  - 在子进程的上下文中，该函数返回 **`0`**，然后继续当前代码的下文执行
+  - 在父进程的上下文中，该函数返回 **`所创建出来的子进程的 PID`**，然后继续当前代码的下文执行
+
+当子进程创建失败，则该函数返回 **`-1`**
+
 ![2020-06-28-00-23-03](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-06-28-00-23-03.png)
+
+```c
+#include <stdio>
+#include <stdlib>
+#include <unistd.h>
+
+int main(void) {
+  int pid = fork();
+  if (pid < 0) {
+    perror("E");
+    exit(EXIT_FAILURE);
+  } else if (pid > 0) {
+    printf("parent process execute\n");
+    printf("create child process, PID is %d\n", pid);
+  } else if (pid == 0) {
+    printf("child process execute\n");
+  }
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int getpid()
+##### <unistd.h>
+
+返回当前上下文所运行的进程的 **`PID`**
+
+```c
+#include <stdio>
+#include <stdlib>
+#include <unistd.h>
+
+int main(void) {
+  printf("PID is %d\n", getpid());
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int getppid()
+##### <unistd.h>
+
+返回当前上下文所运行进程的父进程的 **`PID`**
+
+```c
+#include <stdio>
+#include <stdlib>
+#include <unistd.h>
+
+int main(void) {
+  printf("PPID is %d\n", getppid());
+  return EXIT_SUCCESS;
+}
+```
+
+
+ 为什么要进行进程资源的回收
+   当一个进程退出之后，进程能够回收自己的用户区的资源，但是不能回收内核空间的PCB资源，必须由它的父进程调用wait或者waitpid函数完成对子进程的回收，避免造成系统资源的浪费。
