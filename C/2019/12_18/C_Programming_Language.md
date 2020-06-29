@@ -5934,7 +5934,84 @@ int main(void) {
 }
 ```
 
+<br/>
 
+#### int execl(const char *path, const char *arg, ... )
+##### <unistd.h>
+
+将当前进程的二进制可执行文件替换为 **`path`** 所指定的文件，如果成功，则中断当前进程所依赖的旧二进制可执行文件的上下文调用，并依据所录入的命令行参数 **`arg`** 和 **`...`** 去执行所替换后的可执行文件的入口函数，即开始执行替换后的二进制可执行文件的上下文，如果调用失败，则该函数返回 **`-1`**
+
+我们要保证 **`path`** 所指定的文件是一个可执行文件，即拥有入口函数的，否则该函数的调用失败
+
+该函数在调用完成后，当前进程的用户态中的数据将完全的替换至新可执行文件的上下文，并分配新的地址空间，而内核态的大部分信息将得到保留，包括 **`PCB 进程控制模块`**, **`文件描述符表`** 还有 **`task_struct`** 等等
+
+该函数的最后一个参数一般都设置为 **`NULL`**
+
+main.c
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+
+void foo(void) {
+  /* Keep file number and PCB process control */
+  int fd = open("./test.log", O_RDONLY);
+  if (fd < 0) {
+    perror("E");
+    exit(EXIT_FAILURE);
+  }
+  char buf[5] = { 0 };
+  read(fd, buf, sizeof(buf));
+
+  /* Executeable file arg */
+  char str_fd[32] = { 0 };
+  sprintf(str_fd, "%d", fd);
+  int flag = execl("./test", "test", str_fd, NULL);
+
+  perror("main");
+  exit(EXIT_FAILURE);
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+
+  return EXIT_SUCCESS;
+}
+
+```
+
+test.c
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  printf("%s\n", argv[0]);
+
+  /* file number */
+  int fd = atoi(argv[1]);
+  if (fd < 0) {
+    exit(EXIT_FAILURE);
+  }
+
+  char buf[5] = { 0 };
+  read(fd, buf, sizeof(buf));
+  printf("[%d] %s\n", fd, buf);
+
+  return EXIT_SUCCESS;
+}
+```
 
  为什么要进行进程资源的回收
    当一个进程退出之后，进程能够回收自己的用户区的资源，但是不能回收内核空间的PCB资源，必须由它的父进程调用wait或者waitpid函数完成对子进程的回收，避免造成系统资源的浪费。
