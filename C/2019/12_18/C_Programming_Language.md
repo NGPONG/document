@@ -1047,7 +1047,7 @@ LOW
 
 我们都知道，<kbd>[n]</kbd> 是取数组下标为 [[n]] 的元素的内容，其实 <kbd>[]</kbd> 可以看作是一种语法糖的形式，其实它的实质也是通过对于数组名的偏移和解引用的操作来访问到具体某个下标的元素，即 <kbd>arrary[n]</kbd> 可以看作为 [[*(arrary + n)]] 的简写形式
 
-虽然数组名其在大多数情况下都代表着一个指向当前数组首元素地址的指针，但是对于指针和数组我们是不能把它们混在一起的，数组名代表着指向数组首元素地址的指针这只是属于数组的一种特性，而数组本身是作为一段连续且有序的内存存储空间，对比指针来说，指针只是一个指向具体某个变量在内存的首地址的变量，其次，对于普通的指针来说，其做 [[++]] 操作是允许的，而数组名虽然也是存储着其首元素的内存地址，而做 [[++]] 操作的时候是不允许的，因为数组是一个 [[指针常量]]，最后，一个数组虽然只是声明，但是我们也能够对它进行解引用操作，因为一个数组一旦声明后编译器就能够为它初始化一段线性连续的内存用于存储，只是解引用后的结果可能是一个随机数罢了，而对于指针来说，我们只是声明的情况下我们对它解引用的时候是一种危险的操作，因为我们并未指定该指针的具体指向，故该指针可能是一个空指针抑或是编译器把这种指针初始化为了一个野指针
+虽然数组名其在大多数情况下都代表着一个指向当前数组首元素地址的指针，但是对于指针和数组我们是不能把它们混在一起的，数组名代表着指向数组首元素地址的指针这只是属于数组的一种特性，而数组本身是作为一段连续且有序的内存存储空间，对比指针来说，指针只是一个指向具体某个变量在内存的首地址的变量，其次，对于普通的指针来说，其做 [[++]] 操作是允许的，而数组名虽然也是存储着其首元素的内存地址，而做 [[++]] 操作的时候是不允许的，因为数组是一个 [[指针常量]]，最后，一个数组虽然只是声明，但是我们也能够对它进行解引用操作，因为一个数组一旦声明后编译器就能够为它初始化一段线性连续的内存用于存储，只是解引用后的结果可能是一个随机数罢了��而对于指针来说，我们只是声明的情况下我们对它解引用的时候是一种危险的操作，因为我们并未指定该指针的具体指向，故该指针可能是一个空指针抑或是编译器把这种指针初始化为了一个野指针
 
 <br/>
 
@@ -5597,7 +5597,7 @@ struct task_struct {
 
 当这两个系统调用完毕后，一个新进程真正意义上的被创建出来，当一个新进程被创建出来后，会设置其信号为 **`pending`** 并等待任务调度器 **`scheduler`** 的调度；在这里要扩充一点的是，新进程的信号并不会继承自旧进程当中，假设父进程中尚有几个还未执行的信号还未发生时，子进程对其继承将会引起错乱
 
-对于 **`Page Table`** 的拷贝是及其麻烦且对于时间开销非常之大的事情，因为这些页表可能存在于物理内存中，也有可能再当前进程的可执行映像中，还有一些可能在swap文件中，要找到它们实属一件较为困难的工作，但是针对于某些子进程来说，它所需要完成的事情可能并不需要涉及到一些内存的写入操作，这时候就不需要在进行 **`Page Table`** 的拷贝工作了，这种技术也称为 **`COW`** ( $Copy$ $On$ $Write$ )，在未发生写入操作之前，父进程和子进程都会沿用一块共享的虚拟内存空间以保证新进程创建时的执行效率和时间开销，以下这段话摘自这篇 [文章](https://www.tldp.org/LDP/tlk/)  当中
+对于 **`Page Table`** 的拷贝是及其麻烦且对于时间开销非常之大的事情，��为这些页表可能存在于物理内存中，也有可能再当前进程的可执行映像中，还有一些可能在swap文件中，要找到它们实属一件较为困难的工作，但是针对于某些子进程来说，它所需要完成的事情可能并不需要涉及到一些内存的写入操作，这时候就不需要在进行 **`Page Table`** 的拷贝工作了，这种技术也称为 **`COW`** ( $Copy$ $On$ $Write$ )，在未发生写入操作之前，父进程和子进程都会沿用一块共享的虚拟内存空间以保证新进程创建时的执行效率和时间开销，以下这段话摘自这篇 [文章](https://www.tldp.org/LDP/tlk/)  当中
 
 > Cloning a process's virtual memory is rather tricky. A new set of vm_area_struct data structures must be generated together with their owning mm_struct data structure and the cloned process's page tables. None of the process's virtual memory is copied at this point. That would be a rather difficult and lengthy task for some of that virtual memory would be in physical memory, some in the executable image that the process is currently executing and possibly some would be in the swap file. Instead Linux uses a technique called ``copy on write`` which means that virtual memory will only be copied when one of the two processes tries to write to it. Any virtual memory that is not written to, even if it can be, will be shared between the two processes without any harm occuring. The read only memory, for example the executable code, will always be shared. For copy on write to work, the writeable areas have their page table entries marked as read only and the vm_area_struct data structures describing them are marked as copy on write. When one of the processes attempts to write to this virtual memory a page fault will occur. It is at this point that Linux will make a copy of the memory and fix up the two processes' page tables and virtual memory data structures.
 
@@ -5936,7 +5936,7 @@ int main(void) {
 
 <br/>
 
-#### int execl(const char *path, const char *arg, ... )
+#### int execl / execlp(const char *path, const char *arg, ... )
 ##### <unistd.h>
 
 将当前进程的二进制可执行文件替换为 **`path`** 所指定的文件，如果成功，则中断当前进程所依赖的旧二进制可执行文件的上下文调用，并依据所录入的命令行参数 **`arg`** 和 **`...`** 去执行所替换后的可执行文件的入口函数，即开始执行替换后的二进制可执行文件的上下文，如果调用失败，则该函数返回 **`-1`**
@@ -5946,6 +5946,8 @@ int main(void) {
 该函数在调用完成后，当前进程的用户态中的数据将完全的替换至新可执行文件的上下文，并分配新的地址空间，而内核态的大部分信息将得到保留，包括 **`PCB 进程控制模块`**, **`文件描述符表`** 还有 **`task_struct`** 等等
 
 该函数的最后一个参数一般都设置为 **`NULL`**
+
+**`execl`** 和 **`execlp`** 的功能性是一致的，只是对于 **`execlp`** 来说，他对于所指定的 **`path`** 会在环境变量所指定的路径中去寻找可执行文件，如果找不到则该函数调用失败，简而言之，**`execlp`** 函数会更适合去调用一些 linux 的系统命令
 
 main.c
 ```c
@@ -6013,5 +6015,68 @@ int main(int argc, char *argv[]) {
 }
 ```
 
- 为什么要进行进程资源的回收
-   当一个进程退出之后，进程能够回收自己的用户区的资源，但是不能回收内核空间的PCB资源，必须由它的父进程调用wait或者waitpid函数完成对子进程的回收，避免造成系统资源的浪费。
+<br/>
+
+<span id="pid_t_wait"></span>
+
+#### pid_t wait(int *state)
+##### <wait.h>
+
+阻塞父进程上下文的继续调用，等待当前父进程进程组下的任意子进程的调用结束并回收其所占用的资源，如果函数调用成功，则返回成功回收资源的子进程的 **`PID`**，并且通过所指定的参数 **`state`** 去标识当前子进程的结束状态，如果调用失败 ( 无子进程 ) ，则函数返回 **`-1`**
+
+为什么要进行进程资源的回收？
+
+当一个进程在进行了退出之后，这个进程就会成为一个 **`Zombie`**，即它虽然是一个已经死亡的状态，但是其所占用的部分系统资源 ( 如 : 内核空间的 **`PCB`** )，其生命周期仅当它的上级父进程的结束才会真正意义上的消亡，但是对于部分进程来说其运行时是不可能结束的 ( 如后台服务 )，这时候我们就需要显示的对已经成为 **`Zombie`** 执行资源回收的工作以避免造成系统资源的浪费
+
+- **`state`**
+    
+    对于函数调用完毕后为 state 所赋的值在未经过任何处理时通常对开发者来说是无用的，标准库中为我们提供了以下宏定义以供 state 的使用
+
+    - **`WIFEXITED(status)`** : 返回非 **`0`** 则认为进程是正常结束，否则则认为进程异常结束
+    - **`WEXITSTATUS(status)`** : 获取程序的退出时所返回的结果，即退出状态，异常结束的进程则结果为 **`0`**
+    - **`WIFSIGNALED(status)`** : 如果进程出现了运行级别的异常，则结果为 **`1`**，否则为 **`0`**
+    - **`WTERMSIG(status)`** : 获取进程终止的 **`Signal number`**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <wait.h>
+
+int main(void) {
+  int pid = fork();
+  if (pid < 0) {
+    perror("E");
+    exit(EXIT_FAILURE);
+  } else if (pid == 0) { /*child process*/
+    printf("[%d] child process\n", getpid());
+    exit(EXIT_SUCCESS);
+  } else if (pid > 0) {
+    printf("[%d] parent process\n", getpid());
+
+    int stat;
+    wait(&stat);
+
+    printf("%d\n", stat);
+    printf("%d\n", WIFEXITED(stat));
+    printf("%d\n", WEXITSTATUS(stat));
+    printf("%d\n", WIFSIGNALED(stat));
+    printf("%d\n", WTERMSIG(stat));
+  }
+  
+  return EXIT_SUCCESS
+}
+```
+
+#### pid_t waitpid(pid_t pid, int *state, in options)
+##### <wait.h>
+
+该函数与 [wait](#pid_t_wait) 的功能性是一致的，其最终目的还是去释放 **`Zombie`** 所占用的资源，只是相较于该函数来说，其提供了更多的选项以供开发人员使用
+
+- **`pid`**
+  - **`pid == -1`** : 处理当前父进程进程组下的任意子进程
+  - **`pid > 0`** : 处理指定 **`PID`** 的子进程
+  - **`pid == 0`** : 处理当前父进程进程组下的所有子进程
+  - **`pid < -1`** : 处理当前父进程进程组下的任意子进程
+- **`state`**
+- **`options`**
+- **`return`**
