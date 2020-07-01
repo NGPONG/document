@@ -1095,7 +1095,7 @@ LOW
 </ul>
 <p data-line="1045" class="code-line">在单独使用一个定义好了的数组的数组名的时候，既然它是一个指向数组首元素地址的指针，那是不是意味着我们可以直接通过 <kbd>*</kbd> 操作对数组名进行解引用操作？答案是的，并且其也遵循在 <a href="#%E6%8C%87%E9%92%88%E7%9A%84%E7%B1%BB%E5%9E%8B" data-href="#%E6%8C%87%E9%92%88%E7%9A%84%E7%B1%BB%E5%9E%8B">指针步长</a> 这一小节中所强调的对于解引用时所需遵循的规律，还是拿最初所定义的 <kbd>arrary</kbd> 来说，<kbd>arrary</kbd> 作为一个数组变量，其类型为 <kbd>int []</kbd>，当我们使用这个数组名的时候，原来的类型就需要先去掉一个 <kbd>[]</kbd>，即 <kbd>int []</kbd> -&gt; <kbd>int</kbd>，然后我们再进行解引用操作，即 <kbd>*arrary</kbd>，这时候其步长就需要参考 <kbd>int</kbd> 类型，即 <kbd>4 Bytes</kbd>，那么数组首元素的类型也是 <kbd>int</kbd> 类型，即此次解引用操作 <kbd>*arrary</kbd> 是能够完整的读取到这个数组首元素在内存中所存储的内容的，当然这里所解引用的是数组首元素的内容，那么对于其它下标的内容我们同样可以通过偏移的方式来获取，因为前面说到数组中的每个元素之间都是相隔且连续的，如我们想取下标为 <kbd>1</kbd> 的元素的内容那么我们直接在首地址的基础上再往后偏移 <kbd>1</kbd> 位即可获取到，如: <kbd>*(arrary + 1)</kbd> 即为获取当前数组下标为 <kbd>1</kbd> 的元素的内容</p>
 <p data-line="1047" class="code-line">我们都知道，<kbd>[n]</kbd> 是取数组下标为 <kbd>n</kbd> 的元素的内容，其实 <kbd>[]</kbd> 可以看作是一种语法糖的形式，其实它的实质也是通过对于数组名的偏移和解引用的操作来访问到具体某个下标的元素，即 <kbd>arrary[n]</kbd> 可以看作为 <kbd>*(arrary + n)</kbd> 的简写形式</p>
-<p data-line="1049" class="code-line">虽然数组名其在大多数情况下都代表着一个指向当前数组首元素地址的指针，但是对于指针和数组我们是不能把它们混在一起的，数组名代表着指向数组首元素地址的指针这只是属于数组的一种特性，而数组本身是作为一段连续且有序的内存存储空间，对比指针来说，指针只是一个指向具体某个变量在内存的首地址的变量，其次，对于普通的指针来说，其做 <kbd>++</kbd> 操作是允许的，而数组名虽然也是存储着其首元素的内存地址，而做 <kbd>++</kbd> 操作的时候是不允许的，因为数组是一个 <kbd>指针常量</kbd>，最后，一个数组虽然只是声明，但是我们也能够对它进行解引用操作，因为一个数组一旦声明后编译器就能够为它初始化一段线性连续的内存用于存储，只是解引用后的结果可能是一个随机数罢了，而对于指针来说，我们只是声明的情况下我们对它解引用的时候是一种危险的操作，因为我们并未指定该指针的具体指向，故该指针可能是一个空指针抑或是编译器把这种指针初始化为了一个野指针</p>
+<p data-line="1049" class="code-line">虽然数组名其在大多数情况下都代表着一个指向当前数组首元素地址的指针，但是对于指针和数组我们是不能把它们混在一起的，数组名代表着指向数组首元素地址的指针这只是属于数组的一种特性，而数组本身是作为一段连续且有序的内存存储空间，对比指针来说，指针只是一个指向具体某个变量在内存的首地址的变量，其次，对于普通的指针来说，其做 <kbd>++</kbd> 操作是允许的，而数组名虽然也是存储着其首元素的内存地址，而做 <kbd>++</kbd> 操作的时候是不允许的，因为数组是一个 <kbd>指针常量</kbd>，最后，一个数组虽然只是声明，但是我们也能够对它进行解引用操作，因为一个数组一旦声明后编译器就能够为它初始化一段线性连续的内存用于存储，只是解引用后的结果可能是一个随机数罢了��而对于指针来说，我们只是声明的情况下我们对它解引用的时候是一种危险的操作，因为我们并未指定该指针的具体指向，故该指针可能是一个空指针抑或是编译器把这种指针初始化为了一个野指针</p>
 <br/>
 <a for="toc-anchor" id="%E6%95%B0%E7%BB%84%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96"></a><h4 id="e695b0e7bb84e79a84e5889de5a78be58c96-2" data-line="1053" class="code-line">数组的初始化</h4>
 <p data-line="1054" class="code-line"><span id="数组的初始化"></span></p>
@@ -3310,7 +3310,7 @@ coc#_select_confirm()
 </div></code></pre>
 <br/>
 <a for="toc-anchor" id="int-close(int-fd)"></a><h4 id="int-closeint-fd-2" data-line="3680" class="code-line">int close(int fd)</h4>
-<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-8" data-line="3681" class="code-line">&lt;unistd.h&gt;</h5>
+<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-16" data-line="3681" class="code-line">&lt;unistd.h&gt;</h5>
 <p data-line="3683" class="code-line">释放文件描述符 <kbd>fd</kbd> 在文件描述符表中所占用的空间，并且所对应文件的文件描述符链接计数 <kbd>-1</kbd></p>
 <p data-line="3685" class="code-line">由于 <kbd>PCB 文件描述符表</kbd> 存在限制，当每次使用 <kbd>open</kbd> 函数所打开的文件且不调用 <kbd>close</kbd> 关闭时，则可能会在下一次打开 <kbd>open</kbd> 的时候就打开失败了 ( 返回 <kbd>-1</kbd> )</p>
 <p data-line="3687" class="code-line">需要说明的是,当一个进程终止时，内核对该进程所有尚未关闭的文件描述符调用 <kbd>close</kbd> 关闭，所以即使用户程序不调用 <kbd>close</kbd>，在终止时内核也会自动关闭它打开的所有文件</p>
@@ -3330,7 +3330,7 @@ coc#_select_confirm()
 </div></code></pre>
 <br/>
 <a for="toc-anchor" id="long-lseek(int-fd%2C-long-offset%2C-int-whence)"></a><h4 id="long-lseekint-fd-long-offset-int-whence-2" data-line="3707" class="code-line">long lseek(int fd, long offset, int whence)</h4>
-<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-9" data-line="3708" class="code-line">&lt;unistd.h&gt;</h5>
+<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-17" data-line="3708" class="code-line">&lt;unistd.h&gt;</h5>
 <p data-line="3710" class="code-line">对文件描述符 <kbd>fd</kbd> 所指向文件的 <kbd>文件读写位置指针</kbd> 的位置基于 <kbd>whence</kbd> 位置下进行 <kbd>offset</kbd> 偏移量的移动，如果成功返回 <kbd>偏移后的</kbd>，如果失败则返回 <kbd>-1</kbd></p>
 <ul>
 <li data-line="3712" class="code-line">
@@ -3395,7 +3395,7 @@ coc#_select_confirm()
 </div></code></pre>
 <br/>
 <a for="toc-anchor" id="long-read(int-fd%2C-const-void-*buf%2C-size_t-size)"></a><h4 id="long-readint-fd-const-void-buf-sizet-size-2" data-line="3769" class="code-line">long read(int fd, const void *buf, size_t size)</h4>
-<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-10" data-line="3770" class="code-line">&lt;unistd.h&gt;</h5>
+<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-18" data-line="3770" class="code-line">&lt;unistd.h&gt;</h5>
 <p data-line="3772" class="code-line">从文件描述符 <kbd>fd</kbd> 所指向的文件中读取 <kbd>size</kbd> 个 <kbd>bytes</kbd> 的数据并放入缓冲区 <kbd>buf</kbd> 当中，如果返回 <kbd>&gt; 0</kbd> 则为所读取到的字节数，如果返回 <kbd>= 0</kbd> 则文件独取完毕，如果返回 <kbd>-1</kbd> 则文件读取失败</p>
 <pre><code data-line="3774" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
@@ -3419,7 +3419,7 @@ coc#_select_confirm()
 </div></code></pre>
 <br/>
 <a for="toc-anchor" id="long-write(int-fd%2C-const-void-*buf%2C-size_t-size)"></a><h4 id="long-writeint-fd-const-void-buf-sizet-size-2" data-line="3798" class="code-line">long write(int fd, const void *buf, size_t size)</h4>
-<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-11" data-line="3799" class="code-line">&lt;unistd.h&gt;</h5>
+<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-19" data-line="3799" class="code-line">&lt;unistd.h&gt;</h5>
 <p data-line="3801" class="code-line">将 <kbd>buf</kbd> 缓冲区中的 <kbd>size</kbd> 个 <kbd>bytes</kbd> 的数据写入到文件描述符 <kbd>fd</kbd> 所指向的文件当中，如果成功则返回所写入的字节数，如果失败则返回 <kbd>-1</kbd></p>
 <pre><code data-line="3803" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
@@ -3913,7 +3913,7 @@ closedir(root);
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-fcntl(int-_fd_%2C-int-cmd%2C-...)"></a><h4 id="int-fcntlint-fd-int-cmd-2" data-line="4324" class="code-line">int fcntl(int <u>fd</u>, int cmd, ...)</h4>
+<a for="toc-anchor" id="int-fcntl(int-fd%2C-int-cmd%2C-...)"></a><h4 id="int-fcntlint-fd-int-cmd-2" data-line="4324" class="code-line">int fcntl(int fd, int cmd, ...)</h4>
 <a for="toc-anchor" id="%3Csys%2Ftypes.h%3E-%3Cunistd.h%3E-%3Cfcntl.h%3E"></a><h5 id="systypesh-unistdh-fcntlh-8" data-line="4325" class="code-line">&lt;sys/types.h&gt; &lt;unistd.h&gt; &lt;fcntl.h&gt;</h5>
 <p data-line="4327" class="code-line">一个功能强大的 <kbd>API</kbd>，其内置了众多针对于文件进行控制的功能</p>
 <ul>
@@ -4696,7 +4696,7 @@ B ^ C = A
 <a for="toc-anchor" id="%E7%B3%BB%E7%BB%9F%E5%BA%93"></a><h3 id="e7b3bbe7bb9fe5ba93-2" data-line="5185" class="code-line">系统库</h3>
 <p data-line="5186" class="code-line"><span id="系统库"></span></p>
 <hr>
-<a for="toc-anchor" id="*console*"></a><h2 id="console-2" data-line="5190" class="code-line"><em>Console</em></h2>
+<a for="toc-anchor" id="*console*"></a><h3 id="console-2" data-line="5190" class="code-line"><em>Console</em></h3>
 <p data-line="5191" class="code-line"><span id="Console.h"></span></p>
 <p data-line="5193" class="code-line"><a href="#%E5%9C%A8c%E8%AF%AD%E8%A8%80%E4%B8%AD%E4%B8%89%E7%A7%8D%E7%89%B9%E6%AE%8A%E7%9A%84%E7%B3%BB%E7%BB%9F%E6%96%87%E4%BB%B6" data-href="#%E5%9C%A8c%E8%AF%AD%E8%A8%80%E4%B8%AD%E4%B8%89%E7%A7%8D%E7%89%B9%E6%AE%8A%E7%9A%84%E7%B3%BB%E7%BB%9F%E6%96%87%E4%BB%B6">前面</a> 提到过，一个应用程序在启动的时候会打开三种特殊的系统文件，当这三种特殊的系统文件被打开后同时也会开启相对应的 <strong style="color:red">作为程序与设备之间进行数据沟通的桥梁</strong> 的缓冲区，那么在 c 中，这三种系统文件将以宏定义文件指针的形式长存在当前程序运行时的内存当中，它们分别为 <kbd>stdin</kbd> <kbd>stdout</kbd> <kbd>stderr</kbd>，而对于操作控制台的API来说，其实就是针对这几种特殊系统文件的缓冲区 ( 即 <kbd>stdin</kbd> <kbd>stdout</kbd> <kbd>stderr</kbd> ) 进行读写操作</p>
 <a for="toc-anchor" id="int-printf(char-const*-const-format%2C-...)"></a><h4 id="int-printfchar-const-const-format-2" data-line="5196" class="code-line">int printf(char const* const format, ...)</h4>
@@ -4828,7 +4828,7 @@ B ^ C = A
 </div></code></pre>
 <br/>
 <br/>
-<a for="toc-anchor" id="*windows.h*"></a><h2 id="windowsh-2" data-line="5374" class="code-line"><em>Windows.h</em></h2>
+<a for="toc-anchor" id="*windows.h*"></a><h3 id="windowsh-2" data-line="5374" class="code-line"><em>Windows.h</em></h3>
 <p data-line="5375" class="code-line"><span id="Windows.h"></span></p>
 <a for="toc-anchor" id="int-system(const-char-*command)"></a><h4 id="int-systemconst-char-command-2" data-line="5377" class="code-line">int system(const char *command)</h4>
 <p data-line="5379" class="code-line">执行系统命令 <kbd>command</kbd>，如果成功返回 <kbd>0</kbd>，如果失败则返回 <kbd>-1</kbd></p>
@@ -4868,7 +4868,7 @@ B ^ C = A
 </div></code></pre>
 <br/>
 <br/>
-<a for="toc-anchor" id="*stdlib.h*"></a><h2 id="stdlibh-2" data-line="5422" class="code-line"><em>stdlib.h</em></h2>
+<a for="toc-anchor" id="*stdlib.h*"></a><h3 id="stdlibh-2" data-line="5422" class="code-line"><em>stdlib.h</em></h3>
 <p data-line="5423" class="code-line"><span id="stdlib.h"></span></p>
 <a for="toc-anchor" id="void-srand(int-value)"></a><h4 id="void-srandint-value-2" data-line="5425" class="code-line">void srand(int value)</h4>
 <p data-line="5427" class="code-line">添加一个 <strong style="color:red">随机数种子</strong>，重置函数 <kbd>rand</kbd> 的随机数计数标识，如果在使用函数 <kbd>rand</kbd> 获取随机数之前没有添加随机数种子，则获取到的是一个伪随机数</p>
@@ -4995,25 +4995,26 @@ B ^ C = A
 <p data-line="5572" class="code-line">进程其本质上是动态的，它会随着CPU执行指令而不断变化；linux 内核从设计上去保证每个进程都有自己的权利和权限，<strong style="color:red">一个进程所产生的问题不会影响系统中运行的其他进程，这是因为每个进程都有自己隔离的地址空间</strong></p>
 <p data-line="5574" class="code-line">进程其实就是一个 <code>task_struct</code> 结构体的实例，这个结构体中拥有一个成员用于标识针对于当前操作系统而言的唯一身份标识 <strong><code>PID</code></strong>，<strong><code>PID</code></strong> 由内核所分配，并在一个进程在退出时对其进行释放以供重用</p>
 <p data-line="5576" class="code-line">在 linux 中任何一个进程的创建，都需要依赖于一个父级进程 ( 上帝进程除外，即 <strong><code>PID == 1</code></strong> ) ，正如我们所编写的程序，在启动后其父级进程就是作为 <strong><code>caller</code></strong> 的终端，即 <strong><code>bash</code></strong>，<strong style="color:red">那么一个进程除了会拥有一个 <code>PID</code> 去标识它在这个操作系统中的唯一身份外，还拥有一个 <code>PPID</code> ( 父进程的 <code>PID</code> ) 用于标识当前进程的父级依赖关系</strong></p>
-<p data-line="5578" class="code-line">不可否认的是，进程其地址空间是以父进程作为模型而 clone 出来的，其中拷贝了包括沿用用户态的众多信息如父进程的地址空间, 页表, 堆, 栈 ( 堆栈仅仅只是使用父进程中所衍生出来的虚拟内存地址， ) 等等，但并不意味着子进程的内核态也会从父进程中进行延伸，比如内核态中的 <strong><code>PCB 进程控制模块</code></strong>，由于每一个进程都独属一份 <strong><code>task_struct</code></strong> 的实例，那么理当其内核态也属于是一个新的并且是仅针对于当前进程的</p>
+<p data-line="5578" class="code-line">不可否认的是，进程其地址空间是以父进程作为模型而 clone 出来的，其中拷贝了包括沿用用户态的众多信息如父进程的地址空间, 页表, 堆, 栈 ( 堆栈仅仅只是使用父进程中所衍生出来的虚拟内存地址， ) 等等，但并不意味着子进程内核态中的所有内容也是从父进程中进行延伸出来的，正如内核态中的 <strong><code>PCB 进程控制模块</code></strong> 中所存储的 <strong><code>task_struct</code></strong>，由于每一个进程在当前操作系统中都需要保证仅有一份实例，故这份 <strong><code>task_struct</code></strong> 实例的内容自然也仅属于新进程本身</p>
 <p data-line="5580" class="code-line">虽然子进程在用户态中的众多数据都会从其父进程中 clone 出来，但需要注意的是，这里所延伸出来的方式是以 <strong><code>copy</code></strong> 的形式而进行，也就是说也许子进程和父进程的地址空间的信息看似是相同的，其实实际上二者毫不相干，因为所延生出来的仅仅只是一个虚拟内存的地址，而具体的，这个新进程所使用的新的物理内存页会重新映射一遍这些虚拟内存地址，这同样也符合一个进程在操作系统中的设计理念</p>
-<p data-line="5582" class="code-line">对于任何进程 ( 除了上帝进程 ) 的创建都需要依赖于一个父进程的调用，这种关系向下延伸可以蔓延为一颗树的关系，通常我们也称它为 <strong><code>进程树</code></strong>，我们可以使用命令 <strong><code>pstree</code></strong> 去查看这棵树的具体内容</p>
+<p data-line="5582" class="code-line">需要扩充的是，对于 PCB 模块中的文件描述符表虽然子进程也会从父进程中 clone 出来，虽然这个文件描述符表所存储的数据可能 <strong><code>值</code></strong> 是一致，但是存储这个值的地址空间所映射到的物理内存页和原有父进程中的关系是毫不相干的，但是这里有一点问题是，由于文件描述符所指向的是 <strong><code>inode</code></strong>，也就是说值相同的两个文件描述符往往都能够映射到同一个文件身上，也就意味着，父进程中所衍生出去的子进程，子进程是可以使用其在被创建出来前，父进程中所保有的文件描述符表和其所指向的文件的，但是不同进程之间的文件描述符表是不进行共享的，逻辑上的共享仅仅只是相同的值都能够映射到同一个文件身上罢了</p>
+<p data-line="5584" class="code-line">对于任何进程 ( 除了上帝进程 ) 的创建都需要依赖于一个父进程的调用，这种关系向下延伸可以蔓延为一颗树的关系，通常我们也称它为 <strong><code>进程树</code></strong>，我们可以使用命令 <strong><code>pstree</code></strong> 去查看这棵树的具体内容</p>
 <br/>
-<a for="toc-anchor" id="%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%88%9B%E5%BB%BA"></a><h4 id="e8bf9be7a88be79a84e5889be5bbba-2" data-line="5586" class="code-line">进程的创建</h4>
-<p data-line="5587" class="code-line"><span id="进程的创建"></span></p>
-<p data-line="5589" class="code-line">在一个进程在被真正被创建出来之前，需要经历两次系统调用</p>
-<p data-line="5591" class="code-line">其一则为 <strong><code>clone()</code></strong>，该系统调用以旧 ( 父 ) 进程作为模型 ( 包括了父进程的地址空间还有 <strong><code>Page Table</code></strong> 的信息 ) 并 clone 出一个新的子进程，即生成了属于它的 <strong><code>task_struct</code></strong>  ( 在这里，内核已经为该进程创建了 <strong><code>kernel mode</code></strong> )，顺带的会校验当前系统的资源负载，最后会设置其独一无二的 <strong><code>PID</code></strong> 和与之相关联的父进程的 <strong><code>PPID</code></strong></p>
-<p data-line="5593" class="code-line">其二则为 <strong><code>execve()</code></strong>，该系统调用能够将新进程中的可执行文件替换为新进程所对应的二进制文件，并使用一个或者多个物理内存页去拷贝新进程的地址空间, <strong><code>Page Table</code></strong> 和用户态中的内容替换至子进程当中 ( 原有新进程所 clone 至旧进程的地址空间数据回收释放 )</p>
-<p data-line="5595" class="code-line">当这两个系统调用完毕后，一个新进程真正意义上的被创建出来，当一个新进程被创建出来后，会设置其信号为 <strong><code>pending</code></strong> 并等待任务调度器 <strong><code>scheduler</code></strong> 的调度；在这里要扩充一点的是，新进程的信号并不会继承自旧进程当中，假设父进程中尚有几个还未执行的信号还未发生时，子进程对其继承将会引起错乱</p>
-<p data-line="5597" class="code-line">对于 <strong><code>Page Table</code></strong> 的拷贝是及其麻烦且对于时间开销非常之大的事情，因为这些页表可能存在于物理内存中，也有可能再当前进程的可执行映像中，还有一些可能在swap文件中，要找到它们实属一件较为困难的工作，但是针对于某些子进程来说，它所需要完成的事情可能并不需要涉及到一些内存的写入操作，这时候就不需要在进行 <strong><code>Page Table</code></strong> 的拷贝工作了，这种技术也称为 <strong><code>COW</code></strong> ( <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mi>o</mi><mi>p</mi><mi>y</mi></mrow><annotation encoding="application/x-tex">Copy</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span><span class="mord mathdefault">o</span><span class="mord mathdefault">p</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span></span></span></span> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">On</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mord mathdefault">n</span></span></span></span> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mi>r</mi><mi>i</mi><mi>t</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">Write</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">i</span><span class="mord mathdefault">t</span><span class="mord mathdefault">e</span></span></span></span> )，在未发生写入操作之前，父进程和子进程都会沿用一块共享的虚拟内存空间以保证新进程创建时的执行效率和时间开销，以下这段话摘自这篇 <a href="https://www.tldp.org/LDP/tlk/" data-href="https://www.tldp.org/LDP/tlk/">文章</a>  当中</p>
-<blockquote data-line="5599" class="code-line">
-<p data-line="5599" class="code-line">Cloning a process's virtual memory is rather tricky. A new set of vm_area_struct data structures must be generated together with their owning mm_struct data structure and the cloned process's page tables. None of the process's virtual memory is copied at this point. That would be a rather difficult and lengthy task for some of that virtual memory would be in physical memory, some in the executable image that the process is currently executing and possibly some would be in the swap file. Instead Linux uses a technique called <code>copy on write</code> which means that virtual memory will only be copied when one of the two processes tries to write to it. Any virtual memory that is not written to, even if it can be, will be shared between the two processes without any harm occuring. The read only memory, for example the executable code, will always be shared. For copy on write to work, the writeable areas have their page table entries marked as read only and the vm_area_struct data structures describing them are marked as copy on write. When one of the processes attempts to write to this virtual memory a page fault will occur. It is at this point that Linux will make a copy of the memory and fix up the two processes' page tables and virtual memory data structures.</p>
+<a for="toc-anchor" id="%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%88%9B%E5%BB%BA"></a><h4 id="e8bf9be7a88be79a84e5889be5bbba-2" data-line="5588" class="code-line">进程的创建</h4>
+<p data-line="5589" class="code-line"><span id="进程的创建"></span></p>
+<p data-line="5591" class="code-line">在一个进程在被真正被创建出来之前，需要经历两次系统调用</p>
+<p data-line="5593" class="code-line">其一则为 <strong><code>clone()</code></strong>，该系统调用以旧 ( 父 ) 进程作为模型 ( 包括了父进程的地址空间还有 <strong><code>Page Table</code></strong> 的信息 ) 并 clone 出一个新的子进程，即生成了属于它的 <strong><code>task_struct</code></strong>  ( 在这里，内核已经为该进程创建了 <strong><code>kernel mode</code></strong> )，顺带的会校验当前系统的资源负载，最后会设置其独一无二的 <strong><code>PID</code></strong> 和与之相关联的父进程的 <strong><code>PPID</code></strong></p>
+<p data-line="5595" class="code-line">其二则为 <strong><code>execve()</code></strong>，该系统调用能够将新进程中的可执行文件替换为新进程所对应的二进制文件，并使用一个或者多个物理内存页去拷贝新进程的地址空间, <strong><code>Page Table</code></strong> 和用户态中的内容替换至子进程当中 ( 原有新进程所 clone 至旧进程的地址空间数据回收释放 )</p>
+<p data-line="5597" class="code-line">当这两个系统调用完毕后，一个新进程真正意义上的被创建出来，当一个新进程被创建出来后，会设置其信号为 <strong><code>pending</code></strong> 并等待任务调度器 <strong><code>scheduler</code></strong> 的调度；在这里要扩充一点的是，新进程的信号并不会继承自旧进程当中，假设父进程中尚有几个还未执行的信号还未发生时，子进程对其继承将会引起错乱</p>
+<p data-line="5599" class="code-line">对于 <strong><code>Page Table</code></strong> 的拷贝是及其麻烦且对于时间开销非常之大的事情，��为这些页表可能存在于物理内存中，也有可能再当前进程的可执行映像中，还有一些可能在swap文件中，要找到它们实属一件较为困难的工作，但是针对于某些子进程来说，它所需要完成的事情可能并不需要涉及到一些内存的写入操作，这时候就不需要在进行 <strong><code>Page Table</code></strong> 的拷贝工作了，这种技术也称为 <strong><code>COW</code></strong> ( <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mi>o</mi><mi>p</mi><mi>y</mi></mrow><annotation encoding="application/x-tex">Copy</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span><span class="mord mathdefault">o</span><span class="mord mathdefault">p</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span></span></span></span> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">On</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mord mathdefault">n</span></span></span></span> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mi>r</mi><mi>i</mi><mi>t</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">Write</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">i</span><span class="mord mathdefault">t</span><span class="mord mathdefault">e</span></span></span></span> )，在未发生写入操作之前，父进程和子进程都会沿用一块共享的虚拟内存空间以保证新进程创建时的执行效率和时间开销，以下这段话摘自这篇 <a href="https://www.tldp.org/LDP/tlk/" data-href="https://www.tldp.org/LDP/tlk/">文章</a>  当中</p>
+<blockquote data-line="5601" class="code-line">
+<p data-line="5601" class="code-line">Cloning a process's virtual memory is rather tricky. A new set of vm_area_struct data structures must be generated together with their owning mm_struct data structure and the cloned process's page tables. None of the process's virtual memory is copied at this point. That would be a rather difficult and lengthy task for some of that virtual memory would be in physical memory, some in the executable image that the process is currently executing and possibly some would be in the swap file. Instead Linux uses a technique called <code>copy on write</code> which means that virtual memory will only be copied when one of the two processes tries to write to it. Any virtual memory that is not written to, even if it can be, will be shared between the two processes without any harm occuring. The read only memory, for example the executable code, will always be shared. For copy on write to work, the writeable areas have their page table entries marked as read only and the vm_area_struct data structures describing them are marked as copy on write. When one of the processes attempts to write to this virtual memory a page fault will occur. It is at this point that Linux will make a copy of the memory and fix up the two processes' page tables and virtual memory data structures.</p>
 </blockquote>
 <br/>
-<a for="toc-anchor" id="%E8%BF%9B%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81"></a><h4 id="e8bf9be7a88be79a84e78ab6e68081-2" data-line="5603" class="code-line">进程的状态</h4>
-<p data-line="5604" class="code-line"><span id="进程的状态"></span></p>
-<p data-line="5606" class="code-line">进程运行时的生命周期内会呈现着不同的状态，了解这些状态对于系统问题的排查将会起到非常重要的作用</p>
-<pre><code data-line="5608" class="code-line language-text"><code><div>                                  Receive SIGKILL signal          Parent process recycles resources
+<a for="toc-anchor" id="%E8%BF%9B%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81"></a><h4 id="e8bf9be7a88be79a84e78ab6e68081-2" data-line="5605" class="code-line">进程的状态</h4>
+<p data-line="5606" class="code-line"><span id="进程的状态"></span></p>
+<p data-line="5608" class="code-line">进程运行时的生命周期内会呈现着不同的状态，了解这些状态对于系统问题的排查将会起到非常重要的作用</p>
+<pre><code data-line="5610" class="code-line language-text"><code><div>                                  Receive SIGKILL signal          Parent process recycles resources
                                             ^                                    ^
                                             |           +--------+               |
                                          +--+----------&gt;+ Reaped +&lt;--------------+---+
@@ -5049,157 +5050,157 @@ B ^ C = A
               Receive SIGCONT signal
 </div></code></code></pre>
 <ul>
-<li data-line="5645" class="code-line">
-<p data-line="5645" class="code-line"><strong><code>Runnable(R)</code></strong> : 就绪状态</p>
-<p data-line="5647" class="code-line">就绪状态的状态标志 <strong><code>state</code></strong> 的值为 <strong><code>TASK_RUNNING</code></strong></p>
-<p data-line="5649" class="code-line">此时，程序已被挂入运行队列，处于准备运行状态，一旦获得 CPU 使用权，即可进入 <strong><code>Running(R)</code></strong></p>
+<li data-line="5647" class="code-line">
+<p data-line="5647" class="code-line"><strong><code>Runnable(R)</code></strong> : 就绪状态</p>
+<p data-line="5649" class="code-line">就绪状态的状态标志 <strong><code>state</code></strong> 的值为 <strong><code>TASK_RUNNING</code></strong></p>
+<p data-line="5651" class="code-line">此时，程序已被挂入运行队列，处于准备运行状态，一旦获得 CPU 使用权，即可进入 <strong><code>Running(R)</code></strong></p>
 </li>
-<li data-line="5650" class="code-line">
-<p data-line="5650" class="code-line"><strong><code>Running(R)</code></strong> : 运行状态</p>
-<p data-line="5652" class="code-line">当进程属于正在 <strong><code>Running(R)</code></strong> 时，其 <strong><code>state</code></strong> 的值并不发生改变，仍然为 <strong><code>TASK_RUNNING</code></strong>，并在当前运行的时间片结束后，返回至 <strong><code>Runnable(R)</code></strong></p>
+<li data-line="5652" class="code-line">
+<p data-line="5652" class="code-line"><strong><code>Running(R)</code></strong> : 运行状态</p>
+<p data-line="5654" class="code-line">当进程属于正在 <strong><code>Running(R)</code></strong> 时，其 <strong><code>state</code></strong> 的值并不发生改变，仍然为 <strong><code>TASK_RUNNING</code></strong>，并在当前运行的时间片结束后，返回至 <strong><code>Runnable(R)</code></strong></p>
 </li>
-<li data-line="5653" class="code-line">
-<p data-line="5653" class="code-line"><strong><code>Interruptible Sleep(S)</code></strong> : 可中断等待状态</p>
-<p data-line="5655" class="code-line">状态标志 <strong><code>state</code></strong> 的值为 <strong><code>TASK_INTERRUPTIBL</code></strong></p>
-<p data-line="5657" class="code-line">当处在 <strong><code>Running(R)</code></strong> 的进程尝试着等待某个事件的触发而进入到 <strong><code>Interruptible Sleep(S)</code></strong>，一旦事件被触发或者接收到 唤醒信号，进程会立即结束等待并进入 <strong><code>Runnable(R)</code></strong></p>
+<li data-line="5655" class="code-line">
+<p data-line="5655" class="code-line"><strong><code>Interruptible Sleep(S)</code></strong> : 可中断等待状态</p>
+<p data-line="5657" class="code-line">状态标志 <strong><code>state</code></strong> 的值为 <strong><code>TASK_INTERRUPTIBL</code></strong></p>
+<p data-line="5659" class="code-line">当处在 <strong><code>Running(R)</code></strong> 的进程尝试着等待某个事件的触发而进入到 <strong><code>Interruptible Sleep(S)</code></strong>，一旦事件被触发或者接收到 唤醒信号，进程会立即结束等待并进入 <strong><code>Runnable(R)</code></strong></p>
 </li>
-<li data-line="5658" class="code-line">
-<p data-line="5658" class="code-line"><strong><code>Uninterruptible Sleep(D)</code></strong> : 不可中断等待状态</p>
-<p data-line="5660" class="code-line">状态标志 <strong><code>state</code></strong> 的值为 <strong><code>TASK_UNINTERRUPTIBL</code></strong></p>
-<p data-line="5662" class="code-line">当处在 <strong><code>Running(R)</code></strong> 的进程尝试着等待某个资源的准备完成和有效时则进入到 <strong><code>TASK_UNINTERRUPTIBL</code></strong>，一旦某个资源准备完成，进程会立即结束等待并进入 <strong><code>Runnable(R)</code></strong>，需要注意的是，当前状态无法被信号或者中断所唤醒，只有当它申请的资源有效时才能被唤醒，所发送的信号仅当其被唤醒时才开始检查</p>
-<p data-line="5664" class="code-line">当某个进程正尝试去处理某些数据时，却接收到了 <strong><code>SIGKILL</code></strong> 信号而导致进程的终止，这显然是不合理的，故 linux 中使用这一状态的进程来表示这一情景，举个例子，比如当进程需要对磁盘进行读写，而此刻正在DMA中进行着数据到内存的拷贝，如果这时进程休眠被打断 ( <strong><code>SIGKILL</code></strong> ) 那么很可能会出现问题，所以这时我们就需要这个进程是处在一个不可被打断的状态下才能够保证安全性</p>
+<li data-line="5660" class="code-line">
+<p data-line="5660" class="code-line"><strong><code>Uninterruptible Sleep(D)</code></strong> : 不可中断等待状态</p>
+<p data-line="5662" class="code-line">状态标志 <strong><code>state</code></strong> 的值为 <strong><code>TASK_UNINTERRUPTIBL</code></strong></p>
+<p data-line="5664" class="code-line">当处在 <strong><code>Running(R)</code></strong> 的进程尝试着等待某个资源的准备完成和有效时则进入到 <strong><code>TASK_UNINTERRUPTIBL</code></strong>，一旦某个资源准备完成，进程会立即结束等待并进入 <strong><code>Runnable(R)</code></strong>，需要注意的是，当前状态无法被信号或者中断所唤醒，只有当它申请的资源有效时才能被唤醒，所发送的信号仅当其被唤醒时才开始检查</p>
+<p data-line="5666" class="code-line">当某个进程正尝试去处理某些数据时，却接收到了 <strong><code>SIGKILL</code></strong> 信号而导致进程的终止，这显然是不合理的，故 linux 中使用这一状态的进程来表示这一情景，举个例子，比如当进程需要对磁盘进行读写，而此刻正在DMA中进行着数据到内存的拷贝，如果这时进程休眠被打断 ( <strong><code>SIGKILL</code></strong> ) 那么很可能会出现问题，所以这时我们就需要这个进程是处在一个不可被打断的状态下才能够保证安全性</p>
 </li>
-<li data-line="5665" class="code-line">
-<p data-line="5665" class="code-line"><strong><code>Stopped(T)</code></strong> : 挂起状态</p>
-<p data-line="5667" class="code-line">状态标志 <strong><code>state</code></strong> 的值为 <strong><code>TASK_STOPPED</code></strong></p>
-<p data-line="5669" class="code-line">当处在 <strong><code>Runnable(R)</code></strong> 的进程收到一个 <strong><code>SIGSTOP</code></strong> 信号后，就进入 <strong><code>Stopped(T)</code></strong></p>
-<p data-line="5671" class="code-line">当再当前状态中收到 <strong><code>SIGCONT</code></strong> 信号时，又会恢复至 <strong><code>Runnable(R)</code></strong></p>
-<p data-line="5673" class="code-line">当再当前状态中收到 <strong><code>SIGKILL</code></strong> 信号时，则当前进程完全移除并自动回收</p>
+<li data-line="5667" class="code-line">
+<p data-line="5667" class="code-line"><strong><code>Stopped(T)</code></strong> : 挂起状态</p>
+<p data-line="5669" class="code-line">状态标志 <strong><code>state</code></strong> 的值为 <strong><code>TASK_STOPPED</code></strong></p>
+<p data-line="5671" class="code-line">当处在 <strong><code>Runnable(R)</code></strong> 的进程收到一个 <strong><code>SIGSTOP</code></strong> 信号后，就进入 <strong><code>Stopped(T)</code></strong></p>
+<p data-line="5673" class="code-line">当再当前状态中收到 <strong><code>SIGCONT</code></strong> 信号时，又会恢复至 <strong><code>Runnable(R)</code></strong></p>
+<p data-line="5675" class="code-line">当再当前状态中收到 <strong><code>SIGKILL</code></strong> 信号时，则当前进程完全移除并自动回收</p>
 </li>
-<li data-line="5674" class="code-line">
-<p data-line="5674" class="code-line"><strong><code>Zombie(Z)</code></strong> : 终止状态</p>
-<p data-line="5676" class="code-line">状态标志 <strong><code>state</code></strong> 的值为 <strong><code>TASK_DEAD</code></strong></p>
-<p data-line="5678" class="code-line">进程因完成了 <strong><code>exit()</code></strong> 的系统调用亦或者异常结束，并且其所占用的资源需要父进程进行回收时所产生的状态；除了 <strong><code>task_struct</code></strong> 的以及少数资源外，系统对它不再予以理睬，所以这种状态也叫做 <strong><code>僵死状态</code></strong>，即进程成为了 <strong><code>僵尸进程</code></strong></p>
+<li data-line="5676" class="code-line">
+<p data-line="5676" class="code-line"><strong><code>Zombie(Z)</code></strong> : 终止状态</p>
+<p data-line="5678" class="code-line">状态标志 <strong><code>state</code></strong> 的值为 <strong><code>TASK_DEAD</code></strong></p>
+<p data-line="5680" class="code-line">进程因完成了 <strong><code>exit()</code></strong> 的系统调用亦或者异常结束，并且其所占用的资源需要父进程进行回收时所产生的状态；除了 <strong><code>task_struct</code></strong> 的以及少数资源外，系统对它不再予以理睬，所以这种状态也叫做 <strong><code>僵死状态</code></strong>，即进程成为了 <strong><code>僵尸进程</code></strong></p>
 </li>
 </ul>
 <br/>
-<a for="toc-anchor" id="%E7%89%B9%E6%AE%8A%E7%9A%84%E8%BF%9B%E7%A8%8B"></a><h4 id="e789b9e6ae8ae79a84e8bf9be7a88b-2" data-line="5682" class="code-line">特殊的进程</h4>
-<p data-line="5683" class="code-line"><span id="特殊的进程"></span></p>
-<p data-line="5685" class="code-line"><em>Orphan</em></p>
-<p data-line="5687" class="code-line">当一个子进程的直接父进程因一些特殊原因而被结束 ( 如 : 调用了 <strong><code>exit()</code></strong> 系统调用亦或者异常结束 )，那么这个子进程就会被认作为一个孤儿进程；<strong><code>kernel</code></strong> 会将这个孤儿进程转交给 <strong><code>init</code></strong> 或 <strong><code>systemd</code></strong> 进程进行收养，并也通过它们来完成对这个孤儿进程的资源回收工作</p>
+<a for="toc-anchor" id="%E7%89%B9%E6%AE%8A%E7%9A%84%E8%BF%9B%E7%A8%8B"></a><h4 id="e789b9e6ae8ae79a84e8bf9be7a88b-2" data-line="5684" class="code-line">特殊的进程</h4>
+<p data-line="5685" class="code-line"><span id="特殊的进程"></span></p>
+<p data-line="5687" class="code-line"><em>Orphan</em></p>
+<p data-line="5689" class="code-line">当一个子进程的直接父进程因一些特殊原因而被结束 ( 如 : 调用了 <strong><code>exit()</code></strong> 系统调用亦或者异常结束 )，那么这个子进程就会被认作为一个孤儿进程；<strong><code>kernel</code></strong> 会将这个孤儿进程转交给 <strong><code>init</code></strong> 或 <strong><code>systemd</code></strong> 进程进行收养，并也通过它们来完成对这个孤儿进程的资源回收工作</p>
 <br/>
-<p data-line="5691" class="code-line"><em>Zombie</em></p>
-<p data-line="5693" class="code-line">当一个进程在触发了一次  <strong><code>exit()</code></strong> 的系统调用亦或者异常结束后，那么其所占用的系统资源则处于一个等待父进程进行资源回收的状态，如果父进程并没有显式的该已经 <strong><code>&quot;死亡&quot;</code></strong> 的进程进行资源回收 ( <strong><code>wait()</code></strong> / <strong><code>waitpid()</code></strong> )，则这个进程就会被认作为一个僵尸进程</p>
-<p data-line="5695" class="code-line">僵尸进程会一直占用着这些未被回收的资源，并且无法通过 <strong><code>SIGKILL</code></strong> 信号进行强制结束，仅当以下两种途径才能够真正意义上的结束掉这个僵尸进程 :</p>
+<p data-line="5693" class="code-line"><em>Zombie</em></p>
+<p data-line="5695" class="code-line">当一个进程在触发了一次  <strong><code>exit()</code></strong> 的系统调用亦或者异常结束后，那么其所占用的系统资源则处于一个等待父进程进行资源回收的状态，如果父进程并没有显式的该已经 <strong><code>&quot;死亡&quot;</code></strong> 的进程进行资源回收 ( <strong><code>wait()</code></strong> / <strong><code>waitpid()</code></strong> )，则这个进程就会被认作为一个僵尸进程</p>
+<p data-line="5697" class="code-line">僵尸进程会一直占用着这些未被回收的资源，并且无法通过 <strong><code>SIGKILL</code></strong> 信号进行强制结束，仅当以下两种途径才能够真正意义上的结束掉这个僵尸进程 :</p>
 <ol>
-<li data-line="5696" class="code-line">当其直接父进程的结束 ( 调用了 <strong><code>exit()</code></strong> 亦或者异常结束 )，这个僵尸进程又会被认作为 <strong><code>Orphan process</code></strong>，即被 <strong><code>init</code></strong> 或 <strong><code>systemd</code></strong> 进程收养为子进程，并由它们来完成对僵尸进程的资源释放工作</li>
-<li data-line="5697" class="code-line">直接父进程显式的调用了 <strong><code>wait()</code></strong> / <strong><code>waitpid()</code></strong> 进行僵尸子进程的资源回收</li>
+<li data-line="5698" class="code-line">当其直接父进程的结束 ( 调用了 <strong><code>exit()</code></strong> 亦或者异常结束 )，这个僵尸进程又会被认作为 <strong><code>Orphan process</code></strong>，即被 <strong><code>init</code></strong> 或 <strong><code>systemd</code></strong> 进程收养为子进程，并由它们来完成对僵尸进程的资源释放工作</li>
+<li data-line="5699" class="code-line">直接父进程显式的调用了 <strong><code>wait()</code></strong> / <strong><code>waitpid()</code></strong> 进行僵尸子进程的资源回收</li>
 </ol>
 <br/>
-<p data-line="5701" class="code-line"><em>Daemon(computing)</em></p>
+<p data-line="5703" class="code-line"><em>Daemon(computing)</em></p>
 <br/>
-<a for="toc-anchor" id="%E4%BB%80%E4%B9%88%E6%98%AF%E7%BA%BF%E7%A8%8B"></a><h4 id="e4bb80e4b988e698afe7babfe7a88b-2" data-line="5705" class="code-line">什么是线程</h4>
-<p data-line="5706" class="code-line"><span id="什么是线程"></span></p>
-<p data-line="5708" class="code-line"><strong style="color:red">进程是CPU的最小调度单位</strong></p>
-<p data-line="5710" class="code-line">不得不提的是，在 linux 下其实本并没有线程，只是为了迎合开发者口味，搞了个 <strong><code>轻量级进程</code></strong> 出来，他就是所谓的 <strong><code>Thread</code></strong>；在 linux 中，一个 <strong><code>Thread</code></strong> 会被当作是一个 <strong><code>Process</code></strong> 来看待，它同样也是一个 <strong><code>task_struct</code></strong> 结构体的实例，也拥有一个 <strong><code>PID</code></strong> 来作为当前操作系统而言的唯一身份标识 <strong><code>PID</code></strong>，<strong><code>kernel</code></strong> 并不针对线程去提供针对性的调度</p>
-<p data-line="5712" class="code-line">线程的创建同样需要依赖于一个父级进程，这个父级进程也可能是作为源程序所启动的第一个进程所派生下来的子进程也可能是第一个进程本身，但无论如何，线程的创建往往都需要依赖于一个进程，但是不管该线程的创建是往下延续到多少层级的进程派生，其父进程 <strong><code>PPID</code></strong> 始终都是源程序所启动的第一个进程的 <strong><code>PID</code></strong>，我们可以理解为当前源程序的最上级进程的 <strong><code>PID</code></strong>，那么相对的，对于线程来说区分它到底是属于哪个进程往下的派生通过一个属性 <strong><code>TGID</code></strong> 来确定，属于同一进程下派生出来的线程其 <strong><code>TGID</code></strong> 都为派生者的 <strong><code>PID</code></strong>，它们是属于一种平级的关系</p>
-<p data-line="5714" class="code-line">需要扩充的是，同一进程下的所有线程在调用 <strong><code>getpid()</code></strong> 时所获取到的 <strong><code>PID</code></strong> 是一样的， 因为对于多线程的程序来说，<strong><code>getpid()</code></strong> 系统调用获取的实际上是 <strong><code>TGID</code></strong>，因此隶属同一进程的多个线程看起来 <strong><code>PID</code></strong> 相同</p>
-<p data-line="5716" class="code-line">线程的创建过程和进程一致，也是以父进程作为模型 <strong><code>clone</code></strong> 出来的，但是该系统调用区别于进程的创建，<strong><code>clone</code></strong> 是共享的 <strong><code>clone</code></strong>，这个共享，是地址空间 ,<strong><code>Page Table</code></strong>, 堆 ,栈 的共享，这里需要区别与进程，线程是真正意义上的虚拟内存共享，这就是为什么线程会被称为 <strong><code>轻量级线程</code></strong> 的原因；不可否认的是，线程的创建的确是免去了进程创建需要拷贝地址空间和页表的工作，也就是在一定程度上，线程创建的时间开销是小于进程的，但，这并不是绝对的，并不意味着线程和进程在创建上的时间开销是呈几何倍的差距，实际只有很小，关于这点在后面的节点还会提到</p>
-<p data-line="5718" class="code-line"><strong style="color:red">由于线程和其父线程是共享一段地址空间的关系，故一个线程出现的错误会导致延伸当前线程的主线程 ( 进程 ) 也会随同崩溃</strong></p>
+<a for="toc-anchor" id="%E4%BB%80%E4%B9%88%E6%98%AF%E7%BA%BF%E7%A8%8B"></a><h4 id="e4bb80e4b988e698afe7babfe7a88b-2" data-line="5707" class="code-line">什么是线程</h4>
+<p data-line="5708" class="code-line"><span id="什么是线程"></span></p>
+<p data-line="5710" class="code-line"><strong style="color:red">进程是CPU的最小调度单位</strong></p>
+<p data-line="5712" class="code-line">不得不提的是，在 linux 下其实本并没有线程，只是为了迎合开发者口味，搞了个 <strong><code>轻量级进程</code></strong> 出来，他就是所谓的 <strong><code>Thread</code></strong>；在 linux 中，一个 <strong><code>Thread</code></strong> 会被当作是一个 <strong><code>Process</code></strong> 来看待，它同样也是一个 <strong><code>task_struct</code></strong> 结构体的实例，也拥有一个 <strong><code>PID</code></strong> 来作为当前操作系统而言的唯一身份标识 <strong><code>PID</code></strong>，<strong><code>kernel</code></strong> 并不针对线程去提供针对性的调度</p>
+<p data-line="5714" class="code-line">线程的创建同样需要依赖于一个父级进程，这个父级进程也可能是作为源程序所启动的第一个进程所派生下来的子进程也可能是第一个进程本身，但无论如何，线程的创建往往都需要依赖于一个进程，但是不管该线程的创建是往下延续到多少层级的进程派生，其父进程 <strong><code>PPID</code></strong> 始终都是源程序所启动的第一个进程的 <strong><code>PID</code></strong>，我们可以理解为当前源程序的最上级进程的 <strong><code>PID</code></strong>，那么相对的，对于线程来说区分它到底是属于哪个进程往下的派生通过一个属性 <strong><code>TGID</code></strong> 来确定，属于同一进程下派生出来的线程其 <strong><code>TGID</code></strong> 都为派生者的 <strong><code>PID</code></strong>，它们是属于一种平级的关系</p>
+<p data-line="5716" class="code-line">需要扩充的是，同一进程下的所有线程在调用 <strong><code>getpid()</code></strong> 时所获取到的 <strong><code>PID</code></strong> 是一样的， 因为对于多线程的程序来说，<strong><code>getpid()</code></strong> 系统调用获取的实际上是 <strong><code>TGID</code></strong>，因此隶属同一进程的多个线程看起来 <strong><code>PID</code></strong> 相同</p>
+<p data-line="5718" class="code-line">线程的创建过程和进程一致，也是以父进程作为模型 <strong><code>clone</code></strong> 出来的，但是该系统调用区别于进程的创建，<strong><code>clone</code></strong> 是共享的 <strong><code>clone</code></strong>，这个共享，是地址空间 ,<strong><code>Page Table</code></strong>, 堆 ,栈 的共享，这里需要区别与进程，线程是真正意义上的虚拟内存共享，这就是为什么线程会被称为 <strong><code>轻量级线程</code></strong> 的原因；不可否认的是，线程的创建的确是免去了进程创建需要拷贝地址空间和页表的工作，也就是在一定程度上，线程创建的时间开销是小于进程的，但，这并不是绝对的，并不意味着线程和进程在创建上的时间开销是呈几何倍的差距，实际只有很小，关于这点在后面的节点还会提到</p>
+<p data-line="5720" class="code-line"><strong style="color:red">由于线程和其父线程是共享一段地址空间的关系，故一个线程出现的错误会导致延伸当前线程的主线程 ( 进程 ) 也会随同崩溃</strong></p>
 <br/>
-<a for="toc-anchor" id="%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B"></a><h4 id="e7babfe7a88be6a8a1e59e8b-2" data-line="5722" class="code-line">线程模型</h4>
-<p data-line="5723" class="code-line"><span id="线程模型"></span></p>
-<p data-line="5725" class="code-line">线程模型大体上可以分为以下几种</p>
+<a for="toc-anchor" id="%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B"></a><h4 id="e7babfe7a88be6a8a1e59e8b-2" data-line="5724" class="code-line">线程模型</h4>
+<p data-line="5725" class="code-line"><span id="线程模型"></span></p>
+<p data-line="5727" class="code-line">线程模型大体上可以分为以下几种</p>
 <ol>
-<li data-line="5727" class="code-line">
-<p data-line="5727" class="code-line"><strong><code>1 : 1</code></strong></p>
-<p data-line="5729" class="code-line">Linux 2.6 默认使用 <strong><code>NPTL</code></strong> 线程库就是属于 1 : 1  的线程模型，即一个用户线程对应一个内核线程，内核负责每个线程的调度，可以调度到其他处理器上面</p>
+<li data-line="5729" class="code-line">
+<p data-line="5729" class="code-line"><strong><code>1 : 1</code></strong></p>
+<p data-line="5731" class="code-line">Linux 2.6 默认使用 <strong><code>NPTL</code></strong> 线程库就是属于 1 : 1  的线程模型，即一个用户线程对应一个内核线程，内核负责每个线程的调度，可以调度到其他处理器上面</p>
 <ul>
-<li data-line="5730" class="code-line">优点
+<li data-line="5732" class="code-line">优点
 <ul>
-<li data-line="5731" class="code-line">实现简单</li>
+<li data-line="5733" class="code-line">实现简单</li>
 </ul>
 </li>
-<li data-line="5732" class="code-line">缺点
+<li data-line="5734" class="code-line">缺点
 <ul>
-<li data-line="5733" class="code-line">对用户线程的大部分操作都会映射到内核线程上，引起用户态和内核态的频繁切换</li>
-<li data-line="5734" class="code-line">内核为每个线程都映射调度实体，如果系统出现大量线程，会对系统性能有影响</li>
-</ul>
-</li>
-</ul>
-</li>
-<li data-line="5735" class="code-line">
-<p data-line="5735" class="code-line"><strong><code>n : 1</code></strong></p>
-<p data-line="5737" class="code-line">顾名思义，n : 1 线程模型中，多个用户线程对应到同一个内核线程上，线程的创建、调度、同步的所有细节全部由进程的用户空间线程库来处理</p>
-<ul>
-<li data-line="5738" class="code-line">优点
-<ul>
-<li data-line="5739" class="code-line">用户线程的很多操作对内核来说都是透明的，不需要用户态和内核态的频繁切换。使线程的创建、调度、同步等非常快</li>
-</ul>
-</li>
-<li data-line="5740" class="code-line">缺点
-<ul>
-<li data-line="5741" class="code-line">由于多个用户线程对应到同一个内核线程，如果其中一个用户线程阻塞，那么该其他用户线程也无法执行</li>
-<li data-line="5742" class="code-line">内核并不知道用户态有哪些线程，无法像内核线程一样实现较完整的调度、优先级等</li>
+<li data-line="5735" class="code-line">对用户线程的大部分操作都会映射到内核线程上，引起用户态和内核态的频繁切换</li>
+<li data-line="5736" class="code-line">内核为每个线程都映射调度实体，如果系统出现大量线程，会对系统性能有影响</li>
 </ul>
 </li>
 </ul>
 </li>
-<li data-line="5743" class="code-line">
-<p data-line="5743" class="code-line"><strong><code>n : n</code></strong></p>
-<p data-line="5745" class="code-line">n : 1 线程模型是非常轻量的，问题在于多个用户线程对应到固定的一个内核线程，而 n : n 线程模型解决了这一问题；<strong><code>m</code></strong> 个用户线程对应到 <strong><code>n</code></strong> 个内核线程上，通常 <strong><code>m &gt; n</code></strong> ，由IBM主导的 <strong><code>NGPT</code></strong> 采用了多对多的线程模型，不过现在已废弃</p>
+<li data-line="5737" class="code-line">
+<p data-line="5737" class="code-line"><strong><code>n : 1</code></strong></p>
+<p data-line="5739" class="code-line">顾名思义，n : 1 线程模型中，多个用户线程对应到同一个内核线程上，线程的创建、调度、同步的所有细节全部由进程的用户空间线程库来处理</p>
 <ul>
-<li data-line="5746" class="code-line">优点
+<li data-line="5740" class="code-line">优点
 <ul>
-<li data-line="5747" class="code-line">兼具多对一模型的轻量</li>
-<li data-line="5748" class="code-line">由于对应了多个内核线程，则一个用户线程阻塞时，其他用户线程仍然可以执行</li>
-<li data-line="5749" class="code-line">由于对应了多个内核线程，则可以实现较完整的调度、优先级等</li>
+<li data-line="5741" class="code-line">用户线程的很多操作对内核来说都是透明的，不需要用户态和内核态的频繁切换。使线程的创建、调度、同步等非常快</li>
 </ul>
 </li>
-<li data-line="5750" class="code-line">缺点
+<li data-line="5742" class="code-line">缺点
 <ul>
-<li data-line="5751" class="code-line">实现复杂</li>
+<li data-line="5743" class="code-line">由于多个用户线程对应到同一个内核线程，如果其中一个用户线程阻塞，那么该其他用户线程也无法执行</li>
+<li data-line="5744" class="code-line">内核并不知道用户态有哪些线程，无法像内核线程一样实现较完整的调度、优先级等</li>
+</ul>
+</li>
+</ul>
+</li>
+<li data-line="5745" class="code-line">
+<p data-line="5745" class="code-line"><strong><code>n : n</code></strong></p>
+<p data-line="5747" class="code-line">n : 1 线程模型是非常轻量的，问题在于多个用户线程对应到固定的一个内核线程，而 n : n 线程模型解决了这一问题；<strong><code>m</code></strong> 个用户线程对应到 <strong><code>n</code></strong> 个内核线程上，通常 <strong><code>m &gt; n</code></strong> ，由IBM主导的 <strong><code>NGPT</code></strong> 采用了多对多的线程模型，不过现在已废弃</p>
+<ul>
+<li data-line="5748" class="code-line">优点
+<ul>
+<li data-line="5749" class="code-line">兼具多对一模型的轻量</li>
+<li data-line="5750" class="code-line">由于对应了多个内核线程，则一个用户线程阻塞时，其他用户线程仍然可以执行</li>
+<li data-line="5751" class="code-line">由于对应了多个内核线程，则可以实现较完整的调度、优先级等</li>
+</ul>
+</li>
+<li data-line="5752" class="code-line">缺点
+<ul>
+<li data-line="5753" class="code-line">实现复杂</li>
 </ul>
 </li>
 </ul>
 </li>
 </ol>
-<p data-line="5753" class="code-line">以下这段话介绍了关于 Linux 2.6 默认使用的 <strong><code>NPTL</code></strong> 线程库</p>
-<blockquote data-line="5755" class="code-line">
-<p data-line="5755" class="code-line">POSIX (portable operating system interface) is a set of standards governing operating systems(based on unix). There needs to be a standard for interoperability.  There is a standard for programming interface, for shell and for almost everything in the operating system. Similarly, there is a standard for threads as well.  The initial thread implementation in Linux, did not fully comply with POSIX standard.</p>
-</blockquote>
+<p data-line="5755" class="code-line">以下这段话介绍了关于 Linux 2.6 默认使用的 <strong><code>NPTL</code></strong> 线程库</p>
 <blockquote data-line="5757" class="code-line">
-<p data-line="5757" class="code-line">There were some major reasons why Linux initial thread implementation did not comply with POSIX. One main reason is PID. Earlier implementation of threads had different PID numbers(similar to how processes had different PIDs).</p>
-<p data-line="5759" class="code-line">To fix these issues in the thread implementation, Red Hat started something called NPTL(Native Posix Thread Library), which later on was included in the Linux kernel (starting from 2.6 version of the kernel). The library function to create threads was also included in the GNU C library. The library function is called as pthread_create.</p>
-<p data-line="5761" class="code-line">Although you can use clone system call to create a thread, it is recommended to use pthread_create. This is for portability reasons (It is not necessary that a variant of Unix will have clone() system call available. However, the pthread_create library can still be used, as it will take care of the underlying system call and other complexities).</p>
+<p data-line="5757" class="code-line">POSIX (portable operating system interface) is a set of standards governing operating systems(based on unix). There needs to be a standard for interoperability.  There is a standard for programming interface, for shell and for almost everything in the operating system. Similarly, there is a standard for threads as well.  The initial thread implementation in Linux, did not fully comply with POSIX standard.</p>
+</blockquote>
+<blockquote data-line="5759" class="code-line">
+<p data-line="5759" class="code-line">There were some major reasons why Linux initial thread implementation did not comply with POSIX. One main reason is PID. Earlier implementation of threads had different PID numbers(similar to how processes had different PIDs).</p>
+<p data-line="5761" class="code-line">To fix these issues in the thread implementation, Red Hat started something called NPTL(Native Posix Thread Library), which later on was included in the Linux kernel (starting from 2.6 version of the kernel). The library function to create threads was also included in the GNU C library. The library function is called as pthread_create.</p>
+<p data-line="5763" class="code-line">Although you can use clone system call to create a thread, it is recommended to use pthread_create. This is for portability reasons (It is not necessary that a variant of Unix will have clone() system call available. However, the pthread_create library can still be used, as it will take care of the underlying system call and other complexities).</p>
 </blockquote>
 <br/>
-<a for="toc-anchor" id="%E5%86%8D%E8%81%8A-pid-pgid-tgid-ppid"></a><h4 id="e5868de8818a-pid-pgid-tgid-ppid-2" data-line="5765" class="code-line">再聊 PID PGID TGID PPID</h4>
-<p data-line="5766" class="code-line"><span id="再聊-pid-pgid-tgid"></span></p>
-<p data-line="5768" class="code-line">对于每个进程而言，他都拥有着以下信息用于标识当前进程的所属单位，我们可以通过一些命令行工具，如 : <strong><code>pstree</code></strong>, <strong><code>ps</code></strong>, <strong><code>htop</code></strong> 去查看它</p>
+<a for="toc-anchor" id="%E5%86%8D%E8%81%8A-pid-pgid-tgid-ppid"></a><h4 id="e5868de8818a-pid-pgid-tgid-ppid-2" data-line="5767" class="code-line">再聊 PID PGID TGID PPID</h4>
+<p data-line="5768" class="code-line"><span id="再聊-pid-pgid-tgid"></span></p>
+<p data-line="5770" class="code-line">对于每个进程而言，他都拥有着以下信息用于标识当前进程的所属单位，我们可以通过一些命令行工具，如 : <strong><code>pstree</code></strong>, <strong><code>ps</code></strong>, <strong><code>htop</code></strong> 去查看它</p>
 <ul>
-<li data-line="5770" class="code-line"><strong><code>PID</code></strong>
+<li data-line="5772" class="code-line"><strong><code>PID</code></strong>
 <ul>
-<li data-line="5771" class="code-line">一个进程在当前操作系统的唯一标识</li>
+<li data-line="5773" class="code-line">一个进程在当前操作系统的唯一标识</li>
 </ul>
 </li>
-<li data-line="5772" class="code-line"><strong><code>PGID</code></strong>
+<li data-line="5774" class="code-line"><strong><code>PGID</code></strong>
 <ul>
-<li data-line="5773" class="code-line">进程组ID，一个进程组下有多个进程，并且仅有一个主进程 ( 父进程 )，它的 <strong><code>PID == PGID</code></strong>，除了主进程，在该进程组下的所有进程都属于主进程的子进程，它们的 <strong><code>PID != PGID</code></strong></li>
+<li data-line="5775" class="code-line">进程组ID，一个进程组下有多个进程，并且仅有一个主进程 ( 父进程 )，它的 <strong><code>PID == PGID</code></strong>，除了主进程，在该进程组下的所有进程都属于主进程的子进程，它们的 <strong><code>PID != PGID</code></strong></li>
 </ul>
 </li>
-<li data-line="5774" class="code-line"><strong><code>TGID</code></strong>
+<li data-line="5776" class="code-line"><strong><code>TGID</code></strong>
 <ul>
-<li data-line="5775" class="code-line">线程组ID，每个进程都能够以当前进程作为主线程并向下衍生出子线程，作为主线程而言，它的 <strong><code>PID == TGID</code></strong>，除了主线程，在该线程组下的所有线程都属于主线程的子线程，他们的 <strong><code>PID != TGID</code></strong></li>
+<li data-line="5777" class="code-line">线程组ID，每个进程都能够以当前进程作为主线程并向下衍生出子线程，作为主线程而言，它的 <strong><code>PID == TGID</code></strong>，除了主线程，在该线程组下的所有线程都属于主线程的子线程，他们的 <strong><code>PID != TGID</code></strong></li>
 </ul>
 </li>
-<li data-line="5776" class="code-line"><strong><code>PPID</code></strong>
+<li data-line="5778" class="code-line"><strong><code>PPID</code></strong>
 <ul>
-<li data-line="5777" class="code-line">子进程的父进程 <strong><code>PID</code></strong></li>
+<li data-line="5779" class="code-line">子进程的父进程 <strong><code>PID</code></strong></li>
 </ul>
 </li>
 </ul>
-<pre><code data-line="5779" class="code-line language-c"><div>USER VIEW
+<pre><code data-line="5781" class="code-line language-c"><div>USER VIEW
  &lt;-- PID <span class="hljs-number">43</span> --&gt; &lt;----------------- PID <span class="hljs-number">42</span> -----------------&gt;
                      +---------+
                      | process |
@@ -5216,68 +5217,325 @@ B ^ C = A
                      KERNEL VIEW
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%BC%80%E9%94%80"></a><h4 id="e7babfe7a88be4b88ee8bf9be7a88be79a84e5bc80e99480-2" data-line="5799" class="code-line">线程与进程的开销</h4>
-<p data-line="5800" class="code-line"><span id="线程与进程的开销"></span></p>
-<p data-line="5802" class="code-line"><em>Creation</em></p>
-<p data-line="5804" class="code-line">不可否认的是，创建一个线程的时间开销的确会比创建一个进程要小，原因是因为线程共享了大部分地址空间的数据，而对于进程来说存在一个较大的问题既是 <strong><code> 地址空间的拷贝</code></strong>，在早期来看，两者之间的差别的确是呈几何倍增长，在 《现代操作系统》 中有一句话谈到</p>
-<blockquote data-line="5806" class="code-line">
-<p data-line="5806" class="code-line">创建一个线程较创建一个进程要快10~100倍</p>
+<a for="toc-anchor" id="%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%BC%80%E9%94%80"></a><h4 id="e7babfe7a88be4b88ee8bf9be7a88be79a84e5bc80e99480-2" data-line="5801" class="code-line">线程与进程的开销</h4>
+<p data-line="5802" class="code-line"><span id="线程与进程的开销"></span></p>
+<p data-line="5804" class="code-line"><em>Creation</em></p>
+<p data-line="5806" class="code-line">不可否认的是，创建一个线程的时间开销的确会比创建一个进程要小，原因是因为线程共享了大部分地址空间的数据，而对于进程来说存在一个较大的问题既是 <strong><code> 地址空间的拷贝</code></strong>，在早期来看，两者之间的差别的确是呈几何倍增长，在 《现代操作系统》 中有一句话谈到</p>
+<blockquote data-line="5808" class="code-line">
+<p data-line="5808" class="code-line">创建一个线程较创建一个进程要快10~100倍</p>
 </blockquote>
-<p data-line="5808" class="code-line">针对于进程在创建时，对地址空间的拷贝所消耗的时间拥有 <strong><code>COW</code></strong> 的优化，并且还提供了一系列的池技术的支持，所以，就现在的眼光来看，其实二者之间的区别其实在内核开发者的努力之下已经缩短的非常之小了</p>
-<p data-line="5810" class="code-line">在这个 <a href="https://computing.llnl.gov/tutorials/pthreads/#WhyPthreads" data-href="https://computing.llnl.gov/tutorials/pthreads/#WhyPthreads">网站</a> 中有详细的对比数据，如果除去测试结果中的 销毁时间, Context-switch 的时间，真实的二者创建的时间开销接近于 <strong><code>1 : 1</code></strong></p>
-<p data-line="5812" class="code-line"><em>Context switch</em></p>
-<p data-line="5814" class="code-line">进程的 <strong><code>Context switch</code></strong> 需要分为直接开销和间接开销 :</p>
-<p data-line="5816" class="code-line">对于直接开销来说，它需要经历以下几个过程 ( 其中，刷新 <strong><code>TLB</code></strong> 所导致的 <strong><code>Page Table</code></strong> 的重读，还有 <strong><code>CR3</code></strong> 寄存器的更换是非常消耗时间的过程 )</p>
+<p data-line="5810" class="code-line">针对于进程在创建时，对地址空间的拷贝所消耗的时间拥有 <strong><code>COW</code></strong> 的优化，并且还提供了一系列的池技术的支持，所以，就现在的眼光来看，其实二者之间的区别其实在内核开发者的努力之下已经缩短的非常之小了</p>
+<p data-line="5812" class="code-line">在这个 <a href="https://computing.llnl.gov/tutorials/pthreads/#WhyPthreads" data-href="https://computing.llnl.gov/tutorials/pthreads/#WhyPthreads">网站</a> 中有详细的对比数据，如果除去测试结果中的 销毁时间, Context-switch 的时间，真实的二者创建的时间开销接近于 <strong><code>1 : 1</code></strong></p>
+<p data-line="5814" class="code-line"><em>Context switch</em></p>
+<p data-line="5816" class="code-line">进程的 <strong><code>Context switch</code></strong> 需要分为直接开销和间接开销 :</p>
+<p data-line="5818" class="code-line">对于直接开销来说，它需要经历以下几个过程 ( 其中，刷新 <strong><code>TLB</code></strong> 所导致的 <strong><code>Page Table</code></strong> 的重读，还有 <strong><code>CR3</code></strong> 寄存器的更换是非常消耗时间的过程 )</p>
 <ol>
-<li data-line="5818" class="code-line">切换页表全局目录</li>
-<li data-line="5819" class="code-line">切换内核态堆栈</li>
-<li data-line="5820" class="code-line">切换硬件上下文 ( 进程恢复前，必须装入寄存器的数据统称为硬件上下文 )
+<li data-line="5820" class="code-line">切换页表全局目录</li>
+<li data-line="5821" class="code-line">切换内核态堆栈</li>
+<li data-line="5822" class="code-line">切换硬件上下文 ( 进程恢复前，必须装入寄存器的数据统称为硬件上下文 )
 <ul>
-<li data-line="5821" class="code-line"><strong><code>ip ( instruction pointer )</code></strong> : 指向当前执行指令的下一条指令</li>
-<li data-line="5822" class="code-line"><strong><code>bp ( base pointer )</code></strong> : 用于存放执行中的函数对应的栈帧的栈底地址</li>
-<li data-line="5823" class="code-line"><strong><code>sp ( stack poinger )</code></strong> : 用于存放执行中的函数对应的栈帧的栈顶地址</li>
-<li data-line="5824" class="code-line"><strong><code>CR3</code></strong> : 页目录基址寄存器，保存页目录表的物理地址</li>
-<li data-line="5825" class="code-line">......</li>
+<li data-line="5823" class="code-line"><strong><code>ip ( instruction pointer )</code></strong> : 指向当前执行指令的下一条指令</li>
+<li data-line="5824" class="code-line"><strong><code>bp ( base pointer )</code></strong> : 用于存放执行中的函数对应的栈帧的栈底地址</li>
+<li data-line="5825" class="code-line"><strong><code>sp ( stack poinger )</code></strong> : 用于存放执行中的函数对应的栈帧的栈顶地址</li>
+<li data-line="5826" class="code-line"><strong><code>CR3</code></strong> : 页目录基址寄存器，保存页目录表的物理地址</li>
+<li data-line="5827" class="code-line">......</li>
 </ul>
 </li>
-<li data-line="5826" class="code-line">刷新 <strong><code>TLB</code></strong></li>
-<li data-line="5827" class="code-line">系统调度器的代码执行</li>
+<li data-line="5828" class="code-line">刷新 <strong><code>TLB</code></strong></li>
+<li data-line="5829" class="code-line">系统调度器的代码执行</li>
 </ol>
-<p data-line="5829" class="code-line">而对于间接开销来说，主要指的是虽然切换到一个新进程后，由于各种缓存并不热，速度运行会慢一些；此外如果进程始跨CPU访问的话，之前已经热缓存起来的 <strong><code>TLB</code></strong> ,<strong><code>L1</code></strong>, <strong><code>L2</code></strong>, <strong><code>L3</code></strong> 也因为运行的进程已经变了，所以以局部性原理 cache 起来的代码和数据也都没有用了，导致新进程穿透到内存的 I/O 会变多</p>
-<p data-line="5831" class="code-line">反观线程的 <strong><code>Context switch</code></strong></p>
-<p data-line="5833" class="code-line">虽然对于线程来说其已经和其父线程 ( 进程 ) 已经共享了较多的内核态上的数据，但是为了保证切换后的一致性，故其在进行 <strong><code>Context switch</code></strong> 时同样需要经历页表的切换, 刷新 <strong><code>TLB</code></strong> 还有 <strong><code>CR3</code></strong> 寄存器的更换的过程，所以实际上线程和进程的上下文切换所需的时间开销差别和 <strong><code>Creation</code></strong> 一样，是不大的 ( 线程还是会优于进程一点 ) ，在这片 <a href="https://zhuanlan.zhihu.com/p/79772089" data-href="https://zhuanlan.zhihu.com/p/79772089">文章</a> 中详细的介绍了二者之间的测试结果和测试方式</p>
+<p data-line="5831" class="code-line">而对于间接开销来说，主要指的是虽然切换到一个新进程后，由于各种缓存并不热，速度运行会慢一些；此外如果进程始跨CPU访问的话，之前已经热缓存起来的 <strong><code>TLB</code></strong> ,<strong><code>L1</code></strong>, <strong><code>L2</code></strong>, <strong><code>L3</code></strong> 也因为运行的进程已经变了，所以以局部性原理 cache 起来的代码和数据也都没有用了，导致新进程穿透到内存的 I/O 会变多</p>
+<p data-line="5833" class="code-line">反观线程的 <strong><code>Context switch</code></strong></p>
+<p data-line="5835" class="code-line">虽然对于线程来说其已经和其父线程 ( 进程 ) 已经共享了较多的内核态上的数据，但是为了保证切换后的一致性，故其在进行 <strong><code>Context switch</code></strong> 时同样需要经历页表的切换, 刷新 <strong><code>TLB</code></strong> 还有 <strong><code>CR3</code></strong> 寄存器的更换的过程，所以实际上线程和进程的上下文切换所需的时间开销差别和 <strong><code>Creation</code></strong> 一样，是不大的 ( 线程还是会优于进程一点 ) ，在这片 <a href="https://zhuanlan.zhihu.com/p/79772089" data-href="https://zhuanlan.zhihu.com/p/79772089">文章</a> 中详细的介绍了二者之间的测试结果和测试方式</p>
 <br/>
-<a for="toc-anchor" id="%E9%80%89%E6%8B%A9%E8%BF%9B%E7%A8%8B%E8%BF%98%E6%98%AF%E7%BA%BF%E7%A8%8B%EF%BC%9F"></a><h4 id="e98089e68ba9e8bf9be7a88be8bf98e698afe7babfe7a88b-2" data-line="5838" class="code-line">选择进程还是线程？</h4>
-<p data-line="5839" class="code-line"><span id="选择进程还是线程"></span></p>
-<p data-line="5841" class="code-line">实际上，在 linux 中官方其实更推荐的是使用多进程开发模型，具体理由其实在上一节中已经分析过，在 linux 中的线程和进程之间的不管是执行效率而言还是创建效率，相差都是甚微，而相比，进程严格的隔离性也让程序的健壮性更强一点，而对比线程，事实上只在短线程的情况下比进程有显著的性能差异，但非短线程不可的应用场景其实非常有限</p>
-<p data-line="5843" class="code-line">而在 windows 中，我们还是保有之前使用线程的习惯即可，因为 windows 并没有针对线程和进程之间做和 linux 相同的优化措施，对于 windows 中，进程不管是创建也好还是进行 <strong><code>Context switch</code></strong>，二者之间的时间开销是几何倍的差距所呈现的</p>
-<p data-line="5845" class="code-line">在这里，我们不妨捎带的总结下线程和进程在使用时各自的优缺点</p>
+<a for="toc-anchor" id="%E9%80%89%E6%8B%A9%E8%BF%9B%E7%A8%8B%E8%BF%98%E6%98%AF%E7%BA%BF%E7%A8%8B%EF%BC%9F"></a><h4 id="e98089e68ba9e8bf9be7a88be8bf98e698afe7babfe7a88b-2" data-line="5840" class="code-line">选择进程还是线程？</h4>
+<p data-line="5841" class="code-line"><span id="选择进程还是线程"></span></p>
+<p data-line="5843" class="code-line">实际上，在 linux 中官方其实更推荐的是使用多进程开发模型，具体理由其实在上一节中已经分析过，在 linux 中的线程和进程之间的不管是执行效率而言还是创建效率，相差都是甚微，而相比，进程严格的隔离性也让程序的健壮性更强一点，而对比线程，事实上只在短线程的情况下比进程有显著的性能差异，但非短线程不可的应用场景其实非常有限</p>
+<p data-line="5845" class="code-line">而在 windows 中，我们还是保有之前使用线程的习惯即可，因为 windows 并没有针对线程和进程之间做和 linux 相同的优化措施，对于 windows 中，进程不管是创建也好还是进行 <strong><code>Context switch</code></strong>，二者之间的时间开销是几何倍的差距所呈现的</p>
+<p data-line="5847" class="code-line">在这里，我们不妨捎带的总结下线程和进程在使用时各自的优缺点</p>
 <ul>
-<li data-line="5847" class="code-line">
-<p data-line="5847" class="code-line">线程</p>
+<li data-line="5849" class="code-line">
+<p data-line="5849" class="code-line">线程</p>
 <ul>
-<li data-line="5848" class="code-line">方便高效的内存共享</li>
-<li data-line="5849" class="code-line">占用内存少，切换简单，CPU利用率高</li>
-<li data-line="5850" class="code-line">创建销毁切换速度更快</li>
+<li data-line="5850" class="code-line">方便高效的内存共享</li>
+<li data-line="5851" class="code-line">占用内存少，切换简单，CPU利用率高</li>
+<li data-line="5852" class="code-line">创建销毁切换速度更快</li>
 </ul>
 </li>
-<li data-line="5852" class="code-line">
-<p data-line="5852" class="code-line">进程</p>
+<li data-line="5854" class="code-line">
+<p data-line="5854" class="code-line">进程</p>
 <ul>
-<li data-line="5853" class="code-line">多进程下的地址空间是不进行共享的，想让数据共享只能使用 IPC</li>
-<li data-line="5854" class="code-line">占用内存多，切换复杂，CPU利用率低</li>
-<li data-line="5855" class="code-line">不同进程之间的地址空间实现了良好的隔离，使程序的健壮性更高</li>
-<li data-line="5856" class="code-line">创建销毁切换速度稍慢</li>
-<li data-line="5857" class="code-line">更好的多核可伸缩性，进程的使用将许多内核资源（如地址空间，页表，打开的文件）隔离，在多核系统上的可伸缩性强于多线程程序</li>
+<li data-line="5855" class="code-line">多进程下的地址空间是不进行共享的，想让数据共享只能使用 IPC</li>
+<li data-line="5856" class="code-line">占用内存多，切换复杂，CPU利用率低</li>
+<li data-line="5857" class="code-line">不同进程之间的地址空间实现了良好的隔离，使程序的健壮性更高</li>
+<li data-line="5858" class="code-line">创建销毁切换速度稍慢</li>
+<li data-line="5859" class="code-line">更好的多核可伸缩性，进程的使用将许多内核资源（如地址空间，页表，打开的文件）隔离，在多核系统上的可伸缩性强于多线程程序</li>
 </ul>
 </li>
 </ul>
 <br/>
-<a for="toc-anchor" id="%E8%BF%9B%E7%A8%8B%E7%9A%84%E4%BD%BF%E7%94%A8"></a><h4 id="e8bf9be7a88be79a84e4bdbfe794a8-2" data-line="5861" class="code-line">进程的使用</h4>
-<p data-line="5862" class="code-line"><span id="进程的使用"></span></p>
-<p data-line="5866" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-06-28-00-23-03.png" alt="" class="loading" id="image-hash-e75585f91285fc62d986cba93c9da77335efbc600f7d4b912e2db33563ff1056"></p>
-<p data-line="5870" class="code-line">为什么要进行进程资源的回收
-当一个进程退出之后，进程能够回收自己的用户区的资源，但是不能回收内核空间的PCB资源，必须由它的父进程调用wait或者waitpid函数完成对子进程的回收，避免造成系统资源的浪费。</p>
+<a for="toc-anchor" id="%E8%BF%9B%E7%A8%8B%E7%9A%84%E4%BD%BF%E7%94%A8"></a><h4 id="e8bf9be7a88be79a84e4bdbfe794a8-2" data-line="5863" class="code-line">进程的使用</h4>
+<p data-line="5864" class="code-line"><span id="进程的使用"></span></p>
+<a for="toc-anchor" id="int-fork()"></a><h4 id="int-fork-2" data-line="5866" class="code-line">int fork()</h4>
+<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-20" data-line="5867" class="code-line">&lt;unistd.h&gt;</h5>
+<p data-line="5869" class="code-line">创建一个子进程</p>
+<p data-line="5871" class="code-line">当函数的成功调用，则创建出一个子进程，并且由于子进程是从父进程的基础上 <strong><code>clone</code></strong> 出来的，故这时候子进程和父进程各自执行对应地址空间视角的代码段下问</p>
+<ul>
+<li data-line="5872" class="code-line">在子进程的上下文中，该函数返回 <strong><code>0</code></strong>，然后继续当前代码的下文执行</li>
+<li data-line="5873" class="code-line">在父进程的上下文中，该函数返回 <strong><code>所创建出来的子进程的 PID</code></strong>，然后继续当前代码的下文执行</li>
+</ul>
+<p data-line="5875" class="code-line">当子进程创建失败，则该函数返回 <strong><code>-1</code></strong></p>
+<p data-line="5877" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-06-28-00-23-03.png" alt="" class="loading" id="image-hash-e75585f91285fc62d986cba93c9da77335efbc600f7d4b912e2db33563ff1056"></p>
+<pre><code data-line="5879" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span> </span>{
+  <span class="hljs-keyword">int</span> pid = fork();
+  <span class="hljs-keyword">if</span> (pid &lt; <span class="hljs-number">0</span>) {
+    perror(<span class="hljs-string">"E"</span>);
+    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);
+  } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (pid &gt; <span class="hljs-number">0</span>) {
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"parent process execute\n"</span>);
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"create child process, PID is %d\n"</span>, pid);
+  } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (pid == <span class="hljs-number">0</span>) {
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"child process execute\n"</span>);
+  }
+
+  <span class="hljs-keyword">return</span> EXIT_SUCCESS;
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="int-getpid()"></a><h4 id="int-getpid-2" data-line="5902" class="code-line">int getpid()</h4>
+<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-21" data-line="5903" class="code-line">&lt;unistd.h&gt;</h5>
+<p data-line="5905" class="code-line">返回当前上下文所运行的进程的 <strong><code>PID</code></strong></p>
+<pre><code data-line="5907" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span> </span>{
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"PID is %d\n"</span>, getpid());
+  <span class="hljs-keyword">return</span> EXIT_SUCCESS;
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="int-getppid()"></a><h4 id="int-getppid-2" data-line="5920" class="code-line">int getppid()</h4>
+<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-22" data-line="5921" class="code-line">&lt;unistd.h&gt;</h5>
+<p data-line="5923" class="code-line">返回当前上下文所运行进程的父进程的 <strong><code>PID</code></strong></p>
+<pre><code data-line="5925" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span> </span>{
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"PPID is %d\n"</span>, getppid());
+  <span class="hljs-keyword">return</span> EXIT_SUCCESS;
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="int-execl-%2F-execlp(const-char-*path%2C-const-char-*arg%2C-...-)"></a><h4 id="int-execl--execlpconst-char-path-const-char-arg-2" data-line="5938" class="code-line">int execl / execlp(const char *path, const char *arg, ... )</h4>
+<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-23" data-line="5939" class="code-line">&lt;unistd.h&gt;</h5>
+<p data-line="5941" class="code-line">将当前进程的二进制可执行文件替换为 <strong><code>path</code></strong> 所指定的文件，如果成功，则中断当前进程所依赖的旧二进制可执行文件的上下文调用，并依据所录入的命令行参数 <strong><code>arg</code></strong> 和 <strong><code>...</code></strong> 去执行所替换后的可执行文件的入口函数，即开始执行替换后的二进制可执行文件的上下文，如果调用失败，则该函数返回 <strong><code>-1</code></strong></p>
+<p data-line="5943" class="code-line">我们要保证 <strong><code>path</code></strong> 所指定的文件是一个可执行文件，即拥有入口函数的，否则该函数的调用失败</p>
+<p data-line="5945" class="code-line">该函数在调用完成后，当前进程的用户态中的数据将完全的替换至新可执行文件的上下文，并分配新的地址空间，而内核态的大部分信息将得到保留，包括 <strong><code>PCB 进程控制模块</code></strong>, <strong><code>文件描述符表</code></strong> 还有 <strong><code>task_struct</code></strong> 等等</p>
+<p data-line="5947" class="code-line">该函数的最后一个参数一般都设置为 <strong><code>NULL</code></strong></p>
+<p data-line="5949" class="code-line"><strong><code>execl</code></strong> 和 <strong><code>execlp</code></strong> 的功能性是一致的，只是对于 <strong><code>execlp</code></strong> 来说，他对于所指定的 <strong><code>path</code></strong> 会在环境变量所指定的路径中去寻找可执行文件，如果找不到则该函数调用失败，简而言之，<strong><code>execlp</code></strong> 函数会更适合去调用一些 linux 的系统命令</p>
+<p data-line="5951" class="code-line">main.c</p>
+<pre><code data-line="5952" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdbool.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;fcntl.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/stat.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">foo</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span> </span>{
+  <span class="hljs-comment">/* Keep file number and PCB process control */</span>
+  <span class="hljs-keyword">int</span> fd = open(<span class="hljs-string">"./test.log"</span>, O_RDONLY);
+  <span class="hljs-keyword">if</span> (fd &lt; <span class="hljs-number">0</span>) {
+    perror(<span class="hljs-string">"E"</span>);
+    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);
+  }
+  <span class="hljs-keyword">char</span> buf[<span class="hljs-number">5</span>] = { <span class="hljs-number">0</span> };
+  read(fd, buf, <span class="hljs-keyword">sizeof</span>(buf));
+
+  <span class="hljs-comment">/* Executeable file arg */</span>
+  <span class="hljs-keyword">char</span> str_fd[<span class="hljs-number">32</span>] = { <span class="hljs-number">0</span> };
+  <span class="hljs-built_in">sprintf</span>(str_fd, <span class="hljs-string">"%d"</span>, fd);
+  <span class="hljs-keyword">int</span> flag = execl(<span class="hljs-string">"./test"</span>, <span class="hljs-string">"test"</span>, str_fd, <span class="hljs-literal">NULL</span>);
+
+  perror(<span class="hljs-string">"main"</span>);
+  <span class="hljs-built_in">exit</span>(EXIT_FAILURE);
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  foo();
+
+  <span class="hljs-keyword">return</span> EXIT_SUCCESS;
+}
+
+</div></code></pre>
+<p data-line="5990" class="code-line">test.c</p>
+<pre><code data-line="5991" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdbool.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%s\n"</span>, argv[<span class="hljs-number">0</span>]);
+
+  <span class="hljs-comment">/* file number */</span>
+  <span class="hljs-keyword">int</span> fd = atoi(argv[<span class="hljs-number">1</span>]);
+  <span class="hljs-keyword">if</span> (fd &lt; <span class="hljs-number">0</span>) {
+    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);
+  }
+
+  <span class="hljs-keyword">char</span> buf[<span class="hljs-number">5</span>] = { <span class="hljs-number">0</span> };
+  read(fd, buf, <span class="hljs-keyword">sizeof</span>(buf));
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"[%d] %s\n"</span>, fd, buf);
+
+  <span class="hljs-keyword">return</span> EXIT_SUCCESS;
+}
+</div></code></pre>
+<br/>
+<p data-line="6019" class="code-line"><span id="pid_t_wait"></span></p>
+<a for="toc-anchor" id="pid_t-wait(int-*state)"></a><h4 id="pidt-waitint-state-2" data-line="6021" class="code-line">pid_t wait(int *state)</h4>
+<a for="toc-anchor" id="%3Cwait.h%3E"></a><h5 id="waith-4" data-line="6022" class="code-line">&lt;wait.h&gt;</h5>
+<p data-line="6024" class="code-line">阻塞父进程上下文的继续调用，等待当前父进程进程组下的任意子进程的调用结束并回收其所占用的资源，如果函数调用成功，则返回成功回收资源的子进程的 <strong><code>PID</code></strong>，并且通过所指定的参数 <strong><code>state</code></strong> 去标识当前子进程的结束状态，如果调用失败 ( 无子进程 ) ，则函数返回 <strong><code>-1</code></strong></p>
+<p data-line="6026" class="code-line">为什么要进行进程资源的回收？</p>
+<p data-line="6028" class="code-line">当一个进程在进行了退出之后，这个进程就会成为一个 <strong><code>Zombie</code></strong>，即它虽然是一个已经死亡的状态，但是其所占用的部分系统资源 ( 如 : 内核空间的 <strong><code>PCB</code></strong> )，其生命周期仅当它的上级父进程的结束才会真正意义上的消亡，但是对于部分进程来说其运行时是不可能结束的 ( 如后台服务 )，这时候我们就需要显示的对已经成为 <strong><code>Zombie</code></strong> 执行资源回收的工作以避免造成系统资源的浪费</p>
+<ul>
+<li data-line="6030" class="code-line">
+<p data-line="6030" class="code-line"><strong><code>state</code></strong></p>
+<p data-line="6032" class="code-line">对于函数调用完毕后为 state 所赋的值在未经过任何处理时通常对开发者来说是无用的，标准库中为我们提供了以下宏定义以供 state 的使用</p>
+<ul>
+<li data-line="6034" class="code-line"><strong><code>WIFEXITED(status)</code></strong> : 返回非 <strong><code>0</code></strong> 则认为进程是正常结束，否则则认为进程异常结束</li>
+<li data-line="6035" class="code-line"><strong><code>WEXITSTATUS(status)</code></strong> : 获取程序的退出时所返回的结果，即退出状态，异常结束的进程则结果为 <strong><code>0</code></strong></li>
+<li data-line="6036" class="code-line"><strong><code>WIFSIGNALED(status)</code></strong> : 如果进程出现了运行级别的异常，则结果为 <strong><code>1</code></strong>，否则为 <strong><code>0</code></strong></li>
+<li data-line="6037" class="code-line"><strong><code>WTERMSIG(status)</code></strong> : 获取进程终止的 <strong><code>Signal number</code></strong></li>
+</ul>
+</li>
+</ul>
+<pre><code data-line="6039" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;wait.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span> </span>{
+  <span class="hljs-keyword">int</span> pid = fork();
+  <span class="hljs-keyword">if</span> (pid &lt; <span class="hljs-number">0</span>) {
+    perror(<span class="hljs-string">"E"</span>);
+    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);
+  } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (pid == <span class="hljs-number">0</span>) { <span class="hljs-comment">/*child process*/</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"[%d] child process\n"</span>, getpid());
+    <span class="hljs-built_in">exit</span>(EXIT_SUCCESS);
+  } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (pid &gt; <span class="hljs-number">0</span>) {
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"[%d] parent process\n"</span>, getpid());
+
+    <span class="hljs-keyword">int</span> stat;
+    wait(&amp;stat);
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>, stat);
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>, WIFEXITED(stat));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>, WEXITSTATUS(stat));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>, WIFSIGNALED(stat));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d\n"</span>, WTERMSIG(stat));
+  }
+  
+  <span class="hljs-keyword">return</span> EXIT_SUCCESS
+}
+</div></code></pre>
+<br/>
+<a for="toc-anchor" id="pid_t-waitpid(pid_t-pid%2C-int-*state%2C-in-options)"></a><h4 id="pidt-waitpidpidt-pid-int-state-in-options-2" data-line="6071" class="code-line">pid_t waitpid(pid_t pid, int *state, in options)</h4>
+<a for="toc-anchor" id="%3Cwait.h%3E"></a><h5 id="waith-5" data-line="6072" class="code-line">&lt;wait.h&gt;</h5>
+<p data-line="6074" class="code-line">该函数与 <a href="#pid_t_wait" data-href="#pid_t_wait">wait</a> 的功能性是一致的，其最终目的还是去释放 <strong><code>Zombie</code></strong> 所占用的资源，只是相较于该函数来说，其提供了更多的选项以供开发人员使用</p>
+<ul>
+<li data-line="6076" class="code-line"><strong><code>pid</code></strong>
+<ul>
+<li data-line="6077" class="code-line"><strong><code>pid == -1</code></strong> : 处理当前父进程进程组下的任意子进程</li>
+<li data-line="6078" class="code-line"><strong><code>pid &gt; 0</code></strong> : 处理 ID 为 <strong><code>pid</code></strong> 的子进程</li>
+<li data-line="6079" class="code-line"><strong><code>pid == 0</code></strong> : 处理当前父进程进程组下的所有子进程</li>
+<li data-line="6080" class="code-line"><strong><code>pid &lt; -1</code></strong> : 处理进程组 ID 为 <strong><code>pid</code></strong> 绝对值中的任意子进程</li>
+</ul>
+</li>
+<li data-line="6081" class="code-line"><strong><code>state</code></strong> : 和<a href="#pid_t_wait" data-href="#pid_t_wait">wait</a> 保持一致</li>
+<li data-line="6082" class="code-line"><strong><code>options</code></strong>
+<ul>
+<li data-line="6083" class="code-line"><strong><code>0</code></strong> : 阻塞式回收子进程资源</li>
+<li data-line="6084" class="code-line"><strong><code>WNOHANG</code></strong> : 非阻塞式回收子进程资源</li>
+</ul>
+</li>
+<li data-line="6085" class="code-line"><strong><code>return</code></strong>
+<ul>
+<li data-line="6086" class="code-line"><strong><code>pid &gt; 0</code></strong> : 成功回收资源的子进程 <strong><code>PID</code></strong></li>
+<li data-line="6087" class="code-line"><strong><code>pid == 0</code></strong> : 当参数指定为 <strong><code>WNOHANG</code></strong>，返回值为 0 则代表子进程还未结束</li>
+<li data-line="6088" class="code-line"><strong><code>pid == -1</code></strong> : 函数调用失败，即当前进程下无任何子进程资源</li>
+</ul>
+</li>
+</ul>
+<pre><code data-line="6090" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;wait.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span> </span>{
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">2</span>; ++i) {
+    <span class="hljs-keyword">int</span> pid_0 = fork();
+    <span class="hljs-keyword">if</span> (pid_0 &lt; <span class="hljs-number">0</span>) {
+      perror(<span class="hljs-string">"E"</span>);
+      <span class="hljs-built_in">exit</span>(EXIT_FAILURE);
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (pid_0 == <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">if</span> (i == <span class="hljs-number">1</span>) {
+        <span class="hljs-built_in">printf</span>(<span class="hljs-string">"[%d] process test start\n"</span>, getpid());
+
+        <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+          sleep(<span class="hljs-number">1</span>);
+        }
+      } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">int</span> pid_1 = fork();
+        <span class="hljs-keyword">if</span> (pid_1 &gt; <span class="hljs-number">0</span>) {
+          <span class="hljs-built_in">printf</span>(<span class="hljs-string">"[%d] child process 1 start\n"</span>, getpid());
+
+          <span class="hljs-keyword">int</span> idx = <span class="hljs-number">0</span>;
+          <span class="hljs-keyword">while</span> (++idx &lt; <span class="hljs-number">15</span>) {
+            sleep(<span class="hljs-number">1</span>);
+          }
+
+          <span class="hljs-built_in">printf</span>(<span class="hljs-string">"[%d] child process 1 exit\n"</span>, getpid());
+
+          <span class="hljs-built_in">exit</span>(EXIT_SUCCESS);
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (pid_1 == <span class="hljs-number">0</span>) {
+          <span class="hljs-built_in">printf</span>(<span class="hljs-string">"[%d] child process 2 start\n"</span>, getpid());
+
+          <span class="hljs-keyword">int</span> idx = <span class="hljs-number">0</span>;
+          <span class="hljs-keyword">while</span> ((++idx) &lt; <span class="hljs-number">5</span>) {
+            sleep(<span class="hljs-number">1</span>);
+          }
+
+          <span class="hljs-built_in">printf</span>(<span class="hljs-string">"[%d] child process 2 exit\n"</span>, getpid());
+
+          <span class="hljs-built_in">exit</span>(EXIT_SUCCESS);
+        } <span class="hljs-keyword">else</span> {
+          perror(<span class="hljs-string">"E"</span>);
+          <span class="hljs-built_in">exit</span>(EXIT_FAILURE);
+        }
+      }
+    }
+  }
+
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"[%d] parent start\n"</span>, getpid());
+
+  <span class="hljs-keyword">int</span> state;
+  <span class="hljs-keyword">int</span> flag = waitpid(<span class="hljs-number">0</span>, &amp;state, <span class="hljs-number">0</span>);
+
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"[%d] parent exit: %d\n"</span>, getpid(), flag);
+
+  <span class="hljs-keyword">return</span> EXIT_SUCCESS;
+}
+</div></code></pre>
 </div>
 
 </body>
