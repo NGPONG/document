@@ -6067,6 +6067,8 @@ int main(void) {
 }
 ```
 
+<br/>
+
 #### pid_t waitpid(pid_t pid, int *state, in options)
 ##### <wait.h>
 
@@ -6074,9 +6076,76 @@ int main(void) {
 
 - **`pid`**
   - **`pid == -1`** : 处理当前父进程进程组下的任意子进程
-  - **`pid > 0`** : 处理指定 **`PID`** 的子进程
+  - **`pid > 0`** : 处理 ID 为 **`pid`** 的子进程
   - **`pid == 0`** : 处理当前父进程进程组下的所有子进程
-  - **`pid < -1`** : 处理当前父进程进程组下的任意子进程
-- **`state`**
+  - **`pid < -1`** : 处理进程组 ID 为 **`pid`** 绝对值中的任意子进程
+- **`state`** : 和[wait](#pid_t_wait) 保持一致
 - **`options`**
+  -  **`0`** : 阻塞式回收子进程资源
+  -  **`WNOHANG`** : 非阻塞式回收子进程资源
 - **`return`**
+  - **`pid > 0`** : 成功回收资源的子进程 **`PID`**
+  - **`pid == 0`** : 当参数指定为 **`WNOHANG`**，返回值为 0 则代表子进程还未结束
+  - **`pid == -1`** : 函数调用失败，即当前进程下无任何子进程资源
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <wait.h>
+
+int main(void) {
+  for (int i = 0; i < 2; ++i) {
+    int pid_0 = fork();
+    if (pid_0 < 0) {
+      perror("E");
+      exit(EXIT_FAILURE);
+    } else if (pid_0 == 0) {
+      if (i == 1) {
+        printf("[%d] process test start\n", getpid());
+
+        while (true) {
+          sleep(1);
+        }
+      } else {
+        int pid_1 = fork();
+        if (pid_1 > 0) {
+          printf("[%d] child process 1 start\n", getpid());
+
+          int idx = 0;
+          while (++idx < 15) {
+            sleep(1);
+          }
+
+          printf("[%d] child process 1 exit\n", getpid());
+
+          exit(EXIT_SUCCESS);
+        } else if (pid_1 == 0) {
+          printf("[%d] child process 2 start\n", getpid());
+
+          int idx = 0;
+          while ((++idx) < 5) {
+            sleep(1);
+          }
+
+          printf("[%d] child process 2 exit\n", getpid());
+
+          exit(EXIT_SUCCESS);
+        } else {
+          perror("E");
+          exit(EXIT_FAILURE);
+        }
+      }
+    }
+  }
+
+  printf("[%d] parent start\n", getpid());
+
+  int state;
+  int flag = waitpid(0, &state, 0);
+
+  printf("[%d] parent exit: %d\n", getpid(), flag);
+
+  return EXIT_SUCCESS;
+}
+```
