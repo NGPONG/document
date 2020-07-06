@@ -101,6 +101,8 @@
   - [线程与进程的开销](#线程与进程的开销)
   - [选择进程还是线程？](#选择进程还是线程)
   - [进程的使用](#进程的使用)
+- [进程间通信](#IPC)
+  - [进程间通信的种类](#进程间通信的种类)
 
 <br/>
 
@@ -6171,9 +6173,9 @@ linux 中的进程其地址空间都是相互独立的，每个进程各自有�
 
 进程间通信需要依赖于操作系统所提供特殊的方法，如 : 普通文件, 管道, 信号, 共享内存, 消息队列, 套接字, 命名管道等等，但随着计算机的蓬勃发展，一些方法由于自身设计缺陷被淘汰或者弃用，现今常用的进程间通信方式有
 
-- [管道](#pipe管道) ( 使用最简单 ) 
+- [管道](#pipe管道) ( 使用最简单 )
 - [信号](#) ( 开销最小 )
-- [共享映射区](#) ( 无血缘关系 )
+- [共享映射区](#共享映射区) ( 无血缘关系 )
 - [本地套接字](#) ( 最稳定 )
 
 
@@ -6195,8 +6197,8 @@ linux 中的进程其地址空间都是相互独立的，每个进程各自有�
 由于管道其实质属于一块缓冲区，故管道中的数据一旦被读取 ( **`read`** ) 则不复存在
 
 管道的读写两端默认情况下都是属于阻塞式的操作
-      - **`read`** : 针对于读端进行操作时，如管道没有数据，则读取操作则会发生阻塞
-      -  **`write`** : 针对于写端进行操作时，如管道数据已满，则写入操作则会发生阻塞
+  - **`read`** : 针对于读端进行操作时，如管道没有数据，则读取操作则会发生阻塞
+  -  **`write`** : 针对于写端进行操作时，如管道数据已满，则写入操作则会发生阻塞
 
 <br/>
 
@@ -6306,3 +6308,238 @@ int main(void) {
         - 阻塞当前写入操作，直至缓冲区中有多余的空间被空出来
       - 管道未满
         - 正常写入
+
+<br/>
+
+ #### FIFO
+<span id="fifo111"></span>
+
+**`FIFO`** 同样也是作为管道的一类，通常称之为 **`有名管道`**，区别于上面的 [pipe](#pipe管道)，FIFO 除了能应用于用于有 **血缘关系**{style="color:red"} 的进程之间去完成数据的传输，还能应用于 **没有血缘关系**{style="color:red"} 的进程间去完成数据的传输
+
+为什么 FIFO 通信的机制需要被称为 **`有名管道`**，这同样也是其传输特性所导致的；FIFO 需要依赖于 linux 中的基础文件 **`管道文件 (p)`** 去完成两个进程间的通信，但是需要注意的是，进程间的数据传输并不会写入到管道文件之中，而是依赖于管道文件建立两个进程之间读和写的链接关系，并且管道文件最终又会指向内核的缓冲区当中，所以，通过 FIFO 进行通信实际上数据的流动还是在内核缓冲区中进行
+
+由于 FIFO 本身也是属于管道一类的 IPC 通信机制，故其所保有的特性大部分都可沿用至 [pipe](#pipe管道)
+
+<br/>
+
+***FIFO的特性***
+
+FIFO 严格遵循 $first$ $in$ $first$ $out$ 的特性，即数据的写入总是追加到缓冲区的末尾，而数据的读取则总是会从缓冲区的开始处取出，并且不支持使用 **`lseek()`** 等函数去修改文件读写指针的定位
+
+由于 FIFO 实际上还是依赖于内核缓冲区来进行通信，故缓冲区中的数据一旦被读取 ( read ) 则不复存在
+
+FIFO 需要严格规定两个进程之间的读写两端，这一特性还延续到管道文件的打开身上，**在默认情境之下 ( 未设置 **`O_NONBLOCK`** )，一方进程以 **`读 / 写`** 打开的管道文件始终都会阻塞当前进程的上下文执行直至当前文件接收到存在另一个进程以 **`写 / 读`** 的方式打开**{style="color:red"}
+
+<br/>
+
+***FIFO的使用***
+
+FIFO 的使用并无太多特性，需要注意仅只是创建一个管道文件并且使用完最好使用 **`unlink()`** 删除即可
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#define FIFO_NAME "myfifo"
+
+void foo(void) {
+  if (mkfifo(FIFO_NAME, 0666) < 0)
+    perror("mkfifo");
+
+  int pid = fork();
+  if (pid < 0) {
+    printf("Create child process error\n");
+    exit(EXIT_FAILURE);
+  } else if (pid == 0) {
+    int fd_r = open(FIFO_NAME, O_RDONLY);
+    if (fd_r < 0) {
+      printf("Open reading-only fifo file error\n");
+      exit(EXIT_FAILURE);
+    }
+
+    printf("[%d] Child process start read\n", getpid());
+
+    char buf[14] = { 0 };
+    int size;
+    while ((size = read(fd_r, buf, sizeof(buf))) != 0) {
+      printf("[%d] child process read %d bytes, value = %s", getpid(), size, buf);
+    }
+
+    printf("[%d] Child process ending\n", getpid());
+    close(fd_r);
+    return;
+  } else {
+    int fd_w = open(FIFO_NAME, O_WRONLY);
+    if (fd_w < 0) {
+      printf("Open writing-only fifo file error\n");
+      exit(EXIT_FAILURE);
+    }
+
+    printf("[%d] Parent process start read\n", getpid());
+
+    char buf[0x100] = { 0 };
+    int idx = 0;
+    int size;
+    while (++idx < 10) {
+      sprintf(buf, "%d\n", idx);
+      int size = write(fd_w, buf, strlen(buf) + 1);
+
+      printf("[%d] Parnet process write %d bytes, value = %s", getpid(), size, buf);
+
+      memset(buf, 0, sizeof(buf));
+    }
+
+    printf("[%d] Parent process ending\n", getpid());
+    close(fd_w);
+    return;
+  }
+
+  unlink(FIFO_NAME);
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+***FIFO的阻塞和读写行为***
+
+默认情况之下，FIFO 的阻塞行为除了 **`read()`** **`write()`**，还会延续到文件的打开 **`open()`**，当一方进程以 **`读 / 写`** 打开的管道文件始终都会阻塞当前进程的上下文执行直至当前文件接收到存在另一个进程以 **`写 / 读`** 的方式打开，当然这是默认行为，我们也可以在打开文件 ( **`open()`** ) 的时候通过指定 **`O_NONBLOCK`** 去取消打开时的阻塞行为
+
+- 写端取消阻塞 : 立即返回结果；除了会判断管道文件路径的有效性外，还会判断当前管道文件的读端是否打开，如未打开，则 **`open()`** 函数调用失败
+- 读端取消阻塞 : 立即返回结果；并不会判断所指定的管道文件是否打开写端，仅判断文件路径的有效性去决定  **`open()`** 函数调用结果
+
+对于 FIFO 的读写行为则延续至 [pipe](#pipe管道) 之中，这里不再阐述
+
+<br/>
+
+ #### 共享映射区
+<span id="共享映射区"></span>
+
+共享映射区能够将一个磁盘中的文件作为共享的内容并将之加载至内核的缓冲区内，我们可以简单地理解为该机制可以让一个磁盘文件和内核的缓冲区建立一个映射的关系，就这点和 [FIFO](#fifo111) 有一点相似，但是实际上，共享映射区虽然在使用的时候都是以内核缓冲区为基准，但是要想实现进程二者间的数据共话，数据的写入实际上还是会重新映射到磁盘的文件当中去的
+
+虽然共享区的创建出去需要依赖于一个已经被打开 ( **`open()`** ) 文件的文件标识符来完成，但是实际上，共享区的创建完成后即已经把当前文件的数据都读取到共享映射区当中，即一个共享区的成功创建后就不需要再依赖于所打开的文件，这时候我们可以手动的去关闭它
+
+当我们在对共享区进行读写操作的时候，共享区并不会提供读写的阻塞机制，故使用这一方式去完成 IPC 时我们要保证读端和写端的同步
+
+![2020-07-05-02-26-06](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-07-05-02-26-06.png)
+
+<br/>
+
+***共享映射区的使用***
+
+#### void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)
+##### <sys/mman.h>
+
+依据所打开文件 ( **`open()`** ) 的文件标识符 **`fd`** 在内核中构建一块共享映射区，如果成功，则返回这块内存区域的首地址，如创建失败，则返回为宏 **`MAP_FAILED`** 的结果
+
+- **`addr`** : 指定所创建的共享映射区的内存首地址，通常它由内核本身来指定，故该参数通常设置为 **`NULL`**
+
+- **`length`** : 映射到共享映射区的文件大小，通常它为文件描述符 **`fd`** 所指向的文件的本身大小
+
+- **`prot`** : 构建的共享映射区的保护方式
+  - **`PROT_READ`** : 只读
+  - **`PROT_WRITE`** : 只写
+  - 需要指定多种不同方式时，通过位或操作符来添加
+
+- **`flags`** : 所构建的构想映射区的特性
+  - **`MAP_SHARED`** : 共享映射区的数据可用于不同进程间共享，指定了该参数后往共享映射区所写入的数据会映射回文件本身
+    - 当指定了该特性后，我们要保证共享映射区的保护方式 **`prot`** 所指定的权限要 **`<=`** 打开的文件所指定的权限
+
+  - **`MAP_PRIVATE`** : 共享映射区的数据仅用于单独进程本身，制定了该参数后往共享映射区写入数据时会触发 $COW$ ( copy-on-write ) 的特性，即会对原有共享区的数据拷贝一份新的出来，而写入的数据仅针对于拷贝出来的区域，起到保护原始共享映射区不会被污染的作用
+    - 当指定了该特性后，无需考虑 **`fd`** 所指向的文件权限
+
+  - **`MAP_ANONYMOUS`** : 构建匿名共享映射区，即不需要依赖于一个实际存在的文件
+  - 需要指定多种不同方式时，通过位或操作符来添加
+
+- **`fd`** : 共享映射区在构建时所依赖的文件描述符，需要注意的是，由于共享映射区的构建之初需要依赖于一个实际存在于磁盘中的文件，故 fd 所指向的文件大小必须大于 0，否则在构建共享映射区时会出现总线错误
+  - 当该参数指定为 -1 时，则意为创建一个匿名共享映射区，即不需要依赖于一个实际存在的文件
+
+- **`offset`** : 需要将文件拷贝到共享映射区的字节数，该参数的指定必须为 **0或者4KB的整数倍**{style="color:red"}
+
+#### int munmap(void *addr, size_t length)
+##### <sys/mman.h>
+
+释放共享映射区，共享映射区在使用完毕后我们需要现实的对其进行关闭以供内存的重用
+
+- **`addr`** : 所需释放的共享映射区的首地址，即 **`mmap`** 系统调用的返回值
+- **`length`** : 创建共享映射区时所指定的 **`length`**
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/wait.h>
+
+void foo(void) {
+
+  int fd = open("./test", O_RDWR);
+  if (fd < 0) {
+    perror("open file error");
+    return;
+  }
+
+  int len = lseek(fd, 0, SEEK_END);
+  void *addr = mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  if (addr == MAP_FAILED) {
+    perror("memory map error");
+    return;
+  }
+  close(fd);
+
+  int pid = fork();
+  if (pid < 0) {
+    perror("fork error");
+    return;
+  } else if (pid == 0) { /* child context */
+    sleep(1);
+
+    /* read */
+    printf("[%d] child process start read data\n",getpid());
+
+    printf("%s\n", (char *)addr);
+
+    printf("[%d] child process end\n",getpid());
+    
+    return;
+  } else {               /* parent context */
+    /* write */
+    printf("[%d] parent process start write data\n",getpid());
+
+    char *str = "hello,world!";
+    int size = strlen(str) + 1;
+    memcpy(addr, str, size);
+
+    printf("[%d] parent process write %d bytes, value = %s\n", getpid(), size, str);
+    
+    /* close */
+    wait(NULL);
+    munmap(addr,len);
+  }
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+
+  return EXIT_SUCCESS;
+}
+```
