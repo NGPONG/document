@@ -1061,16 +1061,16 @@ LOW
 
 我们都知道，<kbd>[n]</kbd> 是取数组下标为 [[n]] 的元素的内容，其实 <kbd>[]</kbd> 可以看作是一种语法糖的形式，其实它的实质也是通过对于数组名的偏移和解引用的操作来访问到具体某个下标的元素，即 <kbd>arrary[n]</kbd> 可以看作为 [[*(arrary + n)]] 的简写形式
 
-虽然数组名其在大多数情况下都代表着一个指向当前数组首元素地址的指针，但是对于指针和数组我们是不能把它们混在一起的，数组名代表着指向数组首元素地址的指针这只是属于数组的一种特性，而数组本身是作为一段连续且有序的内存存储空间，对比指针来说，指针只是一个指向具体某个变量在内存的首地址的变量，其次，对于普通的指针来说，其做 [[++]] 操作是允许的，而数组名虽然也是存储着其首元素的内存地址，而做 [[++]] 操作的时候是不允许的，因为数组是一个 [[指针常量]]，最后，一个数组虽然只是声明，但是我们也能够对它进行解引用操作，因为一个数组一旦声明后编译器就能够为它初始化一段线性连续的内存用于存储，只是解引用后的结果可能是一个随机数罢了��而对于指针来说，我们只是声明的情况下我们对它解引用的时候是一种危险的操作，因为我们并未指定该指针的具体指向，故该指针可能是一个空指针抑或是编译器把这种指针初始化为了一个野指针
+虽然数组名其在大多数情况下都代表着一个指向当前数组首元素地址的指针，但是对于指针和数组我们是不能把它们混在一起的，数组名代表着指向数组首元素地址的指针这只是属于数组的一种特性，而数组本身是作为一段连续且有序的内存存储空间，对比指针来说，指针只是一个指向具体某个变量在内存的首地址的变量，其次，对于普通的指针来说，其做 [[++]] 操作是允许的，而数组名虽然也是存储着其首元素的内存地址，而做 [[++]] 操作的时候是不允许的，因为数组是一个 [[指针常量]]，最后，一个数组虽然只是声明，但是我们也能够对它进行解引用操作，因为一个数组一旦声明后编译器就能够为它初始化一段线性连续的内存用于存储，只是解引用后的结果可能是一个随机数罢了，而对于指针来说，我们只是声明的情况下我们对它解引用的时候是一种危险的操作，因为我们并未指定该指针的具体指向，故该指针可能是一个空指针抑或是编译器把这种指针初始化为了一个野指针
 
 <br/>
 
 #### 数组的初始化
 <span id="数组的初始化"></span>
 
-如果我们只是声明了一个数组而没有定义，那么当我们访问数组某个下标的元素的时候，只能够获取到该数组对应存储区中��译器所赋予的默认值，原因是因为我们没有进行 [[数组的初始化操作]] ，编译器帮我们进行了一次隐式初始化操作
+如果我们只是声明了一个数组而没有定义，那么当我们访问数组某个下标的元素的时候，只能够获取到该数组对应存储区中编译器所赋予的默认值，原因是因为我们没有进行 [[数组的初始化操作]] ，编译器帮我们进行了一次隐式初始化操作
 
-而对于人为的进行数组的初始化操作，我们只能通过在定义数组的时候就需要进行，并且需要注意的是，不管是人为的进行初始化也好还是隐式进行初始化，一个数组一�����经历过初始化的过程就不能再改变这个数组其内部所存储的当前数组首元素的地址，原因是数组在初始化完成后，数组名是一个 [[指针常量]]
+而对于人为的进行数组的初始化操作，我们只能通过在定义数组的时候就需要进行，并且需要注意的是，不管是人为的进行初始化也好还是隐式进行初始化，一个数组一旦经历过初始化的过程就不能再改变这个数组其内部所存储的当前数组首元素的地址，原因是数组在初始化完成后，数组名是一个 [[指针常量]]
 
 需要注意的是，我们认为的对数组进行初始化操作，哪怕我们只是在当前初始化的过程中仅仅只是指定了初始化一个元素，编译器也会使没有指定初始化值的元素都赋上一个初始化值 [[0]]
 
@@ -1090,7 +1090,7 @@ int main(void){
 
 对于多维数组来说，不管是多少维的数组，我们都需要把所定义的多维数组名当成是一个一维数组来看，其实包括编译器也是这么认为的，只是这个一维数组名由原来是指向具体某个变量在内存中的首地址的指针变成了 [[这个数一维数组名是指向下一维度数组在内存中的首地址的指针]] ，但离不开的是，不管是一维数组也好还是多维数组，数组名总是一个指向当前数组首元素内存地址的指针
 
-其实对于 [[多维]] 的概念是一种抽象形式，对于多维数组来说，其内存存放布局同样还是遵循着数组的规律��每个实质的元素之间的地址都是相间且连续的，而对于编译器来说，我们通过了一个 [[多维]] 的定义，把一个 [[一维]] 的数组划分了不同的维度去供我们或者运行时使用，我们先来上一个定义三维数组的代码，以带出更多需要重点关注的问题
+其实对于 [[多维]] 的概念是一种抽象形式，对于多维数组来说，其内存存放布局同样还是遵循着数组的规律，每个实质的元素之间的地址都是相间且连续的，而对于编译器来说，我们通过了一个 [[多维]] 的定义，把一个 [[一维]] 的数组划分了不同的维度去供我们或者运行时使用，我们先来上一个定义三维数组的代码，以带出更多需要重点关注的问题
 
 ```c
 int main(void){
@@ -2578,7 +2578,7 @@ struct Postion {
 };
 ```
 
-在上面的代码中，我们声明了一个结构体类型 [[struct Person]] ，该结构体中有两个类型的成员分别为 [[char]] 和 [[int]]，按道理来说该结构体类型所占用的总字节应该为 [[5 Bytes]]�������实际上的结果却为 [[8 Bytes]]，这个就是发生了 [[内存对齐]]
+在上面的代码中，我们声明了一个结构体类型 [[struct Person]] ，该结构体中有两个类型的成员分别为 [[char]] 和 [[int]]，按道理来说该结构体类型所占用的总字节应该为 [[5 Bytes]]，然而实际上的结果却为 [[8 Bytes]]，这个就是发生了 [[内存对齐]]
 
 那么内存对齐到底有什么用呢？
 
@@ -4596,7 +4596,7 @@ int main(void){
 #### volatile
 <span id="volatile"></span>
 
-该关键字能够防止编译器对重复使用的变量进行优化，主要集中在硬件领域开发用的较多，举个例子，跑马灯的控制通常都有一个变量作为标识，比如说 [[int flag = 0]] ， 当它等于 [[0]] 时就代表亮了，等于 [[1]] 时就代表熄灭，而硬件在使用的过程当中，因为跑马灯需要重复的关闭和开启，所以这个变量 [[flag]] 会进行重复的赋值，这时候编译器查看到这个变量存在多次赋值的性质的时候，就自动的帮我把程序在中间运行过程中对于该变量 [[flag]] 所赋值的代码都删除掉，而当我们加了这个关键字之后，��能够防止编译器对于此处所进行的优化
+该关键字能够防止编译器对重复使用的变量进行优化，主要集中在硬件领域开发用的较多，举个例子，跑马灯的控制通常都有一个变量作为标识，比如说 [[int flag = 0]] ， 当它等于 [[0]] 时就代表亮了，等于 [[1]] 时就代表熄灭，而硬件在使用的过程当中，因为跑马灯需要重复的关闭和开启，所以这个变量 [[flag]] 会进行重复的赋值，这时候编译器查看到这个变量存在多次赋值的性质的时候，就自动的帮我把程序在中间运行过程中对于该变量 [[flag]] 所赋值的代码都删除掉，而当我们加了这个关键字之后，能够防止编译器对于此处所进行的优化
 
 ```c
 #include <stdio.h>
@@ -4641,7 +4641,7 @@ int main(void){
     - 汇编文件的后缀通常以 [[.s]] 作为结尾
 
 - 汇编 ( 汇编器 $as$ )
-    - 将 **汇编��件**{style="color:red"} 中的汇编指令翻译为二进制编码，并整合为 **二进制文件**{style="color:red"}
+    - 将 **汇编文件**{style="color:red"} 中的汇编指令翻译为二进制编码，并整合为 **二进制文件**{style="color:red"}
     - 二进制文件的后缀通常以 [[.o]] 作为结尾
 
 - 链接 ( 链接器 $ld$ )
@@ -4975,7 +4975,7 @@ gcc -g source.c -o source
     -   **实现函数本地化，寻址方便，速度快**{style="color:red"} ，我们对于静态库中的函数调用效率和在源程序内的自定义函数的调用效率是相同的
     -   **移植方便**{style="color:red"} ，由于静态库在编译时就被加入到执行代码的一部分，即静态库于源程序在运行时并无瓜葛，即便我们在编译完成源程序后删除了静态库也不影响源程序的继续使用
 -   缺点
-    -   假设我们有 [[10]] 个可执行文件在编译时都加入了相同的静态库作为执行代码的一部分，那么当这 [[10]] 个执行程序在运行时，在内存中就含有着 [[10]] 份相同静态库的资源信息，这也就造成了 **系统资源的消耗较大，浪���了较多的内存**{style="color:red"}
+    -   假设我们有 [[10]] 个可执行文件在编译时都加入了相同的静态库作为执行代码的一部分，那么当这 [[10]] 个执行程序在运行时，在内存中就含有着 [[10]] 份相同静态库的资源信息，这也就造成了 **系统资源的消耗较大，浪费了较多的内存**{style="color:red"}
     -   **静态库对于更新、部署和发布是非常麻烦的**{style="color:red"} ，假设某个静态库被更新了，那么相应的，使用了这个静态库的所有源程序都需要重新进行一次编译，简而言之，**源程序过度依赖于静态库本身**{style="color:red"}
 
 静态库的制作：
@@ -5202,7 +5202,7 @@ gcc -g source.c -o source
 
 ---
 
-### *Console*
+#### Console
 <span id="Console.h"></span>
 
 [前面](#在c语言中三种特殊的系统文件) 提到过，一个应用程序在启动的时候会打开三种特殊的系统文件，当这三种特殊的系统文件被打开后同时也会开启相对应的 **作为程序与设备之间进行数据沟通的桥梁**{style="color:red"} 的缓冲区，那么在 c 中，这三种系统文件将以宏定义文件指针的形式长存在当前程序运行时的内存当中，它们分别为 [[stdin]] [[stdout]] [[stderr]]，而对于操作控制台的API来说，其实就是针对这几种特殊系统文件的缓冲区 ( 即 [[stdin]] [[stdout]] [[stderr]] ) 进行读写操作
@@ -5386,7 +5386,7 @@ int main(){
 <br/>
 <br/>
 
-### *Windows.h*
+#### Windows.h
 <span id="Windows.h"></span>
 
 #### int system(const char *command)
@@ -5611,7 +5611,7 @@ struct task_struct {
 
 当这两个系统调用完毕后，一个新进程真正意义上的被创建出来，当一个新进程被创建出来后，会设置其信号为 **`pending`** 并等待任务调度器 **`scheduler`** 的调度；在这里要扩充一点的是，新进程的信号并不会继承自旧进程当中，假设父进程中尚有几个还未执行的信号还未发生时，子进程对其继承将会引起错乱
 
-对于 **`Page Table`** 的拷贝是及其麻烦且对于时间开销非常之大的事情，��为这些页表可能存在于物理内存中，也有可能再当前进程的可执行映像中，还有一些可能在swap文件中，要找到它们实属一件较为困难的工作，但是针对于某些子进程来说，它所需要完成的事情可能并不需要涉及到一些内存的写入操作，这时候就不需要在进行 **`Page Table`** 的拷贝工作了，这种技术也称为 **`COW`** ( $Copy$ $On$ $Write$ )，在未发生写入操作之前，父进程和子进程都会沿用一块共享的虚拟内存空间以保证新进程创建时的执行效率和时间开销，以下这段话摘自这篇 [文章](https://www.tldp.org/LDP/tlk/)  当中
+对于 **`Page Table`** 的拷贝是及其麻烦且对于时间开销非常之大的事情，因为这些页表可能存在于物理内存中，也有可能再当前进程的可执行映像中，还有一些可能在swap文件中，要找到它们实属一件较为困难的工作，但是针对于某些子进程来说，它所需要完成的事情可能并不需要涉及到一些内存的写入操作，这时候就不需要在进行 **`Page Table`** 的拷贝工作了，这种技术也称为 **`COW`** ( $Copy$ $On$ $Write$ )，在未发生写入操作之前，父进程和子进程都会沿用一块共享的虚拟内存空间以保证新进程创建时的执行效率和时间开销，以下这段话摘自这篇 [文章](https://www.tldp.org/LDP/tlk/)  当中
 
 > Cloning a process's virtual memory is rather tricky. A new set of vm_area_struct data structures must be generated together with their owning mm_struct data structure and the cloned process's page tables. None of the process's virtual memory is copied at this point. That would be a rather difficult and lengthy task for some of that virtual memory would be in physical memory, some in the executable image that the process is currently executing and possibly some would be in the swap file. Instead Linux uses a technique called ``copy on write`` which means that virtual memory will only be copied when one of the two processes tries to write to it. Any virtual memory that is not written to, even if it can be, will be shared between the two processes without any harm occuring. The read only memory, for example the executable code, will always be shared. For copy on write to work, the writeable areas have their page table entries marked as read only and the vm_area_struct data structures describing them are marked as copy on write. When one of the processes attempts to write to this virtual memory a page fault will occur. It is at this point that Linux will make a copy of the memory and fix up the two processes' page tables and virtual memory data structures.
 
@@ -6585,6 +6585,387 @@ int main(int argc, char *argv[]) {
 
 --- 
 
+#### 信号的一些基本概念和特性
+<span id="信号的一些基本概念和特性"></span>
+
 信号是一种信息的载体，是 linux / unix 环境下的古老且经典的通信方式，反观至今天，它任然能够作为一种有效可靠的进程间的通信手段之一
 
-如不考虑阻塞，当一个进程以任何方式收到一个信号时会立刻当前用户态中的运行，并进入到内核态中执行当前所收到信号的相关动作，  排队？纯异步？
+操作系统是拥有多种不同信号定义的，而对于这个定义来说，也仅仅只是代表着具体某个信号所对应的 ID，不管是接收一个信号也好还是发送一个信号，我都需要指定这个信号的定义 ( ID ) 以通知内核当前所需处理的信号，当然，我们无需记忆如此之多的信号所对应的 ID 值，仅在需要时就可以到 [man page session 7 - signal](http://man.he.net/?topic=signal&section=7) 找到不同标准规范的信号定义
+
+信号被存储在内核区的 PCB 模块之中，简而言之就是作为一个结构体中的成员而存在，而作为 PCB 进程控制模块而言，由它来负责控制当前进程中的信号收发
+
+**如不考虑阻塞，当一个进程以任何方式收到一个信号时会立刻 **`中断`** 当前用户态中的运行，并进入到内核态中执行当前所收到信号的相关 **`Action`**<span></span>**{style="color:red"}， 由于 **`Action`** 的执行需要设计到用户态到内核态的切换，所以，就信号的实现手段来说是存在一定的延时性的，但是这种延时性对于用户来说是非常之短，可忽略不计
+
+信号的实现拥有以最大的特性就是 **`异步执行`** ( 这里的异步并不指的是在当前代码上下文中的异步状态，因为信号执行 **`Action`** 时往往会中断当前用户态的运行 )，**当进程收到一个信号且正在执行这个信号所对应的动作时，另一个信号的到达并不会阻塞当前所执行的信号动作，即异步处理另一个信号所对应的动作；但是对于相同的信号来说，重复信号的送达必须得等待上一个信号的动作执行完毕才能够执行，我们可以抽象的理解为这是一个队列的概念，但是这个队列仅能存储 **`1`** 个等待的信号 ( 这 **`1`** 个等待的信号通常也称之为 **`未决信号`** )，剩余信号的送达将都会被内核所丢弃**{style="color:red"}
+
+<br/>
+
+#### 信号的状态和处理方式 ( Action )
+<span id="信号的状态和处理方式"></span>
+
+一个信号从它的产生到抵达一个进程的过程我们可以总结为以下三种状态
+- 产生 : 即产生了一个信号，这个过程可能是键盘中断亦或者系统调用来实现
+- 未决 : 未决状态为产生和抵达之间的一种状态，通常是由于阻塞 ( mask ) 所导致的当前状态，一旦某个信号的阻塞解除，则立即进入 **`抵达`** 状态
+- 抵达 : 即进程已经成功接收到了某个信号，当一个进程接收到了一个信号后，如不考虑阻塞 ( mask ) 的情况，则会立即切换到内核态并执行当前信号的 [Action](#signal_action_111)
+
+<br/>
+
+<span id = "signal_action_111"></span>
+
+信号的 **`Action`** 特就是某个进程在成功接收到某个信号后所需立即执行的动作，这种动作分为了以下三种类型
+
+- Perform the default action
+- Ignore the signal
+- Catch the signal with a signal handler ( by **`signal()`** or **`sigaction()`** system call ) , a programmer-defined function that is automatically invoked
+
+这里需要补充一下 **`Perform the default action`**，在 linux / unix 系统中的所有信号都有一个对应的默认执行动作，具体来说，它归纳为以下几种 ( 对于大多数信号而言其行为都是终止当前进程 )
+
+- Term : Default action is to terminate the process
+- Ign : Default action is to ignore the signal
+- Core : Default action is to terminate the process and  dump  core
+- Stop : Default action is to stop the process
+- Cont  - Default  action  is  to  continue the process if it is currently stopped
+
+[说明文档](http://man.he.net/?topic=signal&section=7) ( man page session 7 - signal ) 中查阅到所有信号所对应的默认执行动作
+
+
+```text
+ First the signals described in the original POSIX.1-1990 standard.
+
+ Signal     Value     Action   Comment
+ ----------------------------------------------------------------------
+ SIGHUP       1        Term    Hangup detected on controlling terminal 
+                               or death of controlling process
+ SIGINT       2        Term    Interrupt from keyboard
+ SIGQUIT      3        Core    Quit from keyboard
+ SIGILL       4        Core    Illegal Instruction
+ SIGABRT      6        Core    Abort signal from abort(3)
+ SIGFPE       8        Core    Floating point exception
+ SIGKILL      9        Term    Kill signal
+ SIGSEGV      11       Core    Invalid memory reference
+ SIGPIPE      13       Term    Broken pipe: write to pipe with no readers
+ SIGALRM      14       Term    Timer signal from alarm(2)
+ SIGTERM      15       Term    Termination signal
+ SIGUSR1   30,10,16    Term    User-defined signal 1
+ SIGUSR2   31,12,17    Term    User-defined signal 2
+ SIGCHLD   20,17,18    Ign     Child stopped or terminated
+ SIGCONT   19,18,25    Cont    Continue if stopped
+ SIGSTOP   17,19,23    Stop    Stop process
+ SIGTSTP   18,20,24    Stop    Stop typed at terminal
+ SIGTTIN   21,21,26    Stop    Terminal input for background process
+ SIGTTOU   22,22,27    Stop    Terminal output for background process
+
+ The signals SIGKILL and SIGSTOP cannot be caught, blocked, or ignored.
+
+ Next  the  signals  not  in  the POSIX.1-1990 standard but described in
+ SUSv2 and POSIX.1-2001.
+
+ Signal       Value     Action   Comment
+ --------------------------------------------------------------------
+ SIGBUS      10,7,10     Core    Bus error (bad memory access)
+ SIGPOLL                 Term    Pollable event (Sys V).
+                                 Synonym for SIGIO
+ SIGPROF     27,27,29    Term    Profiling timer expired
+ SIGSYS      12,31,12    Core    Bad argument to routine (SVr4)
+ SIGTRAP        5        Core    Trace/breakpoint trap
+ SIGURG      16,23,21    Ign     Urgent condition on socket (4.2BSD)
+ SIGVTALRM   26,26,28    Term    Virtual alarm clock (4.2BSD)
+ SIGXCPU     24,24,30    Core    CPU time limit exceeded (4.2BSD)
+ SIGXFSZ     25,25,31    Core    File size limit exceeded (4.2BSD)
+
+ Up to and including Linux 2.2, the default behavior for  SIGSYS,  SIGX-
+ CPU,  SIGXFSZ,  and (on architectures other than SPARC and MIPS) SIGBUS
+ was to terminate the process (without a core  dump).   (On  some  other
+ UNIX systems the default action for SIGXCPU and SIGXFSZ is to terminate
+ the  process  without  a  core  dump.)   Linux  2.4  conforms  to   the
+ POSIX.1-2001  requirements  for  these signals, terminating the process
+ SIGINFO      29,-,-             A synonym for SIGPWR
+ SIGLOST      -,-,-      Term    File lock lost (unused)
+ SIGWINCH     28,28,20   Ign     Window resize signal (4.3BSD, Sun)
+ SIGUNUSED    -,31,-     Core    Synonymous with SIGSYS
+
+ (Signal 29 is SIGINFO / SIGPWR on an alpha but SIGLOST on a sparc.)
+
+
+ SIGEMT is not specified in POSIX.1-2001, but  nevertheless  appears  on
+ most  other UNIX systems, where its default action is typically to ter-
+ minate the process with a core dump.
+
+ SIGPWR (which is not specified in POSIX.1-2001) is typically ignored by
+ default on those other UNIX systems where it appears.
+
+ SIGIO (which is not specified in POSIX.1-2001) is ignored by default on
+ several other UNIX systems.
+
+ Where defined, SIGUNUSED is synonymous with SIGSYS  on  most  architec-
+ tures.
+```
+
+<br/>
+
+#### 信号的基本使用
+<span id="信号的基本使用"></span>
+
+#### sighandler_t signal(int signum, sighandler_t handler)
+##### <signal.h>
+
+捕获指定信号 **`signum`** 在执行时所触发的动作为 **`handler`**
+
+- **`sighandler_t`** : typedef void (*sighandler_t)(int)
+
+- **`signum`** : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定
+
+- **`handler`** : 捕获信号的处理函数
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <signal.h>
+#include <unistd.h>
+
+void SIGINT_handler(int _sig) {
+  printf("Catch SIGINT signal, and disable terminate action by default\n");
+}
+void foo(void) {
+  signal(SIGINT, &SIGINT_handler);
+
+  /* Blocked 3 senconds and then send a SIGINT signal to current process */
+  sleep(3);
+  kill(getpid(), SIGINT);
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int kill(pid_t pid, int signum)
+##### <signal.h>
+
+给指定进程 **`pid`** 发送一个信号 **`signum`**，如果成功则返回 **`0`**，否则返回 **`-1`**
+
+- **`pid`** : 进程的 pid
+
+- **`signum`** : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <signal.h>
+#include <unistd.h>
+
+void foo(void) {
+  /* Blocked 3 senconds and then send a SIGINT signal to current process */
+  sleep(3);
+  kill(getpid(), SIGINT);
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int raise( int signum)
+##### <signal.h>
+
+给当前进程发送一个信号 **`signum`**，如果成功则返回 **`0`**，否则返回 **`-1`**
+
+- **`signum`** : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <signal.h>
+#include <unistd.h>
+
+void foo(void) {
+  /* Blocked 3 senconds and then send a SIGINT signal to current process */
+  sleep(3);
+  raise(SIGINT);
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int abort()
+##### <signal.h>
+
+给当前进程发送一个 **`SIGABRT (6)`** 的信号，并设置 **`core`** 文件 ，如果成功则返回 **`0`**，否则返回 **`-1`**
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <signal.h>
+#include <unistd.h>
+
+void foo(void) {
+  /* Blocked 3 senconds and then send a SIGABRT signal to current process */
+  sleep(3);
+  abort();
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### unsigned int alarm(unsigned int seconds)
+##### <signal.h>
+
+设定一个定时器，在 **`seconds`** 秒后由内核发送一个 **`SIGALRM (14)`** 信号给当前进程
+
+**每一个进程有且仅能拥有一个定时器，后面所声明的定时器则覆盖掉前一个所声明的定时器**{style="color:red"}
+
+该函数所指定的定时器使用的是自然定时法，即与进程状态无关，无论是 就绪, 运行, 挂起(阻塞 / 暂停), 终止, 僵尸, ... 都不影响 alarm 的计数
+
+该函数不存在调用失败的返回结果，其返回值依据 **`seconds`** 来决定是返回 **`0`** 还是返回 **`剩余的秒数`**
+
+- **`seconds`** : 指定定时器的计时秒数
+
+  - **`seconds > 0`** : 指定定时器开启，并函数调用返回 **`0`**
+  - **`seconds = 0`** : 指定定时器关闭，并函数调用返回 **`剩余的秒数`**
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <signal.h>
+#include <unistd.h>
+
+void foo_SIGALRM_handler(int _sig) {
+  printf("Time out\n");
+  exit(EXIT_SUCCESS);
+}
+void foo(void) {
+  /* Registered the SIGALRM signal handler */
+  signal(SIGALRM, foo_02_SIGALRM_handler);
+
+  /* Count down two seconds, then send a SIGALRM signal to the current process */
+  alarm(2);
+
+  sleep(1024);
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value)
+##### <signal.h>
+
+开启一个定时器，如果成功则返回 **`0`**，失败则返回 **`-1`**
+
+**每一个进程有且仅能拥有一个定时器，后面所声明的定时器则覆盖掉前一个所声明的定时器**{style="color:red"}
+
+- **`which`** : 指定定时器的计数方式同时也决定了 timeout 后由内核所发送给当前进程的信号类型
+  
+  - **`ITIMER_REAL`** : 使用自然计数法，timeout 后内核发送一个 **`SIGALRM (14)`** 给当前进程
+  - **`ITIMER_VIRTUAL`** : 虚拟空间计时法，仅计算用户空间的运行时间，timeout 后内核发送一个 **`SIGVTALRM (26)`** 给当前进程
+  - **`ITIMER_PROF`** : 运行时计时法，计算用户空间的运行时间加上内核空间的运行时间，timeout 后内核发送一个 **`SIGPROF (27)`** 给当前进程
+
+- **`new_value`** : 指定定时器的 timeout 时间，其由一个嵌套结构体所构成
+  ```c
+  /* itimerval */
+  struct itimerval { 
+    struct timerval it_interval;  /* Interval time for each timer trigger */
+    struct timerval it_value;     /* Delay time when the timer is first executed */
+  }; 
+
+  /* timeval */
+  struct timeval { 
+    long tv_sec; 		 /* second */
+    long tv_usec; 	 /* microsecond */
+  }      
+  ```
+  - **`itimerval`** 中的每一种时间类型都属于 **`timeval`** 结构体类型；在 **`timeval`** 结构体类型中，我们可以设定当前时间类型所延迟的 秒 / 微妙，注意，仅保证一种成员是有效的，无效的成员设定为 **`0`**
+  
+  - **`it_value`** : 指定定时器在第一次触发时所延迟的时间
+  
+    - 如果当前成员都设定为 **`0`**，则意为取消定时器，无论 **`it_interval`** 设置为何值
+  
+  - **`it_interval`** : 指定定时器每次轮询所间隔的时间
+    - 如果当前成员都设定为 **`0`**，则意为定时器仅依据 **`it_value`** 的延迟时间仅运行一次 ( 假定 **`it_value`** 并未设置为 **`0`**)
+  
+- **`old_value`** : 存放旧的 timeout 时间，如无特殊要求设置为 **`NULL`** 即可
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <signal.h>
+#include <unistd.h>
+#include <sys/time.h>
+#include <pthread.h>
+
+int idx = 0;
+void IGALRM_handler(int _sig) {
+  printf("KEN_MODE [%lu] %d\n", pthread_self(), ++idx);
+}
+void foo(void) {
+  signal(SIGALRM, SIGALRM_handler);
+
+  struct itimerval time_value;
+  time_value.it_value.tv_sec = 0;
+  time_value.it_value.tv_usec = 1 * 1000;
+  time_value.it_interval.tv_sec = 1;
+  time_value.it_interval.tv_usec = 0;
+  setitimer(ITIMER_REAL, &time_value, NULL);
+
+  while (true) {
+    printf("USR_MODE [%lu] %d\n", pthread_self(), ++idx);
+    sleep(1);
+  }
+}
+
+
+int main(int argc, char *argv[]) {
+  foo();
+  return EXIT_SUCCESS;
+}
+
+```
+  
+<br/>
+
+#### 未决信号集和阻塞信号集
+<span id="未决信号集和阻塞信号集"></span>
