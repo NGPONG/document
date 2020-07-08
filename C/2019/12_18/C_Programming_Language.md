@@ -6701,6 +6701,10 @@ int main(int argc, char *argv[]) {
  tures.
 ```
 
+最后要说明的是 **`Catch the signal with a signal handler`**，它能够由开发人员去人为的指定捕获信号后所执行的具体 Action，在这里可能会涉及到多次的内核态到用户态的切换过程，其具体的调用流程如下
+
+![2020-07-09-01-56-26](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-07-09-01-56-26.png)
+
 <br/>
 
 #### 信号的基本使用
@@ -6740,6 +6744,68 @@ void foo(void) {
 
 int main(int argc, char *argv[]) {
   foo();
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
+##### <signal.h>
+
+捕获指定信号 **`signum`** 在执行时所触发的动作为 **`act`**
+
+- **`signum`** : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定
+
+- **`act`** :  用于指定 **`Action`** 执行的一些相关信息，它是一种结构体类型，其结构如下
+  
+  ```c
+  struct sigaction {
+    void      (*sa_handler)(int);
+    void      (*sa_sigaction)(int, siginfo_t *, void *); 
+    sigset_t  sa_mask;
+    int       sa_flags;
+    void      (*sa_restorer)(void);
+  };
+  ```
+  - **`sa_handler`** : 捕获 **`Action`** 在执行时所使用的自定义 **`handler`**
+
+  - **`sa_sigaction`** : 另一种形态的 **`handler`**，通常我们仅需指定 **`sa_handler`** 即可
+
+  - 作为 **`handler`** 的成员可以指定自定义的函数，当指定了任意一个函数指针后，则意味当前 Action 的动作采取的是捕获的方式，当然，我们也可以通过以下两种宏定义来指定这个 Action 的一些具体的行为动作
+    - **`SIG_IGN`** : 采取忽略 Action
+
+    - **`SIG_DF`** : 执行默认的 Action
+
+  - **`sa_mask`** : 阻塞信号集，我们可以通过它来指定在当前信号 **`signum`** 在执行捕获 Action 的 **handler** 时所需屏蔽的信号，需要注意的是，这个屏蔽 ( mask ) 的限制是仅限于执行 **`handler`** 期间才会生效的，并不是一个全局屏蔽的作用
+
+  - **`sa_flags`** : 该成员通常设置为 0
+
+  - **`sa_restorer`** : 已弃用的成员
+
+- **`oldact`** : 旧值，如无特殊要求设置为 NULL 即可
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <signal.h>
+
+void handler(int _sig) {
+  printf("handler executed!\n");
+}
+
+int main(void) {
+  struct sigaction act;
+  act.sa_handler = handler;
+  sigemptyset(&sa_mask);
+  act.sa_flags = 0;
+
+  sigaction(SIGINT, &act, NULL);
+
   return EXIT_SUCCESS;
 }
 ```
@@ -7206,6 +7272,3 @@ int main(void) {
   return EXIT_SUCCESS;
 }
 ```
-
-
-
