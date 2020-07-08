@@ -6594,9 +6594,9 @@ int main(int argc, char *argv[]) {
 
 信号被存储在内核区的 PCB 模块之中，简而言之就是作为一个结构体中的成员而存在，而作为 PCB 进程控制模块而言，由它来负责控制当前进程中的信号收发
 
-**如不考虑阻塞，当一个进程以任何方式收到一个信号时会立刻 **`中断`** 当前用户态中的运行，并进入到内核态中执行当前所收到信号的相关 **`Action`**<span></span>**{style="color:red"}， 由于 **`Action`** 的执行需要设计到用户态到内核态的切换，所以，就信号的实现手段来说是存在一定的延时性的，但是这种延时性对于用户来说是非常之短，可忽略不计
+**如不考虑阻塞，当一个进程以任何方式收到一个信号时会立刻 **`中断`** 当前用户态中的运行，并进入到内核态中执行当前所收到信号的相关 **`Action`**<span></span>**{style="color:red"}； 由于 **`Action`** 的执行需要设计到用户态到内核态的切换，所以，就信号的实现手段来说是存在一定的延时性的，但是这种延时性对于用户来说是非常之短，可忽略不计
 
-信号的实现拥有以最大的特性就是 **`异步执行`** ( 这里的异步并不指的是在当前代码上下文中的异步状态，因为信号执行 **`Action`** 时往往会中断当前用户态的运行 )，**当进程收到一个信号且正在执行这个信号所对应的动作时，另一个信号的到达并不会阻塞当前所执行的信号动作，即异步处理另一个信号所对应的动作；但是对于相同的信号来说，重复信号的送达必须得等待上一个信号的动作执行完毕才能够执行，我们可以抽象的理解为这是一个队列的概念，但是这个队列仅能存储 **`1`** 个等待的信号 ( 这 **`1`** 个等待的信号通常也称之为 **`未决信号`** )，剩余信号的送达将都会被内核所丢弃**{style="color:red"}
+信号的实现拥有以最大的特性就是 **`异步执行`** ( 这里的异步并不指的是在当前代码上下文中的异步状态，因为信号执行 **`Action`** 时往往会中断当前用户态的运行 )，**当进程收到一个信号且正在执行这个信号所对应的动作时，另一个信号的到达并不会阻塞当前所执行的信号动作，即异步处理另一个信号所对应的动作；但是对于相同的信号来说，重复信号的送达必须得等待上一个信号的动作执行完毕才能够执行，我们可以抽象的理解为这是一个队列的概念，但是这个队列仅能存储 **`1`** 个等待的信号 ( 这 **`1`** 个等待的信号通常也称之为 **`未决信号`** )，剩余信号的送达将都会被内核所丢弃**{style="color:red"}，关于相同信号的队列状态，会在 [未决信号集和阻塞信号集](#未决信号集和阻塞信号集) 中进行细说
 
 <br/>
 
@@ -6969,3 +6969,243 @@ int main(int argc, char *argv[]) {
 
 #### 未决信号集和阻塞信号集
 <span id="未决信号集和阻塞信号集"></span>
+
+任何一个信号 ( 除了 **`SIGKILL`** 和 **`SIGSTOP`**，它们无法被捕获、忽略和阻塞 ) 在真正到达一个进程前都会经历一次 **`未决 (pending)`** 的过程，在内核态的 PCB 模块中，拥有一个成员用于维护和表示发生在当前进程中每种信号的未决状态，它称之为 **`未决信号集`**，未决信号集是一个线性集合，其中，集合的每个下标都能够映射至对应 ID 的信号，当一个信号在即将抵达至当前进程前，都会把当前信号维护至未决信号集对应信号 ID 的下标处以表示当前信号的未决状态，**当未决信号集指定下标的空间已经维护了某个信号，那么后来发送至当前进程的这个信号则会被丢弃**{style="color:red"}
+
+当某个信号已处于未决信号集后，两个条件会决定这个信号是否能够真正意义上的抵达至当前进程
+
+1. 当前信号是否正在执行 **`Action`**，如果是的话，那么这个信号则保持不变，任然维持着 **`未决`** 的状态；如果没有，则会进入第二个条件
+   
+2. 当前信号是否被阻塞，如果是的话，那么这个信号则保持不变，任然维持着 **`未决`** 的状态，亦或者我们也可以认为这个信号处于一种等待着阻塞结束的状态；如果没有，则这个信号便会成功抵达当前进程并执行其所对应的 **`Action`**
+
+对于 **`阻塞 ( mask )`** 的信号来说，PCB 模块同样是使用一个结构性和 **`未决信号集`** 保持一致的集合用于维护和表示，我们称这个用于表示信号阻塞信息的集合为 **`阻塞信号集`**；阻塞信号集的数据结构和未决信号集是保持一致性的，即数组中的每个下标都用于存放不同信号的阻塞信息，每个处于未决信号集的信号在执行前都会检查阻塞信号集中对应下标的元素是否已被占用，如果是的话则认为这个信号正在置于一个阻塞的状态，并等待着阻塞的结束 ( 阻塞信号集对应信号 ID 下标的数据重置 ) 以抵达当前进程并执行其所对应的 **`Action`**，它的产生可能是一些其它因素但更多的情况，则交由开发人员通过对应的系统调用来人为的设置
+
+在这里需要强调的是，不管是阻塞信号集也好还是未决信号集，上面所说到的都是 "把当前信号维护至集合的对应下标的存储空间中"，但是这并不是真正意义上的把一个信号存储在这个集合中，真实情况则为把对应集合中对应信号 ID 的下标所存储的数据置为 **`1`** 则能够表示某个信号已经被维护在了某个集合当中，反之置为 **`0`** 则表示某个信号并没有在具体某个集合下面，即还未产生对应集合所表示的状态
+
+对于信号集而言虽然其存储结构简单，但并不意味着我们可以手动的依据下标来修改信号集中具体某个下标 ( 信号 ID ) 的状态，对于一切信号集的操作标准库中提供了一些 API 以供我们执行，而我们对于信号集的修改也要围绕着这些 API 去进行才能够符合标准的规范
+
+```text
+    pending              mask
+  +--------+          +--------+
+ 0|        |         0|        |
+ 1|SIGINT 1| +-----> 1|SIGINT 1|
+ 2|        |         2|        |
+ 3|        |         3|        |
+ 4|        |         4|        |
+ 5|        |         5|        |
+ 6|        |         6|        |
+..|        |        ..|        |
+  |        |          |        |
+  |        |          |        |
+  |        |          |        |
+  +--------+          +--------+
+```
+
+<br/>
+
+#### 信号集的使用
+<span id="信号集的使用"></span>
+
+#### sigset_t
+##### <signal.h>
+
+不管是阻塞信号集也好还是未决信号集，二者之间的存储结构都是一致的，都是一块线性的数组空间，它由以下结构体来进行表示 ()  ，我们对于任何信号集的任何操作都需要以这个结构体的实例为基准去进行
+
+```c
+typedef struct
+{
+  unsigned long int __val[_SIGSET_NWORDS];
+} sigset_t;
+```
+
+<br/>
+
+#### int sigfillset(sigset_t *set)
+##### <signal.h>
+
+将信号集 **`set`** 中的所有数据置为 **`1`**，成功则返回 **`0`**，否则返回 **`-1`**
+
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <signal.h>
+
+int main(void) {
+  sigset_t mask;
+  sigfillset(&mask);
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int sigemptyset(sigset_t *set)
+##### <signal.h>
+
+将信号集 **`set`** 中的所有数据置为 **`0`**，成功则返回 **`0`**，否则返回 **`-1`**
+
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <signal.h>
+
+int main(void) {
+  sigset_t mask;
+  sigemptyset(&mask);
+
+  return EXIT_SUCCESS;
+}
+```
+
+
+<br/>
+
+#### int sigaddset(sigset_t *set, int sig)
+##### <signal.h>
+
+将信号集 **`set`** 中的信号 ID **`sig`** 所对应的下标的数据置为 **`1`**，成功则返回 **`0`**，否则返回 **`-1`**
+
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <signal.h>
+
+int main(void) {
+  sigset_t mask;
+  sigaddset(&mask, SIGINT);
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int sigdelset(sigset_t *set, int sig)
+##### <signal.h>
+
+将信号集 **`set`** 中的信号 ID **`sig`** 所对应的下标的数据置为 **`0`**，成功则返回 **`0`**，否则返回 **`-1`**
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <signal.h>
+
+int main(void) {
+  sigset_t mask;
+  sigdelset(&mask, SIGINT);
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int sigismember(const sigset_t *set, int signum)
+##### <signal.h>
+
+判断指定信号 ID **`signum`** 在当前信号集 **`set`** 所对应的下标的数据是否置为 **`1`**，如果是则返回 **`1`**，不是则返回 **`0`**，函数调用失败时则返回 **`-1`**
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <signal.h>
+
+int main(void) {
+  sigset_t mask;
+  sigemptyset(&mask);
+
+  sigaddset(&mask, SIGINT);
+
+  printf("%d\n",sigismember(&mask,SIGINT));
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int sigpending(sigset_t *set)
+##### <signal.h>
+
+获取当前进程的未决信号集，并将之拷贝到所指定的 **`set`** 当中，成功则返回 **`0`**，否则返回 **`-1`**
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <signal.h>
+
+int main(void) {
+  sigset_t pending;
+  sigpending(&pending);
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
+##### <signal.h>
+
+根据所指定的信号集 **`set`** 和所指定的修改方式 **`how`** 去修改当前进程中的阻塞信号集，成功则返回 **`0`**，否则返回 
+
+- **`how`** : 所指定的修改方式，以宏定义来指定
+  
+  - **`SIG_BLOCK`** : 当前信号集 **`set`** 中值位 **`1`** 的下标则作为屏蔽项
+  - **`SIG_UNBLOCK`** : 当前信号集 **`set`** 中值位 **`1`** 的下标则作为解除屏蔽项
+  
+- **`set`** : 内核中的阻塞信号集的修改依据则以这个参数为基准
+
+- **`oldset`** : 旧值，可忽略
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <signal.h>
+
+int main(void) {
+  sigset_t mask;
+  sigemptyset(&mask);
+
+  sigaddset(&mask, SIGINT);
+
+  sigprocmask(SIG_BLOCK, &mask, NULL);
+
+  return EXIT_SUCCESS;
+}
+```
+
+
+
