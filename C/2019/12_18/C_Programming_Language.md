@@ -95,6 +95,7 @@
   - [进程的创建](#进程的创建)
   - [进程的状态](#进程的状态)
   - [特殊的进程](#特殊的进程)
+  - [守护进程的创建](#守护进程的创建)
   - [什么是线程](#什么是线程)
   - [线程模型](#线程模型)
   - [再聊 PID PGID TGID PPID](#再聊-pid-pgid-tgid)
@@ -115,6 +116,11 @@
 - [共享映射区](#共享映射区)
   - [共享映射区的使用](#共享映射区的使用)
 - [信号](#信号_signal)
+  - [信号的一些基本概念和特性](#信号的一些基本概念和特性)
+  - [信号的状态和处理方式](#信号的状态和处理方式)
+  - [信号的基本使用](#信号的基本使用)
+  - [未决信号集和阻塞信号集](#未决信号集和阻塞信号集)
+  - [信号集的使用](#信号集的使用)
 
 <br/>
 
@@ -3123,7 +3129,7 @@ int main(void){
 
 该函数能够立即刷新文件指针所指向的文件所开启的缓冲区，如果成功返回 [[0]]，如果失败则返回 [[-1]]
 
-关于文件缓冲区的内容在 [这一章](#) 已经有所介绍，这里就不再进行展开了
+关于文件缓冲区的内容在 [这一章](#文件缓冲区) 已经有所介绍，这里就不再进行展开了
 
 ```c
 #include <stdio.h>
@@ -5590,7 +5596,7 @@ struct task_struct {
 
 在 linux 中任何一个进程的创建，都需要依赖于一个父级进程 ( 上帝进程除外，即 **`PID == 1`** ) ，正如我们所编写的程序，在启动后其父级进程就是作为 **`caller`** 的终端，即 **`bash`**，**那么一个进程除了会拥有一个 `PID` 去标识它在这个操作系统中的唯一身份外，还拥有一个 `PPID` ( 父进程的 `PID` ) 用于标识当前进程的父级依赖关系**{style="color:red"}
 
-不可否认的是，进程其地址空间是以父进程作为模型而 clone 出来的，其中拷贝了包括沿用用户态的众多信息如父进程的地址空间, 页表, 堆, 栈 ( 堆栈仅仅只是使用父进程中所衍生出来的虚拟内存地址， ) 等等，但并不意味着子进程内核态中的所有内容也是从父进程中进行延伸出来的，正如内核态中的 **`PCB 进程控制模块`** 中所存储的 **`task_struct`**，由于每一个进程在当前操作系统中都需要保证仅有一份实例，故这份 **`task_struct`** 实例的内容自然也仅属于新进程本身
+不可否认的是，进程其地址空间是以父进程作为模型而 clone 出来的，其中拷贝了包括沿用用户态的众多信息如父进程的 **地址空间、页表、堆、栈 ( 堆栈仅仅只是使用父进程中所衍生出来的虚拟内存地址 )、信号 ( 阻塞信号集和信号的 **`Action`** )**{style="color:red"} 等等，但并不意味着子进程内核态中的所有内容也是从父进程中进行延伸出来的，正如内核态中的 **`PCB 进程控制模块`** 中所存储的 **`task_struct`**，由于每一个进程在当前操作系统中都需要保证仅有一份实例，故这份 **`task_struct`** 实例的内容自然也仅属于新进程本身
 
 虽然子进程在用户态中的众多数据都会从其父进程中 clone 出来，但需要注意的是，这里所延伸出来的方式是以 **`copy`** 的形式而进行，也就是说也许子进程和父进程的地址空间的信息看似是相同的，其实实际上二者毫不相干，因为所延生出来的仅仅只是一个虚拟内存的地址，而具体的，这个新进程所使用的新的物理内存页会重新映射一遍这些虚拟内存地址，这同样也符合一个进程在操作系统中的设计理念
 
@@ -5723,8 +5729,91 @@ struct task_struct {
 
 守护进程 **没有控制终端**{style="color:red"}，**不能直接和用户交互**{style="color:red"} 并且 不受用户的 **登录 / 注销**{style="color:red"} 影响
 
-关于守护进程如何创建，请查看 [这里](#)
- 
+关于守护进程如何创建，请查看 [这里](#守护进程的创建)
+
+<br/>
+
+ #### 守护进程的创建
+<span id="守护进程的创建"></span>
+
+1. 由于要依赖于会话 ( **`setsid()`** ) 的特性，故我们需要构建出一个子进程 ( **`fork()`** ) 并且主进程退出，使这个子进程作为守护进程创建的基准
+2. 子进程调用 **`setsid()`** 以构建一个新的会话，使当前子进程成为一个会话的会长，也成为一个进程组的组长，同时，新创建的会话会丢弃原有的控制终端，使当前进程并不会依赖于控制终端
+3. 改变当前进程的工作目录 ( **`chdir`** ) 以保证工作目录的丢失守护进程的运行不受影响
+4. 由于子进程会继承于父进程的文件操作掩码 ( **`mask`** )，故最好使用 **`unmask()`** 以重置掩码，保证守护进程 ( 子进程 ) IO 操作的灵活性
+5. 关闭和终端操作有关的文件描述符 **`STDIN`** **`STDOUT`** **`STDERR`**
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include <signal.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+
+void handler(int _sig) {
+  int fd_w = open("./log", O_WRONLY | O_CREAT | O_APPEND, 0644);
+  if (fd_w < 0) {
+    perror("open file error");
+    exit(EXIT_FAILURE);
+  }
+
+  static int idx = 0;
+  char *buff = malloc(32);
+  if (buff == NULL) {
+    perror("memory error");
+    exit(EXIT_FAILURE);
+  }
+  memset(buff, 0x0, 32);
+
+  sprintf(buff, "[%d]\n", ++idx);
+
+  /* strlen(xx) + 1 means ensure writed full bytes('\0') */
+  write(fd_w, buff, strlen(buff) + 1);
+
+  free(buff);
+  close(fd_w);
+}
+void foo(void) {
+  int pid = fork();
+  if (pid < 0) {
+    perror("create child process error\n");
+    exit(EXIT_FAILURE);
+  } else if (pid == 0) {
+    /* Improve child process to be session leader. */
+    int sid = setsid();
+    /* Reset file mask */
+    umask(0000);
+    /* Registered a clock */
+    signal(SIGALRM, handler);
+
+    struct itimerval time_value;
+    time_value.it_value.tv_sec = 0;
+    time_value.it_value.tv_usec = 1 * 1000;
+    time_value.it_interval.tv_sec = 1;
+    time_value.it_interval.tv_usec = 0;
+    setitimer(ITIMER_REAL, &time_value, NULL);
+
+    printf("server [%d] started\n", getpid());
+    while (true) {
+      sleep(1);
+    }
+  }
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+  
+  return EXIT_SUCCESS;
+}
+
+```
+
 <br/>
 
  #### 什么是线程
@@ -5738,7 +5827,7 @@ struct task_struct {
 
 需要扩充的是，同一进程下的所有线程在调用 **`getpid()`** 时所获取到的 **`PID`** 是一样的， 因为对于多线程的程序来说，**`getpid()`** 系统调用获取的实际上是 **`TGID`**，因此隶属同一进程的多个线程看起来 **`PID`** 相同
 
-线程的创建过程和进程一致，也是以父进程作为模型 **`clone`** 出来的，但是该系统调用区别于进程的创建，**`clone`** 是共享的 **`clone`**，这个共享，是地址空间 ,**`Page Table`**, 堆 ,栈 的共享，这里需要区别与进程，线程是真正意义上的虚拟内存共享，这就是为什么线程会被称为 **`轻量级线程`** 的原因；不可否认的是，线程的创建的确是免去了进程创建需要拷贝地址空间和页表的工作，也就是在一定程度上，线程创建的时间开销是小于进程的，但，这并不是绝对的，并不意味着线程和进程在创建上的时间开销是呈几何倍的差距，实际只有很小，关于这点在后面的节点还会提到
+线程的创建过程和进程一致，也是以父进程作为模型 **`clone`** 出来的，但是该系统调用区别于进程的创建，**`clone`** 是最大共享的 **`clone`**，这个共享，是 **地址空间 、Page Table、堆、栈、PCB中的文件描述符表、信号 ( 所共享的仅仅只是信号的 **`Action`**，并不包括未决信号集，而对于阻塞信号集也仅仅只是做了一份拷贝的动作并在此基础上作为每个线程的独立延伸  )**{style="color:red"} 的共享，这里需要区别与进程，线程是真正意义上的虚拟内存共享，这就是为什么线程会被称为 **`轻量级线程`** 的原因；不可否认的是，线程的创建的确是免去了进程创建需要拷贝地址空间和页表的工作，也就是在一定程度上，线程创建的时间开销是小于进程的，但，这并不是绝对的，并不意味着线程和进程在创建上的时间开销是呈几何倍的差距，实际只有很小，关于这点在后面的节点还会提到
 
 **由于线程和其父线程是共享一段地址空间的关系，故一个线程出现的错误会导致延伸当前线程的主线程 ( 进程 ) 也会随同崩溃**{style="color:red"}
 
@@ -5796,13 +5885,24 @@ struct task_struct {
   -  一个进程在当前操作系统的唯一标识
 - **`PGID`**
   - 进程组ID，一个进程组下有多个进程，并且仅有一个主进程 ( 父进程 )，它的 **`PID == PGID`**，除了主进程，在该进程组下的所有进程都属于主进程的子进程，它们的 **`PID != PGID`** **`PPID == PGID`** 
+
   - 进程组的存在与主进程是否存活无关，进程组中仅有一个 组员进程 存在则意味着进程组存在
+
 - **`SID`**
   - 会话ID，一个会话下有多个进程组，并且仅有一个会长，它的 **`PID == SID`**，会长进程拥有一个进程组，并且也作为这个进程组内的主进程，即 **`PID == PGID`**，而由会长往下所派生的子进程也纳入至会长进程所在进程组中的子进程，它们的 **`PID == SID`** **`PID != PGID`** **`PPID == PGID`** 
+
   - 创建一个会话需要依赖于一个进程的存在，即让这个进程提升为一个新的会话的会长，但是需要注意的是，**所依赖的进程不能够作为某个进程组的主进程而存在**{style="color:red"}
-  - 会长进程一大特性就是其不依赖于终端，其通常用于 [守护进程](#DaemonDaemon) 的创建
+
+  - 新创建的会话会丢弃原有的控制终端，会长不依赖于终端，这种特性也通常用于 [守护进程](#DaemonDaemon) 的创建
+
 - **`TGID`**
   - 线程组ID，每个进程都能够以当前进程作为主线程并向下衍生出子线程，作为主线程而言，它的 **`PID == TGID`**，除了主线程，在该线程组下的所有线程都属于主线程的子线程，他们的 **`PID != TGID`**
+- **`TID`**
+  - 线程的ID，由于历史原因，在 linux 中的线程分别通过了 **`NPTL`** 和 **`POSIX`** 的实现，故这里的 TID 会存在两种不同
+  
+  - **`NPTL TID`** : 该 TID 仅能通过 [pthread_self()](#pthread_self) 获取，其仅能这个线程在 **当前进程内**{style="color:red"} 的唯一的标识；使用 **`NPTL`** 所提供的线程库来完成多线程模型的开发一律都是使用该 **`TID`** 作为基准
+
+   - **`POSIX TID`** : 该 TID 可以通过系统调用 [gettid()](#) 来获取，但是在标准的 glibc 库中并没有实现对它的封装，故最终还是要通过系统调用 **`syscall`** 来获取，其可作为整个这个线程在 **整个系统**{style="color:red"} 中的唯一标识
 - **`PPID`**
   - 子进程的父进程 **`PID`**
 
@@ -6179,8 +6279,323 @@ int main(void) {
 
 <br/>
 
-#### pid_t waitpid(pid_t pid, int *state, in options)
-##### <wait.h>
+#### pid_t setsid()
+##### <sys/types.h> <unistd.h>
+
+创建一个新的会话，并将当前调用进程提升为所创建会话的会长，同时也能提升为一个进程组的组长，如果成功则返回新建会话的 SID，否则返回 -1
+
+该函数仅作用与非进程组组长进程，通常用于守护进程的创建
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+
+void foo(void) {
+  int pid = fork();
+  if (pid < 0) {
+    perror("create child process error\n");
+    exit(EXIT_FAILURE);
+  } else if (pid == 0) {
+    /* Improve child process to be session leader. */
+    int sid = setsid();
+
+    while (true) {
+      sleep(1);
+    }
+  }
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+  
+  return EXIT_SUCCESS;
+}
+
+```
+
+<br/>
+
+#### 线程的使用
+<span id="线程的使用"></span>
+
+#### int pthread_create(pthread_t *thread,  const pthread_attr_t *attr, void *(*start_routine) (void *) ,void *arg)
+
+##### <pthread.h>
+
+创建一个新的线程，并开始执行函数指针 **`start_routine`** 的上下文，如果成功，则返回 **`0`** 并且返回所创建线程的 **`NPTL TID`** 至指针 **`thread`** 中，如果调用失败，则返回对应的 **`错误码`** ( 需要通过 **`strerror`** 把该错误码转换成有效的输出信息 )
+
+- **`thread`** : 创建成功后所返回线程的 **`NPTL TID`**
+
+- **`attr`** : 指定所创建线程的一些属性，如果为 **`NULL`**，则采用默认属性来对线程进行构造
+
+- **`start_routine`** : 一个函数指针，用于指定线程所执行的上下文
+
+  - 需要注意的是，该函数的返回值所指向的内存单元要不为 **`NULL`**，要不为 **`malloc`** 所分配亦或者全局变量，它不能指向任意一个属于当前函数上下文的栈中所分配的内存单元
+
+- **`arg`** : 传递至 **`start_routine`** 的实参
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/syscall.h>
+
+static int idx = 0;
+
+void *thread_start(void *_arg) {
+  printf("[%lu] child-thread executed\n", pthread_self());
+
+  while (true) {
+    printf("[%lu] %d\n", ++idx);
+    sleep(1);
+  }
+
+  return NULL;
+}
+
+int main(int argc, char *argv[]) {
+  pthread_t t_id;
+  int s = pthread_create(&t_id, NULL, thread_start, NULL);
+  if (s != 0) {
+    char *msg = strerror(s);
+    printf("%s\n", msg);
+  }
+
+  printf("[%lu] main-thread executed, create [%lu]\n", pthread_self(), t_id);
+  while (true) {
+    printf("[%lu] %d\n", ++idx);
+    sleep(1);
+  }
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int pthread_exit(void *retval)
+##### <pthread.h>
+
+退出当前调用者线程的执行，需要注意的是，在使用 **`NPTL`** 所提供的库去实现多线程开发模型时，任意一个线程调用了 **`exit`** ( 父级进程在 **`main`** 函数中的 **`return`** 也属于 **`exit`** 的调用 ) 都会导致其同组 **`TGID`** 下的所有进程的退出 ( 其中也包括了构造出这些子级线程的父级进程，即 **`TGID == PID`**  ) 但是使用 **`pthread_exit`** 进行线程的退出是安全且可控的
+
+- **`retval`** : 表示当前线程所退出的状态，通常指定为 **`NULL`**
+
+  - 需要注意的是，该参数所指向的内存单元要不为 **`NULL`**，要不为 **`malloc`** 所分配亦或者全局变量，它不能指向任意一个属于当前函数上下文的栈中所分配的内存单元
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include <pthread.h>
+
+void *thread_start(void *arg) {
+  int idx = 0;
+  while (true) {
+    printf("[%lu] %d\n", pthread_self(), ++idx);
+    sleep(1);
+
+    if (idx == 5) {
+      pthread_exit(EXIT_SUCCESS);
+    }
+  }
+
+  return NULL;
+}
+
+int main(int argc, char *argv[]) {
+  pthread_t ti_d;
+  int s = pthread_create(&ti_d, NULL, thread_start, NULL);
+  printf("[%lu] create %lu\n",pthread_self(),ti_d);
+
+  while (true) {
+    sleep(1);
+  }
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+<span id = "pthread_self"></span>
+
+#### pthread_t pthread_self()
+##### <pthread.h>
+
+获取当前线程的 **`NPTL TID`**
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include <pthread.h>
+
+void *thread_start(void *arg) {
+  int idx = 0;
+  while (true) {
+    printf("[%lu] %d\n", pthread_self(), ++idx);
+    sleep(1);
+
+    if (idx == 5) {
+      pthread_exit(EXIT_SUCCESS);
+    }
+  }
+
+  return NULL;
+}
+
+int main(int argc, char *argv[]) {
+  pthread_t ti_d;
+  int s = pthread_create(&ti_d, NULL, thread_start, NULL);
+  printf("[%lu] create %lu\n",pthread_self(),ti_d);
+
+  while (true) {
+    sleep(1);
+  }
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+<span id = "pthread_self"></span>
+
+#### int gettid()
+##### <sys/syscall.h> <sys/types.h>
+
+获取当前线程的 **`POSIX TID`**，事实上，**`glibc`** 库中并没有实现对于 **`gettid`** 的封装，故其调用最终还需要通过 **`syscall`** 来执行
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include <pthread.h>
+
+#include <sys/syscall.h>
+#include <sys/types.h>
+
+void *thread_start(void *arg) {
+  int idx = 0;
+  while (true) {
+    printf("[%lu] %d\n", syscall(SYS_getsid), ++idx);
+    sleep(1);
+
+    if (idx == 5) {
+      pthread_exit(EXIT_SUCCESS);
+    }
+  }
+
+  return NULL;
+}
+
+int main(int argc, char *argv[]) {
+  pthread_t ti_d;
+  int s = pthread_create(&ti_d, NULL, thread_start, NULL);
+  printf("[%lu] create %lu\n",syscall(SYS_getsid),ti_d);
+
+  while (true) {
+    sleep(1);
+  }
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int pthread_sigmask()
+##### <sys/syscall.h> <sys/types.h>
+
+设定当前线程的阻塞信号集
+
+每个线程的阻塞信号集虽然会从其父级进程中继承下来，但是这份继承也仅仅只是拷贝，并不属于共享，故任意一个子集线程都可以以这份从父级线程中所拷贝的阻塞信号集向下继续做独立的延伸工作
+
+虽然该函数其功能和形参的实现都和 [sigprocmask](#sigprocmask) 保持一致 ( 故这里不再对该函数的形参做阐述 )，唯一的区别仅是当前函数的内部实现严格遵循着 **`NPTL`** 规范所指定的
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+
+void *thread_start(void *_arg) {
+  sigset_t mask;
+  sigemptyset(&mask);
+  sigaddset(&mask, SIGINT);
+  pthread_sigmask(SIG_BLOCK, &mask, NULL);
+
+  printf("[%lu] child-thread executed\n", pthread_self());
+
+  while (true) {
+    sleep(1);
+  }
+
+  return NULL;
+}
+
+void sig_handler(int _sig) {
+  printf("executed, tid = %lu\n", pthread_self());
+  fflush(stdout);
+
+  exit(EXIT_SUCCESS);
+}
+
+int main(int argc, char *argv[]) {
+  pthread_t t_id;
+  int s = pthread_create(&t_id, NULL, thread_start, NULL);
+  if (s != 0) {
+    char *msg = strerror(s);
+    printf("%s\n", msg);
+  }
+
+  struct sigaction act;
+  sigemptyset(&act.sa_mask);
+  act.sa_handler = sig_handler;
+  act.sa_flags = 0;
+  sigaction(SIGINT, &act, NULL);
+
+  printf("[%lu] main-thread executed, create [%lu]\n", pthread_self(), t_id);
+
+  while (true) {
+    sleep(1);
+  }
+
+  return EXIT_SUCCESS;
+}
+```
+
+pthread_join
+
+
 
 <br/>
 
@@ -6766,12 +7181,18 @@ int main(int argc, char *argv[]) {
 }
 ```
 
+!!! warning
+      由于子进程的创建仅仅只是拷贝父进程地址空间中的数据，即并不共享，故在 **多进程**{style="color:red"} 开发模型下。使用该函数去针对不同的父子级进程去完成相同信号不同处理行为的设置这是安全的，但在 **多线程**{style="color:red"} 开发模型下由于父子级线程之间共享了大部分的地址空间的数据，其中也包括了针对不同信号间的处理行为 ( **`Action`** ) 的设置，故这时候不同线程间使用该函数去完成相同信号不同处理行为的设置时是不安全的，因为某一个线程针对某一个信号的处理行为的设置会覆盖至所有线程之中，故在多线程开发模型下为了保证不被污染，更鼓励使用 [sigwait()](#) / [sigwaitinfo()](#) 去完成信号的处理行为的绑定设置
+
 <br/>
+
+
 
 #### int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
 ##### <signal.h>
 
 捕获指定信号 **`signum`** 在执行时所触发的动作为 **`act`**
+
 
 - **`signum`** : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定
 
@@ -6828,6 +7249,9 @@ int main(void) {
 }
 ```
 
+!!! warning
+      由于子进程的创建仅仅只是拷贝父进程地址空间中的数据，即并不共享，故在 **多进程**{style="color:red"} 开发模型下。使用该函数去针对不同的父子级进程去完成相同信号不同处理行为的设置这是安全的，但在 **多线程**{style="color:red"} 开发模型下由于父子级线程之间共享了大部分的地址空间的数据，其中也包括了针对不同信号间的处理行为 ( **`Action`** ) 的设置，故这时候不同线程间使用该函数去完成相同信号不同处理行为的设置时是不安全的，因为某一个线程针对某一个信号的处理行为的设置会覆盖至所有线程之中，故在多线程开发模型下为了保证不被污染，更鼓励使用 [sigwait()](#) / [sigwaitinfo()](#) 去完成信号的处理行为的绑定设置
+
 <br/>
 
 #### int kill(pid_t pid, int signum)
@@ -6860,6 +7284,9 @@ int main(int argc, char *argv[]) {
   return EXIT_SUCCESS;
 }
 ```
+
+!!! warning
+    当前函数属于 **`POSIX`** 的实现，故使用它来针对 **`NPTL`** 所构造线程的 **`POSIX TID`** 发送信号时，如果当前所发送的信号在所指定线程内存在阻塞 ( **`mask`** )，则会把信号发送至其父级线程 ( 构造当前线程的进程 ) 当中去，故对于使用 **`pthread_create`** 所构建出来的线程去发送信号时，正确的做法应该使用 [pthread_kill](#) 去完成
 
 <br/>
 
@@ -7256,6 +7683,8 @@ int main(void) {
 
 <br/>
 
+<span id  = "sigprocmask"></span>
+
 #### int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 ##### <signal.h>
 
@@ -7290,3 +7719,5 @@ int main(void) {
   return EXIT_SUCCESS;
 }
 ```
+
+!!! warning
