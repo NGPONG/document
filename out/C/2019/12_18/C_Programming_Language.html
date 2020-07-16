@@ -5297,69 +5297,69 @@ B ^ C = A
 <p data-line="5879" class="code-line">Although you can use clone system call to create a thread, it is recommended to use pthread_create. This is for portability reasons (It is not necessary that a variant of Unix will have clone() system call available. However, the pthread_create library can still be used, as it will take care of the underlying system call and other complexities).</p>
 </blockquote>
 <br/>
-<a for="toc-anchor" id="%E5%86%8D%E8%81%8A-pid-pgid-tgid-ppid-sid"></a><h4 id="%E5%86%8D%E8%81%8A-pid-pgid-tgid-ppid-sid" data-line="5883" class="code-line">再聊 PID PGID TGID PPID SID</h4>
-<p data-line="5884" class="code-line"><span id="再聊-pid-pgid-tgid"></span></p>
-<p data-line="5886" class="code-line">对于每个进程而言，他都拥有着以下信息用于标识当前进程的所属单位，我们可以通过一些命令行工具，如 : <strong><code>pstree</code></strong>, <strong><code>ps</code></strong>, <strong><code>htop</code></strong> 去查看它</p>
+<p data-line="5883" class="code-line"><span id="再聊-pid-pgid-tgid"></span></p>
+<a for="toc-anchor" id="%E5%86%8D%E8%81%8A-pid-pgid-tgid-ppid-sid"></a><h4 id="%E5%86%8D%E8%81%8A-pid-pgid-tgid-ppid-sid" data-line="5885" class="code-line">再聊 PID PGID TGID PPID SID</h4>
+<p data-line="5887" class="code-line">对于每个进程而言，他都拥有着以下信息用于标识当前进程的所属单位，我们可以通过一些命令行工具，如 : <strong><code>pstree</code></strong>, <strong><code>ps</code></strong>, <strong><code>htop</code></strong> 去查看它</p>
 <ul>
-<li data-line="5888" class="code-line">
-<p data-line="5888" class="code-line"><strong><code>PID</code></strong></p>
+<li data-line="5889" class="code-line">
+<p data-line="5889" class="code-line"><strong><code>PID</code></strong></p>
 <ul>
-<li data-line="5889" class="code-line">一个进程在当前操作系统的唯一标识</li>
+<li data-line="5890" class="code-line">一个进程在当前操作系统的唯一标识</li>
 </ul>
 </li>
-<li data-line="5890" class="code-line">
-<p data-line="5890" class="code-line"><strong><code>PGID</code></strong></p>
-<ul>
 <li data-line="5891" class="code-line">
-<p data-line="5891" class="code-line">进程组ID，一个进程组下有多个进程，并且仅有一个主进程 ( 父进程 )，它的 <strong><code>PID == PGID</code></strong>，除了主进程，在该进程组下的所有进程都属于主进程的子进程，它们的 <strong><code>PID != PGID</code></strong> <strong><code>PPID == PGID</code></strong></p>
+<p data-line="5891" class="code-line"><strong><code>PGID</code></strong></p>
+<ul>
+<li data-line="5892" class="code-line">
+<p data-line="5892" class="code-line">进程组ID，一个进程组下有多个进程，并且仅有一个主进程 ( 父进程 )，它的 <strong><code>PID == PGID</code></strong>，除了主进程，在该进程组下的所有进程都属于主进程的子进程，它们的 <strong><code>PID != PGID</code></strong> <strong><code>PPID == PGID</code></strong></p>
 </li>
-<li data-line="5893" class="code-line">
-<p data-line="5893" class="code-line">进程组的存在与主进程是否存活无关，进程组中仅有一个 组员进程 存在则意味着进程组存在</p>
+<li data-line="5894" class="code-line">
+<p data-line="5894" class="code-line">进程组的存在与主进程是否存活无关，进程组中仅有一个 组员进程 存在则意味着进程组存在</p>
 </li>
 </ul>
 </li>
-<li data-line="5895" class="code-line">
-<p data-line="5895" class="code-line"><strong><code>SID</code></strong></p>
-<ul>
 <li data-line="5896" class="code-line">
-<p data-line="5896" class="code-line">会话ID，一个会话下有多个进程组，并且仅有一个会长，它的 <strong><code>PID == SID</code></strong>，会长进程拥有一个进程组，并且也作为这个进程组内的主进程，即 <strong><code>PID == PGID</code></strong>，而由会长往下所派生的子进程也纳入至会长进程所在进程组中的子进程，它们的 <strong><code>PID == SID</code></strong> <strong><code>PID != PGID</code></strong> <strong><code>PPID == PGID</code></strong></p>
+<p data-line="5896" class="code-line"><strong><code>SID</code></strong></p>
+<ul>
+<li data-line="5897" class="code-line">
+<p data-line="5897" class="code-line">会话ID，一个会话下有多个进程组，并且仅有一个会长，它的 <strong><code>PID == SID</code></strong>，会长进程拥有一个进程组，并且也作为这个进程组内的主进程，即 <strong><code>PID == PGID</code></strong>，而由会长往下所派生的子进程也纳入至会长进程所在进程组中的子进程，它们的 <strong><code>PID == SID</code></strong> <strong><code>PID != PGID</code></strong> <strong><code>PPID == PGID</code></strong></p>
 </li>
-<li data-line="5898" class="code-line">
-<p data-line="5898" class="code-line">创建一个会话需要依赖于一个进程的存在，即让这个进程提升为一个新的会话的会长，但是需要注意的是，<strong style="color:red">所依赖的进程不能够作为某个进程组的主进程而存在</strong></p>
+<li data-line="5899" class="code-line">
+<p data-line="5899" class="code-line">创建一个会话需要依赖于一个进程的存在，即让这个进程提升为一个新的会话的会长，但是需要注意的是，<strong style="color:red">所依赖的进程不能够作为某个进程组的主进程而存在</strong></p>
 </li>
-<li data-line="5900" class="code-line">
-<p data-line="5900" class="code-line">新创建的会话会丢弃原有的控制终端，会长不依赖于终端，这种特性也通常用于 <a href="#daemondaemon" data-href="#daemondaemon">守护进程</a> 的创建</p>
+<li data-line="5901" class="code-line">
+<p data-line="5901" class="code-line">新创建的会话会丢弃原有的控制终端，会长不依赖于终端，这种特性也通常用于 <a href="#daemondaemon" data-href="#daemondaemon">守护进程</a> 的创建</p>
 </li>
 </ul>
 </li>
-<li data-line="5902" class="code-line">
-<p data-line="5902" class="code-line"><strong><code>TGID</code></strong></p>
+<li data-line="5903" class="code-line">
+<p data-line="5903" class="code-line"><strong><code>TGID</code></strong></p>
 <ul>
-<li data-line="5903" class="code-line">线程组ID，每个进程都能够以当前进程作为主线程并向下衍生出子线程，作为主线程而言，它的 <strong><code>PID == TGID</code></strong>，除了主线程，在该线程组下的所有线程都属于主线程的子线程，他们的 <strong><code>PID != TGID</code></strong></li>
+<li data-line="5904" class="code-line">线程组ID，每个进程都能够以当前进程作为主线程并向下衍生出子线程，作为主线程而言，它的 <strong><code>PID == TGID</code></strong>，除了主线程，在该线程组下的所有线程都属于主线程的子线程，他们的 <strong><code>PID != TGID</code></strong></li>
 </ul>
 </li>
-<li data-line="5905" class="code-line">
-<p data-line="5905" class="code-line"><strong><code>TID</code></strong></p>
-<ul>
 <li data-line="5906" class="code-line">
-<p data-line="5906" class="code-line">线程的ID，由于历史原因，linux 早期的线程实现并未遵循 <strong><code>POSIX</code></strong> 的标准，反观至今的 linux 内核版本所使用的线程实现均遵循了 <strong><code>POSIX</code></strong> ( <strong><code>NPTL</code></strong> ) 的标准，而旧内核的线程实现和至今的线程实现有一点更需要关注的区别则为线程的 <strong><code>&quot;PID&quot;</code></strong>，对于早期并未遵循 <strong><code>POSIX</code></strong> 线程实现标准的内核版本来说，每个线程都具有不同的 <strong><code>PID</code></strong> ( 这和进程的实现一致，至少从这一点来看没错 )，而对于现今遵循了 <strong><code>POSIX</code></strong> ( <strong><code>NPTL</code></strong> ) 标准所实现的线程，上面所述的 <strong><code>&quot;PID&quot;</code></strong> 更应被称之为 <strong><code>TID</code></strong></p>
-</li>
-<li data-line="5908" class="code-line">
-<p data-line="5908" class="code-line"><strong><code>TID</code></strong> : 仅能通过 <a href="#pthread_self" data-href="#pthread_self">pthread_self()</a> 获取，其仅能这个线程在 <strong style="color:red">当前进程内</strong> 的唯一的标识；使用 <strong><code>NPTL</code></strong> 所提供的线程库来完成多线程模型的开发一律都是使用该 <strong><code>TID</code></strong> 作为基准</p>
-</li>
-<li data-line="5910" class="code-line">
-<p data-line="5910" class="code-line"><strong><code>&quot;PID&quot;</code></strong> : 可以通过系统调用 <a href="#gettid_" data-href="#gettid_">gettid()</a> 来获取，但是在标准的 glibc 库中并没有实现对它的封装，故最终还是要通过系统调用 <strong><code>syscall</code></strong> 来获取，其可作为整个这个线程在 <strong style="color:red">整个系统</strong> 中的唯一标识</p>
-</li>
-</ul>
-</li>
-<li data-line="5912" class="code-line">
-<p data-line="5912" class="code-line"><strong><code>PPID</code></strong></p>
+<p data-line="5906" class="code-line"><strong><code>TID</code></strong></p>
 <ul>
-<li data-line="5913" class="code-line">子进程的父进程 <strong><code>PID</code></strong></li>
+<li data-line="5907" class="code-line">
+<p data-line="5907" class="code-line">线程的ID，由于历史原因，linux 早期的线程实现并未遵循 <strong><code>POSIX</code></strong> 的标准，反观至今的 linux 内核版本所使用的线程实现均遵循了 <strong><code>POSIX</code></strong> ( <strong><code>NPTL</code></strong> ) 的标准，而旧内核的线程实现和至今的线程实现有一点更需要关注的区别则为线程的 <strong><code>&quot;PID&quot;</code></strong>，对于早期并未遵循 <strong><code>POSIX</code></strong> 线程实现标准的内核版本来说，每个线程都具有不同的 <strong><code>PID</code></strong> ( 这和进程的实现一致，至少从这一点来看没错 )，而对于现今遵循了 <strong><code>POSIX</code></strong> ( <strong><code>NPTL</code></strong> ) 标准所实现的线程，上面所述的 <strong><code>&quot;PID&quot;</code></strong> 更应被称之为 <strong><code>TID</code></strong></p>
+</li>
+<li data-line="5909" class="code-line">
+<p data-line="5909" class="code-line"><strong><code>TID</code></strong> : 仅能通过 <a href="#pthread_self" data-href="#pthread_self">pthread_self()</a> 获取，其仅能这个线程在 <strong style="color:red">当前进程内</strong> 的唯一的标识；使用 <strong><code>NPTL</code></strong> 所提供的线程库来完成多线程模型的开发一律都是使用该 <strong><code>TID</code></strong> 作为基准</p>
+</li>
+<li data-line="5911" class="code-line">
+<p data-line="5911" class="code-line"><strong><code>&quot;PID&quot;</code></strong> : 可以通过系统调用 <a href="#gettid_" data-href="#gettid_">gettid()</a> 来获取，但是在标准的 glibc 库中并没有实现对它的封装，故最终还是要通过系统调用 <strong><code>syscall</code></strong> 来获取，其可作为整个这个线程在 <strong style="color:red">整个系统</strong> 中的唯一标识</p>
+</li>
+</ul>
+</li>
+<li data-line="5913" class="code-line">
+<p data-line="5913" class="code-line"><strong><code>PPID</code></strong></p>
+<ul>
+<li data-line="5914" class="code-line">子进程的父进程 <strong><code>PID</code></strong></li>
 </ul>
 </li>
 </ul>
-<pre><code data-line="5915" class="code-line language-c"><div>USER VIEW
+<pre><code data-line="5916" class="code-line language-c"><div>USER VIEW
  &lt;-- PID <span class="hljs-number">43</span> --&gt; &lt;----------------- PID <span class="hljs-number">42</span> -----------------&gt;
                      +---------+
                      | process |
@@ -5376,76 +5376,76 @@ B ^ C = A
                      KERNEL VIEW
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%BC%80%E9%94%80"></a><h4 id="%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%BC%80%E9%94%80" data-line="5935" class="code-line">线程与进程的开销</h4>
-<p data-line="5936" class="code-line"><span id="线程与进程的开销"></span></p>
-<p data-line="5938" class="code-line"><em>Creation</em></p>
-<p data-line="5940" class="code-line">不可否认的是，创建一个线程的时间开销的确会比创建一个进程要小，原因是因为线程共享了大部分地址空间的数据，而对于进程来说存在一个较大的问题既是 <strong><code> 地址空间的拷贝</code></strong>，在早期来看，两者之间的差别的确是呈几何倍增长，在 《现代操作系统》 中有一句话谈到</p>
-<blockquote data-line="5942" class="code-line">
-<p data-line="5942" class="code-line">创建一个线程较创建一个进程要快10~100倍</p>
+<a for="toc-anchor" id="%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%BC%80%E9%94%80"></a><h4 id="%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%BC%80%E9%94%80" data-line="5936" class="code-line">线程与进程的开销</h4>
+<p data-line="5937" class="code-line"><span id="线程与进程的开销"></span></p>
+<p data-line="5939" class="code-line"><em>Creation</em></p>
+<p data-line="5941" class="code-line">不可否认的是，创建一个线程的时间开销的确会比创建一个进程要小，原因是因为线程共享了大部分地址空间的数据，而对于进程来说存在一个较大的问题既是 <strong><code> 地址空间的拷贝</code></strong>，在早期来看，两者之间的差别的确是呈几何倍增长，在 《现代操作系统》 中有一句话谈到</p>
+<blockquote data-line="5943" class="code-line">
+<p data-line="5943" class="code-line">创建一个线程较创建一个进程要快10~100倍</p>
 </blockquote>
-<p data-line="5944" class="code-line">针对于进程在创建时，对地址空间的拷贝所消耗的时间拥有 <strong><code>COW</code></strong> 的优化，并且还提供了一系列的池技术的支持，所以，就现在的眼光来看，其实二者之间的区别其实在内核开发者的努力之下已经缩短的非常之小了</p>
-<p data-line="5946" class="code-line">在这个 <a href="https://computing.llnl.gov/tutorials/pthreads/#WhyPthreads" data-href="https://computing.llnl.gov/tutorials/pthreads/#WhyPthreads">网站</a> 中有详细的对比数据，如果除去测试结果中的 销毁时间, Context-switch 的时间，真实的二者创建的时间开销接近于 <strong><code>1 : 1</code></strong></p>
-<p data-line="5948" class="code-line"><em>Context switch</em></p>
-<p data-line="5950" class="code-line">进程的 <strong><code>Context switch</code></strong> 需要分为直接开销和间接开销 :</p>
-<p data-line="5952" class="code-line">对于直接开销来说，它需要经历以下几个过程 ( 其中，刷新 <strong><code>TLB</code></strong> 所导致的 <strong><code>Page Table</code></strong> 的重读，还有 <strong><code>CR3</code></strong> 寄存器的更换是非常消耗时间的过程 )</p>
+<p data-line="5945" class="code-line">针对于进程在创建时，对地址空间的拷贝所消耗的时间拥有 <strong><code>COW</code></strong> 的优化，并且还提供了一系列的池技术的支持，所以，就现在的眼光来看，其实二者之间的区别其实在内核开发者的努力之下已经缩短的非常之小了</p>
+<p data-line="5947" class="code-line">在这个 <a href="https://computing.llnl.gov/tutorials/pthreads/#WhyPthreads" data-href="https://computing.llnl.gov/tutorials/pthreads/#WhyPthreads">网站</a> 中有详细的对比数据，如果除去测试结果中的 销毁时间, Context-switch 的时间，真实的二者创建的时间开销接近于 <strong><code>1 : 1</code></strong></p>
+<p data-line="5949" class="code-line"><em>Context switch</em></p>
+<p data-line="5951" class="code-line">进程的 <strong><code>Context switch</code></strong> 需要分为直接开销和间接开销 :</p>
+<p data-line="5953" class="code-line">对于直接开销来说，它需要经历以下几个过程 ( 其中，刷新 <strong><code>TLB</code></strong> 所导致的 <strong><code>Page Table</code></strong> 的重读，还有 <strong><code>CR3</code></strong> 寄存器的更换是非常消耗时间的过程 )</p>
 <ol>
-<li data-line="5954" class="code-line">切换页表全局目录</li>
-<li data-line="5955" class="code-line">切换内核态堆栈</li>
-<li data-line="5956" class="code-line">切换硬件上下文 ( 进程恢复前，必须装入寄存器的数据统称为硬件上下文 )
+<li data-line="5955" class="code-line">切换页表全局目录</li>
+<li data-line="5956" class="code-line">切换内核态堆栈</li>
+<li data-line="5957" class="code-line">切换硬件上下文 ( 进程恢复前，必须装入寄存器的数据统称为硬件上下文 )
 <ul>
-<li data-line="5957" class="code-line"><strong><code>ip ( instruction pointer )</code></strong> : 指向当前执行指令的下一条指令</li>
-<li data-line="5958" class="code-line"><strong><code>bp ( base pointer )</code></strong> : 用于存放执行中的函数对应的栈帧的栈底地址</li>
-<li data-line="5959" class="code-line"><strong><code>sp ( stack poinger )</code></strong> : 用于存放执行中的函数对应的栈帧的栈顶地址</li>
-<li data-line="5960" class="code-line"><strong><code>CR3</code></strong> : 页目录基址寄存器，保存页目录表的物理地址</li>
-<li data-line="5961" class="code-line">......</li>
+<li data-line="5958" class="code-line"><strong><code>ip ( instruction pointer )</code></strong> : 指向当前执行指令的下一条指令</li>
+<li data-line="5959" class="code-line"><strong><code>bp ( base pointer )</code></strong> : 用于存放执行中的函数对应的栈帧的栈底地址</li>
+<li data-line="5960" class="code-line"><strong><code>sp ( stack poinger )</code></strong> : 用于存放执行中的函数对应的栈帧的栈顶地址</li>
+<li data-line="5961" class="code-line"><strong><code>CR3</code></strong> : 页目录基址寄存器，保存页目录表的物理地址</li>
+<li data-line="5962" class="code-line">......</li>
 </ul>
 </li>
-<li data-line="5962" class="code-line">刷新 <strong><code>TLB</code></strong></li>
-<li data-line="5963" class="code-line">系统调度器的代码执行</li>
+<li data-line="5963" class="code-line">刷新 <strong><code>TLB</code></strong></li>
+<li data-line="5964" class="code-line">系统调度器的代码执行</li>
 </ol>
-<p data-line="5965" class="code-line">而对于间接开销来说，主要指的是虽然切换到一个新进程后，由于各种缓存并不热，速度运行会慢一些；此外如果进程始跨CPU访问的话，之前已经热缓存起来的 <strong><code>TLB</code></strong> ,<strong><code>L1</code></strong>, <strong><code>L2</code></strong>, <strong><code>L3</code></strong> 也因为运行的进程已经变了，所以以局部性原理 cache 起来的代码和数据也都没有用了，导致新进程穿透到内存的 I/O 会变多</p>
-<p data-line="5967" class="code-line">反观线程的 <strong><code>Context switch</code></strong></p>
-<p data-line="5969" class="code-line">虽然对于线程来说其已经和其父线程 ( 进程 ) 已经共享了较多的内核态上的数据，但是为了保证切换后的一致性，故其在进行 <strong><code>Context switch</code></strong> 时同样需要经历页表的切换, 刷新 <strong><code>TLB</code></strong> 还有 <strong><code>CR3</code></strong> 寄存器的更换的过程，所以实际上线程和进程的上下文切换所需的时间开销差别和 <strong><code>Creation</code></strong> 一样，是不大的 ( 线程还是会优于进程一点 ) ，在这片 <a href="https://zhuanlan.zhihu.com/p/79772089" data-href="https://zhuanlan.zhihu.com/p/79772089">文章</a> 中详细的介绍了二者之间的测试结果和测试方式</p>
+<p data-line="5966" class="code-line">而对于间接开销来说，主要指的是虽然切换到一个新进程后，由于各种缓存并不热，速度运行会慢一些；此外如果进程始跨CPU访问的话，之前已经热缓存起来的 <strong><code>TLB</code></strong> ,<strong><code>L1</code></strong>, <strong><code>L2</code></strong>, <strong><code>L3</code></strong> 也因为运行的进程已经变了，所以以局部性原理 cache 起来的代码和数据也都没有用了，导致新进程穿透到内存的 I/O 会变多</p>
+<p data-line="5968" class="code-line">反观线程的 <strong><code>Context switch</code></strong></p>
+<p data-line="5970" class="code-line">虽然对于线程来说其已经和其父线程 ( 进程 ) 已经共享了较多的内核态上的数据，但是为了保证切换后的一致性，故其在进行 <strong><code>Context switch</code></strong> 时同样需要经历页表的切换, 刷新 <strong><code>TLB</code></strong> 还有 <strong><code>CR3</code></strong> 寄存器的更换的过程，所以实际上线程和进程的上下文切换所需的时间开销差别和 <strong><code>Creation</code></strong> 一样，是不大的 ( 线程还是会优于进程一点 ) ，在这片 <a href="https://zhuanlan.zhihu.com/p/79772089" data-href="https://zhuanlan.zhihu.com/p/79772089">文章</a> 中详细的介绍了二者之间的测试结果和测试方式</p>
 <br/>
-<a for="toc-anchor" id="%E9%80%89%E6%8B%A9%E8%BF%9B%E7%A8%8B%E8%BF%98%E6%98%AF%E7%BA%BF%E7%A8%8B%EF%BC%9F"></a><h4 id="%E9%80%89%E6%8B%A9%E8%BF%9B%E7%A8%8B%E8%BF%98%E6%98%AF%E7%BA%BF%E7%A8%8B" data-line="5974" class="code-line">选择进程还是线程？</h4>
-<p data-line="5975" class="code-line"><span id="选择进程还是线程"></span></p>
-<p data-line="5977" class="code-line">实际上，在 linux 中官方其实更推荐的是使用多进程开发模型，具体理由其实在上一节中已经分析过，在 linux 中的线程和进程之间的不管是执行效率而言还是创建效率，相差都是甚微，而相比，进程严格的隔离性也让程序的健壮性更强一点，而对比线程，事实上只在短线程的情况下比进程有显著的性能差异，但非短线程不可的应用场景其实非常有限</p>
-<p data-line="5979" class="code-line">而在 windows 中，我们还是保有之前使用线程的习惯即可，因为 windows 并没有针对线程和进程之间做和 linux 相同的优化措施，对于 windows 中，进程不管是创建也好还是进行 <strong><code>Context switch</code></strong>，二者之间的时间开销是几何倍的差距所呈现的</p>
-<p data-line="5981" class="code-line">在这里，我们不妨捎带的总结下线程和进程在使用时各自的优缺点</p>
+<a for="toc-anchor" id="%E9%80%89%E6%8B%A9%E8%BF%9B%E7%A8%8B%E8%BF%98%E6%98%AF%E7%BA%BF%E7%A8%8B%EF%BC%9F"></a><h4 id="%E9%80%89%E6%8B%A9%E8%BF%9B%E7%A8%8B%E8%BF%98%E6%98%AF%E7%BA%BF%E7%A8%8B" data-line="5975" class="code-line">选择进程还是线程？</h4>
+<p data-line="5976" class="code-line"><span id="选择进程还是线程"></span></p>
+<p data-line="5978" class="code-line">实际上，在 linux 中官方其实更推荐的是使用多进程开发模型，具体理由其实在上一节中已经分析过，在 linux 中的线程和进程之间的不管是执行效率而言还是创建效率，相差都是甚微，而相比，进程严格的隔离性也让程序的健壮性更强一点，而对比线程，事实上只在短线程的情况下比进程有显著的性能差异，但非短线程不可的应用场景其实非常有限</p>
+<p data-line="5980" class="code-line">而在 windows 中，我们还是保有之前使用线程的习惯即可，因为 windows 并没有针对线程和进程之间做和 linux 相同的优化措施，对于 windows 中，进程不管是创建也好还是进行 <strong><code>Context switch</code></strong>，二者之间的时间开销是几何倍的差距所呈现的</p>
+<p data-line="5982" class="code-line">在这里，我们不妨捎带的总结下线程和进程在使用时各自的优缺点</p>
 <ul>
-<li data-line="5983" class="code-line">
-<p data-line="5983" class="code-line">线程</p>
+<li data-line="5984" class="code-line">
+<p data-line="5984" class="code-line">线程</p>
 <ul>
-<li data-line="5984" class="code-line">方便高效的内存共享</li>
-<li data-line="5985" class="code-line">占用内存少，切换简单，CPU利用率高</li>
-<li data-line="5986" class="code-line">创建销毁切换速度更快</li>
+<li data-line="5985" class="code-line">方便高效的内存共享</li>
+<li data-line="5986" class="code-line">占用内存少，切换简单，CPU利用率高</li>
+<li data-line="5987" class="code-line">创建销毁切换速度更快</li>
 </ul>
 </li>
-<li data-line="5988" class="code-line">
-<p data-line="5988" class="code-line">进程</p>
+<li data-line="5989" class="code-line">
+<p data-line="5989" class="code-line">进程</p>
 <ul>
-<li data-line="5989" class="code-line">多进程下的地址空间是不进行共享的，想让数据共享只能使用 IPC</li>
-<li data-line="5990" class="code-line">占用内存多，切换复杂，CPU利用率低</li>
-<li data-line="5991" class="code-line">不同进程之间的地址空间实现了良好的隔离，使程序的健壮性更高</li>
-<li data-line="5992" class="code-line">创建销毁切换速度稍慢</li>
-<li data-line="5993" class="code-line">更好的多核可伸缩性，进程的使用将许多内核资源（如地址空间，页表，打开的文件）隔离，在多核系统上的可伸缩性强于多线程程序</li>
+<li data-line="5990" class="code-line">多进程下的地址空间是不进行共享的，想让数据共享只能使用 IPC</li>
+<li data-line="5991" class="code-line">占用内存多，切换复杂，CPU利用率低</li>
+<li data-line="5992" class="code-line">不同进程之间的地址空间实现了良好的隔离，使程序的健壮性更高</li>
+<li data-line="5993" class="code-line">创建销毁切换速度稍慢</li>
+<li data-line="5994" class="code-line">更好的多核可伸缩性，进程的使用将许多内核资源（如地址空间，页表，打开的文件）隔离，在多核系统上的可伸缩性强于多线程程序</li>
 </ul>
 </li>
 </ul>
 <br/>
-<a for="toc-anchor" id="%E8%BF%9B%E7%A8%8B%E7%9A%84%E4%BD%BF%E7%94%A8"></a><h4 id="%E8%BF%9B%E7%A8%8B%E7%9A%84%E4%BD%BF%E7%94%A8" data-line="5997" class="code-line">进程的使用</h4>
-<p data-line="5998" class="code-line"><span id="进程的使用"></span></p>
-<a for="toc-anchor" id="int-fork()"></a><h4 id="int-fork" data-line="6000" class="code-line">int fork()</h4>
-<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-4" data-line="6001" class="code-line">&lt;unistd.h&gt;</h5>
-<p data-line="6003" class="code-line">创建一个子进程</p>
-<p data-line="6005" class="code-line">当函数的成功调用，则创建出一个子进程，并且由于子进程是从父进程的基础上 <strong><code>clone</code></strong> 出来的，故这时候子进程和父进程各自执行对应地址空间视角的代码段下问</p>
+<a for="toc-anchor" id="%E8%BF%9B%E7%A8%8B%E7%9A%84%E4%BD%BF%E7%94%A8"></a><h4 id="%E8%BF%9B%E7%A8%8B%E7%9A%84%E4%BD%BF%E7%94%A8" data-line="5998" class="code-line">进程的使用</h4>
+<p data-line="5999" class="code-line"><span id="进程的使用"></span></p>
+<a for="toc-anchor" id="int-fork()"></a><h4 id="int-fork" data-line="6001" class="code-line">int fork()</h4>
+<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-4" data-line="6002" class="code-line">&lt;unistd.h&gt;</h5>
+<p data-line="6004" class="code-line">创建一个子进程</p>
+<p data-line="6006" class="code-line">当函数的成功调用，则创建出一个子进程，并且由于子进程是从父进程的基础上 <strong><code>clone</code></strong> 出来的，故这时候子进程和父进程各自执行对应地址空间视角的代码段下问</p>
 <ul>
-<li data-line="6006" class="code-line">在子进程的上下文中，该函数返回 <strong><code>0</code></strong>，然后继续当前代码的下文执行</li>
-<li data-line="6007" class="code-line">在父进程的上下文中，该函数返回 <strong><code>所创建出来的子进程的 PID</code></strong>，然后继续当前代码的下文执行</li>
+<li data-line="6007" class="code-line">在子进程的上下文中，该函数返回 <strong><code>0</code></strong>，然后继续当前代码的下文执行</li>
+<li data-line="6008" class="code-line">在父进程的上下文中，该函数返回 <strong><code>所创建出来的子进程的 PID</code></strong>，然后继续当前代码的下文执行</li>
 </ul>
-<p data-line="6009" class="code-line">当子进程创建失败，则该函数返回 <strong><code>-1</code></strong></p>
-<p data-line="6011" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-06-28-00-23-03.png" alt="" class="loading" id="image-hash--616750029"></p>
-<pre><code data-line="6013" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio&gt;</span></span>
+<p data-line="6010" class="code-line">当子进程创建失败，则该函数返回 <strong><code>-1</code></strong></p>
+<p data-line="6012" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-06-28-00-23-03.png" alt="" class="loading" id="image-hash--616750029"></p>
+<pre><code data-line="6014" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
 
@@ -5465,10 +5465,10 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-getpid()"></a><h4 id="int-getpid" data-line="6036" class="code-line">int getpid()</h4>
-<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-5" data-line="6037" class="code-line">&lt;unistd.h&gt;</h5>
-<p data-line="6039" class="code-line">返回当前上下文所运行的进程的 <strong><code>PID</code></strong></p>
-<pre><code data-line="6041" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio&gt;</span></span>
+<a for="toc-anchor" id="int-getpid()"></a><h4 id="int-getpid" data-line="6037" class="code-line">int getpid()</h4>
+<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-5" data-line="6038" class="code-line">&lt;unistd.h&gt;</h5>
+<p data-line="6040" class="code-line">返回当前上下文所运行的进程的 <strong><code>PID</code></strong></p>
+<pre><code data-line="6042" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
 
@@ -5478,10 +5478,10 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-getppid()"></a><h4 id="int-getppid" data-line="6054" class="code-line">int getppid()</h4>
-<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-6" data-line="6055" class="code-line">&lt;unistd.h&gt;</h5>
-<p data-line="6057" class="code-line">返回当前上下文所运行进程的父进程的 <strong><code>PID</code></strong></p>
-<pre><code data-line="6059" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio&gt;</span></span>
+<a for="toc-anchor" id="int-getppid()"></a><h4 id="int-getppid" data-line="6055" class="code-line">int getppid()</h4>
+<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-6" data-line="6056" class="code-line">&lt;unistd.h&gt;</h5>
+<p data-line="6058" class="code-line">返回当前上下文所运行进程的父进程的 <strong><code>PID</code></strong></p>
+<pre><code data-line="6060" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
 
@@ -5491,15 +5491,15 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-execl-%2F-execlp(const-char-*path%2C-const-char-*arg%2C-...-)"></a><h4 id="int-execl--execlpconst-char-path-const-char-arg" data-line="6072" class="code-line">int execl / execlp(const char *path, const char *arg, ... )</h4>
-<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-7" data-line="6073" class="code-line">&lt;unistd.h&gt;</h5>
-<p data-line="6075" class="code-line">将当前进程的二进制可执行文件替换为 <strong><code>path</code></strong> 所指定的文件，如果成功，则中断当前进程所依赖的旧二进制可执行文件的上下文调用，并依据所录入的命令行参数 <strong><code>arg</code></strong> 和 <strong><code>...</code></strong> 去执行所替换后的可执行文件的入口函数，即开始执行替换后的二进制可执行文件的上下文，如果调用失败，则该函数返回 <strong><code>-1</code></strong></p>
-<p data-line="6077" class="code-line">我们要保证 <strong><code>path</code></strong> 所指定的文件是一个可执行文件，即拥有入口函数的，否则该函数的调用失败</p>
-<p data-line="6079" class="code-line">该函数在调用完成后，当前进程的用户态中的数据将完全的替换至新可执行文件的上下文，并分配新的地址空间，而内核态的大部分信息将得到保留，包括 <strong><code>PCB 进程控制模块</code></strong>, <strong><code>文件描述符表</code></strong> 还有 <strong><code>task_struct</code></strong> 等等</p>
-<p data-line="6081" class="code-line">该函数的最后一个参数一般都设置为 <strong><code>NULL</code></strong></p>
-<p data-line="6083" class="code-line"><strong><code>execl</code></strong> 和 <strong><code>execlp</code></strong> 的功能性是一致的，只是对于 <strong><code>execlp</code></strong> 来说，他对于所指定的 <strong><code>path</code></strong> 会在环境变量所指定的路径中去寻找可执行文件，如果找不到则该函数调用失败，简而言之，<strong><code>execlp</code></strong> 函数会更适合去调用一些 linux 的系统命令</p>
-<p data-line="6085" class="code-line">main.c</p>
-<pre><code data-line="6086" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<a for="toc-anchor" id="int-execl-%2F-execlp(const-char-*path%2C-const-char-*arg%2C-...-)"></a><h4 id="int-execl--execlpconst-char-path-const-char-arg" data-line="6073" class="code-line">int execl / execlp(const char *path, const char *arg, ... )</h4>
+<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-7" data-line="6074" class="code-line">&lt;unistd.h&gt;</h5>
+<p data-line="6076" class="code-line">将当前进程的二进制可执行文件替换为 <strong><code>path</code></strong> 所指定的文件，如果成功，则中断当前进程所依赖的旧二进制可执行文件的上下文调用，并依据所录入的命令行参数 <strong><code>arg</code></strong> 和 <strong><code>...</code></strong> 去执行所替换后的可执行文件的入口函数，即开始执行替换后的二进制可执行文件的上下文，如果调用失败，则该函数返回 <strong><code>-1</code></strong></p>
+<p data-line="6078" class="code-line">我们要保证 <strong><code>path</code></strong> 所指定的文件是一个可执行文件，即拥有入口函数的，否则该函数的调用失败</p>
+<p data-line="6080" class="code-line">该函数在调用完成后，当前进程的用户态中的数据将完全的替换至新可执行文件的上下文，并分配新的地址空间，而内核态的大部分信息将得到保留，包括 <strong><code>PCB 进程控制模块</code></strong>, <strong><code>文件描述符表</code></strong> 还有 <strong><code>task_struct</code></strong> 等等</p>
+<p data-line="6082" class="code-line">该函数的最后一个参数一般都设置为 <strong><code>NULL</code></strong></p>
+<p data-line="6084" class="code-line"><strong><code>execl</code></strong> 和 <strong><code>execlp</code></strong> 的功能性是一致的，只是对于 <strong><code>execlp</code></strong> 来说，他对于所指定的 <strong><code>path</code></strong> 会在环境变量所指定的路径中去寻找可执行文件，如果找不到则该函数调用失败，简而言之，<strong><code>execlp</code></strong> 函数会更适合去调用一些 linux 的系统命令</p>
+<p data-line="6086" class="code-line">main.c</p>
+<pre><code data-line="6087" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -5535,8 +5535,8 @@ B ^ C = A
 }
 
 </div></code></pre>
-<p data-line="6124" class="code-line">test.c</p>
-<pre><code data-line="6125" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<p data-line="6125" class="code-line">test.c</p>
+<pre><code data-line="6126" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -5561,25 +5561,25 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<p data-line="6153" class="code-line"><span id="pid_t_wait"></span></p>
-<a for="toc-anchor" id="pid_t-wait(int-*state)"></a><h4 id="pidt-waitint-state" data-line="6155" class="code-line">pid_t wait(int *state)</h4>
-<a for="toc-anchor" id="%3Cwait.h%3E"></a><h5 id="waith" data-line="6156" class="code-line">&lt;wait.h&gt;</h5>
-<p data-line="6158" class="code-line">阻塞父进程上下文的继续调用，等待当前父进程进程组下的任意子进程的调用结束并回收其所占用的资源，如果函数调用成功，则返回成功回收资源的子进程的 <strong><code>PID</code></strong>，并且通过所指定的参数 <strong><code>state</code></strong> 去标识当前子进程的结束状态，如果调用失败 ( 无子进程 ) ，则函数返回 <strong><code>-1</code></strong></p>
-<p data-line="6160" class="code-line">为什么要进行进程资源的回收？</p>
-<p data-line="6162" class="code-line">当一个进程在进行了退出之后，这个进程就会成为一个 <strong><code>Zombie</code></strong>，即它虽然是一个已经死亡的状态，但是其所占用的部分系统资源 ( 如 : 内核空间的 <strong><code>PCB</code></strong> )，其生命周期仅当它的上级父进程的结束才会真正意义上的消亡，但是对于部分进程来说其运行时是不可能结束的 ( 如后台服务 )，这时候我们就需要显示的对已经成为 <strong><code>Zombie</code></strong> 执行资源回收的工作以避免造成系统资源的浪费</p>
+<p data-line="6154" class="code-line"><span id="pid_t_wait"></span></p>
+<a for="toc-anchor" id="pid_t-wait(int-*state)"></a><h4 id="pidt-waitint-state" data-line="6156" class="code-line">pid_t wait(int *state)</h4>
+<a for="toc-anchor" id="%3Cwait.h%3E"></a><h5 id="waith" data-line="6157" class="code-line">&lt;wait.h&gt;</h5>
+<p data-line="6159" class="code-line">阻塞父进程上下文的继续调用，等待当前父进程进程组下的任意子进程的调用结束并回收其所占用的资源，如果函数调用成功，则返回成功回收资源的子进程的 <strong><code>PID</code></strong>，并且通过所指定的参数 <strong><code>state</code></strong> 去标识当前子进程的结束状态，如果调用失败 ( 无子进程 ) ，则函数返回 <strong><code>-1</code></strong></p>
+<p data-line="6161" class="code-line">为什么要进行进程资源的回收？</p>
+<p data-line="6163" class="code-line">当一个进程在进行了退出之后，这个进程就会成为一个 <strong><code>Zombie</code></strong>，即它虽然是一个已经死亡的状态，但是其所占用的部分系统资源 ( 如 : 内核空间的 <strong><code>PCB</code></strong> )，其生命周期仅当它的上级父进程的结束才会真正意义上的消亡，但是对于部分进程来说其运行时是不可能结束的 ( 如后台服务 )，这时候我们就需要显示的对已经成为 <strong><code>Zombie</code></strong> 执行资源回收的工作以避免造成系统资源的浪费</p>
 <ul>
-<li data-line="6164" class="code-line">
-<p data-line="6164" class="code-line"><strong><code>state</code></strong></p>
-<p data-line="6166" class="code-line">对于函数调用完毕后为 state 所赋的值在未经过任何处理时通常对开发者来说是无用的，标准库中为我们提供了以下宏定义以供 state 的使用</p>
+<li data-line="6165" class="code-line">
+<p data-line="6165" class="code-line"><strong><code>state</code></strong></p>
+<p data-line="6167" class="code-line">对于函数调用完毕后为 state 所赋的值在未经过任何处理时通常对开发者来说是无用的，标准库中为我们提供了以下宏定义以供 state 的使用</p>
 <ul>
-<li data-line="6168" class="code-line"><strong><code>WIFEXITED(status)</code></strong> : 返回非 <strong><code>0</code></strong> 则认为进程是正常结束，否则则认为进程异常结束</li>
-<li data-line="6169" class="code-line"><strong><code>WEXITSTATUS(status)</code></strong> : 获取程序的退出时所返回的结果，即退出状态，异常结束的进程则结果为 <strong><code>0</code></strong></li>
-<li data-line="6170" class="code-line"><strong><code>WIFSIGNALED(status)</code></strong> : 如果进程出现了运行级别的异常，则结果为 <strong><code>1</code></strong>，否则为 <strong><code>0</code></strong></li>
-<li data-line="6171" class="code-line"><strong><code>WTERMSIG(status)</code></strong> : 获取进程终止的 <strong><code>Signal number</code></strong></li>
+<li data-line="6169" class="code-line"><strong><code>WIFEXITED(status)</code></strong> : 返回非 <strong><code>0</code></strong> 则认为进程是正常结束，否则则认为进程异常结束</li>
+<li data-line="6170" class="code-line"><strong><code>WEXITSTATUS(status)</code></strong> : 获取程序的退出时所返回的结果，即退出状态，异常结束的进程则结果为 <strong><code>0</code></strong></li>
+<li data-line="6171" class="code-line"><strong><code>WIFSIGNALED(status)</code></strong> : 如果进程出现了运行级别的异常，则结果为 <strong><code>1</code></strong>，否则为 <strong><code>0</code></strong></li>
+<li data-line="6172" class="code-line"><strong><code>WTERMSIG(status)</code></strong> : 获取进程终止的 <strong><code>Signal number</code></strong></li>
 </ul>
 </li>
 </ul>
-<pre><code data-line="6173" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<pre><code data-line="6174" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;wait.h&gt;</span></span>
 
@@ -5608,34 +5608,34 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="pid_t-waitpid(pid_t-pid%2C-int-*state%2C-in-options)"></a><h4 id="pidt-waitpidpidt-pid-int-state-in-options" data-line="6205" class="code-line">pid_t waitpid(pid_t pid, int *state, in options)</h4>
-<a for="toc-anchor" id="%3Cwait.h%3E"></a><h5 id="waith-1" data-line="6206" class="code-line">&lt;wait.h&gt;</h5>
-<p data-line="6208" class="code-line">该函数与 <a href="#pid_t_wait" data-href="#pid_t_wait">wait</a> 的功能性是一致的，其最终目的还是去释放 <strong><code>Zombie</code></strong> 所占用的资源，只是相较于该函数来说，其提供了更多的选项以供开发人员使用</p>
+<a for="toc-anchor" id="pid_t-waitpid(pid_t-pid%2C-int-*state%2C-in-options)"></a><h4 id="pidt-waitpidpidt-pid-int-state-in-options" data-line="6206" class="code-line">pid_t waitpid(pid_t pid, int *state, in options)</h4>
+<a for="toc-anchor" id="%3Cwait.h%3E"></a><h5 id="waith-1" data-line="6207" class="code-line">&lt;wait.h&gt;</h5>
+<p data-line="6209" class="code-line">该函数与 <a href="#pid_t_wait" data-href="#pid_t_wait">wait</a> 的功能性是一致的，其最终目的还是去释放 <strong><code>Zombie</code></strong> 所占用的资源，只是相较于该函数来说，其提供了更多的选项以供开发人员使用</p>
 <ul>
-<li data-line="6210" class="code-line"><strong><code>pid</code></strong>
+<li data-line="6211" class="code-line"><strong><code>pid</code></strong>
 <ul>
-<li data-line="6211" class="code-line"><strong><code>pid == -1</code></strong> : 处理当前父进程进程组下的任意子进程</li>
-<li data-line="6212" class="code-line"><strong><code>pid &gt; 0</code></strong> : 处理 ID 为 <strong><code>pid</code></strong> 的子进程</li>
-<li data-line="6213" class="code-line"><strong><code>pid == 0</code></strong> : 处理当前父进程进程组下的所有子进程</li>
-<li data-line="6214" class="code-line"><strong><code>pid &lt; -1</code></strong> : 处理进程组 ID 为 <strong><code>pid</code></strong> 绝对值中的任意子进程</li>
+<li data-line="6212" class="code-line"><strong><code>pid == -1</code></strong> : 处理当前父进程进程组下的任意子进程</li>
+<li data-line="6213" class="code-line"><strong><code>pid &gt; 0</code></strong> : 处理 ID 为 <strong><code>pid</code></strong> 的子进程</li>
+<li data-line="6214" class="code-line"><strong><code>pid == 0</code></strong> : 处理当前父进程进程组下的所有子进程</li>
+<li data-line="6215" class="code-line"><strong><code>pid &lt; -1</code></strong> : 处理进程组 ID 为 <strong><code>pid</code></strong> 绝对值中的任意子进程</li>
 </ul>
 </li>
-<li data-line="6215" class="code-line"><strong><code>state</code></strong> : 和<a href="#pid_t_wait" data-href="#pid_t_wait">wait</a> 保持一致</li>
-<li data-line="6216" class="code-line"><strong><code>options</code></strong>
+<li data-line="6216" class="code-line"><strong><code>state</code></strong> : 和<a href="#pid_t_wait" data-href="#pid_t_wait">wait</a> 保持一致</li>
+<li data-line="6217" class="code-line"><strong><code>options</code></strong>
 <ul>
-<li data-line="6217" class="code-line"><strong><code>0</code></strong> : 阻塞式回收子进程资源</li>
-<li data-line="6218" class="code-line"><strong><code>WNOHANG</code></strong> : 非阻塞式回收子进程资源</li>
+<li data-line="6218" class="code-line"><strong><code>0</code></strong> : 阻塞式回收子进程资源</li>
+<li data-line="6219" class="code-line"><strong><code>WNOHANG</code></strong> : 非阻塞式回收子进程资源</li>
 </ul>
 </li>
-<li data-line="6219" class="code-line"><strong><code>return</code></strong>
+<li data-line="6220" class="code-line"><strong><code>return</code></strong>
 <ul>
-<li data-line="6220" class="code-line"><strong><code>pid &gt; 0</code></strong> : 成功回收资源的子进程 <strong><code>PID</code></strong></li>
-<li data-line="6221" class="code-line"><strong><code>pid == 0</code></strong> : 当参数指定为 <strong><code>WNOHANG</code></strong>，返回值为 0 则代表子进程还未结束</li>
-<li data-line="6222" class="code-line"><strong><code>pid == -1</code></strong> : 函数调用失败，即当前进程下无任何子进程资源</li>
+<li data-line="6221" class="code-line"><strong><code>pid &gt; 0</code></strong> : 成功回收资源的子进程 <strong><code>PID</code></strong></li>
+<li data-line="6222" class="code-line"><strong><code>pid == 0</code></strong> : 当参数指定为 <strong><code>WNOHANG</code></strong>，返回值为 0 则代表子进程还未结束</li>
+<li data-line="6223" class="code-line"><strong><code>pid == -1</code></strong> : 函数调用失败，即当前进程下无任何子进程资源</li>
 </ul>
 </li>
 </ul>
-<pre><code data-line="6224" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<pre><code data-line="6225" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;wait.h&gt;</span></span>
@@ -5696,11 +5696,11 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="pid_t-setsid()"></a><h4 id="pidt-setsid" data-line="6288" class="code-line">pid_t setsid()</h4>
-<a for="toc-anchor" id="%3Csys%2Ftypes.h%3E-%3Cunistd.h%3E"></a><h5 id="systypesh-unistdh" data-line="6289" class="code-line">&lt;sys/types.h&gt; &lt;unistd.h&gt;</h5>
-<p data-line="6291" class="code-line">创建一个新的会话，并将当前调用进程提升为所创建会话的会长，同时也能提升为一个进程组的组长，如果成功则返回新建会话的 SID，否则返回 -1</p>
-<p data-line="6293" class="code-line">该函数仅作用与非进程组组长进程，通常用于守护进程的创建</p>
-<pre><code data-line="6295" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<a for="toc-anchor" id="pid_t-setsid()"></a><h4 id="pidt-setsid" data-line="6289" class="code-line">pid_t setsid()</h4>
+<a for="toc-anchor" id="%3Csys%2Ftypes.h%3E-%3Cunistd.h%3E"></a><h5 id="systypesh-unistdh" data-line="6290" class="code-line">&lt;sys/types.h&gt; &lt;unistd.h&gt;</h5>
+<p data-line="6292" class="code-line">创建一个新的会话，并将当前调用进程提升为所创建会话的会长，同时也能提升为一个进程组的组长，如果成功则返回新建会话的 SID，否则返回 -1</p>
+<p data-line="6294" class="code-line">该函数仅作用与非进程组组长进程，通常用于守护进程的创建</p>
+<pre><code data-line="6296" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -5734,29 +5734,29 @@ B ^ C = A
 
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%BD%BF%E7%94%A8"></a><h4 id="%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%BD%BF%E7%94%A8" data-line="6332" class="code-line">线程的使用</h4>
-<p data-line="6333" class="code-line"><span id="线程的使用"></span></p>
-<a for="toc-anchor" id="int-pthread_create(pthread_t-*thread%2C--const-pthread_attr_t-*attr%2C-void-*(*start_routine)-(void-*)-%2Cvoid-*arg)"></a><h4 id="int-pthreadcreatepthreadt-thread-const-pthreadattrt-attr-void-startroutine-void--void-arg" data-line="6335" class="code-line">int pthread_create(pthread_t *thread,  const pthread_attr_t *attr, void *(*start_routine) (void *) ,void *arg)</h4>
-<a for="toc-anchor" id="%3Cpthread.h%3E"></a><h5 id="pthreadh" data-line="6337" class="code-line">&lt;pthread.h&gt;</h5>
-<p data-line="6339" class="code-line">创建一个新的线程，并开始执行函数指针 <strong><code>start_routine</code></strong> 的上下文，如果成功，则返回 <strong><code>0</code></strong> 并且返回所创建线程的 <strong><code>TID</code></strong> 至指针 <strong><code>thread</code></strong> 中，如果调用失败，则返回对应的 <strong><code>错误码</code></strong> ( 需要通过 <strong><code>strerror</code></strong> 把该错误码转换成有效的输出信息 )</p>
+<a for="toc-anchor" id="%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%BD%BF%E7%94%A8"></a><h4 id="%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%BD%BF%E7%94%A8" data-line="6333" class="code-line">线程的使用</h4>
+<p data-line="6334" class="code-line"><span id="线程的使用"></span></p>
+<a for="toc-anchor" id="int-pthread_create(pthread_t-*thread%2C--const-pthread_attr_t-*attr%2C-void-*(*start_routine)-(void-*)-%2Cvoid-*arg)"></a><h4 id="int-pthreadcreatepthreadt-thread-const-pthreadattrt-attr-void-startroutine-void--void-arg" data-line="6336" class="code-line">int pthread_create(pthread_t *thread,  const pthread_attr_t *attr, void *(*start_routine) (void *) ,void *arg)</h4>
+<a for="toc-anchor" id="%3Cpthread.h%3E"></a><h5 id="pthreadh" data-line="6338" class="code-line">&lt;pthread.h&gt;</h5>
+<p data-line="6340" class="code-line">创建一个新的线程，并开始执行函数指针 <strong><code>start_routine</code></strong> 的上下文，如果成功，则返回 <strong><code>0</code></strong> 并且返回所创建线程的 <strong><code>TID</code></strong> 至指针 <strong><code>thread</code></strong> 中，如果调用失败，则返回对应的 <strong><code>错误码</code></strong> ( 需要通过 <strong><code>strerror</code></strong> 把该错误码转换成有效的输出信息 )</p>
 <ul>
-<li data-line="6341" class="code-line">
-<p data-line="6341" class="code-line"><strong><code>thread</code></strong> : 创建成功后所返回线程的 <strong><code>TID</code></strong></p>
+<li data-line="6342" class="code-line">
+<p data-line="6342" class="code-line"><strong><code>thread</code></strong> : 创建成功后所返回线程的 <strong><code>TID</code></strong></p>
 </li>
-<li data-line="6343" class="code-line">
-<p data-line="6343" class="code-line"><strong><code>attr</code></strong> : 指定所创建线程的一些属性，如果为 <strong><code>NULL</code></strong>，则采用默认属性来对线程进行构造</p>
+<li data-line="6344" class="code-line">
+<p data-line="6344" class="code-line"><strong><code>attr</code></strong> : 指定所创建线程的一些属性，如果为 <strong><code>NULL</code></strong>，则采用默认属性来对线程进行构造</p>
 </li>
-<li data-line="6345" class="code-line">
-<p data-line="6345" class="code-line"><strong><code>start_routine</code></strong> : 一个函数指针，用于指定线程所执行的上下文</p>
+<li data-line="6346" class="code-line">
+<p data-line="6346" class="code-line"><strong><code>start_routine</code></strong> : 一个函数指针，用于指定线程所执行的上下文</p>
 <ul>
-<li data-line="6347" class="code-line">需要注意的是，该函数的返回值所指向的内存单元要不为 <strong><code>NULL</code></strong>，要不为 <strong><code>malloc</code></strong> 所分配亦或者全局变量，它不能指向任意一个属于当前函数上下文的栈中所分配的内存单元</li>
+<li data-line="6348" class="code-line">需要注意的是，该函数的返回值所指向的内存单元要不为 <strong><code>NULL</code></strong>，要不为 <strong><code>malloc</code></strong> 所分配亦或者全局变量，它不能指向任意一个属于当前函数上下文的栈中所分配的内存单元</li>
 </ul>
 </li>
-<li data-line="6349" class="code-line">
-<p data-line="6349" class="code-line"><strong><code>arg</code></strong> : 传递至 <strong><code>start_routine</code></strong> 的实参</p>
+<li data-line="6350" class="code-line">
+<p data-line="6350" class="code-line"><strong><code>arg</code></strong> : 传递至 <strong><code>start_routine</code></strong> 的实参</p>
 </li>
 </ul>
-<pre><code data-line="6351" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<pre><code data-line="6352" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdbool.h&gt;</span></span>
@@ -5797,19 +5797,19 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<p data-line="6395" class="code-line"><span id = "pthread_exit"></span></p>
-<a for="toc-anchor" id="int-pthread_exit(void-*retval)"></a><h4 id="int-pthreadexitvoid-retval" data-line="6397" class="code-line">int pthread_exit(void *retval)</h4>
-<a for="toc-anchor" id="%3Cpthread.h%3E"></a><h5 id="pthreadh-1" data-line="6398" class="code-line">&lt;pthread.h&gt;</h5>
-<p data-line="6400" class="code-line">退出当前调用者线程的执行，需要注意的是，在使用 <strong><code>NPTL</code></strong> 所提供的库去实现多线程开发模型时，任意一个线程调用了 <strong><code>exit</code></strong> ( 亦或者等同于父级进程在 <strong><code>main</code></strong> 函数中的 <strong><code>return</code></strong>，这也是属于 <strong><code>exit</code></strong> 的调用 ) 都会导致其同组 <strong><code>TGID</code></strong> 下的所有进程的退出 ( 其中也包括了构造出这些子级线程的父级进程，即 <strong><code>TGID == PID</code></strong>  ) 但是使用 <strong><code>pthread_exit</code></strong> 进行线程的退出是安全且可控的</p>
-<p data-line="6402" class="code-line">如果父级线程其往下所派生的子级线程还处于正在运行的状态，则 <strong style="color:red">父级线程在调用 <strong><code>pthread_exit</code></strong> 退出后并不会阻断其子集线程的执行，但是由于子线程的运行需要依赖于父进程的地址空间，故这时候父级线程并不会也不能够真正的退出 ( 处于僵尸进程的状态 ) ，仅当当前父级进程下的所有子级线程执行完毕后，父级线程才真正被释放</strong></p>
-<p data-line="6404" class="code-line">一个使用了默认构造参数 ( 非分离 ) 的线程即便是使用了 <strong><code>pthread_exit</code></strong> 完成了一次安全且正确的退出后，该线程所占用的系统资源其实还并未真正的完全释放，仅当某个线程对该线程进行了一次 <strong><code>pthread_join</code></strong> 才能保证其资源的全部释放；关于这一点的确适合进程有点相似，但不同的是，进程在这种状态之下我们是可以人为观测到的 ( <strong><code>ps</code></strong>、<strong><code>htop</code></strong> )，而对于线程来说，虽然开发人员无法直观的观测到这种状态之下的线程但并不意味着它就并不存在，相关的更多信息请点击 <a href="#pthread_join" data-href="#pthread_join">这里</a></p>
+<p data-line="6396" class="code-line"><span id = "pthread_exit"></span></p>
+<a for="toc-anchor" id="int-pthread_exit(void-*retval)"></a><h4 id="int-pthreadexitvoid-retval" data-line="6398" class="code-line">int pthread_exit(void *retval)</h4>
+<a for="toc-anchor" id="%3Cpthread.h%3E"></a><h5 id="pthreadh-1" data-line="6399" class="code-line">&lt;pthread.h&gt;</h5>
+<p data-line="6401" class="code-line">退出当前调用者线程的执行，需要注意的是，在使用 <strong><code>NPTL</code></strong> 所提供的库去实现多线程开发模型时，任意一个线程调用了 <strong><code>exit</code></strong> ( 亦或者等同于父级进程在 <strong><code>main</code></strong> 函数中的 <strong><code>return</code></strong>，这也是属于 <strong><code>exit</code></strong> 的调用 ) 都会导致其同组 <strong><code>TGID</code></strong> 下的所有进程的退出 ( 其中也包括了构造出这些子级线程的父级进程，即 <strong><code>TGID == PID</code></strong>  ) 但是使用 <strong><code>pthread_exit</code></strong> 进行线程的退出是安全且可控的</p>
+<p data-line="6403" class="code-line">如果父级线程其往下所派生的子级线程还处于正在运行的状态，则 <strong style="color:red">父级线程在调用 <strong><code>pthread_exit</code></strong> 退出后并不会阻断其子集线程的执行，但是由于子线程的运行需要依赖于父进程的地址空间，故这时候父级线程并不会也不能够真正的退出 ( 处于僵尸进程的状态 ) ，仅当当前父级进程下的所有子级线程执行完毕后，父级线程才真正被释放</strong></p>
+<p data-line="6405" class="code-line">一个使用了默认构造参数 ( 非分离 ) 的线程即便是使用了 <strong><code>pthread_exit</code></strong> 完成了一次安全且正确的退出后，该线程所占用的系统资源其实还并未真正的完全释放，仅当某个线程对该线程进行了一次 <strong><code>pthread_join</code></strong> 才能保证其资源的全部释放；关于这一点的确适合进程有点相似，但不同的是，进程在这种状态之下我们是可以人为观测到的 ( <strong><code>ps</code></strong>、<strong><code>htop</code></strong> )，而对于线程来说，虽然开发人员无法直观的观测到这种状态之下的线程但并不意味着它就并不存在，相关的更多信息请点击 <a href="#pthread_join" data-href="#pthread_join">这里</a></p>
 <ul>
-<li data-line="6406" class="code-line">
-<p data-line="6406" class="code-line"><strong><code>retval</code></strong> : 表示当前线程所退出的状态，通常指定为 <strong><code>NULL</code></strong></p>
-<p data-line="6408" class="code-line">需要注意的是，该参数所指向的内存单元要不为 <strong><code>NULL</code></strong>，要不为 <strong><code>malloc</code></strong> 所分配亦或者全局变量，它不能指向任意一个属于当前函数上下文的栈中所分配的内存单元</p>
+<li data-line="6407" class="code-line">
+<p data-line="6407" class="code-line"><strong><code>retval</code></strong> : 表示当前线程所退出的状态，通常指定为 <strong><code>NULL</code></strong></p>
+<p data-line="6409" class="code-line">需要注意的是，该参数所指向的内存单元要不为 <strong><code>NULL</code></strong>，要不为 <strong><code>malloc</code></strong> 所分配亦或者全局变量，它不能指向任意一个属于当前函数上下文的栈中所分配的内存单元</p>
 </li>
 </ul>
-<pre><code data-line="6410" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<pre><code data-line="6411" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -5844,11 +5844,11 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<p data-line="6448" class="code-line"><span id = "pthread_self"></span></p>
-<a for="toc-anchor" id="pthread_t-pthread_self()"></a><h4 id="pthreadt-pthreadself" data-line="6450" class="code-line">pthread_t pthread_self()</h4>
-<a for="toc-anchor" id="%3Cpthread.h%3E"></a><h5 id="pthreadh-2" data-line="6451" class="code-line">&lt;pthread.h&gt;</h5>
-<p data-line="6453" class="code-line">获取当前线程的 <strong><code>TID</code></strong></p>
-<pre><code data-line="6455" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<p data-line="6449" class="code-line"><span id = "pthread_self"></span></p>
+<a for="toc-anchor" id="pthread_t-pthread_self()"></a><h4 id="pthreadt-pthreadself" data-line="6451" class="code-line">pthread_t pthread_self()</h4>
+<a for="toc-anchor" id="%3Cpthread.h%3E"></a><h5 id="pthreadh-2" data-line="6452" class="code-line">&lt;pthread.h&gt;</h5>
+<p data-line="6454" class="code-line">获取当前线程的 <strong><code>TID</code></strong></p>
+<pre><code data-line="6456" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -5883,11 +5883,11 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<p data-line="6493" class="code-line"><span id = "gettid_"></span></p>
-<a for="toc-anchor" id="int-gettid()"></a><h4 id="int-gettid" data-line="6495" class="code-line">int gettid()</h4>
-<a for="toc-anchor" id="%3Csys%2Fsyscall.h%3E-%3Csys%2Ftypes.h%3E"></a><h5 id="syssyscallh-systypesh" data-line="6496" class="code-line">&lt;sys/syscall.h&gt; &lt;sys/types.h&gt;</h5>
-<p data-line="6498" class="code-line">获取当前线程的 <a href="#%E5%86%8D%E8%81%8A-pid-pgid-tgid" data-href="#%E5%86%8D%E8%81%8A-pid-pgid-tgid">&quot;PID&quot;</a>，事实上，<strong><code>glibc</code></strong> 库中并没有实现对于 <strong><code>gettid</code></strong> 的封装，故其调用最终还需要通过 <strong><code>syscall</code></strong> 来执行</p>
-<pre><code data-line="6500" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<p data-line="6494" class="code-line"><span id = "gettid_"></span></p>
+<a for="toc-anchor" id="int-gettid()"></a><h4 id="int-gettid" data-line="6496" class="code-line">int gettid()</h4>
+<a for="toc-anchor" id="%3Csys%2Fsyscall.h%3E-%3Csys%2Ftypes.h%3E"></a><h5 id="syssyscallh-systypesh" data-line="6497" class="code-line">&lt;sys/syscall.h&gt; &lt;sys/types.h&gt;</h5>
+<p data-line="6499" class="code-line">获取当前线程的 <a href="#%E5%86%8D%E8%81%8A-pid-pgid-tgid" data-href="#%E5%86%8D%E8%81%8A-pid-pgid-tgid">&quot;PID&quot;</a>，事实上，<strong><code>glibc</code></strong> 库中并没有实现对于 <strong><code>gettid</code></strong> 的封装，故其调用最终还需要通过 <strong><code>syscall</code></strong> 来执行</p>
+<pre><code data-line="6501" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -5925,16 +5925,16 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<p data-line="6541" class="code-line"><span id = "pthread_join"></span></p>
-<a for="toc-anchor" id="int-pthread_join(pthread_t-thread%2C-void-**retval)"></a><h4 id="int-pthreadjoinpthreadt-thread-void-retval" data-line="6543" class="code-line">int pthread_join(pthread_t thread, void **retval)</h4>
-<a for="toc-anchor" id="%3Cpthread.h%3E"></a><h5 id="pthreadh-3" data-line="6545" class="code-line">&lt;pthread.h&gt;</h5>
-<p data-line="6547" class="code-line">等待指定线程 <strong><code>thread</code></strong> 的退出并回收其所占用的系统资源，如果调用成功则返回 <strong><code>0</code></strong> 并将线程的退出状态写入至二级指针 <strong><code>retval</code></strong> 所指向的内存块中，如果调用失败，则返回对应的 <strong><code>错误码</code></strong> ( 需要通过 <strong><code>strerror</code></strong> 把该错误码转换成有效的输出信息 )</p>
-<p data-line="6549" class="code-line">一个线程即便是通过了正常途径  ( <strong><code>return</code></strong> 或者 <strong><code>pthread_exit</code></strong> ) 退出后，其还是会保留一小部分资源在内核当中，它类似于僵尸进程，亦或者我们可以称之为 <strong style="color:red">&quot;僵尸线程&quot;</strong> ( 事实上 &quot;僵尸线程&quot; 并未真正的在内核中定义，但是实际上其确实是存在的 )，<strong style="color:red">仅当其父级线程的 真正终止 亦或者 由 <strong><code>pthread_join</code></strong> 所回收，这个 &quot;僵尸线程&quot; 所占有的资源才真正的被完全回收</strong>；<strong style="color:red">在多线程开发模型中，我们应当避免 &quot;僵尸线程&quot; 的产生，当一个应用程序积累了足够多的僵尸线程后，将可能不再保有创建新线程的权限</strong></p>
+<p data-line="6542" class="code-line"><span id = "pthread_join"></span></p>
+<a for="toc-anchor" id="int-pthread_join(pthread_t-thread%2C-void-**retval)"></a><h4 id="int-pthreadjoinpthreadt-thread-void-retval" data-line="6544" class="code-line">int pthread_join(pthread_t thread, void **retval)</h4>
+<a for="toc-anchor" id="%3Cpthread.h%3E"></a><h5 id="pthreadh-3" data-line="6546" class="code-line">&lt;pthread.h&gt;</h5>
+<p data-line="6548" class="code-line">等待指定线程 <strong><code>thread</code></strong> 的退出并回收其所占用的系统资源，如果调用成功则返回 <strong><code>0</code></strong> 并将线程的退出状态写入至二级指针 <strong><code>retval</code></strong> 所指向的内存块中，如果调用失败，则返回对应的 <strong><code>错误码</code></strong> ( 需要通过 <strong><code>strerror</code></strong> 把该错误码转换成有效的输出信息 )</p>
+<p data-line="6550" class="code-line">一个线程即便是通过了正常途径  ( <strong><code>return</code></strong> 或者 <strong><code>pthread_exit</code></strong> ) 退出后，其还是会保留一小部分资源在内核当中，它类似于僵尸进程，亦或者我们可以称之为 <strong style="color:red">&quot;僵尸线程&quot;</strong> ( 事实上 &quot;僵尸线程&quot; 并未真正的在内核中定义，但是实际上其确实是存在的 )，<strong style="color:red">仅当其父级线程的 真正终止 亦或者 由 <strong><code>pthread_join</code></strong> 所回收，这个 &quot;僵尸线程&quot; 所占有的资源才真正的被完全回收</strong>；<strong style="color:red">在多线程开发模型中，我们应当避免 &quot;僵尸线程&quot; 的产生，当一个应用程序积累了足够多的僵尸线程后，将可能不再保有创建新线程的权限</strong></p>
 <ul>
-<li data-line="6551" class="code-line"><strong><code>thread</code></strong> : 指定等待线程的 <strong><code>TID</code></strong></li>
-<li data-line="6552" class="code-line"><strong><code>retval</code></strong> : 用于存储线程退出状态的二级指针，其赋值通常由所等待线程执行函数的返回值亦或者 <a href="#pthread_exit" data-href="#pthread_exit">pthread_exit</a> 的形参来指定</li>
+<li data-line="6552" class="code-line"><strong><code>thread</code></strong> : 指定等待线程的 <strong><code>TID</code></strong></li>
+<li data-line="6553" class="code-line"><strong><code>retval</code></strong> : 用于存储线程退出状态的二级指针，其赋值通常由所等待线程执行函数的返回值亦或者 <a href="#pthread_exit" data-href="#pthread_exit">pthread_exit</a> 的形参来指定</li>
 </ul>
-<pre><code data-line="6554" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<pre><code data-line="6555" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -5968,15 +5968,15 @@ B ^ C = A
 
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-pthread_detach(pthread_t-thread)"></a><h4 id="int-pthreaddetachpthreadt-thread" data-line="6591" class="code-line">int pthread_detach(pthread_t thread)</h4>
-<a for="toc-anchor" id="%3Cpthread.h%3E"></a><h5 id="pthreadh-4" data-line="6592" class="code-line">&lt;pthread.h&gt;</h5>
-<p data-line="6594" class="code-line">设定指定线程 <strong><code>thread</code></strong> 为分离状态，如果成功，则返回 <strong><code>0</code></strong>，如果调用失败，则返回对应的 <strong><code>错误码</code></strong> ( 需要通过 <strong><code>strerror</code></strong> 把该错误码转换成有效的输出信息 )</p>
-<p data-line="6596" class="code-line">当一个线程被置为分离，那么当其在终止后其所占用的资源就会自动由内核所完全回收，即不再需要依赖于父级进程的终止亦或者 <strong><code>pthread_join</code></strong> 的调用</p>
-<p data-line="6598" class="code-line">当一个线程被设置为分离状态后，任意线程针对于当前线程的 <strong><code>pthread_join</code></strong> 都会立即返回错误号为 <strong><code>EINVAL</code></strong> 的错误信息，我们可以理解为 <strong>detach</strong> 即已经不需要依赖于其他线程，但并不意味着该线程真正的不被其他线程所影响；事实上，<strong style="color:red">分离状态仅仅指定了该线程在终止时，操作系统所给予的控制行为 ( 自动回收其所占用的所有资源 )</strong>，一个线程组内的任意线程的 <strong><code>exit</code></strong> ( 亦或者等同于主线程在 <strong><code>main</code></strong> 函数中的 <strong><code>return</code></strong> ) 任然会导致分离状态线程的终止</p>
+<a for="toc-anchor" id="int-pthread_detach(pthread_t-thread)"></a><h4 id="int-pthreaddetachpthreadt-thread" data-line="6592" class="code-line">int pthread_detach(pthread_t thread)</h4>
+<a for="toc-anchor" id="%3Cpthread.h%3E"></a><h5 id="pthreadh-4" data-line="6593" class="code-line">&lt;pthread.h&gt;</h5>
+<p data-line="6595" class="code-line">设定指定线程 <strong><code>thread</code></strong> 为分离状态，如果成功，则返回 <strong><code>0</code></strong>，如果调用失败，则返回对应的 <strong><code>错误码</code></strong> ( 需要通过 <strong><code>strerror</code></strong> 把该错误码转换成有效的输出信息 )</p>
+<p data-line="6597" class="code-line">当一个线程被置为分离，那么当其在终止后其所占用的资源就会自动由内核所完全回收，即不再需要依赖于父级进程的终止亦或者 <strong><code>pthread_join</code></strong> 的调用</p>
+<p data-line="6599" class="code-line">当一个线程被设置为分离状态后，任意线程针对于当前线程的 <strong><code>pthread_join</code></strong> 都会立即返回错误号为 <strong><code>EINVAL</code></strong> 的错误信息，我们可以理解为 <strong>detach</strong> 即已经不需要依赖于其他线程，但并不意味着该线程真正的不被其他线程所影响；事实上，<strong style="color:red">分离状态仅仅指定了该线程在终止时，操作系统所给予的控制行为 ( 自动回收其所占用的所有资源 )</strong>，一个线程组内的任意线程的 <strong><code>exit</code></strong> ( 亦或者等同于主线程在 <strong><code>main</code></strong> 函数中的 <strong><code>return</code></strong> ) 任然会导致分离状态线程的终止</p>
 <ul>
-<li data-line="6600" class="code-line"><strong><code>thread</code></strong> : 分离线程的 <strong><code>TID</code></strong></li>
+<li data-line="6601" class="code-line"><strong><code>thread</code></strong> : 分离线程的 <strong><code>TID</code></strong></li>
 </ul>
-<pre><code data-line="6602" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<pre><code data-line="6603" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -6016,14 +6016,14 @@ B ^ C = A
 
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-pthread_cancel(pthread_t-thread)"></a><h4 id="int-pthreadcancelpthreadt-thread" data-line="6645" class="code-line">int pthread_cancel(pthread_t thread)</h4>
-<a for="toc-anchor" id="%3Cpthread.h%3E"></a><h5 id="pthreadh-5" data-line="6646" class="code-line">&lt;pthread.h&gt;</h5>
-<p data-line="6648" class="code-line">杀死、取消线程 <strong><code>thread</code></strong> 的继续运行，如果成功，则返回 <strong><code>0</code></strong>，如果调用失败，则返回对应的 <strong><code>错误码</code></strong> ( 需要通过 <strong><code>strerror</code></strong> 把该错误码转换成有效的输出信息 )</p>
-<p data-line="6650" class="code-line">需要注意的是，线程的取消工作并不是立即执行的，而是要保证线程在运行至某个状态下才能够完成取消工作，关于这个状态，其通常由一些系统调用来进行检查，诸如 <strong><code>create</code></strong>、<strong><code>open</code></strong>、<strong><code>write</code></strong>、<strong><code>……</code></strong>，关于详情可以点击 <a href="http://man.he.net/?topic=pthreads&amp;section=7" data-href="http://man.he.net/?topic=pthreads&amp;section=7">这里</a>，但是我们可以初略地认为，这个状态则为从用户态切换到内核态的时刻</p>
+<a for="toc-anchor" id="int-pthread_cancel(pthread_t-thread)"></a><h4 id="int-pthreadcancelpthreadt-thread" data-line="6646" class="code-line">int pthread_cancel(pthread_t thread)</h4>
+<a for="toc-anchor" id="%3Cpthread.h%3E"></a><h5 id="pthreadh-5" data-line="6647" class="code-line">&lt;pthread.h&gt;</h5>
+<p data-line="6649" class="code-line">杀死、取消线程 <strong><code>thread</code></strong> 的继续运行，如果成功，则返回 <strong><code>0</code></strong>，如果调用失败，则返回对应的 <strong><code>错误码</code></strong> ( 需要通过 <strong><code>strerror</code></strong> 把该错误码转换成有效的输出信息 )</p>
+<p data-line="6651" class="code-line">需要注意的是，线程的取消工作并不是立即执行的，而是要保证线程在运行至某个状态下才能够完成取消工作，关于这个状态，其通常由一些系统调用来进行检查，诸如 <strong><code>create</code></strong>、<strong><code>open</code></strong>、<strong><code>write</code></strong>、<strong><code>……</code></strong>，关于详情可以点击 <a href="http://man.he.net/?topic=pthreads&amp;section=7" data-href="http://man.he.net/?topic=pthreads&amp;section=7">这里</a>，但是我们可以初略地认为，这个状态则为从用户态切换到内核态的时刻</p>
 <ul>
-<li data-line="6652" class="code-line"><strong><code>thread</code></strong> : 指定取消线程的 <strong><code>TID</code></strong></li>
+<li data-line="6653" class="code-line"><strong><code>thread</code></strong> : 指定取消线程的 <strong><code>TID</code></strong></li>
 </ul>
-<pre><code data-line="6654" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<pre><code data-line="6655" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -6063,10 +6063,10 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-pthread_equal(pthread_t-t1%2C-pthread_t-t2)"></a><h4 id="int-pthreadequalpthreadt-t1-pthreadt-t2" data-line="6697" class="code-line">int pthread_equal(pthread_t t1, pthread_t t2)</h4>
-<a for="toc-anchor" id="%3Cpthread.h%3E"></a><h5 id="pthreadh-6" data-line="6698" class="code-line">&lt;pthread.h&gt;</h5>
-<p data-line="6700" class="code-line">比较两个线程的 TID <strong><code>t1</code></strong>  <strong><code>t2</code></strong> 是否相等，如果相等则返回 <strong><code>1</code></strong> 否则返回 <strong><code>0</code></strong></p>
-<pre><code data-line="6702" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<a for="toc-anchor" id="int-pthread_equal(pthread_t-t1%2C-pthread_t-t2)"></a><h4 id="int-pthreadequalpthreadt-t1-pthreadt-t2" data-line="6698" class="code-line">int pthread_equal(pthread_t t1, pthread_t t2)</h4>
+<a for="toc-anchor" id="%3Cpthread.h%3E"></a><h5 id="pthreadh-6" data-line="6699" class="code-line">&lt;pthread.h&gt;</h5>
+<p data-line="6701" class="code-line">比较两个线程的 TID <strong><code>t1</code></strong>  <strong><code>t2</code></strong> 是否相等，如果相等则返回 <strong><code>1</code></strong> 否则返回 <strong><code>0</code></strong></p>
+<pre><code data-line="6703" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -6085,45 +6085,45 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="ipc-(-interprocess-communication-)"></a><h3 id="ipc--interprocess-communication" data-line="6724" class="code-line">IPC ( InterProcess Communication )</h3>
-<p data-line="6725" class="code-line"><span id="IPC"></span></p>
+<a for="toc-anchor" id="ipc-(-interprocess-communication-)"></a><h3 id="ipc--interprocess-communication" data-line="6725" class="code-line">IPC ( InterProcess Communication )</h3>
+<p data-line="6726" class="code-line"><span id="IPC"></span></p>
 <hr>
-<p data-line="6729" class="code-line">linux 中的进程其地址空间都是相互独立的，每个进程各自有不同的用户地址空间，虽然子进程的创建 clone 于父进程，但他们之间的地址空也仅仅只是一个相同却不共享的关系，所以，进程于进程之间则需要拥有一个可靠的方式去进行数据的传输，而这种进程与进程之间的数据传输的可靠方案我们称之为 <strong><code>IPC</code></strong> ( InterProcess Communication )，即进程间通信</p>
-<p data-line="6731" class="code-line">进程间通信并不是指一种单一的方案，而是多种不同方案的组成，它们都统称为进程间通信技术，但不可否认的是，任何一种方案都需要依赖于内核去完成进程与进程之间的数据传输，即在内核中开辟出一块缓冲区，需要传输数据的进程则往这块缓冲区中写入数据，而需要读取数据的进程则往这块缓冲区中取出数据，二者需要保证一方读一方写的单一职责性去完成本次进程间的数据传输</p>
-<p data-line="6733" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-07-03-14-59-37.png" alt="" class="loading" id="image-hash--1685393384"></p>
+<p data-line="6730" class="code-line">linux 中的进程其地址空间都是相互独立的，每个进程各自有不同的用户地址空间，虽然子进程的创建 clone 于父进程，但他们之间的地址空也仅仅只是一个相同却不共享的关系，所以，进程于进程之间则需要拥有一个可靠的方式去进行数据的传输，而这种进程与进程之间的数据传输的可靠方案我们称之为 <strong><code>IPC</code></strong> ( InterProcess Communication )，即进程间通信</p>
+<p data-line="6732" class="code-line">进程间通信并不是指一种单一的方案，而是多种不同方案的组成，它们都统称为进程间通信技术，但不可否认的是，任何一种方案都需要依赖于内核去完成进程与进程之间的数据传输，即在内核中开辟出一块缓冲区，需要传输数据的进程则往这块缓冲区中写入数据，而需要读取数据的进程则往这块缓冲区中取出数据，二者需要保证一方读一方写的单一职责性去完成本次进程间的数据传输</p>
+<p data-line="6734" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-07-03-14-59-37.png" alt="" class="loading" id="image-hash--1685393384"></p>
 <br/>
-<a for="toc-anchor" id="%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E7%9A%84%E7%A7%8D%E7%B1%BB"></a><h4 id="%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E7%9A%84%E7%A7%8D%E7%B1%BB" data-line="6738" class="code-line">进程间通信的种类</h4>
-<p data-line="6739" class="code-line"><span id="进程间通信的种类"></span></p>
-<p data-line="6741" class="code-line">进程间通信需要依赖于操作系统所提供特殊的方法，如 : 普通文件, 管道, 信号, 共享内存, 消息队列, 套接字, 命名管道等等，但随着计算机的蓬勃发展，一些方法由于自身设计缺陷被淘汰或者弃用，现今常用的进程间通信方式有</p>
+<a for="toc-anchor" id="%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E7%9A%84%E7%A7%8D%E7%B1%BB"></a><h4 id="%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E7%9A%84%E7%A7%8D%E7%B1%BB" data-line="6739" class="code-line">进程间通信的种类</h4>
+<p data-line="6740" class="code-line"><span id="进程间通信的种类"></span></p>
+<p data-line="6742" class="code-line">进程间通信需要依赖于操作系统所提供特殊的方法，如 : 普通文件, 管道, 信号, 共享内存, 消息队列, 套接字, 命名管道等等，但随着计算机的蓬勃发展，一些方法由于自身设计缺陷被淘汰或者弃用，现今常用的进程间通信方式有</p>
 <ul>
-<li data-line="6743" class="code-line"><a href="#pipe%E7%AE%A1%E9%81%93" data-href="#pipe%E7%AE%A1%E9%81%93">管道</a> ( 使用最简单 )</li>
-<li data-line="6744" class="code-line">信号 ( 开销最小 )</li>
-<li data-line="6745" class="code-line"><a href="#%E5%85%B1%E4%BA%AB%E6%98%A0%E5%B0%84%E5%8C%BA" data-href="#%E5%85%B1%E4%BA%AB%E6%98%A0%E5%B0%84%E5%8C%BA">共享映射区</a> ( 无血缘关系 )</li>
-<li data-line="6746" class="code-line">本地套接字 ( 最稳定 )</li>
+<li data-line="6744" class="code-line"><a href="#pipe%E7%AE%A1%E9%81%93" data-href="#pipe%E7%AE%A1%E9%81%93">管道</a> ( 使用最简单 )</li>
+<li data-line="6745" class="code-line">信号 ( 开销最小 )</li>
+<li data-line="6746" class="code-line"><a href="#%E5%85%B1%E4%BA%AB%E6%98%A0%E5%B0%84%E5%8C%BA" data-href="#%E5%85%B1%E4%BA%AB%E6%98%A0%E5%B0%84%E5%8C%BA">共享映射区</a> ( 无血缘关系 )</li>
+<li data-line="6747" class="code-line">本地套接字 ( 最稳定 )</li>
 </ul>
 <br/>
-<a for="toc-anchor" id="pipe-(-%E7%AE%A1%E9%81%93-)"></a><h3 id="pipe--%E7%AE%A1%E9%81%93" data-line="6751" class="code-line">pipe ( 管道 )</h3>
-<p data-line="6752" class="code-line"><span id="pipe管道"></span></p>
+<a for="toc-anchor" id="pipe-(-%E7%AE%A1%E9%81%93-)"></a><h3 id="pipe--%E7%AE%A1%E9%81%93" data-line="6752" class="code-line">pipe ( 管道 )</h3>
+<p data-line="6753" class="code-line"><span id="pipe管道"></span></p>
 <hr>
-<p data-line="6756" class="code-line"><strong><code>pipe</code></strong> 是最基本的 <strong><code>IPC</code></strong> 机制，有时候也称之位 <strong><code>匿名管道</code></strong>，其应用于有 <strong style="color:red">血缘关系</strong> 的进程之间去完成数据的传输</p>
-<p data-line="6758" class="code-line">管道的本质是一块内核的缓冲区，使用环形队列所实现而成，其默认大小为 <strong><code>4 KB</code></strong> ( 通过 <strong><code>ulimit -a</code></strong> 命令查看 )，一个管道都拥有两个端口分别标识这个管道的读端和写端，它被 文件描述符 所引用；我们在创建一个管道的时候我们都可以拿到两个引用自管道读端和写端的文件描述符，依赖于父级进程所创建的子级进程是属于 clone 的关系，即同时 clone 了父级进程上在创建管道时所返回的分别表示着管道读端和写端的文件描述符，依赖于这两个文件描述符并通过 <strong><code>read</code></strong> / <strong><code>write</code></strong>  的这两个系统调用以完成 <strong style="color:red">血缘关系</strong> 进程间的数据通信操作</p>
+<p data-line="6757" class="code-line"><strong><code>pipe</code></strong> 是最基本的 <strong><code>IPC</code></strong> 机制，有时候也称之位 <strong><code>匿名管道</code></strong>，其应用于有 <strong style="color:red">血缘关系</strong> 的进程之间去完成数据的传输</p>
+<p data-line="6759" class="code-line">管道的本质是一块内核的缓冲区，使用环形队列所实现而成，其默认大小为 <strong><code>4 KB</code></strong> ( 通过 <strong><code>ulimit -a</code></strong> 命令查看 )，一个管道都拥有两个端口分别标识这个管道的读端和写端，它被 文件描述符 所引用；我们在创建一个管道的时候我们都可以拿到两个引用自管道读端和写端的文件描述符，依赖于父级进程所创建的子级进程是属于 clone 的关系，即同时 clone 了父级进程上在创建管道时所返回的分别表示着管道读端和写端的文件描述符，依赖于这两个文件描述符并通过 <strong><code>read</code></strong> / <strong><code>write</code></strong>  的这两个系统调用以完成 <strong style="color:red">血缘关系</strong> 进程间的数据通信操作</p>
 <br/>
-<a for="toc-anchor" id="%E7%AE%A1%E9%81%93%E7%9A%84%E7%89%B9%E6%80%A7"></a><h4 id="%E7%AE%A1%E9%81%93%E7%9A%84%E7%89%B9%E6%80%A7" data-line="6762" class="code-line">管道的特性</h4>
-<p data-line="6763" class="code-line"><span id="管道的特性"></span></p>
-<p data-line="6765" class="code-line"><strong style="color:red">一个管道的数据流向是呈单向流动的，也就是说一个管道的创建我们就需要规定好两个进程间谁去使用读端的文件描述符谁去使用写端的文件描述符</strong>，但并不意味着单个进程下就不能同时使用读端和写端所分别引用的文件描述符；虽然管道对于读写的使用并没有进行过单一访问性的校验，但我们不妨设想一种情况，两个进程间使用管道进行通信，假设某个进程同时支持对管道的读和写，但是另一个进程的职责只是负责对管道进行读，那么当着两个进程同时运行的时候 ，我们就无法保证仅持有读权限的进程所读取到的数据是一种合法的数据了，再者如果需要完成两个进程间的同步操作又显得过于麻烦，所以规定一个管道的使用我们必须保证其数据流向是单向的，如有特殊要求，则开启一个数据反向流向的管道即可</p>
-<p data-line="6767" class="code-line">由于管道其实质属于一块缓冲区，故管道中的数据一旦被读取 ( <strong><code>read</code></strong> ) 则不复存在</p>
-<p data-line="6769" class="code-line">管道的读写两端默认情况下都是属于阻塞式的操作</p>
+<a for="toc-anchor" id="%E7%AE%A1%E9%81%93%E7%9A%84%E7%89%B9%E6%80%A7"></a><h4 id="%E7%AE%A1%E9%81%93%E7%9A%84%E7%89%B9%E6%80%A7" data-line="6763" class="code-line">管道的特性</h4>
+<p data-line="6764" class="code-line"><span id="管道的特性"></span></p>
+<p data-line="6766" class="code-line"><strong style="color:red">一个管道的数据流向是呈单向流动的，也就是说一个管道的创建我们就需要规定好两个进程间谁去使用读端的文件描述符谁去使用写端的文件描述符</strong>，但并不意味着单个进程下就不能同时使用读端和写端所分别引用的文件描述符；虽然管道对于读写的使用并没有进行过单一访问性的校验，但我们不妨设想一种情况，两个进程间使用管道进行通信，假设某个进程同时支持对管道的读和写，但是另一个进程的职责只是负责对管道进行读，那么当着两个进程同时运行的时候 ，我们就无法保证仅持有读权限的进程所读取到的数据是一种合法的数据了，再者如果需要完成两个进程间的同步操作又显得过于麻烦，所以规定一个管道的使用我们必须保证其数据流向是单向的，如有特殊要求，则开启一个数据反向流向的管道即可</p>
+<p data-line="6768" class="code-line">由于管道其实质属于一块缓冲区，故管道中的数据一旦被读取 ( <strong><code>read</code></strong> ) 则不复存在</p>
+<p data-line="6770" class="code-line">管道的读写两端默认情况下都是属于阻塞式的操作</p>
 <ul>
-<li data-line="6770" class="code-line"><strong><code>read</code></strong> : 针对于读端进行操作时，如管道没有数据，则读取操作则会发生阻塞</li>
-<li data-line="6771" class="code-line"><strong><code>write</code></strong> : 针对于写端进行操作时，如管道数据已满，则写入操作则会发生阻塞</li>
+<li data-line="6771" class="code-line"><strong><code>read</code></strong> : 针对于读端进行操作时，如管道没有数据，则读取操作则会发生阻塞</li>
+<li data-line="6772" class="code-line"><strong><code>write</code></strong> : 针对于写端进行操作时，如管道数据已满，则写入操作则会发生阻塞</li>
 </ul>
 <br/>
-<a for="toc-anchor" id="%E7%AE%A1%E9%81%93%E7%9A%84%E4%BD%BF%E7%94%A8"></a><h4 id="%E7%AE%A1%E9%81%93%E7%9A%84%E4%BD%BF%E7%94%A8" data-line="6775" class="code-line">管道的使用</h4>
-<p data-line="6777" class="code-line"><span id="管道的使用"></span></p>
-<a for="toc-anchor" id="int-pipe(int-fd_pipe%5B2%5D)"></a><h4 id="int-pipeint-fdpipe2" data-line="6779" class="code-line">int pipe(int fd_pipe[2])</h4>
-<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-8" data-line="6780" class="code-line">&lt;unistd.h&gt;</h5>
-<p data-line="6782" class="code-line">创建一个管道，如果创建成功，则该函数返回 <strong><code>0</code></strong>，并将分别标识管道读端和写端的文件描述符写入至数组参数 <strong><code>fd_pipe</code></strong> 指定下标之中  ( <strong><code>fd_pipe[0]</code></strong> : 读端 , <strong><code>fd_pipe[0]</code></strong> : 写端  )，如果创建失败，则该函数返回 <strong><code>-1</code></strong></p>
-<pre><code data-line="6784" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<a for="toc-anchor" id="%E7%AE%A1%E9%81%93%E7%9A%84%E4%BD%BF%E7%94%A8"></a><h4 id="%E7%AE%A1%E9%81%93%E7%9A%84%E4%BD%BF%E7%94%A8" data-line="6776" class="code-line">管道的使用</h4>
+<p data-line="6778" class="code-line"><span id="管道的使用"></span></p>
+<a for="toc-anchor" id="int-pipe(int-fd_pipe%5B2%5D)"></a><h4 id="int-pipeint-fdpipe2" data-line="6780" class="code-line">int pipe(int fd_pipe[2])</h4>
+<a for="toc-anchor" id="%3Cunistd.h%3E"></a><h5 id="unistdh-8" data-line="6781" class="code-line">&lt;unistd.h&gt;</h5>
+<p data-line="6783" class="code-line">创建一个管道，如果创建成功，则该函数返回 <strong><code>0</code></strong>，并将分别标识管道读端和写端的文件描述符写入至数组参数 <strong><code>fd_pipe</code></strong> 指定下标之中  ( <strong><code>fd_pipe[0]</code></strong> : 读端 , <strong><code>fd_pipe[0]</code></strong> : 写端  )，如果创建失败，则该函数返回 <strong><code>-1</code></strong></p>
+<pre><code data-line="6785" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
 
 <span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span> </span>{
@@ -6170,10 +6170,10 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="%E6%94%B9%E5%8F%98%E7%AE%A1%E9%81%93%E7%9A%84%E9%BB%98%E8%AE%A4%E9%98%BB%E5%A1%9E%E8%A1%8C%E4%B8%BA"></a><h4 id="%E6%94%B9%E5%8F%98%E7%AE%A1%E9%81%93%E7%9A%84%E9%BB%98%E8%AE%A4%E9%98%BB%E5%A1%9E%E8%A1%8C%E4%B8%BA" data-line="6834" class="code-line">改变管道的默认阻塞行为</h4>
-<p data-line="6836" class="code-line"><span id="改变管道的默认阻塞行为"></span></p>
-<p data-line="6838" class="code-line">管道的读写两端由文件描述符所引用，既然是文件描述符，那么就可以通过 <strong><code>fcntl</code></strong> 的系统调用来获取这两个文件描述符在创建时所指定的 <strong><code>flag</code></strong> 并对其进行修改</p>
-<pre><code data-line="6840" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
+<a for="toc-anchor" id="%E6%94%B9%E5%8F%98%E7%AE%A1%E9%81%93%E7%9A%84%E9%BB%98%E8%AE%A4%E9%98%BB%E5%A1%9E%E8%A1%8C%E4%B8%BA"></a><h4 id="%E6%94%B9%E5%8F%98%E7%AE%A1%E9%81%93%E7%9A%84%E9%BB%98%E8%AE%A4%E9%98%BB%E5%A1%9E%E8%A1%8C%E4%B8%BA" data-line="6835" class="code-line">改变管道的默认阻塞行为</h4>
+<p data-line="6837" class="code-line"><span id="改变管道的默认阻塞行为"></span></p>
+<p data-line="6839" class="code-line">管道的读写两端由文件描述符所引用，既然是文件描述符，那么就可以通过 <strong><code>fcntl</code></strong> 的系统调用来获取这两个文件描述符在创建时所指定的 <strong><code>flag</code></strong> 并对其进行修改</p>
+<pre><code data-line="6841" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;fcntl.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 
@@ -6192,59 +6192,59 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="%E7%AE%A1%E9%81%93%E7%9A%84%E8%AF%BB%E5%86%99%E8%A1%8C%E4%B8%BA"></a><h4 id="%E7%AE%A1%E9%81%93%E7%9A%84%E8%AF%BB%E5%86%99%E8%A1%8C%E4%B8%BA" data-line="6862" class="code-line">管道的读写行为</h4>
-<p data-line="6864" class="code-line"><span id="管道的读写行为"></span></p>
-<p data-line="6866" class="code-line">管道的读写行为在不同情境之下都会有不同的体现，总结如下</p>
+<a for="toc-anchor" id="%E7%AE%A1%E9%81%93%E7%9A%84%E8%AF%BB%E5%86%99%E8%A1%8C%E4%B8%BA"></a><h4 id="%E7%AE%A1%E9%81%93%E7%9A%84%E8%AF%BB%E5%86%99%E8%A1%8C%E4%B8%BA" data-line="6863" class="code-line">管道的读写行为</h4>
+<p data-line="6865" class="code-line"><span id="管道的读写行为"></span></p>
+<p data-line="6867" class="code-line">管道的读写行为在不同情境之下都会有不同的体现，总结如下</p>
 <ul>
-<li data-line="6868" class="code-line">read
+<li data-line="6869" class="code-line">read
 <ul>
-<li data-line="6869" class="code-line">写端全部关闭
+<li data-line="6870" class="code-line">写端全部关闭
 <ul>
-<li data-line="6870" class="code-line">有数据
+<li data-line="6871" class="code-line">有数据
 <ul>
-<li data-line="6871" class="code-line">正常读取</li>
+<li data-line="6872" class="code-line">正常读取</li>
 </ul>
 </li>
-<li data-line="6872" class="code-line">无数据
+<li data-line="6873" class="code-line">无数据
 <ul>
-<li data-line="6873" class="code-line">解除读端的默认阻塞，并返回实际读取到的字节数为 <strong><code>0</code></strong></li>
-</ul>
-</li>
-</ul>
-</li>
-<li data-line="6874" class="code-line">写端未全部关闭
-<ul>
-<li data-line="6875" class="code-line">有数据
-<ul>
-<li data-line="6876" class="code-line">正常读取</li>
-</ul>
-</li>
-<li data-line="6877" class="code-line">无数据
-<ul>
-<li data-line="6878" class="code-line">阻塞当前读取操作，直至缓冲区中被写入了新的数据</li>
+<li data-line="6874" class="code-line">解除读端的默认阻塞，并返回实际读取到的字节数为 <strong><code>0</code></strong></li>
 </ul>
 </li>
 </ul>
 </li>
+<li data-line="6875" class="code-line">写端未全部关闭
+<ul>
+<li data-line="6876" class="code-line">有数据
+<ul>
+<li data-line="6877" class="code-line">正常读取</li>
 </ul>
 </li>
-<li data-line="6879" class="code-line">write
+<li data-line="6878" class="code-line">无数据
 <ul>
-<li data-line="6880" class="code-line">读端全部关闭
-<ul>
-<li data-line="6881" class="code-line">管道破裂，进程强制终止，并且内核给当前进程发出 <strong><code>SIGPIPE</code></strong> 信号</li>
+<li data-line="6879" class="code-line">阻塞当前读取操作，直至缓冲区中被写入了新的数据</li>
 </ul>
 </li>
-<li data-line="6882" class="code-line">读端未全部关闭
-<ul>
-<li data-line="6883" class="code-line">管道填满
-<ul>
-<li data-line="6884" class="code-line">阻塞当前写入操作，直至缓冲区中有多余的空间被空出来</li>
 </ul>
 </li>
-<li data-line="6885" class="code-line">管道未满
+</ul>
+</li>
+<li data-line="6880" class="code-line">write
 <ul>
-<li data-line="6886" class="code-line">正常写入</li>
+<li data-line="6881" class="code-line">读端全部关闭
+<ul>
+<li data-line="6882" class="code-line">管道破裂，进程强制终止，并且内核给当前进程发出 <strong><code>SIGPIPE</code></strong> 信号</li>
+</ul>
+</li>
+<li data-line="6883" class="code-line">读端未全部关闭
+<ul>
+<li data-line="6884" class="code-line">管道填满
+<ul>
+<li data-line="6885" class="code-line">阻塞当前写入操作，直至缓冲区中有多余的空间被空出来</li>
+</ul>
+</li>
+<li data-line="6886" class="code-line">管道未满
+<ul>
+<li data-line="6887" class="code-line">正常写入</li>
 </ul>
 </li>
 </ul>
@@ -6253,23 +6253,23 @@ B ^ C = A
 </li>
 </ul>
 <br/>
-<a for="toc-anchor" id="fifo"></a><h3 id="fifo" data-line="6890" class="code-line">FIFO</h3>
-<p data-line="6891" class="code-line"><span id="fifo111"></span></p>
+<a for="toc-anchor" id="fifo"></a><h3 id="fifo" data-line="6891" class="code-line">FIFO</h3>
+<p data-line="6892" class="code-line"><span id="fifo111"></span></p>
 <hr>
-<p data-line="6895" class="code-line"><strong><code>FIFO</code></strong> 同样也是作为管道的一类，通常称之为 <strong><code>有名管道</code></strong>，区别于上面的 <a href="#pipe%E7%AE%A1%E9%81%93" data-href="#pipe%E7%AE%A1%E9%81%93">pipe</a>，FIFO 除了能应用于用于有 <strong style="color:red">血缘关系</strong> 的进程之间去完成数据的传输，还能应用于 <strong style="color:red">没有血缘关系</strong> 的进程间去完成数据的传输</p>
-<p data-line="6897" class="code-line">为什么 FIFO 通信的机制需要被称为 <strong><code>有名管道</code></strong>，这同样也是其传输特性所导致的；FIFO 需要依赖于 linux 中的基础文件 <strong><code>管道文件 (p)</code></strong> 去完成两个进程间的通信，但是需要注意的是，进程间的数据传输并不会写入到管道文件之中，而是依赖于管道文件建立两个进程之间读和写的链接关系，并且管道文件最终又会指向内核的缓冲区当中，所以，通过 FIFO 进行通信实际上数据的流动还是在内核缓冲区中进行</p>
-<p data-line="6899" class="code-line">由于 FIFO 本身也是属于管道一类的 IPC 通信机制，故其所保有的特性大部分都可沿用至 <a href="#pipe%E7%AE%A1%E9%81%93" data-href="#pipe%E7%AE%A1%E9%81%93">pipe</a></p>
+<p data-line="6896" class="code-line"><strong><code>FIFO</code></strong> 同样也是作为管道的一类，通常称之为 <strong><code>有名管道</code></strong>，区别于上面的 <a href="#pipe%E7%AE%A1%E9%81%93" data-href="#pipe%E7%AE%A1%E9%81%93">pipe</a>，FIFO 除了能应用于用于有 <strong style="color:red">血缘关系</strong> 的进程之间去完成数据的传输，还能应用于 <strong style="color:red">没有血缘关系</strong> 的进程间去完成数据的传输</p>
+<p data-line="6898" class="code-line">为什么 FIFO 通信的机制需要被称为 <strong><code>有名管道</code></strong>，这同样也是其传输特性所导致的；FIFO 需要依赖于 linux 中的基础文件 <strong><code>管道文件 (p)</code></strong> 去完成两个进程间的通信，但是需要注意的是，进程间的数据传输并不会写入到管道文件之中，而是依赖于管道文件建立两个进程之间读和写的链接关系，并且管道文件最终又会指向内核的缓冲区当中，所以，通过 FIFO 进行通信实际上数据的流动还是在内核缓冲区中进行</p>
+<p data-line="6900" class="code-line">由于 FIFO 本身也是属于管道一类的 IPC 通信机制，故其所保有的特性大部分都可沿用至 <a href="#pipe%E7%AE%A1%E9%81%93" data-href="#pipe%E7%AE%A1%E9%81%93">pipe</a></p>
 <br/>
-<a for="toc-anchor" id="fifo%E7%9A%84%E7%89%B9%E6%80%A7"></a><h4 id="fifo%E7%9A%84%E7%89%B9%E6%80%A7" data-line="6903" class="code-line">FIFO的特性</h4>
-<p data-line="6905" class="code-line"><span id="FIFO的特性"></span></p>
-<p data-line="6907" class="code-line">FIFO 严格遵循 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mi>i</mi><mi>r</mi><mi>s</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">first</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">s</span><span class="mord mathdefault">t</span></span></span></span> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">in</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span><span class="mord mathdefault">n</span></span></span></span> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mi>i</mi><mi>r</mi><mi>s</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">first</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">s</span><span class="mord mathdefault">t</span></span></span></span> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>o</mi><mi>u</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">out</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.61508em;vertical-align:0em;"></span><span class="mord mathdefault">o</span><span class="mord mathdefault">u</span><span class="mord mathdefault">t</span></span></span></span> 的特性，即数据的写入总是追加到缓冲区的末尾，而数据的读取则总是会从缓冲区的开始处取出，并且不支持使用 <strong><code>lseek()</code></strong> 等函数去修改文件读写指针的定位</p>
-<p data-line="6909" class="code-line">由于 FIFO 实际上还是依赖于内核缓冲区来进行通信，故缓冲区中的数据一旦被读取 ( read ) 则不复存在</p>
-<p data-line="6911" class="code-line">FIFO 需要严格规定两个进程之间的读写两端，这一特性还延续到管道文件的打开身上，<strong style="color:red">在默认情境之下 ( 未设置 <strong><code>O_NONBLOCK</code></strong> )，一方进程以 <strong><code>读 / 写</code></strong> 打开的管道文件始终都会阻塞当前进程的上下文执行直至当前文件接收到存在另一个进程以 <strong><code>写 / 读</code></strong> 的方式打开</strong></p>
+<a for="toc-anchor" id="fifo%E7%9A%84%E7%89%B9%E6%80%A7"></a><h4 id="fifo%E7%9A%84%E7%89%B9%E6%80%A7" data-line="6904" class="code-line">FIFO的特性</h4>
+<p data-line="6906" class="code-line"><span id="FIFO的特性"></span></p>
+<p data-line="6908" class="code-line">FIFO 严格遵循 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mi>i</mi><mi>r</mi><mi>s</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">first</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">s</span><span class="mord mathdefault">t</span></span></span></span> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">in</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span><span class="mord mathdefault">n</span></span></span></span> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mi>i</mi><mi>r</mi><mi>s</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">first</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">s</span><span class="mord mathdefault">t</span></span></span></span> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>o</mi><mi>u</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">out</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.61508em;vertical-align:0em;"></span><span class="mord mathdefault">o</span><span class="mord mathdefault">u</span><span class="mord mathdefault">t</span></span></span></span> 的特性，即数据的写入总是追加到缓冲区的末尾，而数据的读取则总是会从缓冲区的开始处取出，并且不支持使用 <strong><code>lseek()</code></strong> 等函数去修改文件读写指针的定位</p>
+<p data-line="6910" class="code-line">由于 FIFO 实际上还是依赖于内核缓冲区来进行通信，故缓冲区中的数据一旦被读取 ( read ) 则不复存在</p>
+<p data-line="6912" class="code-line">FIFO 需要严格规定两个进程之间的读写两端，这一特性还延续到管道文件的打开身上，<strong style="color:red">在默认情境之下 ( 未设置 <strong><code>O_NONBLOCK</code></strong> )，一方进程以 <strong><code>读 / 写</code></strong> 打开的管道文件始终都会阻塞当前进程的上下文执行直至当前文件接收到存在另一个进程以 <strong><code>写 / 读</code></strong> 的方式打开</strong></p>
 <br/>
-<a for="toc-anchor" id="fifo%E7%9A%84%E4%BD%BF%E7%94%A8"></a><h4 id="fifo%E7%9A%84%E4%BD%BF%E7%94%A8" data-line="6915" class="code-line">FIFO的使用</h4>
-<p data-line="6917" class="code-line"><span id="FIFO的使用"></span></p>
-<p data-line="6919" class="code-line">FIFO 的使用并无太多特性，需要注意仅只是创建一个管道文件并且使用完最好使用 <strong><code>unlink()</code></strong> 删除即可</p>
-<pre><code data-line="6921" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<a for="toc-anchor" id="fifo%E7%9A%84%E4%BD%BF%E7%94%A8"></a><h4 id="fifo%E7%9A%84%E4%BD%BF%E7%94%A8" data-line="6916" class="code-line">FIFO的使用</h4>
+<p data-line="6918" class="code-line"><span id="FIFO的使用"></span></p>
+<p data-line="6920" class="code-line">FIFO 的使用并无太多特性，需要注意仅只是创建一个管道文件并且使用完最好使用 <strong><code>unlink()</code></strong> 删除即可</p>
+<pre><code data-line="6922" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -6344,84 +6344,84 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="fifo%E7%9A%84%E9%98%BB%E5%A1%9E%E5%92%8C%E8%AF%BB%E5%86%99%E8%A1%8C%E4%B8%BA"></a><h4 id="fifo%E7%9A%84%E9%98%BB%E5%A1%9E%E5%92%8C%E8%AF%BB%E5%86%99%E8%A1%8C%E4%B8%BA" data-line="6999" class="code-line">FIFO的阻塞和读写行为</h4>
-<p data-line="7001" class="code-line"><span id="FIFO的阻塞和读写行为"></span></p>
-<p data-line="7003" class="code-line">默认情况之下，FIFO 的阻塞行为除了 <strong><code>read()</code></strong> <strong><code>write()</code></strong>，还会延续到文件的打开 <strong><code>open()</code></strong>，当一方进程以 <strong><code>读 / 写</code></strong> 打开的管道文件始终都会阻塞当前进程的上下文执行直至当前文件接收到存在另一个进程以 <strong><code>写 / 读</code></strong> 的方式打开，当然这是默认行为，我们也可以在打开文件 ( <strong><code>open()</code></strong> ) 的时候通过指定 <strong><code>O_NONBLOCK</code></strong> 去取消打开时的阻塞行为</p>
+<a for="toc-anchor" id="fifo%E7%9A%84%E9%98%BB%E5%A1%9E%E5%92%8C%E8%AF%BB%E5%86%99%E8%A1%8C%E4%B8%BA"></a><h4 id="fifo%E7%9A%84%E9%98%BB%E5%A1%9E%E5%92%8C%E8%AF%BB%E5%86%99%E8%A1%8C%E4%B8%BA" data-line="7000" class="code-line">FIFO的阻塞和读写行为</h4>
+<p data-line="7002" class="code-line"><span id="FIFO的阻塞和读写行为"></span></p>
+<p data-line="7004" class="code-line">默认情况之下，FIFO 的阻塞行为除了 <strong><code>read()</code></strong> <strong><code>write()</code></strong>，还会延续到文件的打开 <strong><code>open()</code></strong>，当一方进程以 <strong><code>读 / 写</code></strong> 打开的管道文件始终都会阻塞当前进程的上下文执行直至当前文件接收到存在另一个进程以 <strong><code>写 / 读</code></strong> 的方式打开，当然这是默认行为，我们也可以在打开文件 ( <strong><code>open()</code></strong> ) 的时候通过指定 <strong><code>O_NONBLOCK</code></strong> 去取消打开时的阻塞行为</p>
 <ul>
-<li data-line="7005" class="code-line">写端取消阻塞 : 立即返回结果；除了会判断管道文件路径的有效性外，还会判断当前管道文件的读端是否打开，如未打开，则 <strong><code>open()</code></strong> 函数调用失败</li>
-<li data-line="7006" class="code-line">读端取消阻塞 : 立即返回结果；并不会判断所指定的管道文件是否打开写端，仅判断文件路径的有效性去决定  <strong><code>open()</code></strong> 函数调用结果</li>
+<li data-line="7006" class="code-line">写端取消阻塞 : 立即返回结果；除了会判断管道文件路径的有效性外，还会判断当前管道文件的读端是否打开，如未打开，则 <strong><code>open()</code></strong> 函数调用失败</li>
+<li data-line="7007" class="code-line">读端取消阻塞 : 立即返回结果；并不会判断所指定的管道文件是否打开写端，仅判断文件路径的有效性去决定  <strong><code>open()</code></strong> 函数调用结果</li>
 </ul>
-<p data-line="7008" class="code-line">对于 FIFO 的读写行为则延续至 <a href="#pipe%E7%AE%A1%E9%81%93" data-href="#pipe%E7%AE%A1%E9%81%93">pipe</a> 之中，这里不再阐述</p>
+<p data-line="7009" class="code-line">对于 FIFO 的读写行为则延续至 <a href="#pipe%E7%AE%A1%E9%81%93" data-href="#pipe%E7%AE%A1%E9%81%93">pipe</a> 之中，这里不再阐述</p>
 <br/>
-<a for="toc-anchor" id="%E5%85%B1%E4%BA%AB%E6%98%A0%E5%B0%84%E5%8C%BA"></a><h3 id="%E5%85%B1%E4%BA%AB%E6%98%A0%E5%B0%84%E5%8C%BA" data-line="7012" class="code-line">共享映射区</h3>
-<p data-line="7013" class="code-line"><span id="共享映射区"></span></p>
+<a for="toc-anchor" id="%E5%85%B1%E4%BA%AB%E6%98%A0%E5%B0%84%E5%8C%BA"></a><h3 id="%E5%85%B1%E4%BA%AB%E6%98%A0%E5%B0%84%E5%8C%BA" data-line="7013" class="code-line">共享映射区</h3>
+<p data-line="7014" class="code-line"><span id="共享映射区"></span></p>
 <hr>
-<p data-line="7017" class="code-line">共享映射区能够将一个磁盘中的文件作为共享的内容并将之加载至内核的缓冲区内，我们可以简单地理解为该机制可以让一个磁盘文件和内核的缓冲区建立一个映射的关系，就这点和 <a href="#fifo111" data-href="#fifo111">FIFO</a> 有一点相似，但是实际上，共享映射区虽然在使用的时候都是以内核缓冲区为基准，但是要想实现进程二者间的数据共话，数据的写入实际上还是会重新映射到磁盘的文件当中去的</p>
-<p data-line="7019" class="code-line">虽然共享区的创建出去需要依赖于一个已经被打开 ( <strong><code>open()</code></strong> ) 文件的文件标识符来完成，但是实际上，共享区的创建完成后即已经把当前文件的数据都读取到共享映射区当中，即一个共享区的成功创建后就不需要再依赖于所打开的文件，这时候我们可以手动的去关闭它</p>
-<p data-line="7021" class="code-line">当我们在对共享区进行读写操作的时候，共享区并不会提供读写的阻塞机制，故使用这一方式去完成 IPC 时我们要保证读端和写端的同步</p>
-<p data-line="7023" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-07-05-02-26-06.png" alt="" class="loading" id="image-hash-875430775"></p>
+<p data-line="7018" class="code-line">共享映射区能够将一个磁盘中的文件作为共享的内容并将之加载至内核的缓冲区内，我们可以简单地理解为该机制可以让一个磁盘文件和内核的缓冲区建立一个映射的关系，就这点和 <a href="#fifo111" data-href="#fifo111">FIFO</a> 有一点相似，但是实际上，共享映射区虽然在使用的时候都是以内核缓冲区为基准，但是要想实现进程二者间的数据共话，数据的写入实际上还是会重新映射到磁盘的文件当中去的</p>
+<p data-line="7020" class="code-line">虽然共享区的创建出去需要依赖于一个已经被打开 ( <strong><code>open()</code></strong> ) 文件的文件标识符来完成，但是实际上，共享区的创建完成后即已经把当前文件的数据都读取到共享映射区当中，即一个共享区的成功创建后就不需要再依赖于所打开的文件，这时候我们可以手动的去关闭它</p>
+<p data-line="7022" class="code-line">当我们在对共享区进行读写操作的时候，共享区并不会提供读写的阻塞机制，故使用这一方式去完成 IPC 时我们要保证读端和写端的同步</p>
+<p data-line="7024" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-07-05-02-26-06.png" alt="" class="loading" id="image-hash-875430775"></p>
 <br/>
-<a for="toc-anchor" id="%E5%85%B1%E4%BA%AB%E6%98%A0%E5%B0%84%E5%8C%BA%E7%9A%84%E4%BD%BF%E7%94%A8"></a><h4 id="%E5%85%B1%E4%BA%AB%E6%98%A0%E5%B0%84%E5%8C%BA%E7%9A%84%E4%BD%BF%E7%94%A8" data-line="7027" class="code-line">共享映射区的使用</h4>
-<p data-line="7029" class="code-line"><span id="共享映射区的使用"></span></p>
-<a for="toc-anchor" id="void-*mmap(void-*addr%2C-size_t-length%2C-int-prot%2C-int-flags%2C-int-fd%2C-off_t-offset)"></a><h4 id="void-mmapvoid-addr-sizet-length-int-prot-int-flags-int-fd-offt-offset" data-line="7031" class="code-line">void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)</h4>
-<a for="toc-anchor" id="%3Csys%2Fmman.h%3E"></a><h5 id="sysmmanh" data-line="7032" class="code-line">&lt;sys/mman.h&gt;</h5>
-<p data-line="7034" class="code-line">依据所打开文件 ( <strong><code>open()</code></strong> ) 的文件标识符 <strong><code>fd</code></strong> 在内核中构建一块共享映射区，如果成功，则返回这块内存区域的首地址，如创建失败，则返回为宏 <strong><code>MAP_FAILED</code></strong> 的结果</p>
+<a for="toc-anchor" id="%E5%85%B1%E4%BA%AB%E6%98%A0%E5%B0%84%E5%8C%BA%E7%9A%84%E4%BD%BF%E7%94%A8"></a><h4 id="%E5%85%B1%E4%BA%AB%E6%98%A0%E5%B0%84%E5%8C%BA%E7%9A%84%E4%BD%BF%E7%94%A8" data-line="7028" class="code-line">共享映射区的使用</h4>
+<p data-line="7030" class="code-line"><span id="共享映射区的使用"></span></p>
+<a for="toc-anchor" id="void-*mmap(void-*addr%2C-size_t-length%2C-int-prot%2C-int-flags%2C-int-fd%2C-off_t-offset)"></a><h4 id="void-mmapvoid-addr-sizet-length-int-prot-int-flags-int-fd-offt-offset" data-line="7032" class="code-line">void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)</h4>
+<a for="toc-anchor" id="%3Csys%2Fmman.h%3E"></a><h5 id="sysmmanh" data-line="7033" class="code-line">&lt;sys/mman.h&gt;</h5>
+<p data-line="7035" class="code-line">依据所打开文件 ( <strong><code>open()</code></strong> ) 的文件标识符 <strong><code>fd</code></strong> 在内核中构建一块共享映射区，如果成功，则返回这块内存区域的首地址，如创建失败，则返回为宏 <strong><code>MAP_FAILED</code></strong> 的结果</p>
 <ul>
-<li data-line="7036" class="code-line">
-<p data-line="7036" class="code-line"><strong><code>addr</code></strong> : 指定所创建的共享映射区的内存首地址，通常它由内核本身来指定，故该参数通常设置为 <strong><code>NULL</code></strong></p>
+<li data-line="7037" class="code-line">
+<p data-line="7037" class="code-line"><strong><code>addr</code></strong> : 指定所创建的共享映射区的内存首地址，通常它由内核本身来指定，故该参数通常设置为 <strong><code>NULL</code></strong></p>
 </li>
-<li data-line="7038" class="code-line">
-<p data-line="7038" class="code-line"><strong><code>length</code></strong> : 映射到共享映射区的文件大小，通常它为文件描述符 <strong><code>fd</code></strong> 所指向的文件的本身大小</p>
+<li data-line="7039" class="code-line">
+<p data-line="7039" class="code-line"><strong><code>length</code></strong> : 映射到共享映射区的文件大小，通常它为文件描述符 <strong><code>fd</code></strong> 所指向的文件的本身大小</p>
 </li>
-<li data-line="7040" class="code-line">
-<p data-line="7040" class="code-line"><strong><code>prot</code></strong> : 构建的共享映射区的保护方式</p>
+<li data-line="7041" class="code-line">
+<p data-line="7041" class="code-line"><strong><code>prot</code></strong> : 构建的共享映射区的保护方式</p>
 <ul>
-<li data-line="7041" class="code-line"><strong><code>PROT_READ</code></strong> : 只读</li>
-<li data-line="7042" class="code-line"><strong><code>PROT_WRITE</code></strong> : 只写</li>
-<li data-line="7043" class="code-line">需要指定多种不同方式时，通过位或操作符来添加</li>
+<li data-line="7042" class="code-line"><strong><code>PROT_READ</code></strong> : 只读</li>
+<li data-line="7043" class="code-line"><strong><code>PROT_WRITE</code></strong> : 只写</li>
+<li data-line="7044" class="code-line">需要指定多种不同方式时，通过位或操作符来添加</li>
 </ul>
 </li>
-<li data-line="7045" class="code-line">
-<p data-line="7045" class="code-line"><strong><code>flags</code></strong> : 所构建的构想映射区的特性</p>
-<ul>
 <li data-line="7046" class="code-line">
-<p data-line="7046" class="code-line"><strong><code>MAP_SHARED</code></strong> : 共享映射区的数据可用于不同进程间共享，指定了该参数后往共享映射区所写入的数据会映射回文件本身</p>
+<p data-line="7046" class="code-line"><strong><code>flags</code></strong> : 所构建的构想映射区的特性</p>
 <ul>
-<li data-line="7047" class="code-line">当指定了该特性后，我们要保证共享映射区的保护方式 <strong><code>prot</code></strong> 所指定的权限要 <strong><code>&lt;=</code></strong> 打开的文件所指定的权限</li>
+<li data-line="7047" class="code-line">
+<p data-line="7047" class="code-line"><strong><code>MAP_SHARED</code></strong> : 共享映射区的数据可用于不同进程间共享，指定了该参数后往共享映射区所写入的数据会映射回文件本身</p>
+<ul>
+<li data-line="7048" class="code-line">当指定了该特性后，我们要保证共享映射区的保护方式 <strong><code>prot</code></strong> 所指定的权限要 <strong><code>&lt;=</code></strong> 打开的文件所指定的权限</li>
 </ul>
 </li>
-<li data-line="7049" class="code-line">
-<p data-line="7049" class="code-line"><strong><code>MAP_PRIVATE</code></strong> : 共享映射区的数据仅用于单独进程本身，制定了该参数后往共享映射区写入数据时会触发 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mi>O</mi><mi>W</mi></mrow><annotation encoding="application/x-tex">COW</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span></span></span></span> ( copy-on-write ) 的特性，即会对原有共享区的数据拷贝一份新的出来，而写入的数据仅针对于拷贝出来的区域，起到保护原始共享映射区不会被污染的作用</p>
+<li data-line="7050" class="code-line">
+<p data-line="7050" class="code-line"><strong><code>MAP_PRIVATE</code></strong> : 共享映射区的数据仅用于单独进程本身，制定了该参数后往共享映射区写入数据时会触发 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mi>O</mi><mi>W</mi></mrow><annotation encoding="application/x-tex">COW</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span></span></span></span> ( copy-on-write ) 的特性，即会对原有共享区的数据拷贝一份新的出来，而写入的数据仅针对于拷贝出来的区域，起到保护原始共享映射区不会被污染的作用</p>
 <ul>
-<li data-line="7050" class="code-line">当指定了该特性后，无需考虑 <strong><code>fd</code></strong> 所指向的文件权限</li>
+<li data-line="7051" class="code-line">当指定了该特性后，无需考虑 <strong><code>fd</code></strong> 所指向的文件权限</li>
 </ul>
-</li>
-<li data-line="7052" class="code-line">
-<p data-line="7052" class="code-line"><strong><code>MAP_ANONYMOUS</code></strong> : 构建匿名共享映射区，即不需要依赖于一个实际存在的文件</p>
 </li>
 <li data-line="7053" class="code-line">
-<p data-line="7053" class="code-line">需要指定多种不同方式时，通过位或操作符来添加</p>
+<p data-line="7053" class="code-line"><strong><code>MAP_ANONYMOUS</code></strong> : 构建匿名共享映射区，即不需要依赖于一个实际存在的文件</p>
+</li>
+<li data-line="7054" class="code-line">
+<p data-line="7054" class="code-line">需要指定多种不同方式时，通过位或操作符来添加</p>
 </li>
 </ul>
 </li>
-<li data-line="7055" class="code-line">
-<p data-line="7055" class="code-line"><strong><code>fd</code></strong> : 共享映射区在构建时所依赖的文件描述符，需要注意的是，由于共享映射区的构建之初需要依赖于一个实际存在于磁盘中的文件，故 fd 所指向的文件大小必须大于 0，否则在构建共享映射区时会出现总线错误</p>
+<li data-line="7056" class="code-line">
+<p data-line="7056" class="code-line"><strong><code>fd</code></strong> : 共享映射区在构建时所依赖的文件描述符，需要注意的是，由于共享映射区的构建之初需要依赖于一个实际存在于磁盘中的文件，故 fd 所指向的文件大小必须大于 0，否则在构建共享映射区时会出现总线错误</p>
 <ul>
-<li data-line="7056" class="code-line">当该参数指定为 -1 时，则意为创建一个匿名共享映射区，即不需要依赖于一个实际存在的文件</li>
+<li data-line="7057" class="code-line">当该参数指定为 -1 时，则意为创建一个匿名共享映射区，即不需要依赖于一个实际存在的文件</li>
 </ul>
 </li>
-<li data-line="7058" class="code-line">
-<p data-line="7058" class="code-line"><strong><code>offset</code></strong> : 需要将文件拷贝到共享映射区的字节数，该参数的指定必须为 <strong style="color:red">0或者4KB的整数倍</strong></p>
+<li data-line="7059" class="code-line">
+<p data-line="7059" class="code-line"><strong><code>offset</code></strong> : 需要将文件拷贝到共享映射区的字节数，该参数的指定必须为 <strong style="color:red">0或者4KB的整数倍</strong></p>
 </li>
 </ul>
-<a for="toc-anchor" id="int-munmap(void-*addr%2C-size_t-length)"></a><h4 id="int-munmapvoid-addr-sizet-length" data-line="7060" class="code-line">int munmap(void *addr, size_t length)</h4>
-<a for="toc-anchor" id="%3Csys%2Fmman.h%3E"></a><h5 id="sysmmanh-1" data-line="7061" class="code-line">&lt;sys/mman.h&gt;</h5>
-<p data-line="7063" class="code-line">释放共享映射区，共享映射区在使用完毕后我们需要现实的对其进行关闭以供内存的重用</p>
+<a for="toc-anchor" id="int-munmap(void-*addr%2C-size_t-length)"></a><h4 id="int-munmapvoid-addr-sizet-length" data-line="7061" class="code-line">int munmap(void *addr, size_t length)</h4>
+<a for="toc-anchor" id="%3Csys%2Fmman.h%3E"></a><h5 id="sysmmanh-1" data-line="7062" class="code-line">&lt;sys/mman.h&gt;</h5>
+<p data-line="7064" class="code-line">释放共享映射区，共享映射区在使用完毕后我们需要现实的对其进行关闭以供内存的重用</p>
 <ul>
-<li data-line="7065" class="code-line"><strong><code>addr</code></strong> : 所需释放的共享映射区的首地址，即 <strong><code>mmap</code></strong> 系统调用的返回值</li>
-<li data-line="7066" class="code-line"><strong><code>length</code></strong> : 创建共享映射区时所指定的 <strong><code>length</code></strong></li>
+<li data-line="7066" class="code-line"><strong><code>addr</code></strong> : 所需释放的共享映射区的首地址，即 <strong><code>mmap</code></strong> 系统调用的返回值</li>
+<li data-line="7067" class="code-line"><strong><code>length</code></strong> : 创建共享映射区时所指定的 <strong><code>length</code></strong></li>
 </ul>
-<pre><code data-line="7068" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<pre><code data-line="7069" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -6487,44 +6487,44 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="%E4%BF%A1%E5%8F%B7-(-signals-)"></a><h3 id="%E4%BF%A1%E5%8F%B7--signals" data-line="7138" class="code-line">信号 ( Signals )</h3>
-<p data-line="7139" class="code-line"><span id="信号_signal"></span></p>
+<a for="toc-anchor" id="%E4%BF%A1%E5%8F%B7-(-signals-)"></a><h3 id="%E4%BF%A1%E5%8F%B7--signals" data-line="7139" class="code-line">信号 ( Signals )</h3>
+<p data-line="7140" class="code-line"><span id="信号_signal"></span></p>
 <hr>
-<a for="toc-anchor" id="%E4%BF%A1%E5%8F%B7%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E5%92%8C%E7%89%B9%E6%80%A7"></a><h4 id="%E4%BF%A1%E5%8F%B7%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E5%92%8C%E7%89%B9%E6%80%A7" data-line="7143" class="code-line">信号的一些基本概念和特性</h4>
-<p data-line="7144" class="code-line"><span id="信号的一些基本概念和特性"></span></p>
-<p data-line="7146" class="code-line">信号是一种信息的载体，是 linux / unix 环境下的古老且经典的通信方式，反观至今天，它任然能够作为一种有效可靠的进程间的通信手段之一</p>
-<p data-line="7148" class="code-line">操作系统是拥有多种不同信号定义的，而对于这个定义来说，也仅仅只是代表着具体某个信号所对应的 ID，不管是接收一个信号也好还是发送一个信号，我都需要指定这个信号的定义 ( ID ) 以通知内核当前所需处理的信号，当然，我们无需记忆如此之多的信号所对应的 ID 值，仅在需要时就可以到 <a href="http://man.he.net/?topic=signal&amp;section=7" data-href="http://man.he.net/?topic=signal&amp;section=7">man page session 7 - signal</a> 找到不同标准规范的信号定义</p>
-<p data-line="7150" class="code-line">信号被存储在内核区的 PCB 模块之中，简而言之就是作为一个结构体中的成员而存在，而作为 PCB 进程控制模块而言，由它来负责控制当前进程中的信号收发</p>
-<p data-line="7152" class="code-line"><strong style="color:red">如不考虑阻塞，当一个进程以任何方式收到一个信号时会立刻 <strong><code>中断</code></strong> 当前用户态中的运行，并进入到内核态中执行当前所收到信号的相关 <strong><code>Action</code></strong><span></span></strong>； 由于 <strong><code>Action</code></strong> 的执行需要设计到用户态到内核态的切换，所以，就信号的实现手段来说是存在一定的延时性的，但是这种延时性对于用户来说是非常之短，可忽略不计</p>
-<p data-line="7154" class="code-line">信号的实现拥有以最大的特性就是 <strong><code>异步执行</code></strong> ( 这里的异步并不指的是在当前代码上下文中的异步状态，因为信号执行 <strong><code>Action</code></strong> 时往往会中断当前用户态的运行 )，当进程收到一个信号且正在执行这个信号所对应的动作时，另一个信号的到达并不会阻塞当前所执行的信号动作，即异步处理另一个信号所对应的动作；但是对于相同的信号来说，重复信号的送达必须得等待上一个信号的动作执行完毕才能够执行，我们可以抽象的理解为这是一个队列的概念，但是这个队列仅能存储 <strong><code>1</code></strong> 个等待的信号 ( 这 <strong><code>1</code></strong> 个等待的信号通常也称之为 <strong><code>未决信号</code></strong> )，剩余信号的送达将都会被内核所丢弃，即 <strong style="color:red">linux 中的信号并不是可靠的</strong></p>
-<p data-line="7156" class="code-line">关于相同信号的队列状态，会在 <a href="#%E6%9C%AA%E5%86%B3%E4%BF%A1%E5%8F%B7%E9%9B%86%E5%92%8C%E9%98%BB%E5%A1%9E%E4%BF%A1%E5%8F%B7%E9%9B%86" data-href="#%E6%9C%AA%E5%86%B3%E4%BF%A1%E5%8F%B7%E9%9B%86%E5%92%8C%E9%98%BB%E5%A1%9E%E4%BF%A1%E5%8F%B7%E9%9B%86">未决信号集和阻塞信号集</a> 中进行细说</p>
+<a for="toc-anchor" id="%E4%BF%A1%E5%8F%B7%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E5%92%8C%E7%89%B9%E6%80%A7"></a><h4 id="%E4%BF%A1%E5%8F%B7%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E5%92%8C%E7%89%B9%E6%80%A7" data-line="7144" class="code-line">信号的一些基本概念和特性</h4>
+<p data-line="7145" class="code-line"><span id="信号的一些基本概念和特性"></span></p>
+<p data-line="7147" class="code-line">信号是一种信息的载体，是 linux / unix 环境下的古老且经典的通信方式，反观至今天，它任然能够作为一种有效可靠的进程间的通信手段之一</p>
+<p data-line="7149" class="code-line">操作系统是拥有多种不同信号定义的，而对于这个定义来说，也仅仅只是代表着具体某个信号所对应的 ID，不管是接收一个信号也好还是发送一个信号，我都需要指定这个信号的定义 ( ID ) 以通知内核当前所需处理的信号，当然，我们无需记忆如此之多的信号所对应的 ID 值，仅在需要时就可以到 <a href="http://man.he.net/?topic=signal&amp;section=7" data-href="http://man.he.net/?topic=signal&amp;section=7">man page session 7 - signal</a> 找到不同标准规范的信号定义</p>
+<p data-line="7151" class="code-line">信号被存储在内核区的 PCB 模块之中，简而言之就是作为一个结构体中的成员而存在，而作为 PCB 进程控制模块而言，由它来负责控制当前进程中的信号收发</p>
+<p data-line="7153" class="code-line"><strong style="color:red">如不考虑阻塞，当一个进程以任何方式收到一个信号时会立刻 <strong><code>中断</code></strong> 当前用户态中的运行，并进入到内核态中执行当前所收到信号的相关 <strong><code>Action</code></strong><span></span></strong>； 由于 <strong><code>Action</code></strong> 的执行需要设计到用户态到内核态的切换，所以，就信号的实现手段来说是存在一定的延时性的，但是这种延时性对于用户来说是非常之短，可忽略不计</p>
+<p data-line="7155" class="code-line">信号的实现拥有以最大的特性就是 <strong><code>异步执行</code></strong> ( 这里的异步并不指的是在当前代码上下文中的异步状态，因为信号执行 <strong><code>Action</code></strong> 时往往会中断当前用户态的运行 )，当进程收到一个信号且正在执行这个信号所对应的动作时，另一个信号的到达并不会阻塞当前所执行的信号动作，即异步处理另一个信号所对应的动作；但是对于相同的信号来说，重复信号的送达必须得等待上一个信号的动作执行完毕才能够执行，我们可以抽象的理解为这是一个队列的概念，但是这个队列仅能存储 <strong><code>1</code></strong> 个等待的信号 ( 这 <strong><code>1</code></strong> 个等待的信号通常也称之为 <strong><code>未决信号</code></strong> )，剩余信号的送达将都会被内核所丢弃，即 <strong style="color:red">linux 中的信号并不是可靠的</strong></p>
+<p data-line="7157" class="code-line">关于相同信号的队列状态，会在 <a href="#%E6%9C%AA%E5%86%B3%E4%BF%A1%E5%8F%B7%E9%9B%86%E5%92%8C%E9%98%BB%E5%A1%9E%E4%BF%A1%E5%8F%B7%E9%9B%86" data-href="#%E6%9C%AA%E5%86%B3%E4%BF%A1%E5%8F%B7%E9%9B%86%E5%92%8C%E9%98%BB%E5%A1%9E%E4%BF%A1%E5%8F%B7%E9%9B%86">未决信号集和阻塞信号集</a> 中进行细说</p>
 <br/>
-<a for="toc-anchor" id="%E4%BF%A1%E5%8F%B7%E7%9A%84%E7%8A%B6%E6%80%81%E5%92%8C%E5%A4%84%E7%90%86%E6%96%B9%E5%BC%8F-(-action-)"></a><h4 id="%E4%BF%A1%E5%8F%B7%E7%9A%84%E7%8A%B6%E6%80%81%E5%92%8C%E5%A4%84%E7%90%86%E6%96%B9%E5%BC%8F--action" data-line="7160" class="code-line">信号的状态和处理方式 ( Action )</h4>
-<p data-line="7161" class="code-line"><span id="信号的状态和处理方式"></span></p>
-<p data-line="7163" class="code-line">一个信号从它的产生到抵达一个进程的过程我们可以总结为以下三种状态</p>
+<a for="toc-anchor" id="%E4%BF%A1%E5%8F%B7%E7%9A%84%E7%8A%B6%E6%80%81%E5%92%8C%E5%A4%84%E7%90%86%E6%96%B9%E5%BC%8F-(-action-)"></a><h4 id="%E4%BF%A1%E5%8F%B7%E7%9A%84%E7%8A%B6%E6%80%81%E5%92%8C%E5%A4%84%E7%90%86%E6%96%B9%E5%BC%8F--action" data-line="7161" class="code-line">信号的状态和处理方式 ( Action )</h4>
+<p data-line="7162" class="code-line"><span id="信号的状态和处理方式"></span></p>
+<p data-line="7164" class="code-line">一个信号从它的产生到抵达一个进程的过程我们可以总结为以下三种状态</p>
 <ul>
-<li data-line="7164" class="code-line">产生 : 即产生了一个信号，这个过程可能是键盘中断亦或者系统调用来实现</li>
-<li data-line="7165" class="code-line">未决 : 未决状态为产生和抵达之间的一种状态，通常是由于阻塞 ( mask ) 所导致的当前状态，一旦某个信号的阻塞解除，则立即进入 <strong><code>抵达</code></strong> 状态</li>
-<li data-line="7166" class="code-line">抵达 : 即进程已经成功接收到了某个信号，当一个进程接收到了一个信号后，如不考虑阻塞 ( mask ) 的情况，则会立即切换到内核态并执行当前信号的 <a href="#signal_action_111" data-href="#signal_action_111">Action</a></li>
+<li data-line="7165" class="code-line">产生 : 即产生了一个信号，这个过程可能是键盘中断亦或者系统调用来实现</li>
+<li data-line="7166" class="code-line">未决 : 未决状态为产生和抵达之间的一种状态，通常是由于阻塞 ( mask ) 所导致的当前状态，一旦某个信号的阻塞解除，则立即进入 <strong><code>抵达</code></strong> 状态</li>
+<li data-line="7167" class="code-line">抵达 : 即进程已经成功接收到了某个信号，当一个进程接收到了一个信号后，如不考虑阻塞 ( mask ) 的情况，则会立即切换到内核态并执行当前信号的 <a href="#signal_action_111" data-href="#signal_action_111">Action</a></li>
 </ul>
 <br/>
-<p data-line="7170" class="code-line"><span id = "signal_action_111"></span></p>
-<p data-line="7172" class="code-line">信号的 <strong><code>Action</code></strong> 特就是某个进程在成功接收到某个信号后所需立即执行的动作，这种动作分为了以下三种类型</p>
+<p data-line="7171" class="code-line"><span id = "signal_action_111"></span></p>
+<p data-line="7173" class="code-line">信号的 <strong><code>Action</code></strong> 特就是某个进程在成功接收到某个信号后所需立即执行的动作，这种动作分为了以下三种类型</p>
 <ul>
-<li data-line="7174" class="code-line">Perform the default action</li>
-<li data-line="7175" class="code-line">Ignore the signal</li>
-<li data-line="7176" class="code-line">Catch the signal with a signal handler ( by <strong><code>signal()</code></strong> or <strong><code>sigaction()</code></strong> system call ) , a programmer-defined function that is automatically invoked</li>
+<li data-line="7175" class="code-line">Perform the default action</li>
+<li data-line="7176" class="code-line">Ignore the signal</li>
+<li data-line="7177" class="code-line">Catch the signal with a signal handler ( by <strong><code>signal()</code></strong> or <strong><code>sigaction()</code></strong> system call ) , a programmer-defined function that is automatically invoked</li>
 </ul>
-<p data-line="7178" class="code-line">这里需要补充一下 <strong><code>Perform the default action</code></strong>，在 linux / unix 系统中的所有信号都有一个对应的默认执行动作，具体来说，它归纳为以下几种 ( 对于大多数信号而言其行为都是终止当前进程 )</p>
+<p data-line="7179" class="code-line">这里需要补充一下 <strong><code>Perform the default action</code></strong>，在 linux / unix 系统中的所有信号都有一个对应的默认执行动作，具体来说，它归纳为以下几种 ( 对于大多数信号而言其行为都是终止当前进程 )</p>
 <ul>
-<li data-line="7180" class="code-line">Term : Default action is to terminate the process</li>
-<li data-line="7181" class="code-line">Ign : Default action is to ignore the signal</li>
-<li data-line="7182" class="code-line">Core : Default action is to terminate the process and  dump  core</li>
-<li data-line="7183" class="code-line">Stop : Default action is to stop the process</li>
-<li data-line="7184" class="code-line">Cont  - Default  action  is  to  continue the process if it is currently stopped</li>
+<li data-line="7181" class="code-line">Term : Default action is to terminate the process</li>
+<li data-line="7182" class="code-line">Ign : Default action is to ignore the signal</li>
+<li data-line="7183" class="code-line">Core : Default action is to terminate the process and  dump  core</li>
+<li data-line="7184" class="code-line">Stop : Default action is to stop the process</li>
+<li data-line="7185" class="code-line">Cont  - Default  action  is  to  continue the process if it is currently stopped</li>
 </ul>
-<p data-line="7186" class="code-line"><a href="http://man.he.net/?topic=signal&amp;section=7" data-href="http://man.he.net/?topic=signal&amp;section=7">说明文档</a> ( man page session 7 - signal ) 中查阅到所有信号所对应的默认执行动作</p>
-<pre><code data-line="7189" class="code-line language-text"><code><div> First the signals described in the original POSIX.1-1990 standard.
+<p data-line="7187" class="code-line"><a href="http://man.he.net/?topic=signal&amp;section=7" data-href="http://man.he.net/?topic=signal&amp;section=7">说明文档</a> ( man page session 7 - signal ) 中查阅到所有信号所对应的默认执行动作</p>
+<pre><code data-line="7190" class="code-line language-text"><code><div> First the signals described in the original POSIX.1-1990 standard.
 
  Signal     Value     Action   Comment
  ----------------------------------------------------------------------
@@ -6594,26 +6594,26 @@ B ^ C = A
  Where defined, SIGUNUSED is synonymous with SIGSYS  on  most  architec-
  tures.
 </div></code></code></pre>
-<p data-line="7261" class="code-line">最后要说明的是 <strong><code>Catch the signal with a signal handler</code></strong>，它能够由开发人员去人为的指定捕获信号后所执行的具体 Action，在这里可能会涉及到多次的内核态到用户态的切换过程，其具体的调用流程如下</p>
-<p data-line="7263" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-07-09-01-56-26.png" alt="" class="loading" id="image-hash--419990157"></p>
+<p data-line="7262" class="code-line">最后要说明的是 <strong><code>Catch the signal with a signal handler</code></strong>，它能够由开发人员去人为的指定捕获信号后所执行的具体 Action，在这里可能会涉及到多次的内核态到用户态的切换过程，其具体的调用流程如下</p>
+<p data-line="7264" class="code-line"><img src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-07-09-01-56-26.png" alt="" class="loading" id="image-hash--419990157"></p>
 <br/>
-<a for="toc-anchor" id="%E4%BF%A1%E5%8F%B7%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8"></a><h4 id="%E4%BF%A1%E5%8F%B7%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8" data-line="7267" class="code-line">信号的基本使用</h4>
-<p data-line="7268" class="code-line"><span id="信号的基本使用"></span></p>
-<a for="toc-anchor" id="sighandler_t-signal(int-signum%2C-sighandler_t-handler)"></a><h4 id="sighandlert-signalint-signum-sighandlert-handler" data-line="7270" class="code-line">sighandler_t signal(int signum, sighandler_t handler)</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh" data-line="7271" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7273" class="code-line">捕获指定信号 <strong><code>signum</code></strong> 在执行时所触发的动作为 <strong><code>handler</code></strong></p>
+<a for="toc-anchor" id="%E4%BF%A1%E5%8F%B7%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8"></a><h4 id="%E4%BF%A1%E5%8F%B7%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8" data-line="7268" class="code-line">信号的基本使用</h4>
+<p data-line="7269" class="code-line"><span id="信号的基本使用"></span></p>
+<a for="toc-anchor" id="sighandler_t-signal(int-signum%2C-sighandler_t-handler)"></a><h4 id="sighandlert-signalint-signum-sighandlert-handler" data-line="7271" class="code-line">sighandler_t signal(int signum, sighandler_t handler)</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh" data-line="7272" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7274" class="code-line">捕获指定信号 <strong><code>signum</code></strong> 在执行时所触发的动作为 <strong><code>handler</code></strong></p>
 <ul>
-<li data-line="7275" class="code-line">
-<p data-line="7275" class="code-line"><strong><code>sighandler_t</code></strong> : typedef void (*sighandler_t)(int)</p>
+<li data-line="7276" class="code-line">
+<p data-line="7276" class="code-line"><strong><code>sighandler_t</code></strong> : typedef void (*sighandler_t)(int)</p>
 </li>
-<li data-line="7277" class="code-line">
-<p data-line="7277" class="code-line"><strong><code>signum</code></strong> : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定</p>
+<li data-line="7278" class="code-line">
+<p data-line="7278" class="code-line"><strong><code>signum</code></strong> : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定</p>
 </li>
-<li data-line="7279" class="code-line">
-<p data-line="7279" class="code-line"><strong><code>handler</code></strong> : 捕获信号的处理函数</p>
+<li data-line="7280" class="code-line">
+<p data-line="7280" class="code-line"><strong><code>handler</code></strong> : 捕获信号的处理函数</p>
 </li>
 </ul>
-<pre><code data-line="7281" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<pre><code data-line="7282" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -6640,19 +6640,19 @@ B ^ C = A
 </div></code></pre>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p data-line="7309" class="code-line">由于子进程的创建仅仅只是拷贝父进程地址空间中的数据，即并不共享，故在 <strong style="color:red">多进程</strong> 开发模型下。使用该函数去针对不同的父子级进程去完成相同信号不同处理行为的设置这是安全的，但在 <strong style="color:red">多线程</strong> 开发模型下由于父子级线程之间共享了大部分的地址空间的数据，其中也包括了针对不同信号间的处理行为 ( <strong><code>Action</code></strong> ) 的设置，故这时候不同线程间使用该函数去完成相同信号不同处理行为的设置时是不安全的，因为某一个线程针对某一个信号的处理行为的设置会覆盖至所有线程之中，故在多线程开发模型下为了保证不被污染，更鼓励使用 <a href="#sigwaitinfo" data-href="#sigwaitinfo">sigwait()</a> / <a href="#sigwaitinfo" data-href="#sigwaitinfo">sigwaitinfo()</a> 去完成信号的处理行为的绑定设置</p>
+<p data-line="7310" class="code-line">由于子进程的创建仅仅只是拷贝父进程地址空间中的数据，即并不共享，故在 <strong style="color:red">多进程</strong> 开发模型下。使用该函数去针对不同的父子级进程去完成相同信号不同处理行为的设置这是安全的，但在 <strong style="color:red">多线程</strong> 开发模型下由于父子级线程之间共享了大部分的地址空间的数据，其中也包括了针对不同信号间的处理行为 ( <strong><code>Action</code></strong> ) 的设置，故这时候不同线程间使用该函数去完成相同信号不同处理行为的设置时是不安全的，因为某一个线程针对某一个信号的处理行为的设置会覆盖至所有线程之中，故在多线程开发模型下为了保证不被污染，更鼓励使用 <a href="#sigwaitinfo" data-href="#sigwaitinfo">sigwait()</a> / <a href="#sigwaitinfo" data-href="#sigwaitinfo">sigwaitinfo()</a> 去完成信号的处理行为的绑定设置</p>
 </div>
 <br/>
-<a for="toc-anchor" id="int-sigaction(int-signum%2C-const-struct-sigaction-*act%2C-struct-sigaction-*oldact)"></a><h4 id="int-sigactionint-signum-const-struct-sigaction-act-struct-sigaction-oldact" data-line="7315" class="code-line">int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-1" data-line="7316" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7318" class="code-line">捕获指定信号 <strong><code>signum</code></strong> 在执行时所触发的动作为 <strong><code>act</code></strong></p>
+<a for="toc-anchor" id="int-sigaction(int-signum%2C-const-struct-sigaction-*act%2C-struct-sigaction-*oldact)"></a><h4 id="int-sigactionint-signum-const-struct-sigaction-act-struct-sigaction-oldact" data-line="7316" class="code-line">int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-1" data-line="7317" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7319" class="code-line">捕获指定信号 <strong><code>signum</code></strong> 在执行时所触发的动作为 <strong><code>act</code></strong></p>
 <ul>
-<li data-line="7321" class="code-line">
-<p data-line="7321" class="code-line"><strong><code>signum</code></strong> : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定</p>
+<li data-line="7322" class="code-line">
+<p data-line="7322" class="code-line"><strong><code>signum</code></strong> : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定</p>
 </li>
-<li data-line="7323" class="code-line">
-<p data-line="7323" class="code-line"><strong><code>act</code></strong> :  用于指定 <strong><code>Action</code></strong> 执行的一些相关信息，它是一种结构体类型，其结构如下</p>
-<pre><code data-line="7325" class="code-line language-c"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sigaction</span> {</span>
+<li data-line="7324" class="code-line">
+<p data-line="7324" class="code-line"><strong><code>act</code></strong> :  用于指定 <strong><code>Action</code></strong> 执行的一些相关信息，它是一种结构体类型，其结构如下</p>
+<pre><code data-line="7326" class="code-line language-c"><div><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sigaction</span> {</span>
   <span class="hljs-keyword">void</span>      (*sa_handler)(<span class="hljs-keyword">int</span>);
   <span class="hljs-keyword">void</span>      (*sa_sigaction)(<span class="hljs-keyword">int</span>, <span class="hljs-keyword">siginfo_t</span> *, <span class="hljs-keyword">void</span> *); 
   <span class="hljs-keyword">sigset_t</span>  sa_mask;
@@ -6661,39 +6661,39 @@ B ^ C = A
 };
 </div></code></pre>
 <ul>
-<li data-line="7334" class="code-line">
-<p data-line="7334" class="code-line"><strong><code>sa_handler</code></strong> : 捕获 <strong><code>Action</code></strong> 在执行时所使用的自定义 <strong><code>handler</code></strong></p>
+<li data-line="7335" class="code-line">
+<p data-line="7335" class="code-line"><strong><code>sa_handler</code></strong> : 捕获 <strong><code>Action</code></strong> 在执行时所使用的自定义 <strong><code>handler</code></strong></p>
 </li>
-<li data-line="7336" class="code-line">
-<p data-line="7336" class="code-line"><strong><code>sa_sigaction</code></strong> : 另一种形态的 <strong><code>handler</code></strong>，通常我们仅需指定 <strong><code>sa_handler</code></strong> 即可</p>
+<li data-line="7337" class="code-line">
+<p data-line="7337" class="code-line"><strong><code>sa_sigaction</code></strong> : 另一种形态的 <strong><code>handler</code></strong>，通常我们仅需指定 <strong><code>sa_handler</code></strong> 即可</p>
 </li>
-<li data-line="7338" class="code-line">
-<p data-line="7338" class="code-line">作为 <strong><code>handler</code></strong> 的成员可以指定自定义的函数，当指定了任意一个函数指针后，则意味当前 Action 的动作采取的是捕获的方式，当然，我们也可以通过以下两种宏定义来指定这个 Action 的一些具体的行为动作</p>
-<ul>
 <li data-line="7339" class="code-line">
-<p data-line="7339" class="code-line"><strong><code>SIG_IGN</code></strong> : 采取忽略 Action</p>
+<p data-line="7339" class="code-line">作为 <strong><code>handler</code></strong> 的成员可以指定自定义的函数，当指定了任意一个函数指针后，则意味当前 Action 的动作采取的是捕获的方式，当然，我们也可以通过以下两种宏定义来指定这个 Action 的一些具体的行为动作</p>
+<ul>
+<li data-line="7340" class="code-line">
+<p data-line="7340" class="code-line"><strong><code>SIG_IGN</code></strong> : 采取忽略 Action</p>
 </li>
-<li data-line="7341" class="code-line">
-<p data-line="7341" class="code-line"><strong><code>SIG_DF</code></strong> : 执行默认的 Action</p>
-</li>
-</ul>
-</li>
-<li data-line="7343" class="code-line">
-<p data-line="7343" class="code-line"><strong><code>sa_mask</code></strong> : 阻塞信号集，我们可以通过它来指定在当前信号 <strong><code>signum</code></strong> 在执行捕获 Action 的 <strong>handler</strong> 时所需屏蔽的信号，需要注意的是，这个屏蔽 ( mask ) 的限制是仅限于执行 <strong><code>handler</code></strong> 期间才会生效的，并不是一个全局屏蔽的作用</p>
-</li>
-<li data-line="7345" class="code-line">
-<p data-line="7345" class="code-line"><strong><code>sa_flags</code></strong> : 该成员通常设置为 0</p>
-</li>
-<li data-line="7347" class="code-line">
-<p data-line="7347" class="code-line"><strong><code>sa_restorer</code></strong> : 已弃用的成员</p>
+<li data-line="7342" class="code-line">
+<p data-line="7342" class="code-line"><strong><code>SIG_DF</code></strong> : 执行默认的 Action</p>
 </li>
 </ul>
 </li>
-<li data-line="7349" class="code-line">
-<p data-line="7349" class="code-line"><strong><code>oldact</code></strong> : 旧值，如无特殊要求设置为 NULL 即可</p>
+<li data-line="7344" class="code-line">
+<p data-line="7344" class="code-line"><strong><code>sa_mask</code></strong> : 阻塞信号集，我们可以通过它来指定在当前信号 <strong><code>signum</code></strong> 在执行捕获 Action 的 <strong>handler</strong> 时所需屏蔽的信号，需要注意的是，这个屏蔽 ( mask ) 的限制是仅限于执行 <strong><code>handler</code></strong> 期间才会生效的，并不是一个全局屏蔽的作用</p>
+</li>
+<li data-line="7346" class="code-line">
+<p data-line="7346" class="code-line"><strong><code>sa_flags</code></strong> : 该成员通常设置为 0</p>
+</li>
+<li data-line="7348" class="code-line">
+<p data-line="7348" class="code-line"><strong><code>sa_restorer</code></strong> : 已弃用的成员</p>
 </li>
 </ul>
-<pre><code data-line="7351" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+</li>
+<li data-line="7350" class="code-line">
+<p data-line="7350" class="code-line"><strong><code>oldact</code></strong> : 旧值，如无特殊要求设置为 NULL 即可</p>
+</li>
+</ul>
+<pre><code data-line="7352" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -6718,22 +6718,22 @@ B ^ C = A
 </div></code></pre>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p data-line="7377" class="code-line">由于子进程的创建仅仅只是拷贝父进程地址空间中的数据，即并不共享，故在 <strong style="color:red">多进程</strong> 开发模型下。使用该函数去针对不同的父子级进程去完成相同信号不同处理行为的设置这是安全的，但在 <strong style="color:red">多线程</strong> 开发模型下由于父子级线程之间共享了大部分的地址空间的数据，其中也包括了针对不同信号间的处理行为 ( <strong><code>Action</code></strong> ) 的设置，故这时候不同线程间使用该函数去完成相同信号不同处理行为的设置时是不安全的，因为某一个线程针对某一个信号的处理行为的设置会覆盖至所有线程之中，故在多线程开发模型下为了保证不被污染，更鼓励使用 <a href="#sigwaitinfo" data-href="#sigwaitinfo">sigwait()</a> / <a href="#sigwaitinfo" data-href="#sigwaitinfo">sigwaitinfo()</a> 去完成信号的处理行为的绑定设置</p>
+<p data-line="7378" class="code-line">由于子进程的创建仅仅只是拷贝父进程地址空间中的数据，即并不共享，故在 <strong style="color:red">多进程</strong> 开发模型下。使用该函数去针对不同的父子级进程去完成相同信号不同处理行为的设置这是安全的，但在 <strong style="color:red">多线程</strong> 开发模型下由于父子级线程之间共享了大部分的地址空间的数据，其中也包括了针对不同信号间的处理行为 ( <strong><code>Action</code></strong> ) 的设置，故这时候不同线程间使用该函数去完成相同信号不同处理行为的设置时是不安全的，因为某一个线程针对某一个信号的处理行为的设置会覆盖至所有线程之中，故在多线程开发模型下为了保证不被污染，更鼓励使用 <a href="#sigwaitinfo" data-href="#sigwaitinfo">sigwait()</a> / <a href="#sigwaitinfo" data-href="#sigwaitinfo">sigwaitinfo()</a> 去完成信号的处理行为的绑定设置</p>
 </div>
 <br/>
-<p data-line="7381" class="code-line"><span id = "kill_fun"></span></p>
-<a for="toc-anchor" id="int-kill(pid_t-pid%2C-int-signum)"></a><h4 id="int-killpidt-pid-int-signum" data-line="7383" class="code-line">int kill(pid_t pid, int signum)</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-2" data-line="7384" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7386" class="code-line">给指定进程 <strong><code>pid</code></strong> 发送一个信号 <strong><code>signum</code></strong>，如果成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
+<p data-line="7382" class="code-line"><span id = "kill_fun"></span></p>
+<a for="toc-anchor" id="int-kill(pid_t-pid%2C-int-signum)"></a><h4 id="int-killpidt-pid-int-signum" data-line="7384" class="code-line">int kill(pid_t pid, int signum)</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-2" data-line="7385" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7387" class="code-line">给指定进程 <strong><code>pid</code></strong> 发送一个信号 <strong><code>signum</code></strong>，如果成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
 <ul>
-<li data-line="7388" class="code-line">
-<p data-line="7388" class="code-line"><strong><code>pid</code></strong> : 进程的 pid</p>
+<li data-line="7389" class="code-line">
+<p data-line="7389" class="code-line"><strong><code>pid</code></strong> : 进程的 pid</p>
 </li>
-<li data-line="7390" class="code-line">
-<p data-line="7390" class="code-line"><strong><code>signum</code></strong> : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定</p>
+<li data-line="7391" class="code-line">
+<p data-line="7391" class="code-line"><strong><code>signum</code></strong> : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定</p>
 </li>
 </ul>
-<pre><code data-line="7392" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<pre><code data-line="7393" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -6755,24 +6755,24 @@ B ^ C = A
 </div></code></pre>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p data-line="7415" class="code-line">当前函数遵循多进程 ( 旧 linux 内核版本的线程和进程的 <strong><code>PID</code></strong> 实现一致，更多信心可以查看 <a href="#%E5%86%8D%E8%81%8A-pid-pgid-tgid" data-href="#%E5%86%8D%E8%81%8A-pid-pgid-tgid">这里</a> ) 开发的实现，故在对于实现了 <strong><code>POSIX</code></strong> 标准的 <strong><code>NPTL</code></strong> 库所构造线程的 <strong><code>TID</code></strong> 发送信号时，如果当前所发送的信号在所指定线程内存在阻塞 ( <strong><code>mask</code></strong> )，则会把信号发送至其父级线程 ( 构造当前线程的进程 ) 当中去，故对于使用 <strong><code>pthread_create</code></strong> 所构建出来的线程去发送信号时，正确的做法应该使用 <a href="#pthread_kill" data-href="#pthread_kill">pthread_kill</a> 去完成</p>
+<p data-line="7416" class="code-line">当前函数遵循多进程 ( 旧 linux 内核版本的线程和进程的 <strong><code>PID</code></strong> 实现一致，更多信心可以查看 <a href="#%E5%86%8D%E8%81%8A-pid-pgid-tgid" data-href="#%E5%86%8D%E8%81%8A-pid-pgid-tgid">这里</a> ) 开发的实现，故在对于实现了 <strong><code>POSIX</code></strong> 标准的 <strong><code>NPTL</code></strong> 库所构造线程的 <strong><code>TID</code></strong> 发送信号时，如果当前所发送的信号在所指定线程内存在阻塞 ( <strong><code>mask</code></strong> )，则会把信号发送至其父级线程 ( 构造当前线程的进程 ) 当中去，故对于使用 <strong><code>pthread_create</code></strong> 所构建出来的线程去发送信号时，正确的做法应该使用 <a href="#pthread_kill" data-href="#pthread_kill">pthread_kill</a> 去完成</p>
 </div>
 <br/>
-<p data-line="7419" class="code-line"><span id = "pthread_kill"></span></p>
-<a for="toc-anchor" id="int-pthread_kill(pthread_t-thread%2C-int-sig)"></a><h4 id="int-pthreadkillpthreadt-thread-int-sig" data-line="7421" class="code-line">int pthread_kill(pthread_t thread, int sig)</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-3" data-line="7422" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7424" class="code-line">向指定线程 <strong><code>thread</code></strong> 发送一个信号 <strong><code>sig</code></strong></p>
-<p data-line="7426" class="code-line"><a href="#kill_fun" data-href="#kill_fun">kill()</a> 由于历史原因，其并未遵循 <strong><code>POSIX</code></strong> 的 标准规范去完成信号发送，但是为了保证内核的升级能够向下兼容，所以它被保留了下来；由于未遵循 <strong><code>POSIX</code></strong> 标准规范，故在使用遵循 <strong><code>POSIX</code></strong> ( <strong><code>NPTL</code></strong> ) 标准规范的多线程开发模型下，如果 <a href="#kill_fun" data-href="#kill_fun">kill()</a> 所发送信号的线程发生了阻塞，则这个信号会发送至其父级线程身上，为了避免这一误导性的错误，在使用 <strong><code>NPTL</code></strong> 完成多线程的开发情景下，信号的发送更推荐使用当前函数</p>
+<p data-line="7420" class="code-line"><span id = "pthread_kill"></span></p>
+<a for="toc-anchor" id="int-pthread_kill(pthread_t-thread%2C-int-sig)"></a><h4 id="int-pthreadkillpthreadt-thread-int-sig" data-line="7422" class="code-line">int pthread_kill(pthread_t thread, int sig)</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-3" data-line="7423" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7425" class="code-line">向指定线程 <strong><code>thread</code></strong> 发送一个信号 <strong><code>sig</code></strong></p>
+<p data-line="7427" class="code-line"><a href="#kill_fun" data-href="#kill_fun">kill()</a> 由于历史原因，其并未遵循 <strong><code>POSIX</code></strong> 的 标准规范去完成信号发送，但是为了保证内核的升级能够向下兼容，所以它被保留了下来；由于未遵循 <strong><code>POSIX</code></strong> 标准规范，故在使用遵循 <strong><code>POSIX</code></strong> ( <strong><code>NPTL</code></strong> ) 标准规范的多线程开发模型下，如果 <a href="#kill_fun" data-href="#kill_fun">kill()</a> 所发送信号的线程发生了阻塞，则这个信号会发送至其父级线程身上，为了避免这一误导性的错误，在使用 <strong><code>NPTL</code></strong> 完成多线程的开发情景下，信号的发送更推荐使用当前函数</p>
 <ul>
-<li data-line="7428" class="code-line">
-<p data-line="7428" class="code-line"><strong><code>thread</code></strong> : 线程的 tid</p>
+<li data-line="7429" class="code-line">
+<p data-line="7429" class="code-line"><strong><code>thread</code></strong> : 线程的 tid</p>
 </li>
-<li data-line="7430" class="code-line">
-<p data-line="7430" class="code-line"><strong><code>sig</code></strong> : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定</p>
-<p data-line="7432" class="code-line">当该参数指定为 <strong><code>0</code></strong> 时，则可以运行错误检查，用于检测指定的线程 <strong><code>thread</code></strong> 是否还在运行</p>
+<li data-line="7431" class="code-line">
+<p data-line="7431" class="code-line"><strong><code>sig</code></strong> : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定</p>
+<p data-line="7433" class="code-line">当该参数指定为 <strong><code>0</code></strong> 时，则可以运行错误检查，用于检测指定的线程 <strong><code>thread</code></strong> 是否还在运行</p>
 </li>
 </ul>
-<pre><code data-line="7434" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<pre><code data-line="7435" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdbool.h&gt;</span></span>
@@ -6835,13 +6835,13 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-raise(-int-signum)"></a><h4 id="int-raise-int-signum" data-line="7500" class="code-line">int raise( int signum)</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-4" data-line="7501" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7503" class="code-line">给当前进程发送一个信号 <strong><code>signum</code></strong>，如果成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
+<a for="toc-anchor" id="int-raise(-int-signum)"></a><h4 id="int-raise-int-signum" data-line="7501" class="code-line">int raise( int signum)</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-4" data-line="7502" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7504" class="code-line">给当前进程发送一个信号 <strong><code>signum</code></strong>，如果成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
 <ul>
-<li data-line="7505" class="code-line"><strong><code>signum</code></strong> : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定</li>
+<li data-line="7506" class="code-line"><strong><code>signum</code></strong> : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定</li>
 </ul>
-<pre><code data-line="7507" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<pre><code data-line="7508" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -6862,10 +6862,10 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-abort()"></a><h4 id="int-abort" data-line="7531" class="code-line">int abort()</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-5" data-line="7532" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7534" class="code-line">给当前进程发送一个 <strong><code>SIGABRT (6)</code></strong> 的信号，并设置 <strong><code>core</code></strong> 文件 ，如果成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
-<pre><code data-line="7536" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<a for="toc-anchor" id="int-abort()"></a><h4 id="int-abort" data-line="7532" class="code-line">int abort()</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-5" data-line="7533" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7535" class="code-line">给当前进程发送一个 <strong><code>SIGABRT (6)</code></strong> 的信号，并设置 <strong><code>core</code></strong> 文件 ，如果成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
+<pre><code data-line="7537" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -6886,22 +6886,22 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="unsigned-int-alarm(unsigned-int-seconds)"></a><h4 id="unsigned-int-alarmunsigned-int-seconds" data-line="7560" class="code-line">unsigned int alarm(unsigned int seconds)</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-6" data-line="7561" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7563" class="code-line">设定一个定时器，在 <strong><code>seconds</code></strong> 秒后由内核发送一个 <strong><code>SIGALRM (14)</code></strong> 信号给当前进程</p>
-<p data-line="7565" class="code-line"><strong style="color:red">每一个进程有且仅能拥有一个定时器，后面所声明的定时器则覆盖掉前一个所声明的定时器</strong></p>
-<p data-line="7567" class="code-line">该函数所指定的定时器使用的是自然定时法，即与进程状态无关，无论是 就绪, 运行, 挂起(阻塞 / 暂停), 终止, 僵尸, ... 都不影响 alarm 的计数</p>
-<p data-line="7569" class="code-line">该函数不存在调用失败的返回结果，其返回值依据 <strong><code>seconds</code></strong> 来决定是返回 <strong><code>0</code></strong> 还是返回 <strong><code>剩余的秒数</code></strong></p>
+<a for="toc-anchor" id="unsigned-int-alarm(unsigned-int-seconds)"></a><h4 id="unsigned-int-alarmunsigned-int-seconds" data-line="7561" class="code-line">unsigned int alarm(unsigned int seconds)</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-6" data-line="7562" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7564" class="code-line">设定一个定时器，在 <strong><code>seconds</code></strong> 秒后由内核发送一个 <strong><code>SIGALRM (14)</code></strong> 信号给当前进程</p>
+<p data-line="7566" class="code-line"><strong style="color:red">每一个进程有且仅能拥有一个定时器，后面所声明的定时器则覆盖掉前一个所声明的定时器</strong></p>
+<p data-line="7568" class="code-line">该函数所指定的定时器使用的是自然定时法，即与进程状态无关，无论是 就绪, 运行, 挂起(阻塞 / 暂停), 终止, 僵尸, ... 都不影响 alarm 的计数</p>
+<p data-line="7570" class="code-line">该函数不存在调用失败的返回结果，其返回值依据 <strong><code>seconds</code></strong> 来决定是返回 <strong><code>0</code></strong> 还是返回 <strong><code>剩余的秒数</code></strong></p>
 <ul>
-<li data-line="7571" class="code-line">
-<p data-line="7571" class="code-line"><strong><code>seconds</code></strong> : 指定定时器的计时秒数</p>
+<li data-line="7572" class="code-line">
+<p data-line="7572" class="code-line"><strong><code>seconds</code></strong> : 指定定时器的计时秒数</p>
 <ul>
-<li data-line="7573" class="code-line"><strong><code>seconds &gt; 0</code></strong> : 指定定时器开启，并函数调用返回 <strong><code>0</code></strong></li>
-<li data-line="7574" class="code-line"><strong><code>seconds = 0</code></strong> : 指定定时器关闭，并函数调用返回 <strong><code>剩余的秒数</code></strong></li>
+<li data-line="7574" class="code-line"><strong><code>seconds &gt; 0</code></strong> : 指定定时器开启，并函数调用返回 <strong><code>0</code></strong></li>
+<li data-line="7575" class="code-line"><strong><code>seconds = 0</code></strong> : 指定定时器关闭，并函数调用返回 <strong><code>剩余的秒数</code></strong></li>
 </ul>
 </li>
 </ul>
-<pre><code data-line="7576" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<pre><code data-line="7577" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -6930,22 +6930,22 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-setitimer(int-which%2C-const-struct-itimerval-*new_value%2C-struct-itimerval-*old_value)"></a><h4 id="int-setitimerint-which-const-struct-itimerval-newvalue-struct-itimerval-oldvalue" data-line="7608" class="code-line">int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value)</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-7" data-line="7609" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7611" class="code-line">开启一个定时器，如果成功则返回 <strong><code>0</code></strong>，失败则返回 <strong><code>-1</code></strong></p>
-<p data-line="7613" class="code-line"><strong style="color:red">每一个进程有且仅能拥有一个定时器，后面所声明的定时器则覆盖掉前一个所声明的定时器</strong></p>
+<a for="toc-anchor" id="int-setitimer(int-which%2C-const-struct-itimerval-*new_value%2C-struct-itimerval-*old_value)"></a><h4 id="int-setitimerint-which-const-struct-itimerval-newvalue-struct-itimerval-oldvalue" data-line="7609" class="code-line">int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value)</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-7" data-line="7610" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7612" class="code-line">开启一个定时器，如果成功则返回 <strong><code>0</code></strong>，失败则返回 <strong><code>-1</code></strong></p>
+<p data-line="7614" class="code-line"><strong style="color:red">每一个进程有且仅能拥有一个定时器，后面所声明的定时器则覆盖掉前一个所声明的定时器</strong></p>
 <ul>
-<li data-line="7615" class="code-line">
-<p data-line="7615" class="code-line"><strong><code>which</code></strong> : 指定定时器的计数方式同时也决定了 timeout 后由内核所发送给当前进程的信号类型</p>
+<li data-line="7616" class="code-line">
+<p data-line="7616" class="code-line"><strong><code>which</code></strong> : 指定定时器的计数方式同时也决定了 timeout 后由内核所发送给当前进程的信号类型</p>
 <ul>
-<li data-line="7617" class="code-line"><strong><code>ITIMER_REAL</code></strong> : 使用自然计数法，timeout 后内核发送一个 <strong><code>SIGALRM (14)</code></strong> 给当前进程</li>
-<li data-line="7618" class="code-line"><strong><code>ITIMER_VIRTUAL</code></strong> : 虚拟空间计时法，仅计算用户空间的运行时间，timeout 后内核发送一个 <strong><code>SIGVTALRM (26)</code></strong> 给当前进程</li>
-<li data-line="7619" class="code-line"><strong><code>ITIMER_PROF</code></strong> : 运行时计时法，计算用户空间的运行时间加上内核空间的运行时间，timeout 后内核发送一个 <strong><code>SIGPROF (27)</code></strong> 给当前进程</li>
+<li data-line="7618" class="code-line"><strong><code>ITIMER_REAL</code></strong> : 使用自然计数法，timeout 后内核发送一个 <strong><code>SIGALRM (14)</code></strong> 给当前进程</li>
+<li data-line="7619" class="code-line"><strong><code>ITIMER_VIRTUAL</code></strong> : 虚拟空间计时法，仅计算用户空间的运行时间，timeout 后内核发送一个 <strong><code>SIGVTALRM (26)</code></strong> 给当前进程</li>
+<li data-line="7620" class="code-line"><strong><code>ITIMER_PROF</code></strong> : 运行时计时法，计算用户空间的运行时间加上内核空间的运行时间，timeout 后内核发送一个 <strong><code>SIGPROF (27)</code></strong> 给当前进程</li>
 </ul>
 </li>
-<li data-line="7621" class="code-line">
-<p data-line="7621" class="code-line"><strong><code>new_value</code></strong> : 指定定时器的 timeout 时间，其由一个嵌套结构体所构成</p>
-<pre><code data-line="7622" class="code-line language-c"><div><span class="hljs-comment">/* itimerval */</span>
+<li data-line="7622" class="code-line">
+<p data-line="7622" class="code-line"><strong><code>new_value</code></strong> : 指定定时器的 timeout 时间，其由一个嵌套结构体所构成</p>
+<pre><code data-line="7623" class="code-line language-c"><div><span class="hljs-comment">/* itimerval */</span>
 <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">itimerval</span> {</span> 
   <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">timerval</span> <span class="hljs-title">it_interval</span>;</span>  <span class="hljs-comment">/* Interval time for each timer trigger */</span>
   <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">timerval</span> <span class="hljs-title">it_value</span>;</span>     <span class="hljs-comment">/* Delay time when the timer is first executed */</span>
@@ -6958,28 +6958,28 @@ B ^ C = A
 }      
 </div></code></pre>
 <ul>
-<li data-line="7635" class="code-line">
-<p data-line="7635" class="code-line"><strong><code>itimerval</code></strong> 中的每一种时间类型都属于 <strong><code>timeval</code></strong> 结构体类型；在 <strong><code>timeval</code></strong> 结构体类型中，我们可以设定当前时间类型所延迟的 秒 / 微妙，注意，仅保证一种成员是有效的，无效的成员设定为 <strong><code>0</code></strong></p>
+<li data-line="7636" class="code-line">
+<p data-line="7636" class="code-line"><strong><code>itimerval</code></strong> 中的每一种时间类型都属于 <strong><code>timeval</code></strong> 结构体类型；在 <strong><code>timeval</code></strong> 结构体类型中，我们可以设定当前时间类型所延迟的 秒 / 微妙，注意，仅保证一种成员是有效的，无效的成员设定为 <strong><code>0</code></strong></p>
 </li>
-<li data-line="7637" class="code-line">
-<p data-line="7637" class="code-line"><strong><code>it_value</code></strong> : 指定定时器在第一次触发时所延迟的时间</p>
+<li data-line="7638" class="code-line">
+<p data-line="7638" class="code-line"><strong><code>it_value</code></strong> : 指定定时器在第一次触发时所延迟的时间</p>
 <ul>
-<li data-line="7639" class="code-line">如果当前成员都设定为 <strong><code>0</code></strong>，则意为取消定时器，无论 <strong><code>it_interval</code></strong> 设置为何值</li>
+<li data-line="7640" class="code-line">如果当前成员都设定为 <strong><code>0</code></strong>，则意为取消定时器，无论 <strong><code>it_interval</code></strong> 设置为何值</li>
 </ul>
 </li>
-<li data-line="7641" class="code-line">
-<p data-line="7641" class="code-line"><strong><code>it_interval</code></strong> : 指定定时器每次轮询所间隔的时间</p>
+<li data-line="7642" class="code-line">
+<p data-line="7642" class="code-line"><strong><code>it_interval</code></strong> : 指定定时器每次轮询所间隔的时间</p>
 <ul>
-<li data-line="7642" class="code-line">如果当前成员都设定为 <strong><code>0</code></strong>，则意为定时器仅依据 <strong><code>it_value</code></strong> 的延迟时间仅运行一次 ( 假定 <strong><code>it_value</code></strong> 并未设置为 <strong><code>0</code></strong>)</li>
+<li data-line="7643" class="code-line">如果当前成员都设定为 <strong><code>0</code></strong>，则意为定时器仅依据 <strong><code>it_value</code></strong> 的延迟时间仅运行一次 ( 假定 <strong><code>it_value</code></strong> 并未设置为 <strong><code>0</code></strong>)</li>
 </ul>
 </li>
 </ul>
 </li>
-<li data-line="7644" class="code-line">
-<p data-line="7644" class="code-line"><strong><code>old_value</code></strong> : 存放旧的 timeout 时间，如无特殊要求设置为 <strong><code>NULL</code></strong> 即可</p>
+<li data-line="7645" class="code-line">
+<p data-line="7645" class="code-line"><strong><code>old_value</code></strong> : 存放旧的 timeout 时间，如无特殊要求设置为 <strong><code>NULL</code></strong> 即可</p>
 </li>
 </ul>
-<pre><code data-line="7646" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<pre><code data-line="7647" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -7018,22 +7018,22 @@ B ^ C = A
 
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="%E6%9C%AA%E5%86%B3%E4%BF%A1%E5%8F%B7%E9%9B%86%E5%92%8C%E9%98%BB%E5%A1%9E%E4%BF%A1%E5%8F%B7%E9%9B%86"></a><h4 id="%E6%9C%AA%E5%86%B3%E4%BF%A1%E5%8F%B7%E9%9B%86%E5%92%8C%E9%98%BB%E5%A1%9E%E4%BF%A1%E5%8F%B7%E9%9B%86" data-line="7688" class="code-line">未决信号集和阻塞信号集</h4>
-<p data-line="7689" class="code-line"><span id="未决信号集和阻塞信号集"></span></p>
-<p data-line="7691" class="code-line">任何一个信号 ( 除了 <strong><code>SIGKILL</code></strong> 和 <strong><code>SIGSTOP</code></strong>，它们无法被捕获、忽略和阻塞 ) 在真正到达一个进程前都会经历一次 <strong><code>未决 (pending)</code></strong> 的过程，在内核态的 PCB 模块中，拥有一个成员用于维护和表示发生在当前进程中每种信号的未决状态，它称之为 <strong><code>未决信号集</code></strong>，未决信号集是一个线性集合，其中，集合的每个下标都能够映射至对应 ID 的信号，当一个信号在即将抵达至当前进程前，都会把当前信号维护至未决信号集对应信号 ID 的下标处以表示当前信号的未决状态，<strong style="color:red">当未决信号集指定下标的空间已经维护了某个信号，那么后来发送至当前进程的这个信号则会被丢弃</strong></p>
-<p data-line="7693" class="code-line">当某个信号已处于未决信号集后，两个条件会决定这个信号是否能够真正意义上的抵达至当前进程</p>
+<a for="toc-anchor" id="%E6%9C%AA%E5%86%B3%E4%BF%A1%E5%8F%B7%E9%9B%86%E5%92%8C%E9%98%BB%E5%A1%9E%E4%BF%A1%E5%8F%B7%E9%9B%86"></a><h4 id="%E6%9C%AA%E5%86%B3%E4%BF%A1%E5%8F%B7%E9%9B%86%E5%92%8C%E9%98%BB%E5%A1%9E%E4%BF%A1%E5%8F%B7%E9%9B%86" data-line="7689" class="code-line">未决信号集和阻塞信号集</h4>
+<p data-line="7690" class="code-line"><span id="未决信号集和阻塞信号集"></span></p>
+<p data-line="7692" class="code-line">任何一个信号 ( 除了 <strong><code>SIGKILL</code></strong> 和 <strong><code>SIGSTOP</code></strong>，它们无法被捕获、忽略和阻塞 ) 在真正到达一个进程前都会经历一次 <strong><code>未决 (pending)</code></strong> 的过程，在内核态的 PCB 模块中，拥有一个成员用于维护和表示发生在当前进程中每种信号的未决状态，它称之为 <strong><code>未决信号集</code></strong>，未决信号集是一个线性集合，其中，集合的每个下标都能够映射至对应 ID 的信号，当一个信号在即将抵达至当前进程前，都会把当前信号维护至未决信号集对应信号 ID 的下标处以表示当前信号的未决状态，<strong style="color:red">当未决信号集指定下标的空间已经维护了某个信号，那么后来发送至当前进程的这个信号则会被丢弃</strong></p>
+<p data-line="7694" class="code-line">当某个信号已处于未决信号集后，两个条件会决定这个信号是否能够真正意义上的抵达至当前进程</p>
 <ol>
-<li data-line="7695" class="code-line">
-<p data-line="7695" class="code-line">当前信号是否正在执行 <strong><code>Action</code></strong>，如果是的话，那么这个信号则保持不变，任然维持着 <strong><code>未决</code></strong> 的状态；如果没有，则会进入第二个条件</p>
+<li data-line="7696" class="code-line">
+<p data-line="7696" class="code-line">当前信号是否正在执行 <strong><code>Action</code></strong>，如果是的话，那么这个信号则保持不变，任然维持着 <strong><code>未决</code></strong> 的状态；如果没有，则会进入第二个条件</p>
 </li>
-<li data-line="7697" class="code-line">
-<p data-line="7697" class="code-line">当前信号是否被阻塞，如果是的话，那么这个信号则保持不变，任然维持着 <strong><code>未决</code></strong> 的状态，亦或者我们也可以认为这个信号处于一种等待着阻塞结束的状态；如果没有，则这个信号便会成功抵达当前进程并执行其所对应的 <strong><code>Action</code></strong></p>
+<li data-line="7698" class="code-line">
+<p data-line="7698" class="code-line">当前信号是否被阻塞，如果是的话，那么这个信号则保持不变，任然维持着 <strong><code>未决</code></strong> 的状态，亦或者我们也可以认为这个信号处于一种等待着阻塞结束的状态；如果没有，则这个信号便会成功抵达当前进程并执行其所对应的 <strong><code>Action</code></strong></p>
 </li>
 </ol>
-<p data-line="7699" class="code-line">对于 <strong><code>阻塞 ( mask )</code></strong> 的信号来说，PCB 模块同样是使用一个结构性和 <strong><code>未决信号集</code></strong> 保持一致的集合用于维护和表示，我们称这个用于表示信号阻塞信息的集合为 <strong><code>阻塞信号集</code></strong>；阻塞信号集的数据结构和未决信号集是保持一致性的，即数组中的每个下标都用于存放不同信号的阻塞信息，每个处于未决信号集的信号在执行前都会检查阻塞信号集中对应下标的元素是否已被占用，如果是的话则认为这个信号正在置于一个阻塞的状态，并等待着阻塞的结束 ( 阻塞信号集对应信号 ID 下标的数据重置 ) 以抵达当前进程并执行其所对应的 <strong><code>Action</code></strong>，它的产生可能是一些其它因素但更多的情况，则交由开发人员通过对应的系统调用来人为的设置</p>
-<p data-line="7701" class="code-line">在这里需要强调的是，不管是阻塞信号集也好还是未决信号集，上面所说到的都是 &quot;把当前信号维护至集合的对应下标的存储空间中&quot;，但是这并不是真正意义上的把一个信号存储在这个集合中，真实情况则为把对应集合中对应信号 ID 的下标所存储的数据置为 <strong><code>1</code></strong> 则能够表示某个信号已经被维护在了某个集合当中，反之置为 <strong><code>0</code></strong> 则表示某个信号并没有在具体某个集合下面，即还未产生对应集合所表示的状态</p>
-<p data-line="7703" class="code-line">对于信号集而言虽然其存储结构简单，但并不意味着我们可以手动的依据下标来修改信号集中具体某个下标 ( 信号 ID ) 的状态，对于一切信号集的操作标准库中提供了一些 API 以供我们执行，而我们对于信号集的修改也要围绕着这些 API 去进行才能够符合标准的规范</p>
-<pre><code data-line="7705" class="code-line language-text"><code><div>    pending              mask
+<p data-line="7700" class="code-line">对于 <strong><code>阻塞 ( mask )</code></strong> 的信号来说，PCB 模块同样是使用一个结构性和 <strong><code>未决信号集</code></strong> 保持一致的集合用于维护和表示，我们称这个用于表示信号阻塞信息的集合为 <strong><code>阻塞信号集</code></strong>；阻塞信号集的数据结构和未决信号集是保持一致性的，即数组中的每个下标都用于存放不同信号的阻塞信息，每个处于未决信号集的信号在执行前都会检查阻塞信号集中对应下标的元素是否已被占用，如果是的话则认为这个信号正在置于一个阻塞的状态，并等待着阻塞的结束 ( 阻塞信号集对应信号 ID 下标的数据重置 ) 以抵达当前进程并执行其所对应的 <strong><code>Action</code></strong>，它的产生可能是一些其它因素但更多的情况，则交由开发人员通过对应的系统调用来人为的设置</p>
+<p data-line="7702" class="code-line">在这里需要强调的是，不管是阻塞信号集也好还是未决信号集，上面所说到的都是 &quot;把当前信号维护至集合的对应下标的存储空间中&quot;，但是这并不是真正意义上的把一个信号存储在这个集合中，真实情况则为把对应集合中对应信号 ID 的下标所存储的数据置为 <strong><code>1</code></strong> 则能够表示某个信号已经被维护在了某个集合当中，反之置为 <strong><code>0</code></strong> 则表示某个信号并没有在具体某个集合下面，即还未产生对应集合所表示的状态</p>
+<p data-line="7704" class="code-line">对于信号集而言虽然其存储结构简单，但并不意味着我们可以手动的依据下标来修改信号集中具体某个下标 ( 信号 ID ) 的状态，对于一切信号集的操作标准库中提供了一些 API 以供我们执行，而我们对于信号集的修改也要围绕着这些 API 去进行才能够符合标准的规范</p>
+<pre><code data-line="7706" class="code-line language-text"><code><div>    pending              mask
   +--------+          +--------+
  0|        |         0|        |
  1|SIGINT 1| +-----&gt; 1|SIGINT 1|
@@ -7049,21 +7049,21 @@ B ^ C = A
   +--------+          +--------+
 </div></code></code></pre>
 <br/>
-<a for="toc-anchor" id="%E4%BF%A1%E5%8F%B7%E9%9B%86%E7%9A%84%E4%BD%BF%E7%94%A8"></a><h4 id="%E4%BF%A1%E5%8F%B7%E9%9B%86%E7%9A%84%E4%BD%BF%E7%94%A8" data-line="7724" class="code-line">信号集的使用</h4>
-<p data-line="7725" class="code-line"><span id="信号集的使用"></span></p>
-<a for="toc-anchor" id="sigset_t"></a><h4 id="sigsett" data-line="7727" class="code-line">sigset_t</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-8" data-line="7728" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7730" class="code-line">不管是阻塞信号集也好还是未决信号集，二者之间的存储结构都是一致的，都是一块线性的数组空间，它由以下结构体来进行表示 ()  ，我们对于任何信号集的任何操作都需要以这个结构体的实例为基准去进行</p>
-<pre><code data-line="7732" class="code-line language-c"><div><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span>
+<a for="toc-anchor" id="%E4%BF%A1%E5%8F%B7%E9%9B%86%E7%9A%84%E4%BD%BF%E7%94%A8"></a><h4 id="%E4%BF%A1%E5%8F%B7%E9%9B%86%E7%9A%84%E4%BD%BF%E7%94%A8" data-line="7725" class="code-line">信号集的使用</h4>
+<p data-line="7726" class="code-line"><span id="信号集的使用"></span></p>
+<a for="toc-anchor" id="sigset_t"></a><h4 id="sigsett" data-line="7728" class="code-line">sigset_t</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-8" data-line="7729" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7731" class="code-line">不管是阻塞信号集也好还是未决信号集，二者之间的存储结构都是一致的，都是一块线性的数组空间，它由以下结构体来进行表示 ()  ，我们对于任何信号集的任何操作都需要以这个结构体的实例为基准去进行</p>
+<pre><code data-line="7733" class="code-line language-c"><div><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span>
 {</span>
   <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">long</span> <span class="hljs-keyword">int</span> __val[_SIGSET_NWORDS];
 } <span class="hljs-keyword">sigset_t</span>;
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-sigfillset(sigset_t-*set)"></a><h4 id="int-sigfillsetsigsett-set" data-line="7741" class="code-line">int sigfillset(sigset_t *set)</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-9" data-line="7742" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7744" class="code-line">将信号集 <strong><code>set</code></strong> 中的所有数据置为 <strong><code>1</code></strong>，成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
-<pre><code data-line="7747" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<a for="toc-anchor" id="int-sigfillset(sigset_t-*set)"></a><h4 id="int-sigfillsetsigsett-set" data-line="7742" class="code-line">int sigfillset(sigset_t *set)</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-9" data-line="7743" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7745" class="code-line">将信号集 <strong><code>set</code></strong> 中的所有数据置为 <strong><code>1</code></strong>，成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
+<pre><code data-line="7748" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -7079,10 +7079,10 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-sigemptyset(sigset_t-*set)"></a><h4 id="int-sigemptysetsigsett-set" data-line="7766" class="code-line">int sigemptyset(sigset_t *set)</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-10" data-line="7767" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7769" class="code-line">将信号集 <strong><code>set</code></strong> 中的所有数据置为 <strong><code>0</code></strong>，成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
-<pre><code data-line="7772" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<a for="toc-anchor" id="int-sigemptyset(sigset_t-*set)"></a><h4 id="int-sigemptysetsigsett-set" data-line="7767" class="code-line">int sigemptyset(sigset_t *set)</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-10" data-line="7768" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7770" class="code-line">将信号集 <strong><code>set</code></strong> 中的所有数据置为 <strong><code>0</code></strong>，成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
+<pre><code data-line="7773" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -7098,10 +7098,10 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-sigaddset(sigset_t-*set%2C-int-sig)"></a><h4 id="int-sigaddsetsigsett-set-int-sig" data-line="7792" class="code-line">int sigaddset(sigset_t *set, int sig)</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-11" data-line="7793" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7795" class="code-line">将信号集 <strong><code>set</code></strong> 中的信号 ID <strong><code>sig</code></strong> 所对应的下标的数据置为 <strong><code>1</code></strong>，成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
-<pre><code data-line="7798" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<a for="toc-anchor" id="int-sigaddset(sigset_t-*set%2C-int-sig)"></a><h4 id="int-sigaddsetsigsett-set-int-sig" data-line="7793" class="code-line">int sigaddset(sigset_t *set, int sig)</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-11" data-line="7794" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7796" class="code-line">将信号集 <strong><code>set</code></strong> 中的信号 ID <strong><code>sig</code></strong> 所对应的下标的数据置为 <strong><code>1</code></strong>，成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
+<pre><code data-line="7799" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -7117,10 +7117,10 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-sigdelset(sigset_t-*set%2C-int-sig)"></a><h4 id="int-sigdelsetsigsett-set-int-sig" data-line="7817" class="code-line">int sigdelset(sigset_t *set, int sig)</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-12" data-line="7818" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7820" class="code-line">将信号集 <strong><code>set</code></strong> 中的信号 ID <strong><code>sig</code></strong> 所对应的下标的数据置为 <strong><code>0</code></strong>，成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
-<pre><code data-line="7822" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<a for="toc-anchor" id="int-sigdelset(sigset_t-*set%2C-int-sig)"></a><h4 id="int-sigdelsetsigsett-set-int-sig" data-line="7818" class="code-line">int sigdelset(sigset_t *set, int sig)</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-12" data-line="7819" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7821" class="code-line">将信号集 <strong><code>set</code></strong> 中的信号 ID <strong><code>sig</code></strong> 所对应的下标的数据置为 <strong><code>0</code></strong>，成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
+<pre><code data-line="7823" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -7136,10 +7136,10 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-sigismember(const-sigset_t-*set%2C-int-signum)"></a><h4 id="int-sigismemberconst-sigsett-set-int-signum" data-line="7841" class="code-line">int sigismember(const sigset_t *set, int signum)</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-13" data-line="7842" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7844" class="code-line">判断指定信号 ID <strong><code>signum</code></strong> 在当前信号集 <strong><code>set</code></strong> 所对应的下标的数据是否置为 <strong><code>1</code></strong>，如果是则返回 <strong><code>1</code></strong>，不是则返回 <strong><code>0</code></strong>，函数调用失败时则返回 <strong><code>-1</code></strong></p>
-<pre><code data-line="7846" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<a for="toc-anchor" id="int-sigismember(const-sigset_t-*set%2C-int-signum)"></a><h4 id="int-sigismemberconst-sigsett-set-int-signum" data-line="7842" class="code-line">int sigismember(const sigset_t *set, int signum)</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-13" data-line="7843" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7845" class="code-line">判断指定信号 ID <strong><code>signum</code></strong> 在当前信号集 <strong><code>set</code></strong> 所对应的下标的数据是否置为 <strong><code>1</code></strong>，如果是则返回 <strong><code>1</code></strong>，不是则返回 <strong><code>0</code></strong>，函数调用失败时则返回 <strong><code>-1</code></strong></p>
+<pre><code data-line="7847" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -7159,10 +7159,10 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<a for="toc-anchor" id="int-sigpending(sigset_t-*set)"></a><h4 id="int-sigpendingsigsett-set" data-line="7869" class="code-line">int sigpending(sigset_t *set)</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-14" data-line="7870" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7872" class="code-line">获取当前进程的未决信号集，并将之拷贝到所指定的 <strong><code>set</code></strong> 当中，成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
-<pre><code data-line="7874" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<a for="toc-anchor" id="int-sigpending(sigset_t-*set)"></a><h4 id="int-sigpendingsigsett-set" data-line="7870" class="code-line">int sigpending(sigset_t *set)</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-14" data-line="7871" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7873" class="code-line">获取当前进程的未决信号集，并将之拷贝到所指定的 <strong><code>set</code></strong> 当中，成功则返回 <strong><code>0</code></strong>，否则返回 <strong><code>-1</code></strong></p>
+<pre><code data-line="7875" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -7178,26 +7178,26 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<p data-line="7893" class="code-line"><span id  = "sigprocmask"></span></p>
-<a for="toc-anchor" id="int-sigprocmask(int-how%2C-const-sigset_t-*set%2C-sigset_t-*oldset)"></a><h4 id="int-sigprocmaskint-how-const-sigsett-set-sigsett-oldset" data-line="7895" class="code-line">int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-15" data-line="7896" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="7898" class="code-line">根据所指定的信号集 <strong><code>set</code></strong> 和所指定的修改方式 <strong><code>how</code></strong> 去修改当前进程中的阻塞信号集，成功则返回 <strong><code>0</code></strong>，否则返回</p>
+<p data-line="7894" class="code-line"><span id  = "sigprocmask"></span></p>
+<a for="toc-anchor" id="int-sigprocmask(int-how%2C-const-sigset_t-*set%2C-sigset_t-*oldset)"></a><h4 id="int-sigprocmaskint-how-const-sigsett-set-sigsett-oldset" data-line="7896" class="code-line">int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-15" data-line="7897" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="7899" class="code-line">根据所指定的信号集 <strong><code>set</code></strong> 和所指定的修改方式 <strong><code>how</code></strong> 去修改当前进程中的阻塞信号集，成功则返回 <strong><code>0</code></strong>，否则返回</p>
 <ul>
-<li data-line="7900" class="code-line">
-<p data-line="7900" class="code-line"><strong><code>how</code></strong> : 所指定的修改方式，以宏定义来指定</p>
+<li data-line="7901" class="code-line">
+<p data-line="7901" class="code-line"><strong><code>how</code></strong> : 所指定的修改方式，以宏定义来指定</p>
 <ul>
-<li data-line="7902" class="code-line"><strong><code>SIG_BLOCK</code></strong> : 当前信号集 <strong><code>set</code></strong> 中值位 <strong><code>1</code></strong> 的下标则作为屏蔽项</li>
-<li data-line="7903" class="code-line"><strong><code>SIG_UNBLOCK</code></strong> : 当前信号集 <strong><code>set</code></strong> 中值位 <strong><code>1</code></strong> 的下标则作为解除屏蔽项</li>
+<li data-line="7903" class="code-line"><strong><code>SIG_BLOCK</code></strong> : 当前信号集 <strong><code>set</code></strong> 中值位 <strong><code>1</code></strong> 的下标则作为屏蔽项</li>
+<li data-line="7904" class="code-line"><strong><code>SIG_UNBLOCK</code></strong> : 当前信号集 <strong><code>set</code></strong> 中值位 <strong><code>1</code></strong> 的下标则作为解除屏蔽项</li>
 </ul>
 </li>
-<li data-line="7905" class="code-line">
-<p data-line="7905" class="code-line"><strong><code>set</code></strong> : 内核中的阻塞信号集的修改依据则以这个参数为基准</p>
+<li data-line="7906" class="code-line">
+<p data-line="7906" class="code-line"><strong><code>set</code></strong> : 内核中的阻塞信号集的修改依据则以这个参数为基准</p>
 </li>
-<li data-line="7907" class="code-line">
-<p data-line="7907" class="code-line"><strong><code>oldset</code></strong> : 旧值，可忽略</p>
+<li data-line="7908" class="code-line">
+<p data-line="7908" class="code-line"><strong><code>oldset</code></strong> : 旧值，可忽略</p>
 </li>
 </ul>
-<pre><code data-line="7909" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
+<pre><code data-line="7910" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
@@ -7218,16 +7218,16 @@ B ^ C = A
 </div></code></pre>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p data-line="7931" class="code-line">该函数并未遵循 <strong><code>POSIX</code></strong> 的规范完成进程的屏蔽信号集的设置，故在使用遵循 <strong><code>POSIX</code></strong> 规范的 <strong><code>NPTL</code></strong> 库所完成多线程模型的情境之下，更推荐的方式则为使用 <a href="#pthread_sigmask" data-href="#pthread_sigmask">pthread_sigmask</a> 来完成</p>
+<p data-line="7932" class="code-line">该函数并未遵循 <strong><code>POSIX</code></strong> 的规范完成进程的屏蔽信号集的设置，故在使用遵循 <strong><code>POSIX</code></strong> 规范的 <strong><code>NPTL</code></strong> 库所完成多线程模型的情境之下，更推荐的方式则为使用 <a href="#pthread_sigmask" data-href="#pthread_sigmask">pthread_sigmask</a> 来完成</p>
 </div>
 <br/>
-<p data-line="7936" class="code-line"><span id = "pthread_sigmask"></span></p>
-<a for="toc-anchor" id="int-pthread_sigmask()"></a><h4 id="int-pthreadsigmask" data-line="7938" class="code-line">int pthread_sigmask()</h4>
-<a for="toc-anchor" id="%3Csys%2Fsyscall.h%3E-%3Csys%2Ftypes.h%3E"></a><h5 id="syssyscallh-systypesh-1" data-line="7939" class="code-line">&lt;sys/syscall.h&gt; &lt;sys/types.h&gt;</h5>
-<p data-line="7941" class="code-line">设定当前线程的阻塞信号集</p>
-<p data-line="7943" class="code-line">每个线程的阻塞信号集虽然会从其父级进程中继承下来，但是这份继承也仅仅只是拷贝，并不属于共享，故任意一个子集线程都可以以这份从父级线程中所拷贝的阻塞信号集向下继续做独立的延伸工作</p>
-<p data-line="7945" class="code-line">虽然该函数其功能和形参的实现都和 <a href="#sigprocmask" data-href="#sigprocmask">sigprocmask</a> 保持一致 ( 故这里不再对该函数的形参做阐述 )，唯一的区别仅是当前函数的内部实现严格遵循着 <strong><code>POSIX</code></strong> 所指定的规范，故在使用 <strong><code>NPTL</code></strong> 库所完成的多线程开发模型中，更为推荐使用该函数来完成线程的阻塞信号集的设置</p>
-<pre><code data-line="7947" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<p data-line="7937" class="code-line"><span id = "pthread_sigmask"></span></p>
+<a for="toc-anchor" id="int-pthread_sigmask()"></a><h4 id="int-pthreadsigmask" data-line="7939" class="code-line">int pthread_sigmask()</h4>
+<a for="toc-anchor" id="%3Csys%2Fsyscall.h%3E-%3Csys%2Ftypes.h%3E"></a><h5 id="syssyscallh-systypesh-1" data-line="7940" class="code-line">&lt;sys/syscall.h&gt; &lt;sys/types.h&gt;</h5>
+<p data-line="7942" class="code-line">设定当前线程的阻塞信号集</p>
+<p data-line="7944" class="code-line">每个线程的阻塞信号集虽然会从其父级进程中继承下来，但是这份继承也仅仅只是拷贝，并不属于共享，故任意一个子集线程都可以以这份从父级线程中所拷贝的阻塞信号集向下继续做独立的延伸工作</p>
+<p data-line="7946" class="code-line">虽然该函数其功能和形参的实现都和 <a href="#sigprocmask" data-href="#sigprocmask">sigprocmask</a> 保持一致 ( 故这里不再对该函数的形参做阐述 )，唯一的区别仅是当前函数的内部实现严格遵循着 <strong><code>POSIX</code></strong> 所指定的规范，故在使用 <strong><code>NPTL</code></strong> 库所完成的多线程开发模型中，更为推荐使用该函数来完成线程的阻塞信号集的设置</p>
+<pre><code data-line="7948" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdbool.h&gt;</span></span>
@@ -7284,21 +7284,21 @@ B ^ C = A
 }
 </div></code></pre>
 <br/>
-<p data-line="8007" class="code-line"><span id = "sigwaitinfo"></span></p>
-<a for="toc-anchor" id="int-sigwaitinfo(const-sigset_t-*set%2C-siginfo_t-*info)"></a><h4 id="int-sigwaitinfoconst-sigsett-set-siginfot-info" data-line="8009" class="code-line">int sigwaitinfo(const sigset_t *set, siginfo_t *info)</h4>
-<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-16" data-line="8010" class="code-line">&lt;signal.h&gt;</h5>
-<p data-line="8012" class="code-line">阻塞当前线程的执行并等待信号集 <strong><code>set</code></strong> 中所设定的信号的到达，如果当前线程某一个符合要求 ( 设置在信号集 <strong><code>set</code></strong> 中且已被指定到内核的屏蔽信号集 <strong><code>mask</code></strong> 中 ) 的信号，则函数调用立即返回 <strong><code>指定信号的 ID</code></strong>，且将所抵达信号的详细信息写入至 <strong><code>info</code></strong> 所指向的内存块中，如调用失败，则函数立即返回 <strong><code>-1</code></strong></p>
-<p data-line="8014" class="code-line">需要注意的是，我们要保证 <strong><code>set</code></strong> 信号集中所指定的信号已用于当前线程的阻塞信号集 ( <strong><code>mask</code></strong> ) 的指定</p>
-<p data-line="8016" class="code-line">当前函数还存在另一派生，即 <a href="https://linux.die.net/man/3/sigwait" data-href="https://linux.die.net/man/3/sigwait">sigwait()</a>，其用法和当前函数大致相同，这里不再阐述</p>
+<p data-line="8008" class="code-line"><span id = "sigwaitinfo"></span></p>
+<a for="toc-anchor" id="int-sigwaitinfo(const-sigset_t-*set%2C-siginfo_t-*info)"></a><h4 id="int-sigwaitinfoconst-sigsett-set-siginfot-info" data-line="8010" class="code-line">int sigwaitinfo(const sigset_t *set, siginfo_t *info)</h4>
+<a for="toc-anchor" id="%3Csignal.h%3E"></a><h5 id="signalh-16" data-line="8011" class="code-line">&lt;signal.h&gt;</h5>
+<p data-line="8013" class="code-line">阻塞当前线程的执行并等待信号集 <strong><code>set</code></strong> 中所设定的信号的到达，如果当前线程某一个符合要求 ( 设置在信号集 <strong><code>set</code></strong> 中且已被指定到内核的屏蔽信号集 <strong><code>mask</code></strong> 中 ) 的信号，则函数调用立即返回 <strong><code>指定信号的 ID</code></strong>，且将所抵达信号的详细信息写入至 <strong><code>info</code></strong> 所指向的内存块中，如调用失败，则函数立即返回 <strong><code>-1</code></strong></p>
+<p data-line="8015" class="code-line">需要注意的是，我们要保证 <strong><code>set</code></strong> 信号集中所指定的信号已用于当前线程的阻塞信号集 ( <strong><code>mask</code></strong> ) 的指定</p>
+<p data-line="8017" class="code-line">当前函数还存在另一派生，即 <a href="https://linux.die.net/man/3/sigwait" data-href="https://linux.die.net/man/3/sigwait">sigwait()</a>，其用法和当前函数大致相同，这里不再阐述</p>
 <ul>
-<li data-line="8018" class="code-line">
-<p data-line="8018" class="code-line"><strong><code>set</code></strong> : 指定需要等待信号的信号集，通常它需要选用于阻塞信号集的设置 <a href="#pthread_sigmask" data-href="#pthread_sigmask">pthread_sigmask()</a></p>
+<li data-line="8019" class="code-line">
+<p data-line="8019" class="code-line"><strong><code>set</code></strong> : 指定需要等待信号的信号集，通常它需要选用于阻塞信号集的设置 <a href="#pthread_sigmask" data-href="#pthread_sigmask">pthread_sigmask()</a></p>
 </li>
-<li data-line="8020" class="code-line">
-<p data-line="8020" class="code-line"><strong><code>info</code></strong> : 用于存储所接受到的信号的详细信息，其成员在这里不再阐述，详情请看 <a href="https://linux.die.net/man/2/sigwaitinfo" data-href="https://linux.die.net/man/2/sigwaitinfo">这里</a></p>
+<li data-line="8021" class="code-line">
+<p data-line="8021" class="code-line"><strong><code>info</code></strong> : 用于存储所接受到的信号的详细信息，其成员在这里不再阐述，详情请看 <a href="https://linux.die.net/man/2/sigwaitinfo" data-href="https://linux.die.net/man/2/sigwaitinfo">这里</a></p>
 </li>
 </ul>
-<pre><code data-line="8022" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<pre><code data-line="8023" class="code-line language-c"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdbool.h&gt;</span></span>

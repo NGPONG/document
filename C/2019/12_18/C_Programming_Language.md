@@ -5881,8 +5881,9 @@ int main(int argc, char *argv[]) {
 
 <br/>
 
- #### 再聊 PID PGID TGID PPID SID
 <span id="再聊-pid-pgid-tgid"></span>
+
+ #### 再聊 PID PGID TGID PPID SID
 
 对于每个进程而言，他都拥有着以下信息用于标识当前进程的所属单位，我们可以通过一些命令行工具，如 : **`pstree`**, **`ps`**, **`htop`** 去查看它
 
