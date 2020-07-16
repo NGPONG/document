@@ -5611,7 +5611,7 @@ struct task_struct {
 
 在一个进程在被真正被创建出来之前，需要经历两次系统调用
 
-其一则为 **`clone()`**，该系统调用以旧 ( 父 ) 进程作为模型 ( 包括了父进程的地址空间还有 **`Page Table`** 的信息 ) 并 clone 出一个新的子进程，即生成了属于它的 **`task_struct`**  ( 在这里，内核已经为该进程创建了 **`kernel mode`** )，顺带的会校验当前系统的资源负载，最后会设置其独一无二的 **`PID`** 和与之相关联的父进程的 **`PPID`**
+其一则为 **`clone()`**，该系统调用以旧 ( 父 ) 进程作为模型 ( 包括了父进程的地址空间还有 **`Page Table`** 的信息 ) 并 clone 出一个新的子进程，即生成了属于它的 **`task_struct`**  ( 在这里，��核已经为该进程创建了 **`kernel mode`** )，顺带的会校验当前系统的资源负载，最后会设置其独一无二的 **`PID`** 和与之相关联的父进程的 **`PPID`**
 
 其二则为 **`execve()`**，该系统调用能够将新进程中的可执行文件替换为新进程所对应的二进制文件，并使用一个或者多个物理内存页去拷贝新进程的地址空间, **`Page Table`** 和用户态中的内容替换至子进程当中 ( 原有新进程所 clone 至旧进程的地址空间数据回收释放 )
 
@@ -5823,13 +5823,17 @@ int main(int argc, char *argv[]) {
 
 不得不提的是，在 linux 下其实本并没有线程，只是为了迎合开发者口味，搞了个 **`轻量级进程`** 出来，他就是所谓的 **`Thread`**；在 linux 中，一个 **`Thread`** 会被当作是一个 **`Process`** 来看待，它同样也是一个 **`task_struct`** 结构体的实例，也拥有一个 **`PID`** 来作为当前操作系统而言的唯一身份标识 **`PID`**，**`kernel`** 并不针对线程去提供针对性的调度
 
-线程的创建同样需要依赖于一个父级进程，这个父级进程也可能是作为源程序所启动的第一个进程所派生下来的子进程也可能是第一个进程本身，但无论如何，线程的创建往往都需要依赖于一个进程，但是不管该线程的创建是往下延续到多少层级的进程派生，其父进程 **`PPID`** 始终都是源程序所启动的第一个进程的 **`PID`**，我们可以理解为当前源程序的最上级进程的 **`PID`**，那么相对的，对于线程来说区分它到底是属于哪个进程往下的派生通过一个属性 **`TGID`** 来确定，属于同一进程下派生出来的线程其 **`TGID`** 都为派生者的 **`PID`**，它们是属于一种平级的关系
+线程的创建同样需要依赖于一个父级进程，这个父级进程也可能是作为源程序所启动的第一个进程所派生下来的子进程也可能是第一个进程本身，但无论如何，**线程的创建往往都需要依赖于一个进程，但是不管该线程的创建是往下延续到多少层级的进程派生，其父进程 **`PPID`** 始终都是源程序所启动的第一个进程的 **`PID`**<span></span>**{style="color:red"}，我们可以理解为当前源程序的最上级进程的 **`PID`**；相对的，**对于线程来说区分它到底是属于哪个进程往下的派生通过一个属性 **`TGID`** 来确定，属于同一进程下派生出来的线程其 **`TGID`** 都为派生者的 **`PID`**<span></span>**{style="color:red"}，并且，**即便是往下延续派生了多个子线程 ( 例如，子线程中又创建了子线程 )，它们任然是属于一种同组平级的关系**{style="color:red"}，简而言之，一个进程组下的所有子线程，无论它们的创建到底是具体到了哪个层级来完成，它们都是属于一个平级的关系
 
 需要扩充的是，同一进程下的所有线程在调用 **`getpid()`** 时所获取到的 **`PID`** 是一样的， 因为对于多线程的程序来说，**`getpid()`** 系统调用获取的实际上是 **`TGID`**，因此隶属同一进程的多个线程看起来 **`PID`** 相同
 
 线程的创建过程和进程一致，也是以父进程作为模型 **`clone`** 出来的，但是该系统调用区别于进程的创建，**`clone`** 是最大共享的 **`clone`**，这个共享，是 **地址空间 、Page Table、堆、栈、PCB中的文件描述符表、信号 ( 所共享的仅仅只是信号的 **`Action`**，并不包括未决信号集，而对于阻塞信号集也仅仅只是做了一份拷贝的动作并在此基础上作为每个线程的独立延伸  )**{style="color:red"} 的共享，这里需要区别与进程，线程是真正意义上的虚拟内存共享，这就是为什么线程会被称为 **`轻量级线程`** 的原因；不可否认的是，线程的创建的确是免去了进程创建需要拷贝地址空间和页表的工作，也就是在一定程度上，线程创建的时间开销是小于进程的，但，这并不是绝对的，并不意味着线程和进程在创建上的时间开销是呈几何倍的差距，实际只有很小，关于这点在后面的节点还会提到
 
-**由于线程和其父线程是共享一段地址空间的关系，故一个线程出现的错误会导致延伸当前线程的主线程 ( 进程 ) 也会随同崩溃**{style="color:red"}
+线程的诞生往往需要以一个父进程为基准所延伸出来，它和父进程共享使用同一块地址空间，所以，线程的存在是需要依赖于一个父进程的，父进程的消亡随之而来的也会销毁且回收至当前进程下所延伸出来所有子线程，反之，一个线程所出现内存错误会导致延伸当前线程的主线程 ( 进程 ) 也会随同崩溃
+
+最后需要说明的是线程中的信号，在线程中的信号所绑定的 Action 是能够与父级进程和父进程中所派生下来的其他子进程去进行共享的，简而言之，**一个线程组内的任意一个线程 ( 包括父进程 ) 所绑定的信号 Action 会一并同步至当前线程组内的所有线程之中 ( 包括父进程 )**{style="color:red"}，所以，在多线程开发模型中为了保证一个进程下所派生的所有线程间的信号 Action 并不会呈一个污染的状态，故更推荐使用 [sigwait](#sigwaitinfo) 去完成信号 Action 的注册工作；需要注意的是，**子线程与父进程之间的信号共享的也仅仅只是信号所绑定的 Action，对于未决信号集和屏蔽信号集来说，每个线程都是一个独立的存在**{style="color:red"}，简而言之，每个线程都可以拥有属于自己本身的未决信号集和屏蔽信号集，需要扩充的是，在多线程开发模型中对于线程的屏蔽信号集的设定更正确的做法则为使用遵守 **`NPTL`** 规范的 [pthread_sigmask()](#pthread_sigmask) 函数去进行
+
+需要补充的是，对于平常信号的发送我们常使用的是 **`kill()`** 函数来完成，但是由于该函数所遵循的是 **POSXI** 的实现，故在多线程开发模型中使用的时候，如果针对某一个线程去发送某一个信号时线程已经对所发送的信号进行了屏蔽，那么该信号会发送至其父级线程中去，关于更多信息请查看 [kill()](#kill_fun)
 
 <br/>
 
@@ -5897,12 +5901,14 @@ int main(int argc, char *argv[]) {
 
 - **`TGID`**
   - 线程组ID，每个进程都能够以当前进程作为主线程并向下衍生出子线程，作为主线程而言，它的 **`PID == TGID`**，除了主线程，在该线程组下的所有线程都属于主线程的子线程，他们的 **`PID != TGID`**
-- **`TID`**
-  - 线程的ID，由于历史原因，在 linux 中的线程分别通过了 **`NPTL`** 和 **`POSIX`** 的实现，故这里的 TID 会存在两种不同
-  
-  - **`NPTL TID`** : 该 TID 仅能通过 [pthread_self()](#pthread_self) 获取，其仅能这个线程在 **当前进程内**{style="color:red"} 的唯一的标识；使用 **`NPTL`** 所提供的线程库来完成多线程模型的开发一律都是使用该 **`TID`** 作为基准
 
-   - **`POSIX TID`** : 该 TID 可以通过系统调用 [gettid()](#) 来获取，但是在标准的 glibc 库中并没有实现对它的封装，故最终还是要通过系统调用 **`syscall`** 来获取，其可作为整个这个线程在 **整个系统**{style="color:red"} 中的唯一标识
+- **`TID`**
+  - 线程的ID，由于历史原因，linux 早期的线程实现并未遵循 **`POSIX`** 的标准，反观至今的 linux 内核版本所使用的线程实现均遵循了 **`POSIX`** ( **`NPTL`** ) 的标准，而旧内核的线程实现和至今的线程实现有一点更需要关注的区别则为线程的 **`"PID"`**，对于早期并未遵循 **`POSIX`** 线程实现标准的内核版本来说，每个线程都具有不同的 **`PID`** ( 这和进程的实现一致，至少从这一点来看没错 )，而对于现今遵循了 **`POSIX`** ( **`NPTL`** ) 标准所实现的线程，上面所述的 **`"PID"`** 更应被称之为 **`TID`**
+  
+  - **`TID`** : 仅能通过 [pthread_self()](#pthread_self) 获取，其仅能这个线程在 **当前进程内**{style="color:red"} 的唯一的标识；使用 **`NPTL`** 所提供的线程库来完成多线程模型的开发一律都是使用该 **`TID`** 作为基准
+
+   - **`"PID"`** : 可以通过系统调用 [gettid()](#gettid_) 来获取，但是在标准的 glibc 库中并没有实现对它的封装，故最终还是要通过系统调用 **`syscall`** 来获取，其可作为整个这个线程在 **整个系统**{style="color:red"} 中的唯一标识
+
 - **`PPID`**
   - 子进程的父进程 **`PID`**
 
@@ -6330,9 +6336,9 @@ int main(int argc, char *argv[]) {
 
 ##### <pthread.h>
 
-创建一个新的线程，并开始执行函数指针 **`start_routine`** 的上下文，如果成功，则返回 **`0`** 并且返回所创建线程的 **`NPTL TID`** 至指针 **`thread`** 中，如果调用失败，则返回对应的 **`错误码`** ( 需要通过 **`strerror`** 把该错误码转换成有效的输出信息 )
+创建一个新的线程，并开始执行函数指针 **`start_routine`** 的上下文，如果成功，则返回 **`0`** 并且返回所创建线程的 **`TID`** 至指针 **`thread`** 中，如果调用失败，则返回对应的 **`错误码`** ( 需要通过 **`strerror`** 把该错误码转换成有效的输出信息 )
 
-- **`thread`** : 创建成功后所返回线程的 **`NPTL TID`**
+- **`thread`** : 创建成功后所返回线程的 **`TID`**
 
 - **`attr`** : 指定所创建线程的一些属性，如果为 **`NULL`**，则采用默认属性来对线程进行构造
 
@@ -6386,14 +6392,20 @@ int main(int argc, char *argv[]) {
 
 <br/>
 
+<span id = "pthread_exit"></span>
+
 #### int pthread_exit(void *retval)
 ##### <pthread.h>
 
-退出当前调用者线程的执行，需要注意的是，在使用 **`NPTL`** 所提供的库去实现多线程开发模型时，任意一个线程调用了 **`exit`** ( 父级进程在 **`main`** 函数中的 **`return`** 也属于 **`exit`** 的调用 ) 都会导致其同组 **`TGID`** 下的所有进程的退出 ( 其中也包括了构造出这些子级线程的父级进程，即 **`TGID == PID`**  ) 但是使用 **`pthread_exit`** 进行线程的退出是安全且可控的
+退出当前调用者线程的执行，需要注意的是，在使用 **`NPTL`** 所提供的库去实现多线程开发模型时，任意一个线程调用了 **`exit`** ( 亦或者等同于父级进程在 **`main`** 函数中的 **`return`**，这也是属于 **`exit`** 的调用 ) 都会导致其同组 **`TGID`** 下的所有进程的退出 ( 其中也包括了构造出这些子级线程的父级进程，即 **`TGID == PID`**  ) 但是使用 **`pthread_exit`** 进行线程的退出是安全且可控的
+
+如果父级线程其往下所派生的子级线程还处于正在运行的状态，则 **父级线程在调用 **`pthread_exit`** 退出后并不会阻断其子集线程的执行，但是由于子线程的运行需要依赖于父进程的地址空间，故这时候父级线程并不会也不能够真正的退出 ( 处于僵尸进程的状态 ) ，仅当当前父级进程下的所有子级线程执行完毕后，父级线程才真正被释放**{style="color:red"}
+
+一个使用了默认构造参数 ( 非分离 ) 的线程即便是使用了 **`pthread_exit`** 完成了一次安全且正确的退出后，该线程所占用的系统资源其实还并未真正的完全释放，仅当某个线程对该线程进行了一次 **`pthread_join`** 才能保证其资源的全部释放；关于这一点的确适合进程有点相似，但不同的是，进程在这种状态之下我们是可以人为观测到的 ( **`ps`**、**`htop`** )，而对于线程来说，虽然开发人员无法直观的观测到这种状态之下的线程但并不意味着它就并不存在，相关的更多信息请点击 [这里](#pthread_join)
 
 - **`retval`** : 表示当前线程所退出的状态，通常指定为 **`NULL`**
 
-  - 需要注意的是，该参数所指向的内存单元要不为 **`NULL`**，要不为 **`malloc`** 所分配亦或者全局变量，它不能指向任意一个属于当前函数上下文的栈中所分配的内存单元
+  需要注意的是，该参数所指向的内存单元要不为 **`NULL`**，要不为 **`malloc`** 所分配亦或者全局变量，它不能指向任意一个属于当前函数上下文的栈中所分配的内存单元
 
 ```c
 #include <math.h>
@@ -6438,7 +6450,7 @@ int main(int argc, char *argv[]) {
 #### pthread_t pthread_self()
 ##### <pthread.h>
 
-获取当前线程的 **`NPTL TID`**
+获取当前线程的 **`TID`**
 
 ```c
 #include <math.h>
@@ -6478,12 +6490,12 @@ int main(int argc, char *argv[]) {
 
 <br/>
 
-<span id = "pthread_self"></span>
+<span id = "gettid_"></span>
 
 #### int gettid()
 ##### <sys/syscall.h> <sys/types.h>
 
-获取当前线程的 **`POSIX TID`**，事实上，**`glibc`** 库中并没有实现对于 **`gettid`** 的封装，故其调用最终还需要通过 **`syscall`** 来执行
+获取当前线程的 ["PID"](#再聊-pid-pgid-tgid)，事实上，**`glibc`** 库中并没有实现对于 **`gettid`** 的封装，故其调用最终还需要通过 **`syscall`** 来执行
 
 ```c
 #include <math.h>
@@ -6526,76 +6538,186 @@ int main(int argc, char *argv[]) {
 
 <br/>
 
-#### int pthread_sigmask()
-##### <sys/syscall.h> <sys/types.h>
+<span id = "pthread_join"></span>
 
-设定当前线程的阻塞信号集
+#### int pthread_join(pthread_t thread, void **retval)
 
-每个线程的阻塞信号集虽然会从其父级进程中继承下来，但是这份继承也仅仅只是拷贝，并不属于共享，故任意一个子集线程都可以以这份从父级线程中所拷贝的阻塞信号集向下继续做独立的延伸工作
+##### <pthread.h>
 
-虽然该函数其功能和形参的实现都和 [sigprocmask](#sigprocmask) 保持一致 ( 故这里不再对该函数的形参做阐述 )，唯一的区别仅是当前函数的内部实现严格遵循着 **`NPTL`** 规范所指定的
+等待指定线程 **`thread`** 的退出并回收其所占用的系统资源，如果调用成功则返回 **`0`** 并将线程的退出状态写入至二级指针 **`retval`** 所指向的内存块中，如果调用失败，则返回对应的 **`错误码`** ( 需要通过 **`strerror`** 把该错误码转换成有效的输出信息 )
+
+一个线程即便是通过了正常途径  ( **`return`** 或者 **`pthread_exit`** ) 退出后，其还是会保留一小部分资源在内核当中，它类似于僵尸进程，亦或者我们可以称之为 **"僵尸线程"**{style="color:red"} ( 事实上 "僵尸线程" 并未真正的在内核中定义，但是实际上其确实是存在的 )，**仅当其父级线程的 真正终止 亦或者 由 **`pthread_join`** 所回收，这个 "僵尸线程" 所占有的资源才真正的被完全回收**{style="color:red"}；**在多线程开发模型中，我们应当避免 "僵尸线程" 的产生，当一个应用程序积累了足够多的僵尸线程后，将可能不再保有创建新线程的权限**{style="color:red"}
+
+- **`thread`** : 指定等待线程的 **`TID`**
+- **`retval`** : 用于存储线程退出状态的二级指针，其赋值通常由所等待线程执行函数的返回值亦或者 [pthread_exit](#pthread_exit) 的形参来指定
 
 ```c
+#include <math.h>
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include <pthread.h>
 #include <unistd.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
 
-void *thread_start(void *_arg) {
-  sigset_t mask;
-  sigemptyset(&mask);
-  sigaddset(&mask, SIGINT);
-  pthread_sigmask(SIG_BLOCK, &mask, NULL);
+void *thread_start(void *_agr) {
+  printf("child-thread executing\n");
 
-  printf("[%lu] child-thread executed\n", pthread_self());
+  sleep(5);
 
+  return NULL;
+}
+void foo(void) {
+  pthread_t t_id;
+  pthread_create(&t_id, NULL, thread_start, NULL);
+
+  void *ret_val = NULL;
+  pthread_join(t_id, &ret_val);
+
+  printf("main-thread executing\n");
+}
+
+int main(int argc, char *argv[]) {
+  foo_01();
+
+  return EXIT_SUCCESS;
+}
+
+```
+
+<br/>
+
+#### int pthread_detach(pthread_t thread)
+##### <pthread.h>
+
+设定指定线程 **`thread`** 为分离状态，如果成功，则返回 **`0`**，如果调用失败，则返回对应的 **`错误码`** ( 需要通过 **`strerror`** 把该错误码转换成有效的输出信息 )
+
+当一个线程被置为分离，那么当其在终止后其所占用的资源就会自动由内核所完全回收，即不再需要依赖于父级进程的终止亦或者 **`pthread_join`** 的调用
+
+当一个线程被设置为分离状态后，任意线程针对于当前线程的 **`pthread_join`** 都会立即返回错误号为 **`EINVAL`** 的错误信息，我们可以理解为 **detach** 即已经不需要依赖于其他线程，但并不意味着该线程真正的不被其他线程所影响；事实上，**分离状态仅仅指定了该线程在终止时，操作系统所给予的控制行为 ( 自动回收其所占用的所有资源 )**{style="color:red"}，一个线程组内的任意线程的 **`exit`** ( 亦或者等同于主线程在 **`main`** 函数中的 **`return`** ) 任然会导致分离状态线程的终止
+
+- **`thread`** : 分离线程的 **`TID`**
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <pthread.h>
+#include <unistd.h>
+
+void *thread_handler(void *_arg) {
+  int idx = 0;
   while (true) {
+    if (idx == 5) {
+      pthread_exit(NULL);
+    }
+
+    printf("[%lu] %d\n", pthread_self(), ++idx);
     sleep(1);
   }
 
   return NULL;
 }
+void foo(void) {
+  pthread_t t_id;
+  pthread_create(&t_id, NULL, thread_handler, NULL);
+  pthread_detach(t_id);
 
-void sig_handler(int _sig) {
-  printf("executed, tid = %lu\n", pthread_self());
-  fflush(stdout);
+  sleep(5);
 
+  pthread_exit(NULL);
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+
+  return EXIT_SUCCESS;
+}
+
+```
+
+<br/>
+
+#### int pthread_cancel(pthread_t thread)
+##### <pthread.h>
+
+杀死、取消线程 **`thread`** 的继续运行，如果成功，则返回 **`0`**，如果调用失败，则返回对应的 **`错误码`** ( 需要通过 **`strerror`** 把该错误码转换成有效的输出信息 )
+
+需要注意的是，线程的取消工作并不是立即执行的，而是要保证线程在运行至某个状态下才能够完成取消工作，关于这个状态，其通常由一些系统调用来进行检查，诸如 **`create`**、**`open`**、**`write`**、**`……`**，关于详情可以点击 [这里](http://man.he.net/?topic=pthreads&section=7)，但是我们可以初略地认为，这个状态则为从用户态切换到内核态的时刻
+
+- **`thread`** : 指定取消线程的 **`TID`**
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <pthread.h>
+#include <unistd.h>
+
+void *thread_start(void *_arg) {
+  printf("child thread executed\n");
+
+  int idx = 0;
+  while (true) {
+    printf("[%lu] %d\n", pthread_self(), ++idx);
+    sleep(1);
+  }
+
+  return NULL;
+}
+void foo_06(void) {
+  pthread_t t_id;
+  pthread_create(&t_id, NULL, thread_start, NULL);
+
+  /* Sleep 3 sec. and kill child thread */
+  sleep(3);
+
+  pthread_cancel(t_id);
+
+  printf("main thread executed\n");
   exit(EXIT_SUCCESS);
 }
 
 int main(int argc, char *argv[]) {
-  pthread_t t_id;
-  int s = pthread_create(&t_id, NULL, thread_start, NULL);
-  if (s != 0) {
-    char *msg = strerror(s);
-    printf("%s\n", msg);
-  }
-
-  struct sigaction act;
-  sigemptyset(&act.sa_mask);
-  act.sa_handler = sig_handler;
-  act.sa_flags = 0;
-  sigaction(SIGINT, &act, NULL);
-
-  printf("[%lu] main-thread executed, create [%lu]\n", pthread_self(), t_id);
-
-  while (true) {
-    sleep(1);
-  }
+  foo();
 
   return EXIT_SUCCESS;
 }
 ```
 
-pthread_join
+<br/>
 
+#### int pthread_equal(pthread_t t1, pthread_t t2)
+##### <pthread.h>
 
+比较两个线程的 TID **`t1`**  **`t2`** 是否相等，如果相等则返回 **`1`** 否则返回 **`0`**
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <pthread.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  pthread_t t_id;
+  pthread_create(&t_id, NULL, thread_start, NULL);
+
+  printf("%d\n", pthread_equals(t_id, pthread_self()));
+
+  return EXIT_SUCCESS;
+}
+```
 
 <br/>
 
@@ -7029,7 +7151,9 @@ int main(int argc, char *argv[]) {
 
 **如不考虑阻塞，当一个进程以任何方式收到一个信号时会立刻 **`中断`** 当前用户态中的运行，并进入到内核态中执行当前所收到信号的相关 **`Action`**<span></span>**{style="color:red"}； 由于 **`Action`** 的执行需要设计到用户态到内核态的切换，所以，就信号的实现手段来说是存在一定的延时性的，但是这种延时性对于用户来说是非常之短，可忽略不计
 
-信号的实现拥有以最大的特性就是 **`异步执行`** ( 这里的异步并不指的是在当前代码上下文中的异步状态，因为信号执行 **`Action`** 时往往会中断当前用户态的运行 )，**当进程收到一个信号且正在执行这个信号所对应的动作时，另一个信号的到达并不会阻塞当前所执行的信号动作，即异步处理另一个信号所对应的动作；但是对于相同的信号来说，重复信号的送达必须得等待上一个信号的动作执行完毕才能够执行，我们可以抽象的理解为这是一个队列的概念，但是这个队列仅能存储 **`1`** 个等待的信号 ( 这 **`1`** 个等待的信号通常也称之为 **`未决信号`** )，剩余信号的送达将都会被内核所丢弃**{style="color:red"}，关于相同信号的队列状态，会在 [未决信号集和阻塞信号集](#未决信号集和阻塞信号集) 中进行细说
+信号的实现拥有以最大的特性就是 **`异步执行`** ( 这里的异步并不指的是在当前代码上下文中的异步状态，因为信号执行 **`Action`** 时往往会中断当前用户态的运行 )，当进程收到一个信号且正在执行这个信号所对应的动作时，另一个信号的到达并不会阻塞当前所执行的信号动作，即异步处理另一个信号所对应的动作；但是对于相同的信号来说，重复信号的送达必须得等待上一个信号的动作执行完毕才能够执行，我们可以抽象的理解为这是一个队列的概念，但是这个队列仅能存储 **`1`** 个等待的信号 ( 这 **`1`** 个等待的信号通常也称之为 **`未决信号`** )，剩余信号的送达将都会被内核所丢弃，即 **linux 中的信号并不是可靠的**{style="color:red"}
+
+关于相同信号的队列状态，会在 [未决信号集和阻塞信号集](#未决信号集和阻塞信号集) 中进行细说
 
 <br/>
 
@@ -7182,7 +7306,7 @@ int main(int argc, char *argv[]) {
 ```
 
 !!! warning
-      由于子进程的创建仅仅只是拷贝父进程地址空间中的数据，即并不共享，故在 **多进程**{style="color:red"} 开发模型下。使用该函数去针对不同的父子级进程去完成相同信号不同处理行为的设置这是安全的，但在 **多线程**{style="color:red"} 开发模型下由于父子级线程之间共享了大部分的地址空间的数据，其中也包括了针对不同信号间的处理行为 ( **`Action`** ) 的设置，故这时候不同线程间使用该函数去完成相同信号不同处理行为的设置时是不安全的，因为某一个线程针对某一个信号的处理行为的设置会覆盖至所有线程之中，故在多线程开发模型下为了保证不被污染，更鼓励使用 [sigwait()](#) / [sigwaitinfo()](#) 去完成信号的处理行为的绑定设置
+      由于子进程的创建仅仅只是拷贝父进程地址空间中的数据，即并不共享，故在 **多进程**{style="color:red"} 开发模型下。使用该函数去针对不同的父子级进程去完成相同信号不同处理行为的设置这是安全的，但在 **多线程**{style="color:red"} 开发模型下由于父子级线程之间共享了大部分的地址空间的数据，其中也包括了针对不同信号间的处理行为 ( **`Action`** ) 的设置，故这时候不同线程间使用该函数去完成相同信号不同处理行为的设置时是不安全的，因为某一个线程针对某一个信号的处理行为的设置会覆盖至所有线程之中，故在多线程开发模型下为了保证不被污染，更鼓励使用 [sigwait()](#sigwaitinfo) / [sigwaitinfo()](#sigwaitinfo) 去完成信号的处理行为的绑定设置
 
 <br/>
 
@@ -7250,9 +7374,11 @@ int main(void) {
 ```
 
 !!! warning
-      由于子进程的创建仅仅只是拷贝父进程地址空间中的数据，即并不共享，故在 **多进程**{style="color:red"} 开发模型下。使用该函数去针对不同的父子级进程去完成相同信号不同处理行为的设置这是安全的，但在 **多线程**{style="color:red"} 开发模型下由于父子级线程之间共享了大部分的地址空间的数据，其中也包括了针对不同信号间的处理行为 ( **`Action`** ) 的设置，故这时候不同线程间使用该函数去完成相同信号不同处理行为的设置时是不安全的，因为某一个线程针对某一个信号的处理行为的设置会覆盖至所有线程之中，故在多线程开发模型下为了保证不被污染，更鼓励使用 [sigwait()](#) / [sigwaitinfo()](#) 去完成信号的处理行为的绑定设置
+      由于子进程的创建仅仅只是拷贝父进程地址空间中的数据，即并不共享，故在 **多进程**{style="color:red"} 开发模型下。使用该函数去针对不同的父子级进程去完成相同信号不同处理行为的设置这是安全的，但在 **多线程**{style="color:red"} 开发模型下由于父子级线程之间共享了大部分的地址空间的数据，其中也包括了针对不同信号间的处理行为 ( **`Action`** ) 的设置，故这时候不同线程间使用该函数去完成相同信号不同处理行为的设置时是不安全的，因为某一个线程针对某一个信号的处理行为的设置会覆盖至所有线程之中，故在多线程开发模型下为了保证不被污染，更鼓励使用 [sigwait()](#sigwaitinfo) / [sigwaitinfo()](#sigwaitinfo) 去完成信号的处理行为的绑定设置
 
 <br/>
+
+<span id = "kill_fun"></span>
 
 #### int kill(pid_t pid, int signum)
 ##### <signal.h>
@@ -7286,7 +7412,88 @@ int main(int argc, char *argv[]) {
 ```
 
 !!! warning
-    当前函数属于 **`POSIX`** 的实现，故使用它来针对 **`NPTL`** 所构造线程的 **`POSIX TID`** 发送信号时，如果当前所发送的信号在所指定线程内存在阻塞 ( **`mask`** )，则会把信号发送至其父级线程 ( 构造当前线程的进程 ) 当中去，故对于使用 **`pthread_create`** 所构建出来的线程去发送信号时，正确的做法应该使用 [pthread_kill](#) 去完成
+    当前函数遵循多进程 ( 旧 linux 内核版本的线程和进程的 **`PID`** 实现一致，更多信心可以查看 [这里](#再聊-pid-pgid-tgid) ) 开发的实现，故在对于实现了 **`POSIX`** 标准的 **`NPTL`** 库所构造线程的 **`TID`** 发送信号时，如果当前所发送的信号在所指定线程内存在阻塞 ( **`mask`** )，则会把信号发送至其父级线程 ( 构造当前线程的进程 ) 当中去，故对于使用 **`pthread_create`** 所构建出来的线程去发送信号时，正确的做法应该使用 [pthread_kill](#pthread_kill) 去完成
+
+<br/>
+
+<span id = "pthread_kill"></span>
+
+#### int pthread_kill(pthread_t thread, int sig)
+##### <signal.h>
+
+向指定线程 **`thread`** 发送一个信号 **`sig`**
+
+[kill()](#kill_fun) 由于历史原因，其并未遵循 **`POSIX`** 的 标准规范去完成信号发送，但是为了保证内核的升级能够向下兼容，所以它被保留了下来；由于未遵循 **`POSIX`** 标准规范，故在使用遵循 **`POSIX`** ( **`NPTL`** ) 标准规范的多线程开发模型下，如果 [kill()](#kill_fun) 所发送信号的线程发生了阻塞，则这个信号会发送至其父级线程身上，为了避免这一误导性的错误，在使用 **`NPTL`** 完成多线程的开发情景下，信号的发送更推荐使用当前函数
+
+- **`thread`** : 线程的 tid
+
+- **`sig`** : 指定的信号，signal.h 头文件中提供了所有信号的宏定义，由于信号所对应的 ID 在不同的操作系统中可能会有不同的实现，故该参数建议统一采用库中所提供的宏定义去指定
+
+  当该参数指定为 **`0`** 时，则可以运行错误检查，用于检测指定的线程 **`thread`** 是否还在运行
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+
+void *thread_start(void *_arg) {
+  sigset_t mask;
+  sigemptyset(&mask);
+  sigaddset(&mask, SIGINT);
+  pthread_sigmask(SIG_BLOCK, &mask, NULL);
+
+  printf("[%lu] child-thread executed\n", pthread_self());
+
+  while (true) {
+    sleep(1);
+  }
+
+  return NULL;
+}
+
+void sig_handler(int _sig) {
+  printf("executed, tid = %lu\n", pthread_self());
+  fflush(stdout);
+
+  exit(EXIT_SUCCESS);
+}
+
+int main(int argc, char *argv[]) {
+  pthread_t t_id;
+  int s = pthread_create(&t_id, NULL, thread_start, NULL);
+  if (s != 0) {
+    char *msg = strerror(s);
+    printf("%s\n", msg);
+  }
+
+  /* Wait for child thread executed and set the set of signal mask */
+  sleep(1);
+
+  struct sigaction act;
+  sigemptyset(&act.sa_mask);
+  act.sa_handler = sig_handler;
+  act.sa_flags = 0;
+  sigaction(SIGINT, &act, NULL);
+
+  /* Send a SIGINT signal to child thread */
+  printf("[%lu] main-thread executed, create [%lu]\n", pthread_self(), t_id);
+
+  pthread_kill(t_id, SIGINT);
+
+  while (true) {
+    sleep(1);
+  }
+
+  return EXIT_SUCCESS;
+}
+```
 
 <br/>
 
@@ -7721,3 +7928,160 @@ int main(void) {
 ```
 
 !!! warning
+    该函数并未遵循 **`POSIX`** 的规范完成进程的屏蔽信号集的设置，故在使用遵循 **`POSIX`** 规范的 **`NPTL`** 库所完成多线程模型的情境之下，更推荐的方式则为使用 [pthread_sigmask](#pthread_sigmask) 来完成
+
+
+<br/>
+
+<span id = "pthread_sigmask"></span>
+
+#### int pthread_sigmask()
+##### <sys/syscall.h> <sys/types.h>
+
+设定当前线程的阻塞信号集
+
+每个线程的阻塞信号集虽然会从其父级进程中继承下来，但是这份继承也仅仅只是拷贝，并不属于共享，故任意一个子集线程都可以以这份从父级线程中所拷贝的阻塞信号集向下继续做独立的延伸工作
+
+虽然该函数其功能和形参的实现都和 [sigprocmask](#sigprocmask) 保持一致 ( 故这里不再对该函数的形参做阐述 )，唯一的区别仅是当前函数的内部实现严格遵循着 **`POSIX`** 所指定的规范，故在使用 **`NPTL`** 库所完成的多线程开发模型中，更为推荐使用该函数来完成线程的阻塞信号集的设置
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+
+void *thread_start(void *_arg) {
+  sigset_t mask;
+  sigemptyset(&mask);
+  sigaddset(&mask, SIGINT);
+  pthread_sigmask(SIG_BLOCK, &mask, NULL);
+
+  printf("[%lu] child-thread executed\n", pthread_self());
+
+  while (true) {
+    sleep(1);
+  }
+
+  return NULL;
+}
+
+void sig_handler(int _sig) {
+  printf("executed, tid = %lu\n", pthread_self());
+  fflush(stdout);
+
+  exit(EXIT_SUCCESS);
+}
+
+int main(int argc, char *argv[]) {
+  pthread_t t_id;
+  int s = pthread_create(&t_id, NULL, thread_start, NULL);
+  if (s != 0) {
+    char *msg = strerror(s);
+    printf("%s\n", msg);
+  }
+
+  struct sigaction act;
+  sigemptyset(&act.sa_mask);
+  act.sa_handler = sig_handler;
+  act.sa_flags = 0;
+  sigaction(SIGINT, &act, NULL);
+
+  printf("[%lu] main-thread executed, create [%lu]\n", pthread_self(), t_id);
+
+  while (true) {
+    sleep(1);
+  }
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+<span id = "sigwaitinfo"></span>
+
+#### int sigwaitinfo(const sigset_t *set, siginfo_t *info)
+##### <signal.h>
+
+阻塞当前线程的执行并等待信号集 **`set`** 中所设定的信号的到达，如果当前线程某一个符合要求 ( 设置在信号集 **`set`** 中且已被指定到内核的屏蔽信号集 **`mask`** 中 ) 的信号，则函数调用立即返回 **`指定信号的 ID`**，且将所抵达信号的详细信息写入至 **`info`** 所指向的内存块中，如调用失败，则函数立即返回 **`-1`**
+
+需要注意的是，我们要保证 **`set`** 信号集中所指定的信号已用于当前线程的阻塞信号集 ( **`mask`** ) 的指定
+
+当前函数还存在另一派生，即 [sigwait()](https://linux.die.net/man/3/sigwait)，其用法和当前函数大致相同，这里不再阐述
+
+- **`set`** : 指定需要等待信号的信号集，通常它需要选用于阻塞信号集的设置 [pthread_sigmask()](#pthread_sigmask) 
+
+- **`info`** : 用于存储所接受到的信号的详细信息，其成员在这里不再阐述，详情请看 [这里](https://linux.die.net/man/2/sigwaitinfo)
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/syscall.h>
+
+void *wait_sig_handler(void *_arg) {
+  printf("[%lu](%lu) child-thread-signal executing\n", pthread_self(), syscall(SYS_gettid));
+
+  sigset_t mask;
+  sigemptyset(&mask);
+  sigaddset(&mask, SIGUSR2);
+  pthread_sigmask(SIG_BLOCK, &mask, NULL);
+
+  siginfo_t sig_info;
+  memset(&sig_info, 0, sizeof(siginfo_t));
+
+  /* Block the execution of the current thread and wait for the arrival of the specified signal */
+  int signum = sigwaitinfo(&mask, &sig_info);
+  printf("[%lu] {%d} deliverd\n", pthread_self(), signum);
+
+  /* When this thread received SIGUSR2 siganl, exied immediately */
+  return NULL;
+}
+
+void *thread_start(void *arg) {
+  /* Create a new thread for signal processing */
+  pthread_t wait_sig_tid;
+  pthread_create(&wait_sig_tid, NULL, foo_08_wait_sig_handler, NULL);
+
+  printf("[%lu](%lu) child-thread executing, create (%lu)\n", pthread_self(), syscall(SYS_gettid), wait_sig_tid);
+  
+  /** 
+   * Waiting for the exit of the signal sub-thread, 
+   * BTW, this does not necessarily need to block waiting, 
+   * it can process anything asynchronously
+  */
+  pthread_join(wait_sig_tid, NULL);
+
+  printf("[%lu](%lu) child-thread exited\n", pthread_self(), syscall(SYS_gettid));
+  return NULL;
+}
+
+void foo(void) {
+  pthread_t t_id;
+  pthread_create(&t_id, NULL, foo_08_thread_start, NULL);
+
+  printf("[%lu](%lu) main-thread executing, create (%lu)\n", pthread_self(), syscall(SYS_gettid), t_id);
+  
+  /* Wait for child-thread exited */
+  pthread_join(t_id, NULL);
+  printf("[%lu](%lu) man-thread exited\n", pthread_self(), syscall(SYS_gettid));
+
+  exit(EXIT_SUCCESS);
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+  return EXIT_SUCCESS;
+}
+```
