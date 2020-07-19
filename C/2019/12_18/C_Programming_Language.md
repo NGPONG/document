@@ -6343,6 +6343,15 @@ int main(int argc, char *argv[]) {
 - **`thread`** : 创建成功后所返回线程的 **`TID`**
 
 - **`attr`** : 指定所创建线程的一些属性，如果为 **`NULL`**，则采用默认属性来对线程进行构造
+  - **`pthread_attr_t`** : 用于描述线程属性的结构体，对于线程属性的设置都需要基于该结构体实例的基准上去进行
+  
+  -  **`int pthread_attr_init (pthread_attr_t* attr)`** : 用于初始化所构建出来的用于描述线程属性设置的 **`pthread_attr_t`** 的实例，一个新创建出来的 pthread_attr_t 的实例在开始应用于设置线程属性前，都需要先对其进行初始化，关于当前函数调用的更多信息请参考 [这里](https://linux.die.net/man/3/pthread_attr_init)
+
+  - **`int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate)`** : 用于设置线程的分离状态的属性，关于当前函数调用的更多信息请参考 [这里](https://linux.die.net/man/3/pthread_attr_setdetachstate)
+
+  - **`int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize)`** : 用于设置分配至线程的栈大小，关于当前函数调用的更多信息请参考 [这里](https://linux.die.net/man/3/pthread_attr_setstacksize)
+
+  - **`int pthread_attr_destroy(pthread_attr_t *attr)`** : 释放用于描述线程属性结构体所占用的资源，通常一个 **`pthread_attr_t`** 结构体的实例在使用完毕后 ( 已经创建线程 ) 我们需要通过该函数调用对其进行资源的释放工作，关于当前函数调用的更多信息请参考 [这里](https://linux.die.net/man/3/pthread_attr_destroy)
 
 - **`start_routine`** : 一个函数指针，用于指定线程所执行的上下文
 
@@ -6721,6 +6730,500 @@ int main(int argc, char *argv[]) {
 }
 ```
 
+
+<br/>
+
+### 线程同步
+<span id="线程同步"></span>
+
+---
+
+关于线程同步的意义这里不再做详细的概述；区别于 [进程](#什么是进程) ，由于线程和其父线程相互间共享了大部分地址空间的数据，故在多线程开发模型的情境下，我们需要拥有一种途径来提供原子性和一致性的操作规范，在 linux 中，为开发人员提供了以下几种途径来保证线程的同步
+
+1. [互斥锁](#互斥锁)
+2. [自旋锁](#自旋锁)
+3. [读写锁](#读写锁)
+4. [条件变量](#条件变量)
+5. [信号量](#信号量)
+
+<br/>
+
+<span id = "互斥锁"></span>
+#### 互斥锁
+
+依赖于一个 **`互斥对象`**，当某个线程在获取互斥对象临界区的锁的时候，如果该锁以被其他线程锁持有，则当前线程则由内核负责通知并进入到阻塞休眠的状态，仅当该锁已被目标线程所释放且当前线程已获取到执行时间片的条件下，内核才会重新唤起当前线程并继续执行其上下文
+
+为了实现 **`锁的状态发生变化后唤醒执行线程`**，就需要把互斥量的锁交由内核所管理，由内核统一负责执行线程的唤醒和休眠的操作，故对于互斥量的加锁和解锁操作往往都需要从用户态中切换至内核态执行，这里就会涉及到一定的上下文切换上的时间开销，但值得一提的是，自 **`linux 2.6`** 以后，互斥量完全通过 **`futex`** 的 API 实现了，大大减小了内部系统调用的开销
+
+针对于互斥锁操作的 API 都内置在 **`pthread.h`** 头文件当中
+
+- **`互斥量`**
+
+  互斥量通过结构体 **`pthread_mutex_t`** 来表示
+
+- **`互斥量的初始化`**
+
+  在尝试获取一个新创建的亦或者是已被销毁的互斥量的临界锁之前，我们必须要对互斥量进行一次初始化的操作，否则当前互斥量所保有的锁则一直保持着被持有着的状态，即尝试获取该锁的时候都会线程的阻塞亦或者失败返回
+
+  对于互斥量的初始化操作来说，其分为了以下两种途径
+
+   - **`int pthread_mutex_init(pthread_mutex_t *restrict mutex, const pthread_mutexattr_t *restrict attr)`**
+
+        动态初始化一个互斥量 **`mutex`**，并指定其类型为 **`attr`**，当 **`attr`** 指定为 **`NULL`** 时，则指定互斥量的类型为默认类型；当函数成功调用时，返回 **`0`**，如果调用失败，则返回对应的 **`错误码`**；关于互斥量类型的更多信息请参考 [这里](https://linux.die.net/man/3/pthread_mutex_lock)
+
+   -  **`PTHREAD_MUTEX_INITIALIZER`** 
+
+         使用宏函数 **`PTHREAD_MUTEX_INITIALIZER`** 静态初始化一个互斥量 **`mutex`**，其效果等同于将形参 **`attr`** 指定为 **`NULL`** 的 **`pthread_mutex_init()`** 的调用
+
+- **`获取互斥量的临界锁`**
+
+    - **`int pthread_mutex_lock(pthread_mutex_t *mutex)`**
+
+      获取互斥量 **`mutex`** 的临界锁，如该锁已被其他线程所持有亦或者临界锁未正确进行过初始化，则当前线程进入至阻塞休眠的状态，仅当该锁已被目标线程所释放且当前线程已获取到执行时间片的条件下，内核才会重新唤起当前线程并继续执行其上下文
+
+    - **`int pthread_mutex_trylock(pthread_mutex_t *mutex)`**
+
+      尝试获取互斥量 **`mutex`** 的临界锁，如该锁已被其他线程所持有亦或者临界锁未正确进行过初始化，则函数的调用立即结束并返回对应的 **`错误码`*
+
+- **`释放当前线程所持有的互斥量的临界锁`**
+
+    - **`int pthread_mutex_unlock(pthread_mutex_t *mutex)`**
+
+      释放掉当前线程所持有的互斥量 **`mutex`** 的锁，如成功则返回 0，否则返回对应的 **`错误码`**
+
+- **`释放互斥量对象`**
+    - **`int pthread_mutex_destroy(pthread_mutex_t *mutex)`**
+
+      释放掉互斥量对象 **`mutex`**，当一个互斥量不再被任何一个线程所使用的时候，我们应该手动的对其进行释放，如成功则返回 0，否则返回对应的 **`错误码`**
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <wait.h>
+
+void *thread_start(void *arg) {
+  pthread_mutex_t *mutex = (pthread_mutex_t *)arg;
+  
+  /* start lock */
+  /* pthread_mutex_lock(mutex); */
+  int errno;
+  if ((errno = pthread_mutex_trylock(mutex)) != 0) {
+    printf("[%lu] %s\n", pthread_self(), strerror(errno));
+    pthread_exit(NULL);
+  }
+
+  sleep(2);
+  printf("[%lu] child-thread executed\n", pthread_self());
+
+  /* end lock */
+  pthread_mutex_unlock(mutex);
+  return NULL;
+}
+
+void foo(void) {
+  pthread_mutex_t mutex;
+  pthread_mutex_init(&mutex, NULL);
+
+  pthread_t threads[2] = { 0 };
+  for (size_t i = 0; i < 2; ++i) {
+    pthread_t t_id;
+    pthread_create(&t_id, NULL, thread_start, (void *)&mutex);
+
+    printf("[%lu] create child thread (%lu)\n", pthread_self(), t_id);
+    threads[i] = t_id;
+  }
+
+  for (int i = 1; i >= 0; --i) {
+    pthread_join(threads[i], NULL);
+    printf("[%lu] Recyle (%lu)\n", pthread_self(), threads[i]);
+  }
+
+  pthread_mutex_destroy(&mutex);
+  pthread_exit(NULL);
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+<span id = "自旋锁"></span>
+#### 自旋锁
+
+自旋锁和互斥锁所实现出来的效果和使用方式都是非常的类似的，仅当某个线程在请求自旋对象所保有的临界锁的时候，如果该锁已被其它线程所占用，则当前线程则处于一个阻塞的状态，需要注意的是，这种阻塞并不是线程的休眠，它区别于互斥锁，实际上该线程还正在占用着 CPU 时间片运行着，它类似于一个 **`while`** 的循环以判断自旋对象所保有的锁是否已被释放，当锁以被释放且以由当前线程获取到 CPU 执行时间片的前提条件下，当前线程则能够进入到自旋锁的临界区中执行上下文
+
+由于自旋锁其阻塞的过程由于是通过一个循环来不断地判断自旋对象所保有的锁是否被释放，故对于自旋锁所造成的阻塞其实线程是一只保留在用户态空间下的，虽然其一定程度上能够解决掉互斥锁由于线程休眠和唤醒时所造成的从用户态切换到内核态的时间开销，但是，自旋锁由于是在循环中不断的进行着判断 ( 判断自旋对象锁保有的锁已被某个线程所释放 )，故，当自旋锁的 **`锁粒度`** 较大的时候，会浪费较多的 CPU 执行时间片
+
+针对于自旋锁操作的 API 都内置在 **`pthread.h`** 头文件当中
+
+- **`自旋对象`**
+
+  自旋对象通过结构体 **`pthread_spinlock_t`** 来表示
+
+- **`自旋对象的初始化`**
+
+  在尝试获取一个新创建的亦或者是已被销毁的自旋对象的临界锁之前，我们必须要对自旋对象进行一次初始化的操作，否则当前自旋对象所保有的锁则一直保持着被持有着的状态，即尝试获取该锁的时候都会线程的阻塞亦或者失败返回
+   - **`int pthread_spin_init(pthread_spinlock_t *lock, int pshared)`**
+
+        动态初始化一个对象 **`mutex`**，并指定其类型为 **`attr`**，它可以为以下两种宏定义之一
+        
+        - **`PTHREAD_PROCESS_SHARED`** : 自旋对象允许在不同进程下的子线程进行共享使用
+        - **`PTHREAD_PROCESS_PRIVATE`** : 自旋对象仅允许在当前进程组下所派生出来的子线程进行共享使用
+
+- **`获取自旋对象的临界锁`**
+
+    - **`int pthread_spin_lock(pthread_spinlock_t *lock)`**
+
+      获取自旋对象 **`lock`** 的临界锁，如该锁已被其他线程所持有亦或者临界锁未正确进行过初始化，则当前线程进入一种循环方式的阻塞状态，仅当该锁已被目标线程所释放且当前线程已获取到执行时间片的条件下，阻塞循环才会退出
+
+    - **`int pthread_spin_trylock(pthread_spinlock_t *lock)`**
+
+      尝试获取自旋对象 **`lock`** 的临界锁，如该锁已被其他线程所持有亦或者临界锁未正确进行过初始化，则函数的调用立即结束并返回对应的 **`错误码`*
+
+- **`释放当前线程所持有的自旋对象的锁`**
+
+    - **`int pthread_spin_unlock(pthread_spinlock_t *lock)`**
+
+      释放掉当前线程所持有的自旋对象 **`lock`** 的锁，如成功则返回 0，否则返回对应的 **`错误码`**
+
+- **`释放互斥量对象`**
+    - **`int pthread_spin_destroy(pthread_spinlock_t *lock)`**
+
+      释放掉自旋对象 **`mutex`**，当一个自旋对象不再被任何一个线程所使用的时候，我们应该手动的对其进行释放，如成功则返回 0，否则返回对应的 **`错误码`**
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <wait.h>
+
+void *thread_start(void *arg) {
+  pthread_spinlock_t *locker = (pthread_spinlock_t *)arg;
+  
+  /* start lock */
+  pthread_spin_lock(locker);
+  /* int errno;                                               */
+  /* if ((errno = pthread_spin_trylock(locker)) != 0) {       */
+  /*   printf("[%lu] %s\n", pthread_self(), strerror(errno)); */
+  /*   pthread_exit(NULL);                                    */
+  /* }                                                        */
+
+  usleep(500 * 1000);
+  
+  /* end lock */
+  pthread_spin_unlock(locker);
+
+  printf("[%lu] child-thread executed\n", pthread_self());
+  return NULL;
+}
+void foo(void) {
+  pthread_spinlock_t locker;
+  pthread_spin_init(&locker, PTHREAD_PROCESS_PRIVATE);
+
+  pthread_t threads[20] = { 0 };
+  for (size_t i = 0; i < 20; ++i) {
+    pthread_t t_id;
+    pthread_create(&t_id, NULL, thread_start, (void *)&locker);
+
+    printf("[%lu] create child thread (%lu)\n", pthread_self(), t_id);
+    threads[i] = t_id;
+  }
+
+  for (int i = 0; i < 20; ++i) {
+    pthread_join(threads[i], NULL);
+    printf("[%lu] Recyle (%lu)\n", pthread_self(), threads[i]);
+  }
+
+  pthread_spin_destroy(&locker);
+  pthread_exit(NULL);
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+
+<span id = "读写锁"></span>
+#### 读写锁
+
+读写锁也称为 **`共享-独占锁`**，它非常适合于对 **数据结构读的次数远大于写**{style="color:red"} 的情景，其提供了两种模式的锁定机制
+- 当线程以 **`读模式`** 获取了读写锁对象的临界区锁的时候，仅当同样使用读模式去获取读写锁对象临界区锁的时候才能成功，反之，当其他线程使用 **`写模式`** 去请求一个已经被某个线程持有读模式锁的读写锁对象的临界区锁的时候，则会造成当前线程的阻塞等待直至读写锁对象的读模式的锁被释放，即，针对于 **`读模式`** 的锁定呈现了一种共享的状态
+- 当线程以 **`写模式`** 获取了读写锁对象的临界区锁的时候，其它线程针对该读写锁对象所使用的任何模式的锁请求都会造成当前线程的阻塞，即，针对于 **`写模式`** 的锁定呈现了一种独占的状态
+
+在读模式的请求与写模式的请求并行请求读写锁对象的情境之下，**写模式请求的优先级会高于读模式的请求**{style="color:red"}，即永远都是写模式的请求优先抵达至读写锁对象中，后来的读模式请求则会因为写模式请求所持有的独占特性而造成阻塞运行
+
+需要注意的是，读写锁并不持有两把锁，所持有的仅仅只是对于请求读写锁对象的临界区锁的模式，即 **`读模式请求`** 和 **`写模式请求`**
+
+针对于读写锁操作的 API 都内置在 **`pthread.h`** 头文件当中
+
+- **`读写锁对象`**
+
+  读写锁对象通过结构体 **`pthread_rwlock_t`** 来表示
+
+- **`读写锁对象的初始化`**
+
+  在尝试获取一个新创建的亦或者是已被销毁的读写锁对象的临界锁之前，我们必须要对读写锁对象进行一次初始化的操作，否则当前读写锁对象所保有的锁则一直保持着被持有着的状态，即尝试获取该锁的时候都会线程的阻塞亦或者失败返回
+   - **`int pthread_rwlock_init(pthread_rwlock_t *restrict rwlock, const pthread_rwlockattr_t *restrict attr)`**
+
+      动态初始化一个读写锁对象 **`rwlock`**，并指定其类型为 **`attr`**，当 **`attr`** 指定为 **`NULL`** 时，则指定互斥量的类型为默认类型；当函数成功调用时，返回 **`0`**，如果调用失败，则返回对应的 **`错误码`**
+
+- **`以读模式获取读写锁对象的临界锁`**
+
+    - **`int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock)`**
+
+      以读模式获取读写锁对象 **`rwlock`** 的临界锁，如该锁已被其他线程以 **`写模式`** 所持有亦或者临界锁未正确进行过初始化，则阻塞当前线程的执行直至读写锁对象所已被其它线程所持有的临界区锁已被释放
+
+    - **`int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock)`**
+
+      尝试以读模式获取读写锁对象 **`rwlock`** 的临界锁，如该锁已被其他线程以 **`写模式`** 所持有亦或者临界锁未正确进行过初始化，则函数的调用立即结束并返回对应的 **`错误码`*
+
+- **`以写模式获取读写锁对象的临界锁`**
+
+    - **`int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock)`**
+
+      以写模式获取读写锁对象 **`rwlock`** 的临界锁，如该锁已被其他线程以 **`任意模式`** 所持有亦或者临界锁未正确进行过初始化，则阻塞当前线程的执行直至读写锁对象所已被其它线程所持有的临界区锁已被释放
+
+    - **`int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock)`**
+
+      尝试写模式获取读写锁对象 **`rwlock`** 的临界锁，如该锁已被其他线程以 **`任意模式`** 所持有亦或者临界锁未正确进行过初始化，则函数的调用立即结束并返回对应的 **`错误码`*
+
+
+- **`释放当前线程所持有的读写锁对象的锁`**
+
+    - **`int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)`**
+
+      释放掉当前线程所持有的自旋对象 **`lock`** 的锁，如成功则返回 0，否则返回对应的 **`错误码`**
+
+- **`释放读写锁对象`**
+    - **`int pthread_spin_destroy(pthread_spinlock_t *lock)`**
+
+      释放掉自旋对象 **`mutex`**，当一个自旋对象不再被任何一个线程所使用的时候，我们应该手动的对其进行释放，如成功则返回 0，否则返回对应的 **`错误码`**
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <wait.h>
+
+void *thread_start(void *arg) {
+  pthread_spinlock_t *locker = (pthread_spinlock_t *)arg;
+  
+  /* start lock */
+  pthread_spin_lock(locker);
+  /* int errno;                                               */
+  /* if ((errno = pthread_spin_trylock(locker)) != 0) {       */
+  /*   printf("[%lu] %s\n", pthread_self(), strerror(errno)); */
+  /*   pthread_exit(NULL);                                    */
+  /* }                                                        */
+
+  usleep(500 * 1000);
+  
+  /* end lock */
+  pthread_spin_unlock(locker);
+
+  printf("[%lu] child-thread executed\n", pthread_self());
+  return NULL;
+}
+void foo(void) {
+  pthread_spinlock_t locker;
+  pthread_spin_init(&locker, PTHREAD_PROCESS_PRIVATE);
+
+  pthread_t threads[20] = { 0 };
+  for (size_t i = 0; i < 20; ++i) {
+    pthread_t t_id;
+    pthread_create(&t_id, NULL, thread_start, (void *)&locker);
+
+    printf("[%lu] create child thread (%lu)\n", pthread_self(), t_id);
+    threads[i] = t_id;
+  }
+
+  for (int i = 0; i < 20; ++i) {
+    pthread_join(threads[i], NULL);
+    printf("[%lu] Recyle (%lu)\n", pthread_self(), threads[i]);
+  }
+
+  pthread_spin_destroy(&locker);
+  pthread_exit(NULL);
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+<span id = "条件变量"></span>
+#### 条件变量
+
+条件变量的使用依赖于 **`条件变量对象`** 和 **`互斥对象`**，也就是说，条件变量的使用玩玩需要配合互斥量来进行的；需要注意的是，条件变量虽然也提供了一种阻塞等待的机制，但是条件变量本身不是锁，是属于一种 **`线程间的通讯机制`**，它所解决的问题并不是 **`互斥`**，而是 **`等待`**
+
+条件变量整体而言可以拆分出两种动作 : 
+
+- **`等待`** : 当 **`等待线程`** 使用了条件变量的等待动作后，条件变量会阻塞当前阻塞线程的执行，使之置于休眠状态，并恢复由于正在请求所依赖 **`互斥量`** 保有的临界锁而处于阻塞休眠状态的线程的执行 ( **`通知线程`** )，仅当 **`通知线程`** 成功的发送了一个 **`唤醒通知`**，等待线程才会被 **`唤醒`** 并执行检测，如果所依赖的 **`互斥量`** 其本身所保有的临界锁正在被持有，则等待线程 **`回到`** 休眠状态 ( 通知线程继续执行互斥临界区的上下文，不受影响 ) ，仅当持有 **`互斥量`** 锁保有的锁的线程其临界区执行完毕，等待线程才恢复所保留的上下文继续执行 ( 由于等待线程继续执行的上下文处在互斥量的临界区内，故这时候其它线程在请求互斥量锁保有的锁的时候同样会造成阻塞休眠 ) ( 这一机制也是为了保证互斥量的临界区执行是唯一的 )，反之，等待线程会立即恢复所保留上下文并继续执行
+
+- **`通知`** : 通知的任务就较为简单，**`通知线程`** 所保有的任务就是负责发送通知，当通知成功送达至 **`等待线程`** 中，则执行等待线程初次被唤醒后的逻辑判断；通知线程并不关心所发送的通知是否成功送达，其所关心的仅仅只是发送一个通知，在一个通知被发送出去后，通知线程还是会继续执行其上下文逻辑
+
+在这里需要再强调一点的是，对于 **`等待`** 任务其在被初次唤醒后会执行一次逻辑判断，即判断所依赖的 **`互斥量`** 其本身所保有的临界锁是否已被持有，所以我们在实际使用的时候需要注意 **`通知线程`** 在执行通知时所在的上下文段，当所执行的通知动作是处于 **`互斥量`** 的锁定临界区内的时候，这时候的通知动作就会导致 **`等待线程`** 会执行多余的 **`被唤醒`** 的动作，即执行了不必要的上下文切换，因为当通知动作储在互斥量锁定临界区内的时候，即便等待线程被唤醒，其同样还是会回到休眠的状态，因为当前互斥量所保有的临界区的锁还在被通知线程所占用着
+
+针对于条件变量操作的 API 都内置在 **`pthread.h`** 头文件当中
+
+- **`条件变量对象`**
+
+  读写锁对象通过结构体 **`pthread_cond_t`** 来表示
+
+- **`条件变量对象的初始化`**
+
+  在使用一个新创建的亦或者是已被销毁的条件变量对象前，我们必须要对条件变量对象进行一次初始化的操作，否则会造成未定义的行为
+   - **`int pthread_cond_init(pthread_cond_t *restrict cond, const pthread_condattr_t *restrict cond_attr)`**
+
+      动态初始化一个条件变量对象 **`cond`**，并指定其类型为 **`cond_attr`**，当 **`cond_attr`** 指定为 **`NULL`** 时，则指定条件变量对象的类型为默认类型；当函数成功调用时，返回 **`0`**，如果调用失败，则返回对应的 **`错误码`**
+
+- **`等待`**
+
+    - **`int pthread_cond_wait(pthread_cond_t *restrict cond, pthread_mutex_t *restrict mutex)`**
+
+      使当前线程 ( **`等待线程`** ) 处于阻塞休眠的状态，并唤醒由于正在请求 **mutex** 临界锁而导致休眠阻塞状态线程的执行，仅当 **`通知线程`** 成功的发送了一个 **`唤醒通知`**，等待线程才会被 **`唤醒`** 并执行检测，如果所依赖的 **`互斥量`** 其本身所保有的临界锁正在被持有，则等待线程 **`回到`** 休眠状态 ( 通知线程继续执行互斥临界区的上下文，不受影响 ) ，仅当持有 **`互斥量`** 锁保有的锁的线程其临界区执行完毕，等待线程才恢复所保留的上下文继续执行 ( 由于等待线程继续执行的上下文处在互斥量的临界区内，故这时候其它线程在请求互斥量锁保有的锁的时候同样会造成阻塞休眠 ) ( 这一机制也是为了保证互斥量的临界区执行是唯一的 )，反之，等待线程会立即恢复所保留上下文并继续执行
+
+- **`唤醒`**
+
+    - **`int pthread_cond_signal(pthread_cond_t *cond)`**
+
+      给使用了条件变量对象 **`cond`** 的线程发送一个唤醒通知，当函数成功调用时，返回 **`0`**，如果调用失败，则返回对应的 **`错误码`**
+
+- **`释放条件变量对象`**
+    - **`int pthread_cond_destroy(pthread_cond_t *cond)`**
+
+      释放掉条件变量对象 **`cond`**，当一个条件变量对象不再被任何一个线程所使用的时候，我们应该手动的对其进行释放，如成功则返回 0，否则返回对应的 **`错误码`**
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <pthread.h>
+#include <unistd.h>
+
+static pthread_mutex_t mutex;
+static pthread_cond_t cond;
+static char data[64] = { 0 };
+
+static void _init(void) {
+  pthread_mutex_init(&mutex, NULL);
+  pthread_cond_init(&cond, NULL);
+}
+
+static void _free(void) {
+  pthread_mutex_destroy(&mutex);
+  pthread_cond_destroy(&cond);
+}
+
+void *producer_thread_start(void *_arg) {
+  int idx = 0;
+
+  while (true) {
+    pthread_mutex_lock(&mutex);   /* Start lock */
+
+    memset(data, 0x0, sizeof(data));
+    sprintf(data, "%d\n\0", ++idx);
+
+    pthread_mutex_unlock(&mutex); /* End lock */
+    
+    sleep(1);
+    /* Notify consumer-thread to resume the context */
+    pthread_cond_signal(&cond);
+  }
+
+  return NULL;
+}
+void *consumer_thread_start(void *_arg) {
+  while (true) {
+    pthread_mutex_lock(&mutex);   /* Start lock */
+
+    if (strlen(data) == 0) {
+      /* Suspend current thread executed and resume producter thread executed */
+      pthread_cond_wait(&cond, &mutex);
+    }
+    printf("%s", data);
+
+    /** 
+     * It needs to be cleared to 0 after each read is completed, 
+     * in order to prevent the current thread from preempting the CPU time slice in the next loop
+     */
+    memset(data, 0x0, sizeof(data));
+
+    pthread_mutex_unlock(&mutex); /* End lock */
+  }
+
+  return NULL;
+}
+void foo(void) {
+  int t_ret;
+
+  _init();
+
+  /* Create producter process */
+  pthread_t t_id_producer;
+  if ((t_ret = pthread_create(&t_id_producer, NULL, producer_thread_start, NULL))) {
+    printf("%s\n", strerror(t_ret));
+    exit(EXIT_FAILURE);
+  }
+  /* Create consumer process */
+  pthread_t t_id_consumer;
+  if ((t_ret = pthread_create(&t_id_consumer, NULL, consumer_thread_start, NULL))) {
+    printf("%s\n", strerror(t_ret));
+    exit(EXIT_FAILURE);
+  }
+
+  /* Wait for all thread executed */
+  pthread_join(t_id_producer, NULL);
+  pthread_join(t_id_consumer, NULL);
+
+  _free();
+  pthread_exit(NULL);
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+
+  return EXIT_SUCCESS;
+}
+```
+
+
+<br/>
+
+<span id = "信号量"></span>
+#### 信号量
+
+
+
 <br/>
 
 ### IPC ( InterProcess Communication )
@@ -6743,7 +7246,7 @@ linux 中的进程其地址空间都是相互独立的，每个进程各自有�
 进程间通信需要依赖于操作系统所提供特殊的方法，如 : 普通文件, 管道, 信号, 共享内存, 消息队列, 套接字, 命名管道等等，但随着计算机的蓬勃发展，一些方法由于自身设计缺陷被淘汰或者弃用，现今常用的进程间通信方式有
 
 - [管道](#pipe管道) ( 使用最简单 )
-- 信号 ( 开销最小 )
+- [信号](#信号_signal) ( 开销最小 )
 - [共享映射区](#共享映射区) ( 无血缘关系 )
 - 本地套接字 ( 最稳定 )
 
