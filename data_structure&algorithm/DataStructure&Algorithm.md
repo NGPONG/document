@@ -3,6 +3,7 @@
 ### 目录
 
 - [开始](#前言)
+- [关于算法的时间复杂度与空间复杂度](#关于算法的时间复杂度与空间复杂度)
 - [Arrary](#arrary)
 - [Linked List](#linkedlist)
 - [Stack & Queue](#stackqueue)
@@ -1097,8 +1098,8 @@ int Destory(struct Stack *stack) {
 树的节点包含一个数据元素及若干指向其子树的分支
  - 节点拥有的子树数称为 <font color = "red">节点的度</font> ( $Degree$ ) ;
  - 度为 0 的节点称为 <font color="red">叶节点</font> ( $Leaf$ ) 或终端节点 ;
- - 度不为 0 的节点 称为非终端节点或 <font color = "red">分支节点</font>，除根节点之外，分支节点也称为 <font color="red">内部节点</font> ;
- - 树 内各节点的度的最大值则为 <font color="red">树的度</font> ;
+ - 度不为 0 的节点称为非终端节点或 <font color = "red">分支节点</font>，除根节点之外，分支节点也称为 <font color="red">内部节点</font> ;
+ - 树内各节点的度的最大值则为 <font color="red">树的度</font> ;
  
    ![2020-3-4-17-3-5.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-4-17-3-5.png)
 
@@ -1108,7 +1109,7 @@ int Destory(struct Stack *stack) {
 #### 节点间的关系
 
 - 节点的子树的根称为该节点的 <font color="red">孩子</font> ( $Child$ ) ;
-- 相应地，该节点称为孩子的 <font color="red">双亲 </font> ( $Parent$ ) ;
+- 相应地，该节点称为孩子的 <font color="red">双亲</font> ( $Parent$ ) ;
 - 同一个 双亲 的 孩子 之间互称 <font color="red">兄弟</font> ( $Sibling$ ) ;
 - 根到该节点所经分支上的所有节点都称为该节点的 <font color="red">祖先</font> ( $ancestor$ ) ;
 - 以某节点为根的子树中的任一节点都称为节点的 <font color="red">子孙</font> ( $Offspring$ )
@@ -1119,14 +1120,14 @@ int Destory(struct Stack *stack) {
 
 #### 树的其它相关概念
 
-- <font color="red">节点的层次</font> ( $Level$ ) 从根开始定义起，根为第一层，根的孩子为第二层，若某结 点在第1层，则其子树的根就在第 *1 + 1* 层 ;
+- <font color="red">节点的层次</font> ( $Level$ ) 从根开始定义起，根为第一层，根的孩子为第二层，若某结点在第1层，则其子树的根就在第 *1 + 1* 层 ;
 
 - 双亲在局一层的节点互为 <font color="red">堂兄弟</font> ( $Cousins$ ) ;
 
-- 树中结点的最大层次称为 <font color = "red">树 的深度</font> ( $Depth$ ) 或 高度 ;
+- 树中结点的最大层次称为 <font color = "red">树的深度</font> ( $Depth$ ) 或 高度 ;
 
-- 如果将树中结点的各子树看成从左至右是有次序的，不能互换的，则称该树为 <font color= "red">有 序树</font> ，否则称为 <font color="red">无序树</font> ; 
-- <font color="red">森林</font> ( $Forest$ ) 是 $m$ ( $m > 0$ ) 棵互不相交的树的集合，对树中每个结点而言，其 子树的集合即为森林
+- 如果将树中结点的各子树看成从左至右是有次序的，不能互换的，则称该树为 <font color= "red">有序树</font> ，否则称为 <font color="red">无序树</font> ; 
+- <font color="red">森林</font> ( $Forest$ ) 是 $m$ ( $m > 0$ ) 棵互不相交的树的集合，对树中每个结点而言，其子树的集合即为森林
 
   ![2020-3-4-17-19-45.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-4-17-19-45.png)
 
@@ -1617,7 +1618,7 @@ int Preorder_Create_BinaryTree(Binary_Tree **tree, Binary_Tree *parent) {
 *森林转换为二叉树*
 
 1. 把每颗树转换为二叉树
-2. 第一颗二叉树不动，从第二棵二叉树开始，依次把后一棵二叉树的根结点作为前一棵二叉树的根结点的右孩子，用线连接起来，当所有的二又树连接起来后就得到了由森林转换来的二叉树
+2. 第一颗二叉树不动，从第二棵二叉树开始，依次把后一棵二叉树的根结点作为前一棵二叉树的根结点的右孩子，用线连接起来，当所���的二又树连接起来后就得到了由森林转换来的二叉树
 
 	![2020-3-9-17-37-5.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-9-17-37-5.png)
 
