@@ -239,8 +239,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct dynamicArrary {
-
+struct dynamicArrary { 
 	void **ptr_arrary;
 	int length;
 };
@@ -250,13 +249,10 @@ struct dynamicArrary {
  * @param {type} 
  * @return: 
  */
-int CheckArraryAvailableLength(struct dynamicArrary *arrary) {
-
-	if (arrary->length == capacity) {
-
+int CheckArraryAvailableLength(struct dynamicArrary *arrary) { 
+	if (arrary->length == capacity) { 
 		int flag = ReallocArrary(&arrary->ptr_arrary, arrary->length);
-		if (!flag) {
-
+		if (!flag) { 
 			printf("[Realloc complete]  struct address = %p, arrary adderss = %p\n", arrary, arrary->ptr_arrary);
 		}
 	}
@@ -269,12 +265,10 @@ int CheckArraryAvailableLength(struct dynamicArrary *arrary) {
  * @param {type} 
  * @return: 
  */
-int ReallocArrary(void ***p_ptr_arrary, int length) {
-
+int ReallocArrary(void ***p_ptr_arrary, int length) { 
 	capacity += 10;
 	void **arrary_new = malloc(sizeof(void *) * capacity);
-	if (arrary_new == NULL) {
-
+	if (arrary_new == NULL) { 
 		return -1;
 	}
 
@@ -293,25 +287,21 @@ int ReallocArrary(void ***p_ptr_arrary, int length) {
  * @param {type} 
  * @return: 
  */
-struct dynamicArrary *InitDynamicArrary(int m_capacity) {
-
-	if (m_capacity <= 0) {
-
+struct dynamicArrary *InitDynamicArrary(int m_capacity) { 
+	if (m_capacity <= 0) { 
 		return NULL;
 	}
 
 	capacity = m_capacity;
 
 	struct dynamicArrary *arrary = malloc(sizeof(struct dynamicArrary));
-	if (arrary == NULL) {
-
+	if (arrary == NULL) { 
 		return NULL;
 	}
 	memset(arrary, 0, sizeof(struct dynamicArrary));
 
 	arrary->ptr_arrary = malloc(sizeof(void *) * m_capacity);
-	if (arrary->ptr_arrary == NULL) {
-
+	if (arrary->ptr_arrary == NULL) { 
 		return NULL;
 	}
 	memset(arrary->ptr_arrary, 0, sizeof(void *) * m_capacity);
@@ -326,23 +316,18 @@ struct dynamicArrary *InitDynamicArrary(int m_capacity) {
  * @param {type} 
  * @return: 
  */
-int Insert(struct dynamicArrary *arrary, int index, void *value) {
-
-	if (index < 0) {
-
+int Insert(struct dynamicArrary *arrary, int index, void *value) { 
+	if (index < 0) { 
 		return -1;
 	}
-	if (CheckArraryAvailableLength(arrary)) {
-
+	if (CheckArraryAvailableLength(arrary)) { 
 		return -1;
 	}
-	if (index >= arrary->length) {
-
+	if (index >= arrary->length) { 
 		index = arrary->length;
 	}
 
-	for (int i = arrary->length - 1; i >= index; i--) {
-
+	for (int i = arrary->length - 1; i >= index; i--) { 
 		memcpy(arrary->ptr_arrary + i + 1, arrary->ptr_arrary + i, sizeof(void *));
 	}
 
@@ -358,10 +343,8 @@ int Insert(struct dynamicArrary *arrary, int index, void *value) {
  * @param {type} 
  * @return: 
  */
-int Add(struct dynamicArrary *arrary, void *value) {
-
-	if (CheckArraryAvailableLength(arrary)) {
-
+int Add(struct dynamicArrary *arrary, void *value) { 
+	if (CheckArraryAvailableLength(arrary)) { 
 		return -1;
 	}
 
@@ -376,22 +359,19 @@ int Add(struct dynamicArrary *arrary, void *value) {
  * @param {type} 
  * @return: 
  */
-int RemoveByPostion(struct dynamicArrary *arrary, int index) {
-
+int RemoveByPostion(struct dynamicArrary *arrary, int index) { 
 	if (index < 0) {
 
 		return -1;
 	}
-	if (index >= arrary->length) {
-
+	if (index >= arrary->length) { 
 		index = arrary->length;
 	}
 
 	printf("[Remove]  address = %p\n", *(arrary->ptr_arrary + index));
 	free(*(arrary->ptr_arrary + index));
 
-	for (int i = index + 1; i < arrary->length; i++) {
-
+	for (int i = index + 1; i < arrary->length; i++) { 
 		printf("[Exchange]  address_exchanged = %p, address_exchanger = %p\n", arrary->ptr_arrary + i - 1, arrary->ptr_arrary + i);
 		*(arrary->ptr_arrary + i - 1) = *(arrary->ptr_arrary + i);
 		*(arrary->ptr_arrary + i) = NULL;
@@ -407,17 +387,13 @@ int RemoveByPostion(struct dynamicArrary *arrary, int index) {
  * @param {type} 
  * @return: 
  */
-int RemoveByValue(struct dynamicArrary *arrary, void *value, int (*invoker)(void *data_source, void *data_compare)) {
-
-	if (arrary == NULL || invoker == NULL) {
-
+int RemoveByValue(struct dynamicArrary *arrary, void *value, int (*invoker)(void *data_source, void *data_compare)) { 
+	if (arrary == NULL || invoker == NULL) { 
 		return -1;
 	}
 
-	for (int i = 0; i < arrary->length; i++) {
-
-		if (invoker(*(arrary->ptr_arrary + i), value)) {
-
+	for (int i = 0; i < arrary->length; i++) { 
+		if (invoker(*(arrary->ptr_arrary + i), value)) { 
 			RemoveByPostion(arrary, i);
 			break;
 		}
@@ -431,10 +407,8 @@ int RemoveByValue(struct dynamicArrary *arrary, void *value, int (*invoker)(void
  * @param {type} 
  * @return: 
  */
-int DestoryArrary(struct dynamicArrary *arrary) {
-
-	if (arrary == NULL) {
-		
+int DestoryArrary(struct dynamicArrary *arrary) { 
+	if (arrary == NULL) {  
 		return -1;
 	}
 
@@ -443,13 +417,11 @@ int DestoryArrary(struct dynamicArrary *arrary) {
 	char str_CustomerInput[8] = { 0 };
 	fgets(str_CustomerInput, sizeof(str_CustomerInput), stdin);
 
-	if (strcmp(str_CustomerInput, "yes\n")) {
-	
+	if (strcmp(str_CustomerInput, "yes\n")) { 
 		return -1;
 	}
 
-	for (int i = 0; i < arrary->length; i++) {
-
+	for (int i = 0; i < arrary->length; i++) { 
 		printf("[free]  element address = %p\n", *(arrary->ptr_arrary + i));
 		free(*(arrary->ptr_arrary + i));
 	}
@@ -536,14 +508,12 @@ int DestoryArrary(struct dynamicArrary *arrary) {
 单链表的实现
 
 ```c
-typedef struct node {
-
+typedef struct node { 
 	void *data;
 	struct node *next;
 } node_t;
 
-typedef struct list {
-
+typedef struct list { 
 	node_t *head;
 	node_t *tail;
 	int size;
@@ -555,11 +525,9 @@ typedef struct list {
  * @param {type} 
  * @return: 
  */
-list_t *Create() {
-
+list_t *Create() { 
 	list_t *list = malloc(sizeof(list_t));
-	if (list == NULL) {
-	
+	if (list == NULL) { 
 		perror("heap out");
 		return NULL;
 	}
@@ -573,29 +541,23 @@ list_t *Create() {
  * @param {type} 
  * @return: 
  */
-void AddNode(list_t *list, void *data) {
-
-	if (list == NULL) {
-	
+void AddNode(list_t *list, void *data) { 
+	if (list == NULL) { 
 		return;
 	}
 
 	// create a new node
 	node_t *node = malloc(sizeof(node_t));
-	if (node == NULL) {
-	
+	if (node == NULL) { 
 		perror("heap error");
 		return;
 	}
 	node->data = data;
 	node->next = NULL;
 
-	if (list->head == NULL) {
-	
+	if (list->head == NULL) { 
 		list->head = list->tail = node;
-	}
-	else {
-	
+	} else { 
 		list->tail->next = node;
 		list->tail = node;
 	}
@@ -608,20 +570,16 @@ void AddNode(list_t *list, void *data) {
  * @param {type} 
  * @return: 
  */
-void ForeachAllNode(list_t *list,void (*invoker)(node_t *)) {
-
-	if (list == NULL || list->head == NULL) {
-
+void ForeachAllNode(list_t *list,void (*invoker)(node_t *)) { 
+	if (list == NULL || list->head == NULL) { 
 		return;
 	}
 
 	node_t *current = list->head;
-	while (1) {
-
+	while (1) { 
 		invoker(current);
 
-		if ((current = current->next) == NULL) {
-			
+		if ((current = current->next) == NULL) { 
 			printf("foreach ended******************************************\n");
 			printf("head address = %p\n", list->head);
 			printf("tail address = %p\n", list->tail);
@@ -637,38 +595,29 @@ void ForeachAllNode(list_t *list,void (*invoker)(node_t *)) {
  * @param {type} 
  * @return: 
  */
-void Insert(list_t *list, int index, void *data) {
-
-	if (list == NULL) {
-	
+void Insert(list_t *list, int index, void *data) { 
+	if (list == NULL) { 
 		return;
 	}
 
 	node_t *node = malloc(sizeof(node_t));
-	if (node == NULL) {
-	
+	if (node == NULL) { 
 		return;
 	}
 
 	node->data = data;
 	node->next = NULL;
 
-	if (index < 0) {
-	
+	if (index < 0) { 
 		return;
 	}
-	else if (index == 0) {
-
+	else if (index == 0) { 
 		node->next = list->head;
 		list->head = node;
-	}
-	else if (index > list->size - 1) {
-	
+	} else if (index > list->size - 1) {
 		list->tail->next = node;
 		list->tail = node;
-	}
-	else {
-	
+	} else { 
 		node_t *node_bef = list->head;
 		for (size_t i = 0; i < index - 1; i++) {
 
@@ -689,18 +638,11 @@ void Insert(list_t *list, int index, void *data) {
  * @return: 
  */
 void Delete(list_t *list, int index) {
-
-	if (list == NULL || list->head == NULL || list->tail == NULL) {
-
-		return;
-	}
+	if (list == NULL || list->head == NULL || list->tail == NULL) return;
 
 	if (index < 0) {
-
 		return;
-	}
-	else if (index == 0) {
-	
+	} else if (index == 0) {
 		node_t *head = list->head;
 		printf("delete and free %p\n", head);
 
@@ -710,12 +652,9 @@ void Delete(list_t *list, int index) {
 			list->tail = list->head;
 		}
 		free(head);
-	}
-	else if (index >= list->size - 1) {
-	
+	} else if (index >= list->size - 1) {
 		node_t *node_current = list->head;
 		if (node_current->next == NULL) {
-		
 			printf("delete and free %p\n", node_current);
 			free(node_current);
 			list->head = NULL;
@@ -726,9 +665,7 @@ void Delete(list_t *list, int index) {
 
 
 		while (1) {
-
 			if (node_current->next == list->tail) {
-				
 				break;
 			}
 
@@ -740,12 +677,9 @@ void Delete(list_t *list, int index) {
 		list->tail = node_current;
 		list->tail->next = NULL;
 		free(tail);
-	}
-	else {
-	
+	} else {
 		node_t *node_aft = list->head;
-		for (size_t i = 0; i < index - 1; i++) {
-
+		for (size_t i = 0; i < index - 1; i++) 
 			node_aft = node_aft->next;
 		}
 
@@ -767,9 +701,7 @@ void Delete(list_t *list, int index) {
  * @return: 
  */
 void Reverse_List(list_t *list) {
-
 	if (list == NULL) {
-	
 		return;
 	}
 
@@ -798,11 +730,9 @@ void Reverse_List(list_t *list) {
  * @return: 
  */
 void Free(list_t *list) {
-
 	node_t *current = list->head;
 	node_t *next_temp;
 	while (1) {
-
 		if ((next_temp = current->next) == NULL) {
 
 			printf("free node address = %p, Data address = %p\n", list->tail, list->tail->data);
@@ -968,7 +898,6 @@ PUSH +-->+ E |   | D | | C | | B |   | A +---> POP
 #define MAX_LENGTH 0x400
 
 struct Stack {
-
 	char *s_data;
 	int s_size;
 };
@@ -979,16 +908,13 @@ struct Stack {
  * @return: 
  */
 struct Stack *Init_Stack() {
-
 	struct Stack *stack = malloc(sizeof(struct Stack));
 	if (stack == NULL) {
-
 		return NULL;
 	}
 
 	stack->s_data = malloc(sizeof(char) * MAX_LENGTH);
 	if (stack->s_data == NULL) {
-	
 		return NULL;
 	}
 
@@ -1004,9 +930,7 @@ struct Stack *Init_Stack() {
  * @return: 
  */
 int Push(struct Stack *stack, char data) {
-
 	if (stack == NULL || stack->s_size == MAX_LENGTH) {
-
 		return -1;
 	}
 
@@ -1022,7 +946,6 @@ int Push(struct Stack *stack, char data) {
  * @return: 
  */
 int Pop(struct Stack *stack) {
-
 	if (stack == NULL || stack->s_size == 0) {
 	
 		return -1;
@@ -1040,9 +963,7 @@ int Pop(struct Stack *stack) {
  * @return: 
  */
 int Destory(struct Stack *stack) {
-
 	if (stack == NULL || stack->s_data == NULL) {
-	
 		return -1;
 	}
 
@@ -1145,7 +1066,7 @@ int Destory(struct Stack *stack) {
 
 <br/>
 
-*双亲表示法*
+_*双亲表示法*_
 
 我们以一组连续的空间去存储一棵树中的所有节点，每个节点除了维护了一个该节点所指示的 <font color="red">数据域</font> ( $Data$ ) 外，还附设一个指示器去维护该节点的双亲节点在连续空间所处的下标 ( 如果没有则为 $-1$ ) ，我们称它为 <font color = "red">双亲域</font> ( $Parent$ )
 
@@ -1157,7 +1078,7 @@ int Destory(struct Stack *stack) {
 
 <br/>
 
-*孩子表示法*
+_*孩子表示法*_
 
 我们以一组连续的空间去存储一棵树中的所有节点，每个节点除了维护了一个该节点所指示的 <font color="red">数据域</font> ( $Data$ ) 外，还维护了一个 <font color = "red">孩子域</font> ( $FirstChild$ ) 的指针指向了当前节点下的所有孩子节点，旗下的所有孩子节点以单链表存储结构的形式连接起来，<font color = "red">即 孩子域 指向了存储其下所有孩子节点的单链表在内存中的首地址</font>
 
@@ -1173,7 +1094,7 @@ int Destory(struct Stack *stack) {
 
 <br/>
 
-*孩子兄弟表示法*
+_*孩子兄弟表示法*_
 
 孩子兄弟表示法是一种最为常用的一种表示法，它的好处在于能够把一颗复杂的树转换为一颗 <font color = "red">二叉树</font>，对于二叉树的定义我们在下面的节点会提到，现在先聊下孩子兄弟表示法的具体表示方式
 
@@ -1209,14 +1130,14 @@ int Destory(struct Stack *stack) {
 
 #### 二叉树的特点和基本形态
 
-*二叉树的特点：*
+_*二叉树的特点：*_
 - 每个结点 <font color = "red">最多有两棵子树</font>，所以二叉树中不存在度大于 $2$ 的结点，注意，不是只有两棵子树，而是最多有，<font color = "red">没有子树</font> 或者 <font color = "red">有一棵子树</font> 都是可以的
 
 - <font color = "red">左子树和右子树是有顺序的</font>，次序不能任意颠倒，即二叉树是一颗 <font color = "red">有序树</font>
 
 - 即使树中某结点只有一棵子树，也要区分它是 <font color = "red">左子树</font> 还是 <font color = "red">右子树</font>
 
-*二叉树具有的五种基本形态：*
+_*二叉树具有的五种基本形态：*_
 
 - 空二叉树
 - 只有一个根节点
@@ -1293,7 +1214,7 @@ int Destory(struct Stack *stack) {
 - 具有 $n$ 个结点的 <font color = "red">完全二叉树</font> 的深度为 $⌊\log(2^n)⌋+1$ ( $⌊x⌋$ 表示为大于 $x$ 的最大整数 )
 
 - 如果对一颗具有 $n$ 个结点的完全二叉树 ( 其深度为 $⌊\log(2^n)⌋+1$ ) 的结点按层序编号 ( 从第 $1$ 层到第 $⌊\log(2^n)⌋+1$ 层，每层从左到右 )，对任意节点 $i$ ( $1 \leq i \leq n$ ) 有：
-	- 如果 $i=1$，则结点 $i$ 为二叉树的根，无双亲 ; 如果 $i>1$，则其双亲是节点 $⌊i/2⌋$
+	- 如果 $i=1$，则结点 $i$ 为二叉树的根，无双亲 ; 如果 $i>1$，则其双亲是节点 $⌊\displaystyle \frac{i}{2}⌋$
 	- 如果 $2i>n$，则结点 $i$ 无左孩子 ( 结点 $i$ 为叶子节点 ) ； 否则其左孩子是结点 $2i$
 	- 如果 $2i+1>n$，则结点 $i$ 无右孩子 ; 否则其右孩子是结点 $2i+1$
   
@@ -1304,7 +1225,7 @@ int Destory(struct Stack *stack) {
 
 #### 二叉树的存储结构
 
-*二叉树顺序存储结构*
+_*二叉树顺序存储结构*_
 
 <font color = "red">顺序存储</font> 对树这种 $1:n$ 的关系结构实现起来是比较困难的，但是二叉树是一种特殊的树，由于它的特殊性，使得用顺序存储结构也可以实现
 
@@ -1320,7 +1241,7 @@ int Destory(struct Stack *stack) {
 
 <br/>
 
-*二叉树链表*
+_*二叉树链表*_
 
 既然顺序存储适用性不强，我们就要考虑 <font color = "red">链式存储结构</font>
 
@@ -1332,7 +1253,6 @@ int Destory(struct Stack *stack) {
 typedef char ElementType_t;
 
 typedef struct binary_node {
-
 	ElementType_t data;
 	struct binary_node *parent;	/* Extension */
 	struct binary_node *left;  	/* Left sub tree */
@@ -1355,13 +1275,12 @@ typedef struct binary_node {
 
 <br/>
 
-*前序遍历*
+_*前序遍历*_
 
 规则是若二又树为空，用空操作返回，否则先访问根结点，然后前序遍历左子树，再前序遍历右子树，如下图所示，其遍历顺序则为：$ABDGHCEIF$
 
 ```c
 int Preorder_Traverse_BinaryTree(Binary_Tree *tree) {
-
 	if (tree == 0x0)
 		return -1;
 
@@ -1377,13 +1296,12 @@ int Preorder_Traverse_BinaryTree(Binary_Tree *tree) {
 
 <br/>
 
-*中序遍历*
+_*中序遍历*_
 
 规则是若树为空，则空操作返回，否则从根结点开始 ( 注意并不是先访问根結点 )，中序遍历根结点的左子树，然后是访问根结点，最后中序遍历右子树，如下图所示，其遍历顺序则为：$GDHBAEICF$
 
 ```C
 int Middorder_Traverse_BinaryTree(Binary_Tree *tree) {
-
 	if (tree == 0x0)
 		return -1;
 
@@ -1399,13 +1317,12 @@ int Middorder_Traverse_BinaryTree(Binary_Tree *tree) {
 
 <br/>
 
-*后序遍历*
+_*后序遍历*_
 
 规则是若树为空，则空操作返回，否则从左到右先叶子后结点的方式遍历访问左右子树，最后是访问根结点，如下图所示，其遍历顺序则为：$GHDB1EFCA$
 
 ```c
 int Postorder_Traverse_BinaryTree(Binary_Tree *tree) {
-
 	if (tree == 0x0)
 		return -1;
 
@@ -1421,7 +1338,7 @@ int Postorder_Traverse_BinaryTree(Binary_Tree *tree) {
 
 <br/>
 
-*遍历结果的推理*
+_*遍历结果的推理*_
 
 - 已知前序遍历序列和中序遍历序列，可以唯一确定一棵二叉树
   - 前序：$ABCDEF$
@@ -1443,7 +1360,7 @@ int Postorder_Traverse_BinaryTree(Binary_Tree *tree) {
 
 <br/>
 
-*后序遍历*
+_*后序遍历*_
 
 ```c
 /* 
@@ -1469,9 +1386,8 @@ int Postorder_Traverse_BinaryTree(Binary_Tree *tree) {
 static size_t index_Postorder = 0;
 static ElementType_t Perfect_BinaryTree_data[] = { 'A',																		 /* ROOT */
 											'B', 'D', 'H', '#', '#', 'I', '#', '#', 'E', 'J', '#', '#', 'K', '#', '#',		 /* LEFT */
-											'C', 'F', 'L', '#', '#', 'M', '#', '#', 'G', 'N', '#', '#', 'O', '#', '#' };	 /* RIGHT */
+											'C', 'F', 'L', '#', '#', 'M', '#', '#', 'G', 'N', '#', '#', 'O', '#', '#' };	 /* RIGHT */					
 Binary_Tree *Postorder_Create_BinaryTree(Binary_Tree *parent) {
-
 	ElementType_t ch = Perfect_BinaryTree_data[index_Postorder++];
 	if (ch == '#') {
 
@@ -1503,7 +1419,7 @@ Binary_Tree *Postorder_Create_BinaryTree(Binary_Tree *parent) {
 
 <br/>
 
-*前序遍历*
+_*前序遍历*_
 
 ```c
 /* 
@@ -1538,7 +1454,6 @@ static ElementType_t Binary_Tree_Data[] = {
 	'A','B','D','H','#','K','#','#','#','E','#','#',
 	'C','F','I','#','#','#','G','#','J','#','#' };
 int Preorder_Create_BinaryTree(Binary_Tree **tree, Binary_Tree *parent) {
-
 	ElementType_t ch = Binary_Tree_Data[index_Preorder++];
 	if (ch == '#') {
 
@@ -1566,6 +1481,30 @@ int Preorder_Create_BinaryTree(Binary_Tree **tree, Binary_Tree *parent) {
 	}
 
 	return 0;
+}
+```
+
+<br/>
+
+#### 二叉树的深度
+
+```c
+/* The deep for Binary-Tree */
+int BinaryTree_Deep(struct binary_node *node) {
+  int deep = 0;
+
+  if (node != NULL) {
+    int leftdeep = BinaryTree_Deep(node->left);
+    int rightdeep = BinaryTree_Deep(node->right);
+
+    /*
+     * Get a deeper value of the left or right subtrees,
+     * plus one to add the depth of the current node
+     */
+    deep = leftdeep >= rightdeep ? leftdeep + 1 : rightdeep + 1;
+  }
+
+  return deep;
 }
 ```
 
@@ -1605,7 +1544,7 @@ int Preorder_Create_BinaryTree(Binary_Tree **tree, Binary_Tree *parent) {
 
 <br/>
 
-*树转换为二叉树*
+_*树转换为二叉树*_
 
 1. 加线：把所有兄弟节点之间加一条连接线
 2. 去线：对树中毎个结点，只保留它与第一个孩子结点的连线，删除它与其他孩子结点之间的连线
@@ -1615,16 +1554,16 @@ int Preorder_Create_BinaryTree(Binary_Tree **tree, Binary_Tree *parent) {
 
 <br/>
 
-*森林转换为二叉树*
+_*森林转换为二叉树*_
 
 1. 把每颗树转换为二叉树
-2. 第一颗二叉树不动，从第二棵二叉树开始，依次把后一棵二叉树的根结点作为前一棵二叉树的根结点的右孩子，用线连接起来，当所���的二又树连接起来后就得到了由森林转换来的二叉树
+2. 第一颗二叉树不动，从第二棵二叉树开始，依次把后一棵二叉树的根结点作为前一棵二叉树的根结点的右孩子，用线连接起来，当所有的二叉树连接起来后就得到了由森林转换来的二叉树
 
 	![2020-3-9-17-37-5.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-9-17-37-5.png)
 
 <br/>
 
-*二叉树转换为树*
+_*二叉树转换为树*_
 
 1. 加线：若某结点 $K$ 的左孩子结点存在，则将这个左孩子的 $n$ 个右孩子结点都作结点 $K$ 的孩子，并用线连接起来 
 2. 去线：删除原二叉树中所有结点与其右孩子结点的连接线
@@ -1634,7 +1573,7 @@ int Preorder_Create_BinaryTree(Binary_Tree **tree, Binary_Tree *parent) {
 
 <br/>
 
-*二叉树转换为森林*
+_*二叉树转换为森林*_
 
 !!! INFO
 	判断一棵二叉树能够转换成一棵树还是森林，标准很简单，那就是只要看这棵二叉树树的根结点有没有右孩子，有就是森林，没有就是一棵树
@@ -1649,7 +1588,7 @@ int Preorder_Create_BinaryTree(Binary_Tree **tree, Binary_Tree *parent) {
 
 #### 赫夫曼树
 
-*赫夫曼树的定义*
+_*赫夫曼树的定义*_
 
 - 从树中一个结点到另一个结点之间的分支构成两个结点之间的 <font color = "red">路径</font>
 - 路径上的分支数目称作 <font color = "red">路径长度</font>
@@ -1661,7 +1600,7 @@ int Preorder_Create_BinaryTree(Binary_Tree **tree, Binary_Tree *parent) {
 
 <br/>
 
-*如何构造一颗赫夫曼树*
+_*如何构造一颗赫夫曼树*_
 
 1. 根据给定的 $n$ 个权值 $\{w_1,w_2,\ldots,w_n\}$ 构成 $n$ 棵二叉树的集合 $F=\{T_1,T_2,\ldots,T_n\}$，其中每棵二叉树 $T_i$ 中只有一个带权为 $w_i$，其左右树均为空
 2. 在 $F$ 中选取两棵根结点的权值最小的树作为左右子树构造一棵新的二叉树树 $K$，且置 $K$ 的权值为其左右子树上根结点的权值之和
@@ -1676,14 +1615,131 @@ int Preorder_Create_BinaryTree(Binary_Tree **tree, Binary_Tree *parent) {
 
 ---
 
-在树形结构中，一对父母可以拥有多个孩子，但是每个孩子却只能由一对父母，这是一个道理。可现实生活中，人与人之间的关于就是非常的复杂了，这通常映射出一种 $n : n$ 的结构，即我认识我的朋友，而我朋友的朋友又可能认识我，以此往复....
+在树形结构中，一对父母可以拥有多个孩子，但是每个孩子却只能由一对父母，这是一个道理。可现实生活中，人与人之间的关系总是非常复杂的，即我认识我的朋友，而我朋友的朋友又可能认识我，以此往复，这通常映射出一种 $n : n$ 的结构，而为了解决诸如这类 $n : n$ 的问题，**`图`** 就出现了
 
-而为了解决诸如这类 $n : n$ 的问题，**图** 的使用就出现了
+!!! info 图的简单定义
 
-![2020-10-20-17-29-33](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-20-17-29-33.png)
+	图 ( Graph ) 是由顶点的非空集合和顶点之间边的集合组成，通常表示为$: G(V , E)$，其中 $G$ 表示为一个图，$V$ 是图 $G$ 中顶点的集合，$E$ 是图 $G$ 中边的集合
 
-> 图 ( Graph ) 是由顶点的非空集合和顶点之间边的集合组成，通常表示为: $G(V , E)$，其中 $G$ 表示为一个图，$V$ 是图 $G$ 中顶点的集合，$E$ 是图 $G$ 中边的集合
+	- 图 $G$ 中的所有元素称之为<span style='color:red'>顶点</span> $(Vertex)$
+	- 在图结构中，不允许没有顶点，若 $V$ 是顶点的集合，则强调该集合<span style='color:red'>有穷非空</span>
+	- 图 $G$ 中的任意两个顶点之间都可能存在关系，它们之间的逻辑关系用<span style='color:red'>边</span>来表示
+	- 在图结构中，不允许没有顶点，若 $E$ 是边的集合，则该集合<span style='color:red'>允许为空</span>，简而言之就是一张图仅有一个顶点的存在
+
+	![2020-10-20-17-29-33](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-20-17-29-33.png)
 
 
+<br/>
 
-这里要强调的是: 
+#### 各种图的定义
+
+_*简单图与复杂图*_
+
+一张图中，若不存在顶点到其自身的边，且同一条边不重复出现，则称这样的图为<span style='color:red'>简单图</span>(左)，反之则为<span style='color:red'>复杂图/网络</span>(右)，需要强调的是，<span style='color:red'>该文章所讨论的模型均为以简单图为基准所展开</span>
+
+![2020-10-20-23-10-00](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-20-23-10-00.png)
+
+<br/>
+
+_*无向图*_
+
+若一张图的顶点 $V_i$ 到顶点 $V_j$ 之间的边<span style='color:red'>没有方向</span>，则称这条边为<span style='color:red'>无向边</span> $(Edge)$
+
+无向边所连接的两个顶点 $V_i$ 与 $V_j$，这条无向边表示为<span style='color:red'>无序对</span> $: (V_i ,V_j)$，也正因为它是一条无向边，故我们还可以表示为 $: (V_j ,V_i)$
+
+若一张图中的任意两个顶点之间的边都属于无向边，那么这张图就是一张<span style='color:red'>无向图</span> $(Undirected$ $graphs)$
+
+下图呈现了一张无向图 $G = (V,\{E\})$，其中顶点集合 $: V = \{A, B, C, D\}$；边集合 $: E = \{(A,B),(B,C),(C,D),(D,A),(A,C)\}$；
+
+![2020-10-20-22-41-41](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-20-22-41-41.png)
+
+<br/>
+
+_*有向图*_
+
+若一张图的顶点 $V_i$ 到顶点 $V_j$ 之间的边<span style='color:red'>有方向</span>，则称这条边为<span style='color:red'>有向边</span>，更多的，我们会称它为<span style='color:red'>弧</span> $(Arc)$
+
+有向边所连接的两个顶点，其中 $V_i$ 指向 $V_j$，那么这条弧表示为<span style='color:red'>有序偶</span> $: (V_i ,V_j)$，$V_i$ 称为<span style='color:red'>弧尾</span> $(Tail)$，$V_j$ 称为<span style='color:red'>弧头</span> $(Head)$
+
+若一张图中的任意两个顶点之间的边都属于有向边，那么这张图就是一张<span style='color:red'>有向图</span> $(Directed$ $graphs)$
+
+下图呈现了一张有向图 $G = (V,\{E\})$，其中顶点集合 $: V = \{A, B, C, D\}$；边集合 $: E = \{<A,D>,<B,A>,<C,A>,<B,C>\}$；
+
+![2020-10-20-23-06-33](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-20-23-06-33.png)
+
+<br/>
+
+_*无向完全图*_
+
+在无向图中，如果任意两个顶点之间都存在边，则称这张图为<span style='color:red'>无向完全图</span>
+
+含有 $n$ 个顶点的无向完全图存在边数 $e = \displaystyle \frac{n \times (n-1)}{2}$，其中，$0 \le e \le \displaystyle \frac{n \times (n-1)}{2}n$
+
+下图呈现了一张标准的无向完全图，因为每个顶点都要与除它以外的顶点连线，顶点 $A$ 与 $BCD$ 三个顶点连线，共有四个顶点，自然是 $4 \times 3$ ，但由于顶点 $A$ 与顶点B连线后，计算 $B$ 与 $A$ 连线就是重复，因此要整体除以2，即共有6条边
+
+![2020-10-20-23-18-28](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-20-23-18-28.png)
+
+<br/>
+
+_*有向完全图*_
+
+在有向图中，如果任意两个顶点之间都存在<span style='color:red'>方向互为相反</span>的弧，则称这张图为<span style='color:red'>有向完全图</span>
+
+含有 $n$ 个顶点的有向完全图存在边数 $e = n \times (n-1)$，其中，$0 \le e \le n \times (n-1)$
+
+![2020-10-20-23-26-47](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-20-23-26-47.png)
+
+<br/>
+
+_*稀疏图与稠密图*_
+
+有很少条边或弧的图称为稀疏图，反之称为稠密图，当然，这里稀疏和稠密是模糊的概念，都是相对而言的，故不进行展开
+
+<br/>
+
+_*网*_
+
+给定图的边或弧中存在与它相关的数据信息，则这种与图的边或弧相关的数据称之为<span style='color:red'>权</span> $(Weight)$；通常，这些权可用来表示一段距离
+
+带权的图通常称为<span style='color:red'>网</span> $(Network)$
+
+![2020-10-20-23-33-49](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-20-23-33-49.png)
+
+<br/>
+
+_*子图*_
+
+假设两个图 $G = (V,\{E\})$ 和 $G` = (V`,\{E`\})$，如果 $V` \subseteq V$ 且 $E` \subseteq E$，则称 $G`$ 为 $G$ 的<span style='color:red'>子图</span> $(Subgraph)$
+
+![2020-10-20-23-38-09](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-20-23-38-09.png)
+
+
+<br/>
+
+#### 图的顶点与边之间的关系
+
+_*无向图中，顶点与边之间的关系*_
+
+- 给定一张无向图 $G = (V,\{E\})$，如果边 $(V,V`) \in E$，则称顶点 $V$ 与 $V`$ <span style='color:red'>互为邻接点</span> $(Adjacent)$；边 $(V,V`)$ <span style='color:red'>依附</span>$(incident)$<span style='color:red'>于</span> 顶点 $V$ 和 $V`$；顶点 $V$ 和 $V`$ 与 $(V,V`)$ <span style='color:red'>相关联</span>
+
+- 和某个顶点 $V_i$ 相关联的边的数目称之为顶点 $V_i$ 的<span style='color:red'>度</span> $(Degree)$，记为 $: TD(V_i)$
+
+- <span style='color:red'>一张无向图中的边数其实就是该图中各顶点度的和的一半</span>(多出的一半是因为重复两次计数)，简记之 $: \displaystyle e = \frac{1}{2} \sum_{i = 1}^{n} TD(V_i)$
+
+<br/>
+
+_*有向图中，顶点与边之间的关系*_
+
+- 给定一张有向图 $G = (V,\{E\})$，如果弧 $<V,V`> \in E$，则称顶点 $V$ <span style='color:red'>邻接到</span>顶点 $V`$；弧 $<V,V`>$ 与顶点 $V$ 和 $V`$ <span style='color:red'>相关联</span>
+
+- 以顶点 $V$ 为头的弧的数目称为顶点 $V$ 的<span style='color:red'>入度</span> $(InDegree)$，记为 $: ID(V)$
+
+- 以顶点 $V$ 为尾的弧的数目称为顶点 $V$ 的<span style='color:red'>出度</span> $(InDegree)$，记为 $: OD(V)$
+
+- 顶点 $V$ 的度为 $TD(V) = ID(V) + OD(V)$
+
+- <span style='color:red'>一张有向图中的边数其实各顶点的入度和亦或者出度和</span>，简记之 $: \displaystyle e = \sum_{i = 1}^{n} ID(V_i) = \sum_{i = 1}^{n} OD(V_i)$
+
+<br/>
+
+_*路径*_
