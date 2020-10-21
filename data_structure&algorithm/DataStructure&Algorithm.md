@@ -1323,8 +1323,7 @@ _*后序遍历*_
 
 ```c
 int Postorder_Traverse_BinaryTree(Binary_Tree *tree) {
-	if (tree == 0x0)
-		return -1;
+	if (tree == 0x0) return -1;
 
 	Postorder_Traverse_BinaryTree(tree->left);
 	Postorder_Traverse_BinaryTree(tree->right);
@@ -1390,16 +1389,11 @@ static ElementType_t Perfect_BinaryTree_data[] = { 'A',																		 /* ROO
 Binary_Tree *Postorder_Create_BinaryTree(Binary_Tree *parent) {
 	ElementType_t ch = Perfect_BinaryTree_data[index_Postorder++];
 	if (ch == '#') {
-
 		return NULL;
-	}
-	else {
-
+	} else {
 		Binary_Tree *tree = (Binary_Tree *)malloc(sizeof(struct binary_node));
-		if (tree == 0x0) {
-
-			return -1;
-		}
+		if (tree == 0x0) return -1;
+		
 		memset(tree, 0, sizeof(struct binary_node));
 
 		tree->left = Postorder_Create_BinaryTree(tree);
@@ -1408,9 +1402,9 @@ Binary_Tree *Postorder_Create_BinaryTree(Binary_Tree *parent) {
 		tree->data = ch;
 		tree->parent = parent;
 		printf("[+] Create Binary-node: Node-Value = %c, Node-Address = %p, Parent-Address = %p\n",
-			tree->data,
-			tree,
-			tree->parent);
+			   tree->data,
+			   tree,
+			   tree->parent);
 
 		return tree;
 	}
@@ -1456,25 +1450,20 @@ static ElementType_t Binary_Tree_Data[] = {
 int Preorder_Create_BinaryTree(Binary_Tree **tree, Binary_Tree *parent) {
 	ElementType_t ch = Binary_Tree_Data[index_Preorder++];
 	if (ch == '#') {
-
 		return -1;
-	}
-	else {
-
+	} else {
 		*tree = (Binary_Tree *)malloc(sizeof(Binary_Tree));
-		if (*tree == 0x0) {
+		if (*tree == 0x0) return -1;
 
-			return -1;
-		}
 		memset(*tree, 0, sizeof(Binary_Tree));
 
 		(*tree)->data = ch;
 		(*tree)->parent = parent;
 		printf("[+] Create Binary-node: Node-Value = %c, Node-Address = %p, Parent-value = %c, Parent-Address = %p\n",
-			(*tree)->data,
-			*tree,
-			(*tree)->parent == NULL ? '-' : (*tree)->parent->data,
-			(*tree)->parent);
+			   (*tree)->data,
+			   *tree,
+			   (*tree)->parent == NULL ? '-' : (*tree)->parent->data,
+			   (*tree)->parent);
 
 		Preorder_Create_BinaryTree(&(*tree)->left, *tree);
 		Preorder_Create_BinaryTree(&(*tree)->right, *tree);
@@ -1636,6 +1625,8 @@ _*如何构造一颗赫夫曼树*_
 _*简单图与复杂图*_
 
 一张图中，若不存在顶点到其自身的边，且同一条边不重复出现，则称这样的图为<span style='color:red'>简单图</span>(左)，反之则为<span style='color:red'>复杂图/网络</span>(右)，需要强调的是，<span style='color:red'>该文章所讨论的模型均为以简单图为基准所展开</span>
+
+需要补充的是，对于无向图为模型的简单图而言，是不允许两个顶点间出现重复的边的，因为对于该无向边所表示的方向是可互逆的；对于有向图为模型的简单图而言，是允许两点之间出现重复的弧的，但是仅允许这两条重复的弧所表示的有序偶是不同的，即方向不同
 
 ![2020-10-20-23-10-00](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-20-23-10-00.png)
 
