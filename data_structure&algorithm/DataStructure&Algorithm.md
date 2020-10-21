@@ -1730,7 +1730,7 @@ _*无向图中，顶点与边之间的关系*_
 
 _*有向图中，顶点与边之间的关系*_
 
-- 给定一张有向图 $G = (V,\{E\})$，如果弧 $<V,V`> \in E$，则称顶点 $V$ <span style='color:red'>邻接到</span>顶点 $V`$；弧 $<V,V`>$ 与顶点 $V$ 和 $V`$ <span style='color:red'>相关联</span>
+- 给定一张有向图 $G = (V,\{E\})$，如果弧 $<V,V`>$ $\in E$，则称顶点 $V$ <span style='color:red'>邻接到</span>顶点 $V`$；弧 $<V,V`>$ 与顶点 $V$ 和 $V`$ <span style='color:red'>相关联</span>
 
 - 以顶点 $V$ 为头的弧的数目称为顶点 $V$ 的<span style='color:red'>入度</span> $(InDegree)$，记为 $: ID(V)$
 
@@ -1743,3 +1743,79 @@ _*有向图中，顶点与边之间的关系*_
 <br/>
 
 _*路径*_
+
+在树形结构中，根节点到任意节点的路径是唯一的，但是在<span style='color:red'>一张图中，顶点与顶点之间的路径却是不唯一的</span>
+
+> 顶点 $V_i$ 到 顶点 $V_j$ 中所经过的<span style='color:red'>顶点序列集</span>，称为从顶点 $V_i$ 到 顶点 $V_j$ 的路径<span style='color:red'>路径</span> $(Path)$，这条<span style='color:red'>路径的长度</span>，即为路径上的边或弧的数目
+
+- 无向图中，顶点 $V$ 到 顶点 $V`$ 路径的序列集 $(V = V_{i,0}, V_{i,1} \dots , V_{i,m} = V`)$，其中 $(V_{i,j-1},V_{i,j}) \in E$，$1 \le j \le m$，如下图所示，列举的顶点 $B$ 到顶点 $D$ 的四种不同路径
+
+	![2020-10-21-11-10-57](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-21-11-10-57.png)
+
+- 有向图中，顶点 $V$ 到 顶点 $V`$ 路径的序列集 $(V = V_{i,0}, V_{i,1} \dots , V_{i,m} = V`)$，其中 $<V_{i,j-1},V_{i,j}>$ $\in E$，$1 \le j \le m$，如下图所示，列举的顶点 $B$ 到顶点 $D$ 的两种不同路径
+
+	![2020-10-21-11-14-18](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-21-11-14-18.png)
+
+- 第一个顶点到最后一个顶点相同的路径称为<span style='color:red'>回路或环</span> $(Cycle)$；顶点序列集中，顶点不重复出现的路径称为<span style='color:red'>简单路径</span>；除了第一个顶点和最后一个顶点外，其余顶点不重复出现的回路称为<span style='color:red'>简单回路或简单环</span>；如下图所示，左侧的环因第一个顶点和最后一个顶点都是 $B$，且 $C$、$D$、 $A$ 没有重复出现，因此是一个简单环，而右侧的环由于顶点 $C$ 的重复，无法构成简单环
+
+	![2020-10-21-11-40-34](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-21-11-40-34.png)
+
+
+<br/>
+
+#### 连通图相关概念
+
+_*连通图*_
+
+给定一张无向图 $G = (V,\{E\})$，如果顶点 $V$ 到顶点 $V`$ 有路径，则称 $V$ 和 $V`$ 是<span style='color:red'>连通的</span>；如果对于一张图中的任意两个顶点 $V_i$ 、$V_j$ $\in E$，$V_i$ 和 $V_j$ 都是连通的，则称 $G$ 为<span style='color:red'>连通图</span> $(Connected-Graph)$；如下图，左图由于顶点 $E$ 、$F$ 无法与外层图进行连通，所以它不是一张连通图，而右图则为一张标准的连通图
+
+![2020-10-21-13-36-37](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-21-13-36-37.png)
+
+无向图中的<span style='color:red'>极大连通子图</span>称为<span style='color:red'>连通分量</span>，它要求: 
+- 必须作为为一张无向图中的子图而存在
+- 子图本身也能够够造出一张连通图
+- 连通子图含有最大顶点数，因为一张图中能够拆分出多种不同的子图，故只取顶点数最大的一张
+- 具有极大顶点数的连通子图包含依附于这些顶点的所有边
+
+如下图所给出的示范，其中，图一是一个无向非连通图，但是它却有两个极大连通子图，分别为: 图二、图三；而图四尽管页数与图一的子图，但是它却无法满足包含最大顶点数的条件
+
+![2020-10-21-13-44-02](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-21-13-44-02.png)
+
+![2020-10-21-13-44-14](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-21-13-44-14.png)
+
+<br/>
+
+_*强连通图*_
+
+给定一张有向图 $G = (V,\{E\})$，如果对于每一对 $V_i,V_j$ $\in E$ 、$V_i \ne V_j$，从 $V_i$ 到 $V_j$ 和从 $V_j$ 到 $V_i$ 都存在路径，则称 $G$ 是<span style='color:red'>强连通图</span>
+
+在有向图中的<span style='color:red'>极大强连通子图</span>称作为有向图的<span style='color:red'>强连通分量</span>，它要求: 
+- 必须作为为一张有向图中的子图而存在
+- 子图本身也能够够造出一张连通图
+- 连通子图含有最大顶点数，因为一张图中能够拆分出多种不同的子图，故只取顶点数最大的一张
+- 具有极大顶点数的连通子图包含依附于这些顶点的所有边
+
+如下图，左图由于顶点 $D$ 无法与外层图进行连通，所以它不是一张强连通图；而右图则为一张标准的强连通图，并且它还是属于左图的强连通分量
+
+![2020-10-21-16-24-24](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-21-16-24-24.png)
+
+
+<br/>
+
+_*关于连通图的生成树*_
+
+所谓的<span style='color:red'>连通图生成树</span>是一个<span style='color:red'>极小的连通子图</span>，它含有图中全部的 $n$ 个顶点，但只有足以构成一棵树的 $n-1$ 条边
+
+如下图: 图1是一张普通图，但显然它不是生成树，当去掉两条构成环的边后，比如图2或图3，就满足 $n$ 个顶点 $n - 1$ 条边且连通的定义了，它们都是一颗生成树
+
+在这里也能够得到一个结论，即 : <span style='color:red'>如果一个图有 $n$ 个顶点和小于 $n-1$ 的边，则是非连通图，反之，如果它多于 $n-1$ 条边，则必定构成一个环，因为这条边使得它依附的那两个顶点之间有了第二条路径</span>；如图二和图三，我们会发现随便添加两个顶点之间的连线都能够构成一个环(包括子图的构造)，但是，<span style='color:red'>拥有 $n-1$ 条边并不意味着它一定是生成树</span>，如图四的例子
+
+![2020-10-21-16-42-45](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-21-16-42-45.png)
+
+<span style='color:red'>如果一个有向图恰好有一个顶点的入度为 0，其余顶点入度均为 1，则它同样属于一颗有向树</span>(所谓入度为 0 其实就相当于树中的根节点，其余顶点入度为 1 就相当于这颗树中非根节点的双亲只有一个)
+
+<span style='color:red'>一个有向图的生成森林由若干颗有向树组成，含有图中的所有顶点，但只有足以构成若干颗不相交的有向树的弧</span>
+
+如下图: 图1是一张有向图，去掉一些不必要的弧后，可以分解成图2和图3的两颗有向树，而图2和图3正是由于<span style='color:red'>不相交的特性</span>，它们能够共同的构成图1的生成森林
+
+![2020-10-21-16-50-25](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-21-16-50-25.png)
