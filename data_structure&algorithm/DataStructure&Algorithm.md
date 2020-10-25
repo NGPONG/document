@@ -1711,7 +1711,7 @@ _*子图*_
 
 _*无向图中，顶点与边之间的关系*_
 
-- 给定一张无向图 $G = (V,\{E\})$，如果边 $(V,V`) \in E$，则称顶点 $V$ 与 $V`$ <span style='color:red'>互为邻接点</span> $(Adjacent)$；边 $(V,V`)$ <span style='color:red'>依附</span>$(incident)$<span style='color:red'>于</span> 顶点 $V$ 和 $V`$；顶点 $V$ 和 $V`$ 与 $(V,V`)$ <span style='color:red'>相关联</span>
+- 给定一张无向图 $G = (V,\{E\})$，如果边 $(V_i,V_j) \in E$，则称顶点 $V_i$ 与 $V_j$ <span style='color:red'>互为邻接点</span> $(Adjacent)$；边 $(V_i,V_j)$ <span style='color:red'>依附</span>$(incident)$<span style='color:red'>于</span> 顶点 $V_$ 和 $V_j$；顶点 $V_i$ 和 $V_j$ 与 $(V_i,V_j)$ <span style='color:red'>相关联</span>
 
 - 和某个顶点 $V_i$ 相关联的边的数目称之为顶点 $V_i$ 的<span style='color:red'>度</span> $(Degree)$，记为 $: TD(V_i)$
 
@@ -1721,7 +1721,7 @@ _*无向图中，顶点与边之间的关系*_
 
 _*有向图中，顶点与边之间的关系*_
 
-- 给定一张有向图 $G = (V,\{E\})$，如果弧 $<V,V`>$ $\in E$，则称顶点 $V$ <span style='color:red'>邻接到</span>顶点 $V`$；弧 $<V,V`>$ 与顶点 $V$ 和 $V`$ <span style='color:red'>相关联</span>
+- 给定一张有向图 $G = (V,\{E\})$，如果弧 $<V_i,V_j>$ $\in E$，则称顶点 $V_i$ <span style='color:red'>邻接到</span>顶点 $V_j$；弧 $<V_i,V_j>$ 与顶点 $V_i$ 和 $V_j$ <span style='color:red'>相关联</span>
 
 - 以顶点 $V$ 为头的弧的数目称为顶点 $V$ 的<span style='color:red'>入度</span> $(InDegree)$，记为 $: ID(V)$
 
@@ -1758,7 +1758,7 @@ _*路径*_
 
 _*连通图*_
 
-给定一张无向图 $G = (V,\{E\})$，如果顶点 $V$ 到顶点 $V`$ 有路径，则称 $V$ 和 $V`$ 是<span style='color:red'>连通的</span>；如果对于一张图中的任意两个顶点 $V_i$ 、$V_j$ $\in E$，$V_i$ 和 $V_j$ 都是连通的，则称 $G$ 为<span style='color:red'>连通图</span> $(Connected-Graph)$；如下图，左图由于顶点 $E$ 、$F$ 无法与外层图进行连通，所以它不是一张连通图，而右图则为一张标准的连通图
+给定一张无向图 $G = (V,\{E\})$，如果顶点 $V_i$ 到顶点 $V_j$ 有路径，则称 $V_i$ 和 $V_j$ 是<span style='color:red'>连通的</span>；如果对于一张图中的任意两个顶点 $V_i$ 、$V_j$ $\in E$，$V_i$ 和 $V_j$ 都是连通的，则称 $G$ 为<span style='color:red'>连通图</span> $(Connected-Graph)$；如下图，左图由于顶点 $E$ 、$F$ 无法与外层图进行连通，所以它不是一张连通图，而右图则为一张标准的连通图
 
 ![2020-10-21-13-36-37](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-21-13-36-37.png)
 
@@ -1810,3 +1810,532 @@ _*关于连通图的生成树*_
 如下图: 图1是一张有向图，去掉一些不必要的弧后，可以分解成图2和图3的两颗有向树，而图2和图3正是由于<span style='color:red'>不相交的特性</span>，它们能够共同的构成图1的生成森林
 
 ![2020-10-21-16-50-25](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-21-16-50-25.png)
+
+<br/>
+
+#### 图的抽象数据类型
+
+_*邻接矩阵*_
+
+图的<span style='color:red'>邻接矩阵</span> $(Adjacency \: Matrix)$ 存储方式是用两个数组来表示图；一个一维数组存储图中顶点信息，一个二维数组 (称为邻接矩阵) 存储图中的边或弧的信息
+
+> 设图 $G$ 有 $n$ 个顶点，则邻接矩阵是一个 $n \times n$ 的方阵，定义为 : <br/><br/>
+> $
+arc[i][j] = \begin{cases}
+   1 &\text{if } \:\: (V_i,V_j) \in E &\text{or } <V_i,V_j> \in E \\
+   0 &\text{contrary}
+\end{cases}
+$
+
+<span style='color:red'>对于无向图而言，其邻接矩阵是一个[对称矩阵](https://baike.baidu.com/item/%E5%AF%B9%E7%A7%B0%E7%9F%A9%E9%98%B5)</span>，如下图所示，展示了一张无向图转换成邻接矩阵后的抽象数据结构
+
+![2020-10-24-20-01-36](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-24-20-01-36.png)
+
+
+对于有向图而言，其邻接矩阵和无向图稍有差异 : <span style='color:red'>因为有向图中的边都作为有向边(弧)，故，有向图邻接矩阵的抽象数据结构仅作为一个普通的矩阵而存在</span>，如下图所示
+
+![2020-10-24-20-12-55](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-24-20-12-55.png)
+
+对于网而言，由于网中的边是带有权的，故我们只需要把最开始的定义替换下即可适用 
+
+> 设图 $G$ 有 $n$ 个顶点，则邻接矩阵是一个 $n \times n$ 的方阵，定义为 : <br/><br/>
+> $
+arc[i][j] = \begin{cases}
+   W_{i,j} &\text{if } \:\: (V_i,V_j) \in E &\text{or } <V_i,V_j> \in E \\
+   0 &\text{if } \:\: i = j \\
+	 \infty &\text{contrary}
+\end{cases}
+$
+
+在这里，$W_{i,j}$ 表示为 $(V_i,V_j)$ 或 $<V_i,V_j>$ 上的权值；$infty$ 是一个不可能的极限值，即代表着所对应下标的元素不存在两顶点间的依附边
+
+![2020-10-24-20-25-26](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-24-20-25-26.png)
+
+
+当拥有了这副矩阵，我们就可以很容易地知道图中的一些信息
+- 我们要排查两顶点是否有边无边，即排查矩阵中对应顶点中的元是否值为 1
+- 无向图中的邻接矩阵，我们通常研究的是顶点的度；顶点 $V_i$ 的度为矩阵中第 $V_i$ 行(或列)各元素之和
+- 有向图中的邻接矩阵，我们通常研究的是顶点的出度和入度；顶点 $V_i$ 的入度为矩阵中第 $V_i$ 列各元素之和；顶点 $V_i$ 的出度为矩阵中第 $V_i$ 行各元素之和
+- 求顶点 $V_i$ 的所有邻接点就是将矩阵中第 $i$ 行中的所有元素扫描一遍，当 $arc[i][j] = 1$ 时，所对应列的顶点就是作为 $V_i$ 的邻接点
+
+下面的代码展示了如何构建一副以邻接矩阵为数据结构的图
+
+```c
+/** TODO: 依照《大话数据结构》的 图7-4-4 所构建 */
+
+#define MAXVEX 100          /* Max count of vertex */
+#define G_INFINITY 65535    /* Max value of weight */
+
+typedef char vertex_type;   /* Type of vertex, it's might should be defined by users */
+typedef int edge_type;      /* Type of weight, it's might should be defined by users */
+
+typedef struct {
+  vertex_type vexs[5]; /* Table of vertex */
+  edge_type arc[5][5]; /* Adjacency Matrix, can be seen as table of edge */
+  int vertexs_num, edges_num;
+} n_graph;
+
+void create_edge_node_by_pait(int i, int j, edge_type **arc) {
+	arc[i][j] = 1;
+}
+
+void init_ort_graph(graph_ort *G) {
+  memset(G, 0x0, sizeof(n_graph));
+
+  G->vertexs_num = 5;
+  G->edges_num   = 6;
+
+  /* 初始化顶点表 */
+  char ascii_start = '0';
+  for (size_t i = 0; i < G->vertexs_num; ++i) {
+    G->vexs[i] = ascii_start;
+    ++ascii_start;
+  }
+
+  /* 初始化邻接矩阵中所有元的默认值，默认为正无穷 */
+  for (int i = 0; i < G->vertexs_num; ++i) {
+    for (int j = 0; j < G->vertexs_num; ++j) {
+      int val = 0;
+      if (i != j) val = G_INFINITY;
+
+      G->arc[i][j] = val;
+	}
+  }
+}
+
+void main(void) {
+  n_graph *G = (n_graph *)malloc(sizeof(n_graph));
+  init_graph(G);
+
+  create_edge_node_by_pait(0, 4, G->arc);
+  create_edge_node_by_pait(1, 0, G->arc);
+  create_edge_node_by_pait(1, 2, G->arc);
+  create_edge_node_by_pait(1, 0, G->arc);
+  create_edge_node_by_pait(2, 0, G->arc);
+  create_edge_node_by_pait(2, 3, G->arc);
+  create_edge_node_by_pait(3, 4, G->arc);
+}
+```
+
+<br/>
+
+_*邻接表*_
+
+邻接矩阵是不错的一种图存储结构，但是，对于边数相对顶点较少的图，这种结构是存在对存储空间的极大浪费的，如下图所示的一副稀疏有向图，邻接矩阵中除了 $arc[1][0]$ 有权值外，没有其它弧，那么其余的存储空间都被浪费掉了
+
+![2020-10-24-21-58-03](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-24-21-58-03.png)
+
+为此，结合了链式结构与线性结构的特性，<span style='color:red'>邻接表</span>就此诞生了，<span style='color:red'>邻接表 $(Adjacenct \: List)$ 为数组与链表相结合的存储方法</span>，其处理通常是这样的 : 
+- 图中顶点 $V$ 用一个一维数组存储，另外，对于顶点数组中，每个数据元素还需要存储指向第一个邻接点的指针，以便于查找该顶点的边信息
+- 图中每个顶点 $V$ 的所有邻接点构成一个线性表，由于邻接点的个数不定，所以用单链表存储，所构成的边表中 : 
+
+  - 无向图称为顶点 $V_i$ 的<span style='color:red'>边表</span>
+  - 有向图则称为顶点 $V_i$ 作为弧尾的<span style='color:red'>出边表</span> 或者是 以顶点 $V_i$ 作为弧头的 <span style='color:red'>入边表</span>
+
+先从无向图开始，对于无向图而言，其所定义的邻接表如下图所示 : 
+
+![2020-10-24-22-11-22](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-24-22-11-22.png)
+
+而对于有向图，其邻接表结构也是类似的，但是需要注意的是，对于有向图而言其通常区分为以弧头作为存储标准还是以弧尾作为存储标准，这取决于我们对于给定一张图的研究方向，是主要针对顶点的入度进行考量呢还是主要针对顶点的出度进行考量呢？而依据这两种目的性的不同，所构造出来的邻接表结构又区分为<span style='color:red'>邻接表(出边表)</span>或者<span style='color:red'>逆邻接表(入边表)</span>
+
+![2020-10-24-22-15-22](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-24-22-15-22.png)
+
+对于网而言，仅需要对于链表中的元素结构中新增一个权值的成员即可，这里不做开展
+
+这样的结构，对于我们要获得图的相关信息也是很方便的 : 
+- 要想知道某个顶点的度，就去查找这个顶点的边表中结点的个数
+- 若要判断顶点 $V_i$ 到 $V_j$ 是否存在边，只需要测试顶点 $V_i$ 的边表中 adjvex 是否存在结点 $V_j$ 的下标 $j$ 就行了
+- 若求顶点的所有邻接点，其实就是对此顶点的边表进行遍历，得到的 adjvex 域对应的顶点就是邻接点
+
+以下代码展示了以无向图为基准所构建出来的邻接表，需要补充的是，由于是以无向图为基准，故边的录入是可逆的，所以代码中还添加了对于重复录入边的校验规则；其次，由于所构造的是无向图，所以在每次构造出一个给定边的时候，我们还可以同时构造出该边所对等顶点的边信息(思考无向图中所构造出的对称矩阵)；对于有向图的构建和以下代码的函数展示是一致的，都是依赖于链表的头插法来进行
+
+```c
+/** TODO: 依照《大话数据结构》的 图7-4-6 所构建 */
+
+typedef char vertext_type;
+typedef int edge_type;
+
+/* 边表节点 */
+typedef struct edge_node {
+  int adj_vex_idx;        /* 邻接点域，存储该顶点所对应的下标 */
+  struct edge_node *next; /* 指向下一个邻接点 */
+} edge_node;
+
+
+/* 顶点表节点 */
+typedef struct {
+  vertext_type data;
+  edge_node *first_edge;
+} vertext_node;
+
+
+/* 图结构 */
+typedef struct {
+  vertext_node adj_list[4];
+  int vertexs_num;
+  int edges_num;
+} graph_adj;
+
+bool verify_repeat(int idx, vertext_node *head) {
+  bool flg = true;
+
+  edge_node *nod = head->first_edge;
+  while (true) {
+    if (nod == NULL) break;
+
+    if (nod->adj_vex_idx == idx) {
+      flg = false;
+      break;
+    }
+
+    nod = nod->next;
+  }
+
+  return flg;
+}
+
+void create_edge_node_by_pait(int i, int j, edge_type weight, vertext_node *adj_list) {
+  if(adj_list == NULL) return;
+
+  /**
+   * 由于是无向图，边的录入是可以反方向的，故这里还要判断一下是否重复录入了，
+   * 其实主要是因为下面的代码在构造出一个顺向边的时候又同时构造出其逆向边所导致的，
+   * 如果正常录入边的话还不需要判断重复
+  */
+  if (!verify_repeat(j, &adj_list[i])) {
+    return;
+  }
+
+  edge_node *e_i = (edge_node *)malloc(sizeof(edge_node));
+  e_i->adj_vex_idx = i;
+  e_i->next = adj_list[j].first_edge;
+  adj_list[j].first_edge = e_i;
+
+  /* 依赖于无向图的对称矩阵的特性，在构造玩顺向下标的边后还可以同时构造出其逆向下标的边 */
+  edge_node *e_j = (edge_node *)malloc(sizeof(edge_node));
+  e_j->adj_vex_idx = j;
+  e_j->next = adj_list[i].first_edge;
+  adj_list[i].first_edge = e_j;
+}
+
+void init_adjgraph(graph_adj *G) {
+  memset(G, 0x0, sizeof(graph_adj));
+
+  G->vertexs_num = 4;
+  G->edges_num   = 5;
+
+  /* 初始化顶点表 */
+  char ascii_start = '0';
+  for (size_t i = 0; i < G->vertexs_num; ++i) {
+    G->adj_list[i].data = ascii_start;
+	G->adj_list[i].first_edge = NULL;
+    ++ascii_start;
+  }
+}
+
+void main(void) {
+  graph_adj grap;
+  init_adjgraph(&grap);
+
+  create_edge_node_by_pait(0, 1, 0, G->adj_list);
+  create_edge_node_by_pait(0, 2, 0, G->adj_list);
+  create_edge_node_by_pait(0, 3, 0, G->adj_list);
+  create_edge_node_by_pait(1, 0, 0, G->adj_list);
+  create_edge_node_by_pait(1, 2, 0, G->adj_list);
+  create_edge_node_by_pait(2, 0, 0, G->adj_list);
+  create_edge_node_by_pait(2, 1, 0, G->adj_list);
+  create_edge_node_by_pait(2, 3, 0, G->adj_list);
+  create_edge_node_by_pait(3, 0, 0, G->adj_list);
+  create_edge_node_by_pait(3, 2, 0, G->adj_list);
+}
+```
+
+<br/>
+
+_*十字邻接表*_
+
+对于有向图来说，邻接表是有缺陷的。关心了出度问题，想了解入度就必须要遍历整个图才能知道，反之，逆邻接表解决了入度却不了解出度的情况，有没有可能把邻接表与逆邻接表结合起来呢？答案是肯定的，就是把它们整合在一起，这就衍生出了有向图的一种存储方法: <span style='color:red'>十字链表 $(OrthogonalList)$</span>
+
+为此，我们需要重新定义下顶点表结点的结构，如下图 : 
+
+![2020-10-24-22-37-58](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-24-22-37-58.png)
+
+- firstin : 入边表头指针，指向该顶点的入边表中第一个结点
+- firstout : 出边表头指针，指向该顶点的出边表中的第一个结点
+
+而边表结点的结构也需重新定义，如下图 : 
+
+![2020-10-24-22-39-21](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-24-22-39-21.png)
+
+
+- tailvex : 弧起点在顶点表的下标
+- headvex : 弧终点在顶点表中的下标
+- headlink : 是指入边表指针域，指向终点相同的下一条边
+- taillink : 是指出边表指针域，指向起点相同的下一条边
+- 如果是网，还可以再增加一个 weight 域来存储权值
+
+那么最终，其整合为下图所示的抽象数据结构
+
+![2020-10-24-22-44-00](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-24-22-44-00.png)
+
+我们不必把十字链表想的过于复杂，我们只需要把它理解为是有向图中的邻接表和逆邻接表这两种数据结构给柔和到一个链表中进行管控即可，下面的代码则展示了如何创建一个十字链表
+
+```c
+/** TODO: 依照《大话数据结构》的 图7-4-10 所构建 */
+
+typedef char vertext_type;
+typedef int edge_type;
+
+/* 边表节点 */
+typedef struct edge_node {
+  int tail_idx;                /* 出边表的邻接节点域 */
+  struct edge_node *next_tail; /* 指向出边表的下一个邻接点 */
+  
+  int head_idx;                /* 入边表的邻接节点域 */
+  struct edge_node *next_head; /* 指向入边表的下一个邻接点 */
+} edge_node;
+
+
+/* 顶点表节点 */
+typedef struct {
+  vertext_type data;
+  edge_node *first_out; /* 对应着出边表 */
+  edge_node *first_in;  /* 对应着入边表 */
+} vertext_node;
+
+
+/* 图结构 */
+typedef struct {
+  vertext_node ort_list[4];
+  int vertexs_num;
+  int edges_num;
+} graph_ort;
+
+
+void create_edge_node_by_pait(int i, int j, vertext_node *ort_list) {
+  if(ort_list == NULL) return;
+
+  /* 初始化入边表的信息 */
+  edge_node *e = (edge_node *)malloc(sizeof(edge_node));
+  printf("[INFO] create %p\n", e);
+  e->head_idx = j;
+  e->next_head = ort_list[i].first_in;
+  ort_list[i].first_in = e;
+
+  /* 初始化出边表信息 */
+  e->tail_idx = i;
+  e->next_tail = ort_list[j].first_out;
+  ort_list[j].first_out = e;
+}
+
+void init_ort_graph(graph_ort *G) {
+  memset(G, 0x0, sizeof(graph_ort));
+
+  G->vertexs_num = 4;
+  G->edges_num   = 5;
+
+  char ascii_start = '0';
+  for (size_t i = 0; i < G->vertexs_num; ++i) {
+    G->ort_list[i].data = ascii_start;
+    ++ascii_start;
+  }
+}
+
+void main(void) {
+  create_edge_node_by_pait(2, 1, G->ort_list);
+  create_edge_node_by_pait(2, 0, G->ort_list);
+  create_edge_node_by_pait(1, 2, G->ort_list);
+  create_edge_node_by_pait(1, 0, G->ort_list);
+  create_edge_node_by_pait(0, 3, G->ort_list);
+}
+```
+
+
+<br/>
+
+_*邻接多重表*_
+
+如果我们在无向图的应用中，关注的重点是顶点，那么邻接表是不错的选择，但如果我们更关注边的操作，比如对已访问过的边做标记，删除某一条边等操作，那就意味着，需要找到这条边的两个边表结点进行操作，这其实还是比较麻烦的，如下图所示，若要删除左图的 $(V_0,V_2)$ 这条边，需要对邻接表结构中右边表的阴影两个结点进行删除操作，显然这是比较烦琐的
+
+![2020-10-24-22-50-10](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-24-22-50-10.png)
+
+为此，仿造十字链表的设计思想对原有的邻接表进行改造，重新定义了边表结点的结构如下图所示 : 
+
+![2020-10-24-22-51-36](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-24-22-51-36.png)
+
+其中 : 
+- ivex / jvex : 与某条边依附的两个顶点在顶点表中下标
+- link : 指向依附顶点 ivex 的下一条边
+- jlink : 指向依附顶点 jvex 的下一条边
+- ilink 指向的结点的 jvex 一定要和它本身的 ivex 的值相同
+
+这就是<span style='color:red'>邻接多重表</span>结构
+
+依照上面的构造方式，邻接多重表的抽象数据类型构造如下 : 
+
+![2020-10-24-22-57-26](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-24-22-57-26.png)
+
+<br/>
+
+#### 图的遍历
+
+从图中某一顶点出发访遍图中其余顶点，且使每一个顶点仅被访问一次，这一过程就叫做<span style='color:red'>图的遍历 $(Traversing \: Graph)$</span>
+
+因为图的任一顶点都可能和其余的所有顶点相邻接，极有可能存在沿着某条路径搜索后，又回到原顶点，而有些顶点却还没有遍历到的情况。因此我们需要在遍历过程中把访问过的顶点打上标记，以避免访问多次而不自知，具体办法是<span style='color:red'>设置一个访问数组 `visited[n]`，$n$ 是图中顶点的个数，初值为 0，访问过后设置为 1</span>
+
+<span style='color:red'>通常有两种遍历次序方案，它们分别是深度优先遍历和广度优先遍历</span>
+
+<br/>
+
+_*深度优先遍历*_
+
+<span style='color:red'>深度优先遍历 $(Depth \: First \: Search)$</span>，也有称为深度优先搜索，简称为DFS
+
+深度优先遍历的设计理念和树的前序遍历的过程十分类似，<span style='color:red'>它从图中某个顶点 $V_i$ 出发，访问此顶点，然后从 $V_i$ 的未被访问的邻接点出发深度优先遍历图，直至图中所有和 $V_i$ 有路径相通的顶点都被访问到</span>，简而言之，即先保证从唯一一个方向遍历完所有的顶点，然后再逐个退回挨个沿着当前方向最近的邻接点接着遍历，以此往复
+
+而对于非连通图而言，该算法也是同样能够适用的，<span style='color:red'>只需要对它的连通分量分别进行深度优先遍历，即在先前一个顶点进行一次深度优先遍历后，若图中尚有顶点未被访问，则另选图中一个未曾被访问的顶点作起始点，重复上述过程，直至图中所有顶点都被访问到为止</span>
+
+下图则展示了一幅图在使用深度优先遍历的抽象过程(<span style='color:red'>注意虚线，这是沿路作为往返时会经历的一个判断是否被访问到的过程</span>)，<span style='color:red'>事实上，我们无需理会一张图的开始次序，因为作为图来说，从哪个顶点开始进行遍历都是一个合理的过程</span>
+
+![2020-10-25-01-40-30](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-25-01-40-30.png)
+
+下面的代码展示了以邻接矩阵作为存储结构的遍历方式 : 
+
+```c
+bool visted[5] = { false };
+
+void DES(int i, n_graph *G) {
+  visted[i] = true;
+  printf("[info] search: %c\n", G->vexs[i]);
+
+  for (size_t j = 0; j < G->vertexs_num; ++j) {
+    if (G->arc[i][j] && !visted[j]) {
+      DES(j, G);
+    }
+  }
+}
+
+void DES_traverse(n_graph *G) {
+  for (size_t i = 0; i < G->vertexs_num; ++i) {
+    if (visted[i]) continue;
+
+    DES(i, G);
+  }
+}
+```
+
+下面的代码展示了以邻接表作为存储结构的遍历方式 : 
+
+```c
+bool visted[5] = { false };
+
+void DES(int i, vertext_node *adj_list) {
+  visted[i] = true;
+  printf("[info] search: %c\n", adj_list[i].data);
+
+  edge_node *cur = adj_list[i].first_edge;
+  while (cur) {
+    if (!visted[cur->adj_vex_idx]) 
+      DES(cur->adj_vex_idx, adj_list);
+
+    cur = cur->next;
+  }
+}
+
+void DES_traverse(graph_adj *G) {
+  for (size_t i = 0; i < G->vertexs_num; ++i) {
+    if (visted[i]) continue;
+    DES(i, G->adj_list);
+  }
+}
+```
+
+对比两个不同存储结构的深度优先遍历算法，对于 $n$ 个顶点 $E$ 条边的图来说，邻接矩阵由于是二维数组，要查找每个顶点的邻接点需要访问矩阵中的所有元素，因此其时间复杂度为: $O(n^{2})$；而邻接表做存储结构时，找邻接点所需的时间取决于顶点和边的数量，所以其时间复杂度为 $O(n+E)$。<span style='color:red'>显然对于点多边少的稀疏图来说，邻接表结构使得算法在时间效率上大大提高</span>
+
+<br/>
+
+_*广度优先遍历*_
+
+<span style='color:red'>深度优先遍历 $(Breadth \: First \: Search)$</span>，也有称为广度优先搜索，简称为BFS
+
+如果说图的深度优先遍历类似树的前序遍历，那么图的广度优先遍历就类似于树的<span style='color:red'>层序搜索</span>，注意，理解层序这点很关键，广度优先遍历总会先把一个层级的元素都遍历完，并且依赖于一个数据结构存储当前层级中能够被成功遍历的元素(即还未被访问的)，然后在遍历完当前层级后再挨个取出上一步所存储的元素，以此往复，如下图所示
+
+![2020-10-26-00-52-40](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-26-00-52-40.png)
+
+下面的代码展示了以邻接矩阵作为存储结构的遍历方式 : 
+
+```c
+bool visted[5] = { false };
+
+void BFS(int _i, n_graph *_G, Queue *_queue) {
+  visted[_i] = true;
+
+  AddQ(_queue, _i);
+
+  while (!IsEmptyQ(_queue)) {
+    _i = DeleteQ(_queue);
+    for (int j = 0; j < _G->vertexs_num; ++j) {
+      if(_G->arc[_i][j] == 1 && !visted[j]) {
+        visted[j] = true;
+        AddQ(_queue, j);
+      }
+    }
+  }
+}
+
+void BFS_traverse(n_graph *_G) { 
+  memset(visted, false, sizeof(visted));
+
+  Queue *queue = CreateQueue();
+
+  for (size_t i = 0; i < _G->vertexs_num; ++i) {
+    if (visted[i]) continue;
+    BFS(i, _G, queue);
+  }
+}
+```
+
+下面的代码展示了以邻接表作为存储结构的遍历方式 : 
+
+```c
+bool visted[5] = { false };
+
+void BFS(int _i, graph_adj *_G, Queue *_queue) {
+  visted[_i] = true;
+
+  AddQ(_queue, _i);
+
+  while (!IsEmptyQ(_queue)) {
+    _i = DeleteQ(_queue);
+    edge_node *cur = _G->adj_list[_i].first_edge;
+
+    while (cur) {
+      if(!visted[cur->adj_vex_idx]) {
+        visted[cur->adj_vex_idx] = true;
+        AddQ(_queue, cur->adj_vex_idx);
+      }
+      cur = cur->next;
+    }
+  }
+}
+
+void BFS_traverse(graph_adj *_G) { 
+  memset(visted, false, sizeof(visted));
+
+  Queue *queue = CreateQueue();
+
+  for (size_t i = 0; i < _G->vertexs_num; ++i) {
+    if (visted[i]) continue;
+    BFS(i, _G, queue);
+  }
+}
+```
+
+对比图的深度优先遍历与广度优先遍历算法，它们在时间复杂度上是一样的，不同之处仅仅在于对顶点访问的顺序不同，可见两者在全图遍历上是没有优劣之分，只是视不同情况采取不同的策略
+
+不过如果图顶点和边非常多，不能在短时间内遍历完成，遍历的目的是为了寻找合适的顶点，那么选择哪种遍历就要仔细斟酌了。<span style='color:red'>深度优先更适合目标比较明确，以找到目标为主要目的的情况</span>；<span style='color:red'>而广度优先更适合在不断扩大遍历范围时找到相对最优解的情况</span>
+
+<br/>
+
+#### 最小生成树
+
