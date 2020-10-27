@@ -1758,7 +1758,7 @@ _*路径*_
 
 _*连通图*_
 
-给定一张无向图 $G = (V,\{E\})$，如果顶点 $V_i$ 到顶点 $V_j$ 有路径，则称 $V_i$ 和 $V_j$ 是<span style='color:red'>连通的</span>；如果对于一张图中的任意两个顶点 $V_i$ 、$V_j$ $\in E$，$V_i$ 和 $V_j$ 都是连通的，则称 $G$ 为<span style='color:red'>连通图</span> $(Connected-Graph)$；如下图，左图由于顶点 $E$ 、$F$ 无法与外层图进行连通，所以它不是一张连通图，而右图则为一张标准的连通图
+给定一张无向图 $G = (V,\{E\})$，如果顶点 $V_i$ 到顶点 $V_j$ <span style='color:red'>有路径</span>，则称 $V_i$ 和 $V_j$ 是<span style='color:red'>连通的</span>；如果对于一张图中的任意两个顶点 $V_i$ 、$V_j$ $\in E$，$V_i$ 和 $V_j$ 都是连通的，则称 $G$ 为<span style='color:red'>连通图</span> $(Connected-Graph)$；如下图，左图由于顶点 $E$ 、$F$ 无法与外层图进行连通，所以它不是一张连通图，而右图则为一张标准的连通图，其中，任意两顶点间都存在路劲相通
 
 ![2020-10-21-13-36-37](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-21-13-36-37.png)
 
