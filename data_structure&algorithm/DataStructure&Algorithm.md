@@ -2,13 +2,15 @@
 
 ### 目录
 
-- [开始](#前言)
+- [Start](#前言)
 - [关于算法的时间复杂度与空间复杂度](#关于算法的时间复杂度与空间复杂度)
 - [Arrary](#arrary)
 - [Linked List](#linkedlist)
 - [Stack & Queue](#stackqueue)
 - [Tree](#tree)
 - [Binary Tree](#binary_tree)
+- [Disjoint Set](#Disjoint-Set)
+- [Graph](#graph)
 
 <br/>
 
@@ -1602,6 +1604,190 @@ _*如何构造一颗赫夫曼树*_
 
 ### Disjoint Set
 
+---
+
+给定一组数据集，<span style='color:red'>数据集中的各元素均存在关联</span>，现需要将里面的元素再做一次元素间强关联性的分组，这时候就可以用到<span style='color:red'>并查集</span>这个数据结构来完成
+
+并查集一种简洁而优雅的数据结构，主要用于解决一些元素分组的问题，它管理一系列不相交的集合，我们可以把上面所提到的那一组数据集的内部中再依据元素之间的关联性拆分出多个集合，并查集能够支持对这些所拆分出来的集合执行 :
+- 合并( $Union$ ) : 把两个不相交的集合合并为一个集合 
+- 查询( $Find$ ) : 查询两个元素是否在同一个集合内
+
+并查集在实际工程项目中的使用通常会和连通图搭配在一起，<span style='color:red'>因为对于一个能够成功合并的集合来说，其内部必定会存在一副连通图</span>，那么所延伸出来的需求诸如 : 判断一张图中是否存在连通图、顶点是否存在于一个连通图内、……，不得不说的是，这并不是并查集最初需要解决的数学问题，但是把它放在连通图中配合使用的确是一个很不错的选择
+
+<br/>
+
+#### 并查集的使用
+
+既然强调并查集是一种优雅的数据结构，那么就其所提供的合并集合的功能来看，我们就不能单纯的使用暴力解法来解决实际问题了
+
+先思考一个问题，对于两个集合的合并操作，如果屏蔽掉暴力求解法的使用，那么用什么方式才能够更加优雅的对这两个数据集进行合并呢？那就是树，当两棵树之间需要被合并一方的根节点改为合并一方的根节点时，其实这时候就完成了两棵树之间的合并工作
+
+而并查集之所以称之为优雅，是因为其内部同样是依赖于树结构进行合并，<span style='color:red'>在并查集中，对于集合中的每一个元素都看作是一个集合(树)</span>，由这些小的集合根据原数据集中，元素间的关联关系去不断地合并出一个或多个不相交的集合，这个过程就依赖于树的设计理念来实现
+
+其中，对于每颗树中的根节点在并查集中又称呼为<span style='color:red'>代表元</span>，有代表元来最终完成合并的工作。为了保证并查集的简易性，其并不会挪用树中的过多设计结构，一般来说，仅使用一个一维数组来表示一颗树的关系，其中，数组中每个下标其实就是代表着每一个不同的顶点，下标的值就是代表着当前结点所对应的父节点在这个数组中的下标，直至下标的值为其顶点本身，则代表着当前结点属于一个根节点，那么我们就可以抽象出以下的数据结构和使用方式
+
+> 下面代码中还附带了 $Rank$ 的初始化，其主要是应用于并查集的搜寻优化工作，下面会提到
+
+```c
+#define VERTICES 6 /* Num of vertex */
+
+static int parent[VERTICES]; /* The idx of arrary is each of vertexs, and value is parent idx of current vertex */ 
+static int rank[VERTICES];   /* Record the rank of tree */
+
+/* @breif 初始化并查集 */
+void initialise_disjoint_set() {
+  /* rank */
+  memset(rank, 0x0, sizeof(rank));
+
+  /* parent_set */
+  for (size_t i = 0; i < VERTICES; ++i) {
+    parent[i] = i;
+  }
+}
+
+/* @breif 找到当前顶点的最上级根节点 */
+int find_root_quick(int f) {
+  if (parent[f] == f) { /* 在初始情况下，我们初始化 parent 每个下标所对应的值为顶点本身 */
+    return f;
+  }
+
+  /**
+   * 如果顶点的父节点并不是顶点本身(初始化情况下)，
+   * 那么就继续沿着其所对应的父结点继续向上递归搜索，直至找到根
+  */
+  return find_root_quick(parent[f]);
+}
+
+/* @breif 合并两个顶点至一个集合内，有可能会合并失败，这种情况则为两个顶点本身就属于一个集合内 */
+bool union_set_quick(int x, int y) {
+  int x_root = find_root(x);
+  int y_root = find_root(y);
+
+  /* 当根节点相同时，则代表着所输入的 x 和 y 是在同一个集合内 */
+  if (x_root == y_root) {
+    return false;
+  }
+
+  parent[x_root] = y_root;
+  return true;
+}
+
+void initialise_disjoint_set() {
+  /* rank */
+  memset(rank, 0x0, sizeof(rank));
+
+  /* parent_set */
+  for (size_t i = 0; i < VERTICES; ++i) {
+    parent[i] = i;
+  }
+}
+
+/* @breif 查找一副图是否存在环 */
+void find_cycle_in_graph(void) {
+  /**
+   * 这里本应该拥有一个创建图且初始化图的过程，但是
+   * 这里省略掉了，仅模拟出已经查找出图中所有的边
+  */
+  int edges[VERTICES][2] = {
+    { 0, 1 }, { 1, 2 }, { 1, 3 }, 
+    { 2, 4 }, { 3, 4 }, { 2, 5 }
+  };
+
+  initialise_disjoint_set();
+
+  /**
+   * 逐个合并图中的所有的边，也就是两个顶点之间不断进行合并 
+   * 对于存在环的图来说(不考虑相同边的情况)，如果合并时存在
+   * 两个不同的顶点属于同一个集合内(union_set返回false)，那
+   * 么这个集合所构成的图中，任意两点的连线都可以构成一个环
+  */
+  for (size_t i = 0; i < VERTICES; ++i) {
+    int x = edges[i][0];
+    int y = edges[i][1];
+
+    if (!union_set_quick(x, y)) {
+      printf("Cycle detected\n");
+      return;
+    }
+  }
+  printf("None cycle\n");
+
+  return;
+}
+```
+
+<br/>
+
+#### 并查集的优化
+
+_*路劲压缩*_
+
+上面的代码展示了并查集的最基本的一些操作，然后实际上是存在着一定的问题的，正如上面最初版的合并集合的代码(union_set_quick)那一部分，由于每次合并仅只是固定把 $x$ 的代表元合并至 $y$ 的代表元，那么考虑每次合并时所输入的结点都是一种线性关系，那么<span style='color:red'>最终所合并出来的树会退化成一个长的单链表，在越往后的合并工作中，每次查找根节点的工作就会呈线性增长</span>，如下图所示
+
+![2020-10-31-01-32-25](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-31-01-32-25.png)
+
+我们可以使用<span style='color:red'>路径压缩</span>的方法来解决这个问题，其实它也是非常好的实现，既然我们只关心一个元素对应的根节点，那我们希望每个元素到根节点的路径尽可能短，简而言之，只要我们在查询的过程中，把沿途的每个节点的父节点都设为根节点即可，那么查找部分的代码(find_root_quick)就可以更改如下
+
+> 路径压缩时直接将节点的父亲修改成最终的祖先节点，在破坏原先的树结构的同时，在有些场景中也会损失信息
+
+```c
+int find_root_compress(int f) {
+  if (parent[f] == f) { /* 在初始情况下，我们初始化 parent 每个下标所对应的值为顶点本身 */
+    return f;
+  }
+
+  parent[f] = find_root_compress(parent[f]); /* 将当前结点的父节点设置为根节点 */
+  return parent[f];
+}
+```
+
+<br/>
+
+_*按秩合并*_
+
+为了解决路劲压缩上的一些问题，我们可以按照两颗树的深度的不同来进行合并的次序，我们通过观察可以发现，当把简单的树往复杂的树上合并时，合并出来的树其深度并不会增加，反之则每次合并后，树的深度都会 +1，如下图所示
+
+![2020-10-31-01-46-02](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-31-01-46-02.png)
+
+这里就引入了 $Rank$ 数组的改变，该数组的下标对应着每个结点，而<span style='color:red'>下标所在的值着代表着当前节点所呈现出来的树的深度(以当前结点作为根的树或者子树)</span>，每当我们即将要进行树的合并工作的时候，我们需要增加判断两棵树之间的 $Rank$ 并保证总是由小到大的顺序来合并即可完成优化工作
+
+这里要扩展的是，<span style='color:red'>当树的深度一样的时候，无论由输入值的哪一方的代表元来进行合并其最终结果都一样的</span>，但是我们还要保证的是，每次进行合并后，合并的一方其深度需要 +1
+
+> 按秩合并虽然能够解决时间复杂度上的一些问题，但是其却牺牲了部分空间上的复杂度
+
+> 路径压缩和按秩合并如果一起使用，时间复杂度接近 $O(n)$ ，但是很可能会破坏rank的准确性
+
+```c
+bool union_set_rank(int x, int y) {
+  int x_root = find_root_quick(x);
+  int y_root = find_root_quick(y);
+
+  if (x_root == y_root) {
+    return false;
+  }
+
+  /** 
+   * 为了保证树的生成并不会退化成单向长链表而导致 parent 查找过程的复杂度会线性提升的情景，这
+   * 里引入了 Rank 的概念
+   * 
+   * - 当两颗树(已经合并了的两个暂时不相交的集合)的深度不同时，如果将较深的树合并至较浅的树中
+   *   时，整颗树的深度都会比原有较深的树 +1，反之则不变
+   * - 当两颗树的深度是相同的时候，这里想象出唯有一个顶点的情景，这时候进行合并，不管是由谁作
+   *   为父结点都无所谓，但是要保证作为父结点的那颗树其对应根的深度要 +1
+  */
+  if (rank[x_root] > rank[y_root]) {
+    parent[y_root] = x_root;
+  } else if (rank[y_root] < rank[x_root]) {
+    parent[x_root] = y_root;
+  } else {
+    parent[x_root] = y_root;
+    ++rank[y_root];
+  }
+
+  return true;
+}
+```
+
 
 
 <br/>
@@ -1719,7 +1905,7 @@ _*子图*_
 
 _*无向图中，顶点与边之间的关系*_
 
-- 给定一张无向图 $G = (V,\{E\})$，如果边 $(V_i,V_j) \in E$，则称顶点 $V_i$ 与 $V_j$ <span style='color:red'>互为邻接点</span> $(Adjacent)$；边 $(V_i,V_j)$ <span style='color:red'>依附</span>$(incident)$<span style='color:red'>于</span> 顶点 $V_$ 和 $V_j$；顶点 $V_i$ 和 $V_j$ 与 $(V_i,V_j)$ <span style='color:red'>相关联</span>
+- 给定一张无向图 $G = (V,\{E\})$，如果边 $(V_i,V_j) \in E$，则称顶点 $V_i$ 与 $V_j$ <span style='color:red'>互为邻接点</span> $(Adjacent)$；边 $(V_i,V_j)$ <span style='color:red'>依附</span>$(incident)$ 于顶点 $V_i$ 和 $V_j$；顶点 $V_i$ 和 $V_j$ 与 $(V_i,V_j)$ <span style='color:red'>相关联</span>
 
 - 和某个顶点 $V_i$ 相关联的边的数目称之为顶点 $V_i$ 的<span style='color:red'>度</span> $(Degree)$，记为 $: TD(V_i)$
 
@@ -1731,9 +1917,9 @@ _*有向图中，顶点与边之间的关系*_
 
 - 给定一张有向图 $G = (V,\{E\})$，如果弧 $<V_i,V_j>$ $\in E$，则称顶点 $V_i$ <span style='color:red'>邻接到</span>顶点 $V_j$；弧 $<V_i,V_j>$ 与顶点 $V_i$ 和 $V_j$ <span style='color:red'>相关联</span>
 
-- 以顶点 $V$ 为头的弧的数目称为顶点 $V$ 的<span style='color:red'>入度</span> $(InDegree)$，记为 $: ID(V)$
+- 以顶点 $V$ 为头的弧的数目称为顶点 $V$ 的<span style='color:red'>入度</span>$(InDegree)$，记为 $: ID(V)$
 
-- 以顶点 $V$ 为尾的弧的数目称为顶点 $V$ 的<span style='color:red'>出度</span> $(InDegree)$，记为 $: OD(V)$
+- 以顶点 $V$ 为尾的弧的数目称为顶点 $V$ 的<span style='color:red'>出度</span>$(InDegree)$，记为 $: OD(V)$
 
 - 顶点 $V$ 的度为 $TD(V) = ID(V) + OD(V)$
 
@@ -1803,7 +1989,9 @@ _*强连通图*_
 
 _*关于连通图的生成树*_
 
-所谓的<span style='color:red'>连通图生成树</span>是一个<span style='color:red'>极小的连通子图</span>，它含有图中全部的 $n$ 个顶点，但只有足以构成一棵树的 $n-1$ 条边
+<span id = "关于连通图的生成树"></span>
+
+所谓的<span style='color:red'>连通图生成树</span>是一个<span style='color:red'>极小的连通子图</span>，<span style='color:red'>它含有图中全部的 $n$ 个顶点，但只有足以构成一棵树的 $n-1$ 条边，且图结构中不能存在环</span>
 
 如下图: 图1是一张普通图，但显然它不是生成树，当去掉两条构成环的边后，比如图2或图3，就满足 $n$ 个顶点 $n - 1$ 条边且连通的定义了，它们都是一颗生成树
 
@@ -2339,6 +2527,61 @@ void BFS_traverse(graph_adj *_G) {
 }
 ```
 
+<br/>
+
+_*关于广度优先算法所构造出的无权图的最短路径*_
+
+<span id = "关于广度优先算法所构造出的无权图的最短路径"></span>
+
+虽然无权图的最短路径没有什么研究价值，但事实上，[Dijksktra](#Dijksktra) 的最短路径的算法也是基于这个所演变过来的
+
+在无权图中，设每条邻接边的权恒为 1，并使用一个 parent 数组记录下最短路径，关于具体原理，参考这两个视频的讲解
+- [正月点灯笼 - BFS和DFS算法（第1讲）](#https://www.bilibili.com/video/BV1Ks411579J)
+- [正月点灯笼 - BFS和DFS算法（第2讲）](#https://www.bilibili.com/video/BV1Ks411575U)
+
+```c
+bool visted[5] = { false };
+
+int *BFS(int _i, graph_adj *_G, Queue *_queue) {
+  int parent[_G->vertexs_num];
+  memset(parent, 0x0, sizeof(int) ( _G->vertexs_num));
+
+  visted[_i] = true;
+
+  AddQ(_queue, _i);
+
+  while (!IsEmptyQ(_queue)) {
+    _i = DeleteQ(_queue);
+    edge_node *cur = _G->adj_list[_i].first_edge;
+
+    while (cur) {
+      if(!visted[cur->adj_vex_idx]) {
+        visted[cur->adj_vex_idx] = true;
+        parent[cur->adj_vex_idx] = _i;
+        AddQ(_queue, cur->adj_vex_idx);
+      }
+      cur = cur->next;
+    }
+  }
+}
+
+void BFS_traverse(graph_adj *_G) { 
+  memset(visted, false, sizeof(visted));
+
+  Queue *queue = CreateQueue();
+
+  for (size_t i = 0; i < _G->vertexs_num; ++i) {
+    if (visted[i]) continue;
+    BFS(i, _G, queue);
+  }
+}
+```
+
+
+<br/>
+
+_*小结*_
+
 对比图的深度优先遍历与广度优先遍历算法，它们在时间复杂度上是一样的，不同之处仅仅在于对顶点访问的顺序不同，可见两者在全图遍历上是没有优劣之分，只是视不同情况采取不同的策略
 
 不过如果图顶点和边非常多，不能在短时间内遍历完成，遍历的目的是为了寻找合适的顶点，那么选择哪种遍历就要仔细斟酌了。<span style='color:red'>深度优先更适合目标比较明确，以找到目标为主要目的的情况</span>；<span style='color:red'>而广度优先更适合在不断扩大遍历范围时找到相对最优解的情况</span>
@@ -2347,3 +2590,161 @@ void BFS_traverse(graph_adj *_G) {
 
 #### 最小生成树
 
+在前面的[图的定义](#关于连通图的生成树)小节中提到过图的生成树的定义，而<span style='color:red'>构造连通网的最小代价生成的树则称为最小生成树 $(Minimum \:\: Cost \:\: Spaning \:\: Tree)$</span>
+
+找连通网的最小生成树，经典的有两种算法，它们分别为Prim(普里姆)算法和Kruskal(克鲁斯卡尔)算法，对比两个算法，<span style='color:red'>Kruskal算法主要是针对边来展开，边数少时效率会非常高，所以对于稀疏图有很大的优势</span>；<span style='color:red'>而普里姆算法对于稠密图，即边数非常多的情况会更好一些</span>
+
+
+<br/>
+
+_*Prim*_
+
+假设 $N = (P,\{E\})$ 是连通网，$TE$ 是 $N$ 上最小生成树中边的集合。算法从 $U=\{u_0\} \: (u_0 \in E)$，$TE = \{\}$ 开始。重复执行下述操作 : 在所有 $u \in U$，$v \in V - U$ 的边 $(u，v) \in E$ 中找一条代价最小的边 $(u_0,v_0)$ 并入集合 $TE$，同时 $v_0$ 并入 $U$，直至 $U=V$ 为止。此时 $TE$ 中必有 $n-1$ 条边，则 $T = (V,\{TE\})$ 为 $N$ 的最小生成树
+
+Prim 算法的时间复杂度为 $O(n^2)$
+
+```c
+void min_span_tree_prim(n_graph *G) {
+  int adj_vexs[G->vertexs_num]; /* 保存顶点的下标 */
+  int low_cast[G->vertexs_num]; /* 保存权值，它的下标所对应的值和 adj_vexs 所相呼应
+                                    并且该数组所对应的下标为0的时候，也意味着该下标的顶
+                                    点已经被纳入至最小生成树当中 */
+
+  low_cast[0] = 0; /* 设最小生成树从0顶点开始，也就是说在最开始的时候，顶点0就被纳入到最小生成树当中去了 */
+  adj_vexs[0] = 0;
+
+  /* 依照第一个顶点(0)的那一行中的所有的值都初始化 */
+  for (size_t i = 1; i < G->vertexs_num; ++i) {
+    adj_vexs[i] = 0;
+    low_cast[i] = G->arc[0][i];
+  }
+
+  /**
+   * 以下的循环至始至终都要过滤掉顶点为 0 的，因为它在最
+   * 开始的时候已经被纳入到最小生成树了，故需要跳过进行判断
+ */
+  for (size_t i = 1; i < G->vertexs_num; ++i) {
+    int k = 0;
+    int min = G_INFINITY;
+    /* 从 low_cast 专门用于保存权值的数组中筛选出一个最小值 */
+    for (size_t j = 1; j < G->vertexs_num; ++j) {
+      if(low_cast[j] != 0 && low_cast[j] < min) {
+        min = low_cast[j];
+        k = j;
+      }
+    }
+
+    /* 最小值的顶点纳入到最小生成树当中 */
+    printf("(%d, %d)\n", adj_vexs[k], k);
+    low_cast[k] = 0;
+
+    /* 初始化 low_cast，从第 k 行初始化 */
+    for (size_t j = 1; j < G->vertexs_num; ++j) {
+      if(low_cast[j] != 0 && G->arc[k][j] < low_cast[j]) { /* 这一步: G->arc[k][j] < low_cast[j]，意味着可能会覆
+                                                              盖掉，但是仔细想想看，该算法是查找最小的权，故覆盖掉是合理的 */
+        low_cast[j] = G->arc[k][j];
+        adj_vexs[j] = k;
+      }
+    }
+  }
+}
+```
+
+<br/>
+
+_*Kruskal*_
+
+Kruskal 算法主要是依赖于[并查集](#Disjoint-Set)来完成，它会提前先找出图中的所有的边，并依照权值进行排序，依次遍历这些边并归并为集合中，通过并查集的特性查找不存在构成环(因为构成环则必定不属于生成树，详情查看[这一小节](#关于连通图的生成树))的边则属于最小生成树的边
+
+假设 $N = (V,\{E\})$ 是连通网，则令最小生成树的初始状态为只有 $n$ 个顶点而无边的非连通图 $T = \{V,\{\})$，图中每个顶点自成一个连通分量。在 $E$ 中选择代价最小的边，若该边依附的顶点落在 $T$ 中不同的连通分量上，则将此边加入到 $T$ 中，否则舍去此边而选择下一条代价最小的边。依次类推，直至 $T$ 中所有顶点都在同一连通分量上为止
+
+此算法在查找树的根节点(find_root) 由边数 $e$ 决定(可以进行优化，详情请查看[并查集](#Disjoint-Set)章节)，时间复杂度为 $O(loge)$，而外面有一个 for 循环 $e$ 次，所以克鲁斯卡尔算法的时间复杂度为 $O(eloge)$
+
+```c
+int find_root(int *parent, int x) {
+  if(parent[x] == x) {
+    return x;
+  }
+
+  find(parent, parent[x]);
+}
+
+void min_span_tree_kruskal(n_graph *G) {
+  Edge edges[G->edges_num];
+  int parent[G->vertexs_num];
+
+  /* 这里省略掉对 edges 数组进行初始化的代码，简而言之就是构造出图中的所有的边并依照权值进行排序即可 */
+
+  for (size_t i = 0; i < G->vertexs_num; ++i) {
+    parent[i] = 0;
+  }
+
+  for (size_t i = 0; i < G->vertexs_num; ++i) {
+    int x_root = find_root(parent, edges[i].begin);
+    int y_root = find_root(parent, edges[i].end);
+
+    if(n != m) {
+      parent[x_root] = y_root;
+      printf("(%d, %d)\n", edges[i].begin, edges[i].end);
+    }
+  }
+}
+```
+
+<br/>
+
+#### 最短路径
+
+在网图和非网图中，最短路径的含义是不同的。由于非网图它没有边上的权值，所谓的最短路径，其实就是指两顶点之间经过的边数最少的路径；<span style='color:red'>而对于网图来说，最短路径，是指两顶点之间经过的边上权值之和最少的路径，并且我们称路径上的第一个顶点是源点，最后一个顶点是终点</span>
+
+<br/>
+
+_*Dijkstra*_
+
+<span id = "Dijksktra"></span>
+
+Dijkstra 算法求得最短路径是基于 [关于广度优先算法所构造出的无权图的最短路径](#关于广度优先算法所构造出的无权图的最短路径) 所演变而来的，两者之间非常的相似，但是，由于需要求得最短的路径，即邻接点间的权值需要为最小值，故原先的队列需要替换为<span style='color:red'>优先队列</span> 来使用，其中，元素的值则作为能够找到当前顶点的唯一标识，而优先度则作为<span style='color:red'>已归纳为最短路径的顶点到当前顶点的权</span>
+
+关于该算法的视频讲解请查看 [正月点灯笼 - BFS和DFS算法（第3讲）](#https://www.bilibili.com/video/BV1ts41157Sy)
+
+```c
+void dijkstra(n_graph *G) {
+  int parent[G->vertexs_num];  /* 存储最短路径的一维数组 */
+  for (size_t i = 0; i < G->vertexs_num; ++i) {
+    parent[i] = -1;
+  } 
+
+  priority_queue queue;
+
+  /* 初始化原点 */
+  node nod_first;
+  nod_first.idx = 0;
+  nod_first.priority = 0;
+  queue.push(&queue, nod_first)
+  parent[0] = 0;
+
+  while (!is_empty(&priority_queue)) {
+    node pre = pop(&queue);
+
+    /* 如果上一个顶点并没有被访问过，则添加访问 */
+    if (!visited[pre.idx]) {
+      visited[pre.idx] = true;
+    }
+
+    for (int j = 0; j < G->vertexs_num; ++j) {
+      if(G->arc[pre.idx][j] != 0 &&
+         G->arc[pre.idx][j] != G_INFINITY &&
+         !visited[j] /* 如果 pre 的邻接点 j 已经被访问过，则跳过当前顶点，否则会出现无限循环 */ ) {
+        /* 当前顶点入队 */
+        node tmp;
+        tmp.idx = j;
+        tmp.priority = G->arc[j][pre.idx]
+        push(&queue, tmp);
+
+        /* 纳入最短路径的顶点之中 */
+        parent[j] = pre.idx; 
+      }
+    }
+  }
+}
+```
