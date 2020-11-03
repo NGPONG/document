@@ -2,15 +2,60 @@
 
 ### 目录
 
-- [Start](#前言)
-- [关于算法的时间复杂度与空间复杂度](#关于算法的时间复杂度与空间复杂度)
-- [Arrary](#arrary)
-- [Linked List](#linkedlist)
-- [Stack & Queue](#stackqueue)
-- [Tree](#tree)
-- [Binary Tree](#binary_tree)
-- [Disjoint Set](#Disjoint-Set)
-- [Graph](#graph)
+- [*Data Structure & Algorithm*](#data-structure--algorithm)
+    - [目录](#目录)
+    - [前言](#前言)
+      - [什么是数据结构](#什么是数据结构)
+      - [数据结构的分类](#数据结构的分类)
+      - [什么是算法](#什么是算法)
+      - [算法的特性](#算法的特性)
+      - [算法和数据结构之间的联系](#算法和数据结构之间的联系)
+    - [Arrary](#arrary)
+      - [Basic Arrary](#basic-arrary)
+      - [Dynamic Arrary](#dynamic-arrary)
+    - [Linked List](#linked-list)
+      - [链表与数组](#链表与数组)
+      - [链表中的头节点和尾节点](#链表中的头节点和尾节点)
+      - [Singly Linked List](#singly-linked-list)
+      - [Doubly linked list](#doubly-linked-list)
+      - [Singly Circular linked list](#singly-circular-linked-list)
+      - [Doubly Circular linked list](#doubly-circular-linked-list)
+    - [Stack & Queue](#stack--queue)
+      - [Stack 的存储模型](#stack-的存储模型)
+      - [Queue 的存储模型](#queue-的存储模型)
+      - [Stack 的具体实现](#stack-的具体实现)
+    - [串](#串)
+      - [KMP](#kmp)
+    - [Tree](#tree)
+      - [节点的分类](#节点的分类)
+      - [节点间的关系](#节点间的关系)
+      - [树的其它相关概念](#树的其它相关概念)
+      - [树的表示法](#树的表示法)
+    - [Binary Tree](#binary-tree)
+      - [二叉树的特点和基本形态](#二叉树的特点和基本形态)
+      - [特殊的二叉树](#特殊的二叉树)
+      - [二叉树的性质](#二叉树的性质)
+      - [二叉树的存储结构](#二叉树的存储结构)
+      - [二叉树的遍历](#二叉树的遍历)
+      - [二叉树的建立](#二叉树的建立)
+      - [二叉树的深度](#二叉树的深度)
+      - [线索二叉树](#线索二叉树)
+      - [树、森林与二叉树之间的转换](#树森林与二叉树之间的转换)
+      - [赫夫曼树](#赫夫曼树)
+    - [Disjoint Set](#disjoint-set)
+      - [并查集的使用](#并查集的使用)
+      - [并查集的优化](#并查集的优化)
+    - [Graph](#graph)
+      - [各种图的定义](#各种图的定义)
+      - [图的顶点与边之间的关系](#图的顶点与边之间的关系)
+      - [连通图相关概念](#连通图相关概念)
+      - [图的抽象数据类型](#图的抽象数据类型)
+      - [图的遍历](#图的遍历)
+      - [最小生成树](#最小生成树)
+      - [最短路径](#最短路径)
+      - [拓补排序](#拓补排序)
+      - [关键路径 (待填坑)](#关键路径-待填坑)
+
 
 <br/>
 
@@ -21,12 +66,14 @@
 ---
 
 #### 什么是数据结构
+<span id = "什么是数据结构"></span>
 
 数据是描述客观事物的符号，是计算机中可以操作的对象，是能被计算机识别，并输入给计算机处理的符号集合，而数据结构则为负责描述某一类数据具体的类型的一种结构，更具体来讲，<span style="color:red">数据结构是计算机存储、组织数据的方式，它是相互之间存在一种或多种特定关系的数据元素的集合</span>，通常情况下，精心选择的数据结构可以带来更高的运行或者存储效率
 
 <br/>
 
 #### 数据结构的分类
+<span id = "数据结构的分类"></span>
 
 按照视点的不同，我们把数据结构分为 <font color="red">逻辑结构</font> 和 <font color="red">物理结构</font>
 
@@ -180,12 +227,16 @@
 
 #### 什么是算法
 
+<span id = "什么是算法"></span>
+
 算法是特定问题求解步骤的描述，在计算机中表现为指令的有限序列，算法是独立存在的一种解决问题的方法和思想，
 对于算法而言，语言并不重要，重要的是思想
 
 <br/>
 
 #### 算法的特性
+
+<span id = "算法的特性"></span>
 
 - 输入输出：算法具有零个或多个输入、至少有一个或多个输出
 - 有穷性：指算法在执行有限的步骤之后，自动结束而不会出现无限循环，并且每一个步骤在可接受的时间内完成
@@ -196,6 +247,8 @@
 <br/>
 
 #### 算法和数据结构之间的联系
+
+<span id = "算法和数据结构之间的联系"></span>
 
 算法是为了解决实际问题而设计，而数据结构只是静态的描述了数据元素之间的关系，它是算法需要处理问题的一种载体，即算法和数据结构之间是属于一种 <font color="red">相辅相成</font> 的关系，<font color="red">一个高效的应用程序需要在数据结构的基础上设计和选择算法</font>
 
@@ -209,6 +262,8 @@
 ---
 
 #### Basic Arrary
+
+<span id = "Basic-Arrary"></span>
 
 作为基础数据类型的一种，其应用对我们来说再熟悉不过，在我们声明了一个数组后，<font color = "red">数组的每个成员的内存地址都是连续且有序的</font>，关于这点特性我们就能够总结出数组的优点和缺点
 
@@ -233,6 +288,8 @@
 <br/>
 
 #### Dynamic Arrary
+
+<span id = " q-Arrary"></span>
 
 动态数组属于对 $Basic Arrary$ 的一项扩展内容，它在 <font color = "red">保持 Basic Arrary 本质不变的情况下，还解决掉了 Basic Arrary 无法进行动态扩展的短板</font>
 
@@ -460,6 +517,8 @@ int DestoryArrary(struct dynamicArrary *arrary) {
 
 #### 链表与数组
 
+<span id="链表与数组"></span>
+
 对于链表来说，其通常用于和 $Arrary$ 做对比，由于链表是通过节点与节点之间的连接来完成一条数据链的构造，故该特性能够解决掉 Arrary 本身所存在的许多缺点，但是相对的，更是由于这一特性，链表在解决了 Arrary 本身所存在的缺陷的同时却无法保留掉原有数组本身的 <font color = "red">优点</font>，即 链表 在解决了 Arrary 本身所存在的缺陷的同时又把 Arrary 身上的优点转换为了 链表 所带有的缺陷
 
 - 优点
@@ -476,6 +535,8 @@ int DestoryArrary(struct dynamicArrary *arrary) {
 
 #### 链表中的头节点和尾节点
 
+<span id="链表中的头节点和尾节点"></span>
+
 什么是链表的头节点和尾节点？
 
 一张链表在初始化完毕后，我们通常会额外添加两个特殊的节点，这两个节点仅仅只是维护了一个指针域，指针域指向这张链表的头节点和尾节点在内存中的首地址，而这两种特殊的节点就为链表的 <font color = "red">头节点</font> 和 <font color = "red">尾节点</font>
@@ -489,6 +550,8 @@ int DestoryArrary(struct dynamicArrary *arrary) {
 <br/>
 
 #### Singly Linked List
+
+<span id="Singly-Linked-List"></span>
 
 单链表的存储模型
 ```c
@@ -758,6 +821,8 @@ void Free(list_t *list) {
 
 #### Doubly linked list
 
+<span id="Doubly-Linked-List"></span>
+
 双链表的存储模型
 
 ```c
@@ -781,6 +846,8 @@ NULL <-----+Last|   +-----+Last|   +-----+Last|   +-----+Last|   +-----+Last|   
 <br/>
 
 #### Singly Circular linked list
+
+<span id="Singly-Circular-linked-list"></span>
 
 单向循环链表的存储模型
 
@@ -806,6 +873,8 @@ NULL <-----+Last|   +-----+Last|   +-----+Last|   +-----+Last|   +-----+Last|   
 <br/>
 
 #### Doubly Circular linked list
+
+<span id="Doubly-Circular-linked-list"></span>
 
 双向循环链表的存储模型
 
@@ -854,6 +923,8 @@ NULL <-----+Last|   +-----+Last|   +-----+Last|   +-----+Last|   +-----+Last|   
 
 #### Stack 的存储模型
 
+<span id = "Stack的存储模型"></span>
+
 ```c
 BOTTOM
    ↑
@@ -880,6 +951,8 @@ BOTTOM
 
 #### Queue 的存储模型
 
+<span id = "Queue的存储模型"></span>
+
 ```c
    BACK <----------------------------------> FONT
 
@@ -893,6 +966,8 @@ PUSH +-->+ E |   | D | | C | | B |   | A +---> POP
 <br/>
 
 #### Stack 的具体实现
+
+<span id = "Stack的具体实现"></span>
 
 在这篇 Blog 中，我并不打算对 $Queue$ 的存储结构进行实现，因为二者实现起来相似度还是挺高，故本 Blog 中只是针对 $Stack$ 进行了一个实现，下面代码中则为实现了一个 <font color = "red">顺序存储</font> 的字符栈
 
@@ -981,6 +1056,22 @@ int Destory(struct Stack *stack) {
 
 <br/>
 
+<span id = "串"></span>
+
+### 串
+
+---
+
+关于<font color = "red">串$(String)$</font>的具体定义本文不再细说，因为对于串来说，其抽象数据结构应属我们所见过最多的，这里仅描述串数据结果中所衍生出来的一些算法的应用
+
+
+#### KMP
+
+
+
+
+<br/>
+
 <span id = "Tree"></span>
 
 ### Tree
@@ -988,6 +1079,8 @@ int Destory(struct Stack *stack) {
 ---
 
 上面所讨论都是 $1 : 1$ 的线性结构，可现实中，还有很多 $1 : n$ 成员排列方式的情况需要处理，针对这种情况我们采用 <font color = "red">树形结构</font> 去描绘成员 ( 数据 ) 之间的逻辑关系更为合适
+
+<span id = "树的定义"></span>
 
 !!! INFO 树的定义
 	树 ( $Tree$ ) 是 $n$ ( $n \geq 0$ ) 个节点的有限集
@@ -1014,9 +1107,12 @@ int Destory(struct Stack *stack) {
 	
 	![2020-3-4-18-24-42.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-4-18-24-42.png)
 
+
 <br/>
 
 #### 节点的分类
+
+<span id = "节点的分类"></span>
 
 树的节点包含一个数据元素及若干指向其子树的分支
  - 节点拥有的子树数称为 <font color = "red">节点的度</font> ( $Degree$ ) ;
@@ -1031,6 +1127,8 @@ int Destory(struct Stack *stack) {
 
 #### 节点间的关系
 
+<span id = "节点间的关系"></span>
+
 - 节点的子树的根称为该节点的 <font color="red">孩子</font> ( $Child$ ) ;
 - 相应地，该节点称为孩子的 <font color="red">双亲</font> ( $Parent$ ) ;
 - 同一个 双亲 的 孩子 之间互称 <font color="red">兄弟</font> ( $Sibling$ ) ;
@@ -1042,6 +1140,8 @@ int Destory(struct Stack *stack) {
 <br/>
 
 #### 树的其它相关概念
+
+<span id = "树的其它相关概念"></span>
 
 - <font color="red">节点的层次</font> ( $Level$ ) 从根开始定义起，根为第一层，根的孩子为第二层，若某结点在第1层，则其子树的根就在第 *1 + 1* 层 ;
 
@@ -1058,6 +1158,8 @@ int Destory(struct Stack *stack) {
 <br/>
 
 #### 树的表示法
+
+<span id = "树的表示法"></span>
 
 上面所展示的树形结构是从 <font color="red">人的逻辑概念上所看到的树形结构</font>，而对于开发人员而言，这种逻辑上的数据结构是难以操作和构造的，作为数据结构存储的两大分支无非就是 *顺序存储* 和 *链式存储*，而对于不进行过任何处理的树形结构来说显然是不满足这两种分支的存储模型的，所以我们必须把逻辑上的树形结构转换为一个真实的、具体的数据结构，简而言之，就是 <font color="red">把一颗复杂的树转换为一颗能够处理的树</font>，这种转换方式也称为 <font color = "red">树的表示法</font>
 
@@ -1132,6 +1234,8 @@ _*孩子兄弟表示法*_
 
 #### 二叉树的特点和基本形态
 
+<span id = "二叉树的特点和基本形态"></span>
+
 _*二叉树的特点：*_
 - 每个结点 <font color = "red">最多有两棵子树</font>，所以二叉树中不存在度大于 $2$ 的结点，注意，不是只有两棵子树，而是最多有，<font color = "red">没有子树</font> 或者 <font color = "red">有一棵子树</font> 都是可以的
 
@@ -1150,6 +1254,8 @@ _*二叉树具有的五种基本形态：*_
 <br/>
 
 #### 特殊的二叉树
+
+<span id = "特殊的二叉树"></span>
 
 上面所提到的是二叉树的基本形态，但是对于二叉树来说，它是多变的，即可能在某种形态之下有着它一定的研究价值，我们把这些具有特殊形态的树都统称为 特殊的二叉树
 
@@ -1203,6 +1309,8 @@ _*二叉树具有的五种基本形态：*_
 
 #### 二叉树的性质
 
+<span id = "二叉树的性质"></span>
+
 - 在二叉树的第 $i$ 层上至多有 $2^{i-1}$ 个结点 ( $i\geq$ 1)
 
 - 深度为 $k$ 的二叉树至多有 $2^k-1$ 个结点 ( $k\geq1$ )
@@ -1226,6 +1334,8 @@ _*二叉树具有的五种基本形态：*_
 <br/>
 
 #### 二叉树的存储结构
+
+<span id = "二叉树的存储结构"></span>
 
 _*二叉树顺序存储结构*_
 
@@ -1268,6 +1378,8 @@ typedef struct binary_node {
 <br/>
 
 #### 二叉树的遍历
+
+<span id = "二叉树的遍历"></span>
 
 二叉树的遍历次序不同于 <font color = "red">线性结构</font>，最多也就是从头至尾、循环、双向等简单的遍历方式，树的结点之间不存在 <font color = "red">唯一的前驱和后继</font> 关系，在访问一个结点后，下一个被访问的结点面临着不同的选择，由于选择方式的不同，遍历的次序就完全不同了
 
@@ -1356,6 +1468,8 @@ _*遍历结果的推理*_
 <br/>
 
 #### 二叉树的建立
+
+<span id = "二叉树的建立"></span>
 
 二叉树的建立同样需要采用遍历的方式去创建，对于存在空子数的结点我们在遍历的过程中需要通过一个 <font color = "red">额外的标识符</font> 来确定，在下面的代码中，提供了两种 <font color = "red">不同的遍历次序</font> 来构造一棵二叉树
 
@@ -1479,6 +1593,8 @@ int Preorder_Create_BinaryTree(Binary_Tree **tree, Binary_Tree *parent) {
 
 #### 二叉树的深度
 
+<span id = "二叉树的深度"></span>
+
 ```c
 /* The deep for Binary-Tree */
 int BinaryTree_Deep(struct binary_node *node) {
@@ -1502,6 +1618,8 @@ int BinaryTree_Deep(struct binary_node *node) {
 <br/>
 
 #### 线索二叉树
+
+<span id = "线索二叉树"></span>
 
 对于上面的所构造的二叉树中都存在着一个问题，那就是：<font color = "red">空指针域并未得到充分地利用</font>
 
@@ -1528,6 +1646,8 @@ int BinaryTree_Deep(struct binary_node *node) {
 <br/>
 
 #### 树、森林与二叉树之间的转换
+
+<span id = "树、森林与二叉树之间的转换"></span>
 
 在前面提到过，我们对于树形结构的探究通常都采用 <font color  ="red">孩子兄弟表示法</font> 来将一颗复杂的树转化为二叉树进行存储，而借助二叉链表的特性，树和二叉树之间是可以进行相互转换的
 
@@ -1579,6 +1699,8 @@ _*二叉树转换为森林*_
 
 #### 赫夫曼树
 
+<span id = "赫夫曼树"></span>
+
 _*赫夫曼树的定义*_
 
 - 从树中一个结点到另一个结点之间的分支构成两个结点之间的 <font color = "red">路径</font>
@@ -1617,6 +1739,8 @@ _*如何构造一颗赫夫曼树*_
 <br/>
 
 #### 并查集的使用
+
+<span id = "并查集的使用"></span>
 
 既然强调并查集是一种优雅的数据结构，那么就其所提供的合并集合的功能来看，我们就不能单纯的使用暴力解法来解决实际问题了
 
@@ -1720,6 +1844,8 @@ void find_cycle_in_graph(void) {
 
 #### 并查集的优化
 
+<span id = "并查集的优化"></span>
+
 _*路劲压缩*_
 
 上面的代码展示了并查集的最基本的一些操作，然后实际上是存在着一定的问题的，正如上面最初版的合并集合的代码(union_set_quick)那一部分，由于每次合并仅只是固定把 $x$ 的代表元合并至 $y$ 的代表元，那么考虑每次合并时所输入的结点都是一种线性关系，那么<span style='color:red'>最终所合并出来的树会退化成一个长的单链表，在越往后的合并工作中，每次查找根节点的工作就会呈线性增长</span>，如下图所示
@@ -1816,6 +1942,8 @@ bool union_set_rank(int x, int y) {
 
 #### 各种图的定义
 
+<span id = "各种图的定义"></span>
+
 _*简单图与复杂图*_
 
 一张图中，若不存在顶点到其自身的边，且同一条边不重复出现，则称这样的图为<span style='color:red'>简单图</span>(左)，反之则为<span style='color:red'>复杂图/网络</span>(右)，需要强调的是，<span style='color:red'>该文章所讨论的模型均为以简单图为基准所展开</span>
@@ -1903,6 +2031,8 @@ _*子图*_
 
 #### 图的顶点与边之间的关系
 
+<span id = "图的顶点与边之间的关系"></span>
+
 _*无向图中，顶点与边之间的关系*_
 
 - 给定一张无向图 $G = (V,\{E\})$，如果边 $(V_i,V_j) \in E$，则称顶点 $V_i$ 与 $V_j$ <span style='color:red'>互为邻接点</span> $(Adjacent)$；边 $(V_i,V_j)$ <span style='color:red'>依附</span>$(incident)$ 于顶点 $V_i$ 和 $V_j$；顶点 $V_i$ 和 $V_j$ 与 $(V_i,V_j)$ <span style='color:red'>相关联</span>
@@ -1943,12 +2073,20 @@ _*路径*_
 
 - 第一个顶点到最后一个顶点相同的路径称为<span style='color:red'>回路或环</span> $(Cycle)$；顶点序列集中，顶点不重复出现的路径称为<span style='color:red'>简单路径</span>；除了第一个顶点和最后一个顶点外，其余顶点不重复出现的回路称为<span style='color:red'>简单回路或简单环</span>；如下图所示，左侧的环因第一个顶点和最后一个顶点都是 $B$，且 $C$、$D$、 $A$ 没有重复出现，因此是一个简单环，而右侧的环由于顶点 $C$ 的重复，无法构成简单环
 
+  !!! INFO INFO
+
+      注意有向图的回路的构建顺序，由于有向图中的边是作为有向的弧，故可能会出现形状是环状但是实际上却不是环的情景
+
 	![2020-10-21-11-40-34](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-21-11-40-34.png)
+
+
 
 
 <br/>
 
 #### 连通图相关概念
+
+<span id = "连通图相关概念"></span>
 
 _*连通图*_
 
@@ -2010,6 +2148,8 @@ _*关于连通图的生成树*_
 <br/>
 
 #### 图的抽象数据类型
+
+<span id = "图的抽象数据类型"></span>
 
 _*邻接矩阵*_
 
@@ -2375,6 +2515,8 @@ _*邻接多重表*_
 
 #### 图的遍历
 
+<span id = "图的遍历"></span>
+
 从图中某一顶点出发访遍图中其余顶点，且使每一个顶点仅被访问一次，这一过程就叫做<span style='color:red'>图的遍历 $(Traversing \: Graph)$</span>
 
 因为图的任一顶点都可能和其余的所有顶点相邻接，极有可能存在沿着某条路径搜索后，又回到原顶点，而有些顶点却还没有遍历到的情况。因此我们需要在遍历过程中把访问过的顶点打上标记，以避免访问多次而不自知，具体办法是<span style='color:red'>设置一个访问数组 `visited[n]`，$n$ 是图中顶点的个数，初值为 0，访问过后设置为 1</span>
@@ -2590,6 +2732,10 @@ _*小结*_
 
 #### 最小生成树
 
+<span id = "最小生成树"></span>
+
+> 最小生成树属于有环图的应用
+
 在前面的[图的定义](#关于连通图的生成树)小节中提到过图的生成树的定义，而<span style='color:red'>构造连通网的最小代价生成的树则称为最小生成树 $(Minimum \:\: Cost \:\: Spaning \:\: Tree)$</span>
 
 找连通网的最小生成树，经典的有两种算法，它们分别为Prim(普里姆)算法和Kruskal(克鲁斯卡尔)算法，对比两个算法，<span style='color:red'>Kruskal算法主要是针对边来展开，边数少时效率会非常高，所以对于稀疏图有很大的优势</span>；<span style='color:red'>而普里姆算法对于稠密图，即边数非常多的情况会更好一些</span>
@@ -2695,7 +2841,15 @@ void min_span_tree_kruskal(n_graph *G) {
 
 #### 最短路径
 
+<span id = "最短路径"></span>
+
+> 最短路径属于有环图的应用
+
 在网图和非网图中，最短路径的含义是不同的。由于非网图它没有边上的权值，所谓的最短路径，其实就是指两顶点之间经过的边数最少的路径；<span style='color:red'>而对于网图来说，最短路径，是指两顶点之间经过的边上权值之和最少的路径，并且我们称路径上的第一个顶点是源点，最后一个顶点是终点</span>
+
+
+![2020-11-02-13-24-31](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-02-13-24-31.png)
+
 
 <br/>
 
@@ -2726,7 +2880,14 @@ void dijkstra(n_graph *G) {
   while (!is_empty(&priority_queue)) {
     node pre = pop(&queue);
 
-    /* 如果上一个顶点并没有被访问过，则添加访问 */
+    /**
+     * 如果上一个顶点并没有被访问过，则添加访问，
+     * 在这一步中才加入队列和广度优先算法存在一
+     * 点区别，因为只有在下一次循环的时候，优先
+     * 队列才会对上一次所加入的顶点进行排序，而
+     * 我们在下一次则拿到这个排序的结果才加入到
+     * 队列中
+    */
     if (!visited[pre.idx]) {
       visited[pre.idx] = true;
     }
@@ -2748,3 +2909,177 @@ void dijkstra(n_graph *G) {
   }
 }
 ```
+
+Dijkstra 算法解决了从某个源点到其余各顶点的最短路径问题，从循环嵌套可以很容易得到此算法的时间复杂度为 $O(n^2)$，或许有人会认为，如果我指定了所需要找到的某个源点和终点，那是否就可以缩小该算法的时间复杂度了？事实上，这种做法是并不可取的，这个问题和求源点到其他所有顶点的最短路径一样复杂，时间复杂度依然是 $O(n^2)$，这就好比，你吃了七个包子终于算是吃饱了，就感觉很不划算，前六个包子白吃了，应该直接吃第七个包子，于是你就去寻找可以吃一个就能饱肚子的包子，能够满足你的要求最终结果只能有一个，那就是用七个包子的面粉和馅做的一个大包子，<span style='color:red'>这种只关注结果而忽略过程的思想是非常不可取的</span>
+
+那么当我们想通过该算法来知道任意源点到任意终点的距离，此时简单的办法就是对每个顶点当作源点运行一次 Dijkstra 运算，等于在原有算法的基础上，再来一次循环，此时整个算法的时间复杂度就成了 $O(n^3)$
+
+<br/>
+
+_*Floyd*_
+
+Floyd 算法依赖于两个数组，他们分别为 :
+- D : 用于存储权值的数组，在还未开始修改前，它即为邻接矩阵的复制，在算法运行结束后，它对迎着节点 $v$ 到节点 $w$ 的最短路径权值和
+- P : 存储最短路径的具体节点，默认情况下它初始化为对应节点的值，在算法运行结束后，它用于存储最短路径节点的前置下标
+
+在算法核心中，依赖于以下公式对上面所说的两个数组进行修改
+
+> 设 $i$ 为循环的每个节点，Floyd 算法需要计算出任意节点到任意节点间的最短路径
+> 
+> 设 $v$、$w$ 作为邻接矩阵中的索引 ; $v$ 作为行索引 ; $w$ 作为列索引
+> 
+> 令:
+> - $D[v][w] = min\{D[v][w],D[v][i] + D[i][w]\} \:$
+> - $P[v][w] = P[w][i]$
+> 
+> ![2020-11-02-22-40-37](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-02-22-40-37.png)
+
+```c
+void shortest_path_floyd(n_graph *G) {
+  int P[G->vertexs_num][G->vertexs_num];
+  int D[G->vertexs_num][G->vertexs_num];
+  for (size_t v = 0; v < G->vertexs_num; ++v) {
+    for (size_t w = 0; w < G->vertexs_num; ++w) {
+      P[v][w] = w;
+      D[v][w] = G->arc[v][w];
+    }
+  }
+  
+  for (size_t i = 0; i < G->vertexs_num; ++i) {
+    for (size_t v = 0; v < G->vertexs_num; ++v) {
+      for (size_t w = 0; w < G->vertexs_num; ++w) {
+        if (D[v][w] > D[v][i] + D[i][w]) {
+          D[v][w] = D[v][i] + D[i][w];
+          P[v][w] = P[v][i];
+        }
+      }
+    }
+  }
+
+  /* 打印路径 */
+  for (int v = 0; v < G->vertexs_num; ++v) {
+    for (int w = v + 1; w < G->vertexs_num; ++w) {
+      printf("v%d - v%d weight: %d\n", v, w, D[v][w]);
+      int k = P[v][w];
+      printf(" path: %d", v);
+      while (w != k) {
+        printf(" -> %d", k);
+        k = P[k][w];
+      }
+      printf(" -> %d\n", w);
+    }
+    printf("\n");
+  }
+}
+```
+
+可以发现，Floyd 算法由于 $i$ 的存在，故其默认情况下都会求出任意点到任意点之间的最短路径，这和 Dijkstra 算法稍显不同 ; Dijkstra 针对的是具体的某个源点到终点，如需求出任意点之间的路径，则需要在外层套一个循环 ; 而 Floyd 算法则是针对的整张网
+
+虽然从求任意点的最短路径这一例题来说，Floyd 和 Dijkstra 算法的时间复杂度都需要 $O(n^3)$，但是我们会发现，Floyd 算法再使用的时候会显得更加的优雅
+
+
+<br/>
+
+#### 拓补排序
+
+<span id = "拓补排序"></span>
+
+我们会把施工过程、生产流程、软件开发、教学安排都当成一整个项目工程来对待，其中，所有的工程都可以分为若干个活动的子工程(<span style='color:red'>也称活动</span>)。在这些活动之间，通常会受到一定的条件约束，如其中的某些活动必须在另一些活动完成后才能开始，就像电影制作不可能在人员到位进驻场地时，导演还没找到，也不可能在拍摄的过程中连场地也没有，这都会将导致荒谬的结果，<span style='color:red'>因此，这样的工程图一定是作为无环有向图而存在</span>
+
+![2020-11-03-10-53-24](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-03-10-53-24.png)
+
+> 在一个表示工程的有向图中，用顶点表示活动，用弧表示活动之间的依赖关系，这样的有向图为顶点表示活动的网，我们称为 <span style='color:red'>AOV 网 $(Activity \: On \: Vertex \: Network)$</span>，其中 :
+> - 网中的弧表示两活动之间存在的某种相互的制约依赖关系
+> - 网中不能存在环 (让某个活动以自己的开始作为先决条件是不可取的)
+
+通过 AOV 网，我们能够在其中找到多条不同的<span style='color:red'>拓补序列</span> :
+
+> 设 $G = \{V,E\}$ 是一个具有 $n$ 个顶点的有向图，$V$ 中的顶点序列 $\{v_1,\:v_2,\:\dots,\: v_n\}$ 满足若从顶点 $v_i$ 到 $v_j$ 有一条路径，则在顶点序列中顶点 $v_i$ 必在顶点 $v_j$ 之前，则我们称这样的顶点序列为一个<span style='color:red'>拓补序列</span>
+
+<br/>
+
+<span style='color:red'>而所谓的拓补排序，其实就是对一个有向图构造拓补序列的过程</span>，在构造时会存在两种结果
+- 如果所构造的序列中，图中的顶点全部输出，则说明当前图是不存在环的 AOV 网
+- 如果所构造的序列中，所输出的顶点少于图中的顶点数，则说明这个网存在回路
+
+对 AOV 网进行拓补排序的基本思路是 : 
+
+> 从 AOV 网中选择一个入度为 0 的顶点输出，然后删去此节点，并删除以此顶点为尾的弧(<span style='color:red'>作为弧头的顶点的入度 -1</span>)，继续重复此过程，直至输出全部顶点或是 AOV 网中不存在入度为 0 的顶点为止
+
+```c
+#include <stdbool.h>
+#include "stack.h"
+
+typedef char vertext_type;
+typedef int edge_type;
+
+typedef struct edge_node {
+  int adj_vex_idx;       
+  struct edge_node *next;
+} edge_node;
+
+
+typedef struct {
+  vertext_type data;
+  int in;
+  edge_node *first_edge;
+} vertext_node;
+
+
+typedef struct {
+  vertext_node adj_list[14];
+  int vertexs_num;
+  int edges_num;
+} graph_adj;
+
+/**
+ * @breif 拓补排序
+ * @param
+ *  - graph 网
+ * @return 
+ *  - true 拓补序列构造成功，此图为 AOV 网，即不存在环
+ *  - false 拓补序列构造失败，此图不是 AOV 网，即存在环
+*/
+bool topo_logic_sort(graph_adj *grap) {
+  bool status = true;
+  int count = 0; /* 统计纳为拓补序列的顶点个数，当该值小于图中
+                    顶点个数的和时，则证明无法生成拓补序列 */
+  Stack *stack = init_stack();
+
+  /* 寻找是否存在入度为0的节点，如果存在，则入栈 */
+  for (size_t i = 0; i < grap->vertexs_num; ++i) {
+    if (grap->adj_list[i].in == 0) {
+      push(stack, i);
+    }
+  }
+
+  while (stack->s_size) {
+    int vex = pop(stack);
+
+    printf("%d ", vex);
+    ++count;
+
+    for (edge_node *node = grap->adj_list[vex].first_edge; node; node = node->next) {
+      int k = node->adj_vex_idx;
+      if ((--grap->adj_list[k].in) == 0) {
+        push(stack, k);
+      }
+    }
+  }
+
+  if (count < grap->vertexs_num) { /* 存在环 */
+    status = false;
+  }
+
+  return status;
+}
+
+```
+
+分析整个算法，对一个具有 $n$ 个顶点 $e$ 条弧的 $AOV$ 网来说，第一次在顶点表中扫描入度为 0 的顶点入栈的时间复杂度为 $O(n)$，而 while 循环中共执行了 $e$ 次，故整个算法的时间复杂度为 $O(n + e)$
+
+<br/>
+
+#### 关键路径 (待填坑)
+
+<span id = "关键路径-待填坑"></span>
