@@ -2,59 +2,61 @@
 
 ### 目录
 
-- [*Data Structure & Algorithm*](#data-structure--algorithm)
-    - [目录](#目录)
-    - [前言](#前言)
-      - [什么是数据结构](#什么是数据结构)
-      - [数据结构的分类](#数据结构的分类)
-      - [什么是算法](#什么是算法)
-      - [算法的特性](#算法的特性)
-      - [算法和数据结构之间的联系](#算法和数据结构之间的联系)
-    - [Arrary](#arrary)
-      - [Basic Arrary](#basic-arrary)
-      - [Dynamic Arrary](#dynamic-arrary)
-    - [Linked List](#linked-list)
-      - [链表与数组](#链表与数组)
-      - [链表中的头节点和尾节点](#链表中的头节点和尾节点)
-      - [Singly Linked List](#singly-linked-list)
-      - [Doubly linked list](#doubly-linked-list)
-      - [Singly Circular linked list](#singly-circular-linked-list)
-      - [Doubly Circular linked list](#doubly-circular-linked-list)
-    - [Stack & Queue](#stack--queue)
-      - [Stack 的存储模型](#stack-的存储模型)
-      - [Queue 的存储模型](#queue-的存储模型)
-      - [Stack 的具体实现](#stack-的具体实现)
-    - [串](#串)
-      - [KMP](#kmp)
-    - [Tree](#tree)
-      - [节点的分类](#节点的分类)
-      - [节点间的关系](#节点间的关系)
-      - [树的其它相关概念](#树的其它相关概念)
-      - [树的表示法](#树的表示法)
-    - [Binary Tree](#binary-tree)
-      - [二叉树的特点和基本形态](#二叉树的特点和基本形态)
-      - [特殊的二叉树](#特殊的二叉树)
-      - [二叉树的性质](#二叉树的性质)
-      - [二叉树的存储结构](#二叉树的存储结构)
-      - [二叉树的遍历](#二叉树的遍历)
-      - [二叉树的建立](#二叉树的建立)
-      - [二叉树的深度](#二叉树的深度)
-      - [线索二叉树](#线索二叉树)
-      - [树、森林与二叉树之间的转换](#树森林与二叉树之间的转换)
-      - [赫夫曼树](#赫夫曼树)
-    - [Disjoint Set](#disjoint-set)
-      - [并查集的使用](#并查集的使用)
-      - [并查集的优化](#并查集的优化)
-    - [Graph](#graph)
-      - [各种图的定义](#各种图的定义)
-      - [图的顶点与边之间的关系](#图的顶点与边之间的关系)
-      - [连通图相关概念](#连通图相关概念)
-      - [图的抽象数据类型](#图的抽象数据类型)
-      - [图的遍历](#图的遍历)
-      - [最小生成树](#最小生成树)
-      - [最短路径](#最短路径)
-      - [拓补排序](#拓补排序)
-      - [关键路径 (待填坑)](#关键路径-待填坑)
+  - [前言](#前言)
+    - [什么是数据结构](#什么是数据结构)
+    - [数据结构的分类](#数据结构的分类)
+    - [什么是算法](#什么是算法)
+    - [算法的特性](#算法的特性)
+    - [算法和数据结构之间的联系](#算法和数据结构之间的联系)
+  - [Arrary](#arrary)
+    - [Basic Arrary](#basic-arrary)
+    - [Dynamic Arrary](#dynamic-arrary)
+  - [Linked List](#linked-list)
+    - [链表与数组](#链表与数组)
+    - [链表中的头节点和尾节点](#链表中的头节点和尾节点)
+    - [Singly Linked List](#singly-linked-list)
+    - [Doubly linked list(待填坑)](#doubly-linked-list)
+    - [Singly Circular linked list(待填坑)](#singly-circular-linked-list)
+    - [Doubly Circular linked list(待填坑)](#doubly-circular-linked-list)
+  - [Stack & Queue](#stack--queue)
+    - [Stack 的存储模型](#stack-的存储模型)
+    - [Queue 的存储模型](#queue-的存储模型)
+    - [Stack 的具体实现](#stack-的具体实现)
+  - [串](#串)
+    - [KMP](#kmp)
+  - [Tree](#tree)
+    - [节点的分类](#节点的分类)
+    - [节点间的关系](#节点间的关系)
+    - [树的其它相关概念](#树的其它相关概念)
+    - [树的表示法](#树的表示法)
+  - [Binary Tree](#binary-tree)
+    - [二叉树的特点和基本形态](#二叉树的特点和基本形态)
+    - [特殊的二叉树](#特殊的二叉树)
+    - [二叉树的性质](#二叉树的性质)
+    - [二叉树的存储结构](#二叉树的存储结构)
+    - [二叉树的遍历](#二叉树的遍历)
+    - [二叉树的建立](#二叉树的建立)
+    - [二叉树的深度](#二叉树的深度)
+    - [线索二叉树](#线索二叉树)
+    - [树、森林与二叉树之间的转换](#树森林与二叉树之间的转换)
+    - [赫夫曼树](#赫夫曼树)
+  - [Disjoint Set](#disjoint-set)
+    - [并查集的使用](#并查集的使用)
+    - [并查集的优化](#并查集的优化)
+  - [Graph](#graph)
+    - [各种图的定义](#各种图的定义)
+    - [图的顶点与边之间的关系](#图的顶点与边之间的关系)
+    - [连通图相关概念](#连通图相关概念)
+    - [图的抽象数据类型](#图的抽象数据类型)
+    - [图的遍历](#图的遍历)
+    - [最小生成树](#最小生成树)
+    - [最短路径](#最短路径)
+    - [拓补排序](#拓补排序)
+    - [关键路径 (待填坑)](#关键路径-待填坑)
+  - [Search](#Search)
+    - [查找的种类](#查找的种类)
+    - [顺序表查找](#顺序表查找)
+    - [有序表查找](#有序表查找)
 
 
 <br/>
@@ -327,11 +329,9 @@ int CheckArraryAvailableLength(struct dynamicArrary *arrary) {
 int ReallocArrary(void ***p_ptr_arrary, int length) { 
 	capacity += 10;
 	void **arrary_new = malloc(sizeof(void *) * capacity);
-	if (arrary_new == NULL) { 
+	if (arrary_new == NULL) 
 		return -1;
-	}
 
-	printf("[Realloc]  address old = %p, address new = %p\n", *p_ptr_arrary, arrary_new);
 	/*move the data from the old array to the new array*/
 	memcpy(arrary_new, *p_ptr_arrary, sizeof(void *) * length);
 
@@ -347,25 +347,20 @@ int ReallocArrary(void ***p_ptr_arrary, int length) {
  * @return: 
  */
 struct dynamicArrary *InitDynamicArrary(int m_capacity) { 
-	if (m_capacity <= 0) { 
+	if (m_capacity <= 0) 
 		return NULL;
-	}
 
 	capacity = m_capacity;
 
 	struct dynamicArrary *arrary = malloc(sizeof(struct dynamicArrary));
-	if (arrary == NULL) { 
+	if (arrary == NULL) 
 		return NULL;
-	}
 	memset(arrary, 0, sizeof(struct dynamicArrary));
 
 	arrary->ptr_arrary = malloc(sizeof(void *) * m_capacity);
-	if (arrary->ptr_arrary == NULL) { 
+	if (arrary->ptr_arrary == NULL) 
 		return NULL;
-	}
 	memset(arrary->ptr_arrary, 0, sizeof(void *) * m_capacity);
-
-	printf("[Init dynamic arrary]  struct address = %p, arrary adderss = %p\n", arrary, arrary->ptr_arrary);
 
 	return arrary;
 }
@@ -376,19 +371,15 @@ struct dynamicArrary *InitDynamicArrary(int m_capacity) {
  * @return: 
  */
 int Insert(struct dynamicArrary *arrary, int index, void *value) { 
-	if (index < 0) { 
+	if (index < 0) 
 		return -1;
-	}
-	if (CheckArraryAvailableLength(arrary)) { 
+	if (CheckArraryAvailableLength(arrary)) 
 		return -1;
-	}
-	if (index >= arrary->length) { 
+	if (index >= arrary->length) 
 		index = arrary->length;
-	}
 
-	for (int i = arrary->length - 1; i >= index; i--) { 
+	for (int i = arrary->length - 1; i >= index; i--) 
 		memcpy(arrary->ptr_arrary + i + 1, arrary->ptr_arrary + i, sizeof(void *));
-	}
 
 	/*insert*/
 	memcpy(arrary->ptr_arrary + index, &value, sizeof(void *));
@@ -407,7 +398,6 @@ int Add(struct dynamicArrary *arrary, void *value) {
 		return -1;
 	}
 
-	printf("[Add]  arrary address = %p, value address = %p, arrary length = %d\n", arrary->ptr_arrary + arrary->length, value, arrary->length + 1);
 	memcpy(arrary->ptr_arrary + arrary->length, &value, sizeof(void *));
 	arrary->length++;
 	return 0;
@@ -427,11 +417,9 @@ int RemoveByPostion(struct dynamicArrary *arrary, int index) {
 		index = arrary->length;
 	}
 
-	printf("[Remove]  address = %p\n", *(arrary->ptr_arrary + index));
 	free(*(arrary->ptr_arrary + index));
 
 	for (int i = index + 1; i < arrary->length; i++) { 
-		printf("[Exchange]  address_exchanged = %p, address_exchanger = %p\n", arrary->ptr_arrary + i - 1, arrary->ptr_arrary + i);
 		*(arrary->ptr_arrary + i - 1) = *(arrary->ptr_arrary + i);
 		*(arrary->ptr_arrary + i) = NULL;
 	}
@@ -447,9 +435,8 @@ int RemoveByPostion(struct dynamicArrary *arrary, int index) {
  * @return: 
  */
 int RemoveByValue(struct dynamicArrary *arrary, void *value, int (*invoker)(void *data_source, void *data_compare)) { 
-	if (arrary == NULL || invoker == NULL) { 
+	if (arrary == NULL || invoker == NULL) 
 		return -1;
-	}
 
 	for (int i = 0; i < arrary->length; i++) { 
 		if (invoker(*(arrary->ptr_arrary + i), value)) { 
@@ -476,19 +463,13 @@ int DestoryArrary(struct dynamicArrary *arrary) {
 	char str_CustomerInput[8] = { 0 };
 	fgets(str_CustomerInput, sizeof(str_CustomerInput), stdin);
 
-	if (strcmp(str_CustomerInput, "yes\n")) { 
+	if (strcmp(str_CustomerInput, "yes\n")) 
 		return -1;
-	}
 
-	for (int i = 0; i < arrary->length; i++) { 
-		printf("[free]  element address = %p\n", *(arrary->ptr_arrary + i));
+	for (int i = 0; i < arrary->length; i++) 
 		free(*(arrary->ptr_arrary + i));
-	}
 
-	printf("[free]  arrary address = %p\n", arrary->ptr_arrary);
 	free(arrary->ptr_arrary);
-
-	printf("[free]  struct address = %p\n", arrary);
 	free(arrary);
 
 	capacity = 0;
@@ -3179,3 +3160,167 @@ bool topo_logic_sort(graph_adj *grap) {
 #### 关键路径 (待填坑)
 
 <span id = "关键路径-待填坑"></span>
+
+COMING SOON
+
+<br/>
+
+<span id = "Search"></span>
+
+### Search
+
+---
+
+只要你打开电脑，就会涉及到查找技术，如炒股软件中查股票信息、硬盘文件中找照片、在光盘中搜 DVD，甚至玩游戏时在内存中查找攻击力、魅力值等数据修改用来作弊等，都要涉及到查找，当然，在互联网上查找信息就更加是家常便饭，<font color = "red">所有这些需要被查的数据所在的集合，我们给它一个统称叫查找表</font>
+
+- 查找表 $(Search \: \:Table)$ 是由同一类型的数据元素(或记录)构成的集合
+
+- 关键字 $(Key)$ 是数据元素中某个数据项的值，又称为键值，用它可以标识一个数据元素 ; 也可以标识一个记录的某个数据项(字段)，我们称为<font color = "red">关键码</font>
+
+  - 若此关键字可以唯一地标识一个记录，则称此关键字为主关键字 $(Primary \:\: Key)$，这也就意味着，对不同的记录，其主关键字均不相同
+
+  - 若此可以识别多个数据元素(或记录)，我们称为次关键字 $(Secondary \:\: Key)$，次关键字也可以理解为是不以唯一标识一个数据元素(或记录)的关键字，它对应的数据项就是次关键码
+
+<font color = "red">查找 $(Searching)$ 就是根据给定的某个值，在查找表中确定一个其关键字等于给定值的数据元素(或记录)</font>
+
+
+<br/>
+
+#### 查找的种类
+
+<span id = "查找的种类"></span>
+
+查找表按照操作方式来分有两大种 : 
+
+1. <font color = "red">静态查找表 $(StaticSearch \:\: Table)$</font> ∶ 只作查找操作的查找表，它的主要操作有 :
+  
+   - 查询某个 **特定的** 数据元素是否在查找表中
+  
+   - 检索某个 **特定的** 数据元素和各种属性
+
+按照我们大多数人的理解，查找，当然是在已经有的数据中找到我们需要的，静态查找就是在干这样的事情。不过，现实中还有存在这样的应用 : <font color = "red">查找的目的不仅仅只是查找</font>
+
+比如网络时代的新名词，如反应年轻人生活的 "蜗居"、"蚁族"、"孩奴"、"啃老" 等，以及 "X客" 系列如博客、播客、闪客、黑客、威客等，如果需要将它们收录到汉语词典中，显然收录时就需要查找它们是否存在，以及找到如果不存在时应该收录的位置。再比如，如果你需要对某网站上亿的注册用户进行清理工作，注销一些非法用户，你就需查找到它们后进行删除，删除后其实整个查找表也会发生变化，对于这样的应用，我们就需要使用动态查找表
+
+2. <font color = "red">动态查找表 $(Dynamic Search Table)$</font> ∶ 在查找过程中同时插入查找表中不存在的数据元素，或者从查找表中删除已经存在的某个数据元素，动态查找表的主要操作有 : 
+  
+     - 查找时插入数据元素
+  
+     - 查找时删除数据元素
+
+<br/>
+
+#### 顺序表查找
+<span id = "顺序表查找"></span>
+
+我们可以把散落的图书可以理解为一个集合，而将它们排列整齐，就如同是将此集合构造成一个线性表，<font color = "red">我们要针对这一线性表进行查找操作，因此它就是静态查找表</font>
+
+> 顺序查找 $(Sequential \:\: Search)$ 又叫线性查找，是最基本的查找技术，它的查找过程是 ∶ 从表中第一个(或最后一个)记录开始，逐个进行记录的关键字和给定值比较，若某个记录的关键字和给定值相等，则查找成功，找到所查的记录;如果直到最后一个(或第一个)记录，其关键字和给定值比较都不等时，则表中没有所查的记录，查找不成功
+
+```c
+int foo(int *arrary, int key, int n) {
+  for (size_t i = 0; i < n; ++i) 
+    if(arrary[i] == key) 
+      return i;
+}
+
+int main(void) {
+  int arrary[] = { 1, 6, 3, 5, 9 };
+  int idx = foo(arrary, 5, sizeof(arrary) / sizeof(int));
+
+  return EXIT_SUCCESS;
+}
+```
+
+对于这种顺序查找算法来说，查找成功最好的情况就是在第一个位置就找到了，算法时间复杂度为 $O(1)$，最坏的情况是在最后一位置才找到，需要 $n$ 次比较，时间复杂度为 $O(n)$，当查找不成功时，需要 $n+1$ 次比较，时间复杂度为 $O(n)$，关键字在任何一位置的概率是相同的，所以平均查找次数为 $\displaystyle \frac{(n+1)}{2}$，所以最终时间复杂度还是 $O(n)$
+
+
+<br/>
+
+#### 有序表查找
+<span id = "有序表查找"></span>
+
+我们如果仅仅是把书整理在书架上，要找到一本书还是比较困难的，也就是刚才讲的需要逐个顺序查找。但如果我们在整理书架时，将图书按照书名的拼音排序放置，那么要找到某一本书就相对容易了，说白了，就是对图书做了有序排列，一个线性表有序时，对于查找总是很有帮助的
+
+<br/>
+
+_*折半查找*_
+
+> 折半查找$(Binary \:\: Search)$技术，又称为<font color = "red">二分查找</font>，它的前提是线性表中的记录必须是关键码有序(通常从小到大有序)，线性表必须采用顺序存储，折半查找的基本思想是 ∶ 在有序表中，取中间记录作为比较对象，若给定值与中间记录的关键字相等，则查找成功 ; 若给定值小于中间记录的关键字，则在中间记录的左半区继续查找 ; 若给定值大于中间记录的关键字，则在中间记录的右半区继续查找，不断重复上述过程，直到查找成功，或所有查找区域无记录，查找失败为止
+
+一个符合的例子就是猜 100 数字以内的小游戏，每次依据对比的结果取中间记录，直至猜到数字为止，如下图所示
+
+![2020-11-04-23-58-07](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-04-23-58-07.png)
+
+```c
+int binary_search(int *arrary, int key, int size) {
+  int low = 0;
+  int hig = size - 1;
+
+  while (low <= hig) {
+    int mid = (low + hig) / 2;  /* 取中间下标 */
+    if(key < arrary[mid])       /* 若 key 值比预估的数小，则最大指针下标需要从 mid 处 -1(跳过重复的判断) */
+      hig = mid - 1;
+    else if (key > arrary[mid]) /* 若 key 值比预估的数大，则最小指针下标需要从 mid 处 +1(跳过重复的判断) */
+      low = mid + 1;
+    else                        /* 若最大和最小相等，则意味着 low 和 high 指针指向同一个下标，即找到了位置 */
+      return mid;
+  }
+
+  return -1;
+}
+
+int main(void) {
+  int arrary[] = { 0, 1, 16, 24, 35, 47, 59, 62, 73, 88, 99 };
+  binary_search(arrary, 62, sizeof(arrary) / sizeof(int));
+
+  return EXIT_SUCCESS;
+}
+```
+
+在前面二叉树的性质小节中，有过对 "具有 $n$ 个结点的完全二叉树的深度为 $└log2^n┘ + 1$ 性质的推导过程，在这里尽管折半查找判定二叉树并不是完全二叉树，但同样相同的推导可以得出，最坏情况是查找到关键字或查找失败的次数为$└log2^n┘ + 1$，对于最好的情况，，当然是1次了。因此最终我们<font color = "red">折半算法的时间复杂度为 $O(logn)$</font>，它显然远远好于顺序查找的 $O(n)$ 时间复杂度了
+
+由于折半查找的前提条件是需要有序表顺序存储，对于静态查找表，一次排序后不再变化，这样的算法已经比较好了，<font color = "red">但对于需要频繁执行插入或删除操作的数据集来说，维护有序的排序会带来不小的工作量，那就不建议使用</font>
+
+<br/>
+
+_*插值查找*_
+
+<font color = "red">反观二分查找，思考一个问题就是，为何一定是对半分，而不是四分之一亦或者更多呢？</font>因为从结果来看，如果我们所需要的 $key$ 在一个较小亦或者较大的位置的话，那么我们分的越多那么所节省的时间也就越多，举个例子 : 比如要在取值范围0～10000 之间 100 个元素从小到大均匀分布的数组中查找 5，我们自然会考虑从数组下标较小的开始查找
+
+在二分查找中，获取中位数下标的公式经过略微等式变化后可以得到 : $\displaystyle mid = \frac{low + hight}{2} = low + \frac{1}{2}(hight - low)$，也就是 $mid$ 等于最低下标 $low$ 加上最高下标 $high$ 的差的一半，而当我们把上面的公式改进为 : $\displaystyle mid =  low + \frac{key-a[low]}{a[high - a[low]}(hight - low)$，就能够根据我们所录入的 $key$ 去动态的调整所需 <font color = "red">"对折"</font> 的大小了
+
+> 插值查找 $(Interpolation \:\: Search)$ 是根据要查找的关键字 $key$ 与查找表中最大最小记录的关键字比较后的查找方法，其核心就在于插值的计算公式 $\displaystyle \frac{key-a[low]}{a[high - a[low]}$ `
+
+```c
+int binary_search(int *arrary, int key, int size) {
+  int low = 0;
+  int hig = size - 1;
+
+  while (low <= hig) {
+    int mid = low + (hig - low) * (key - arrary[low]) / (arrary[hig] - arrary[low]);  /* 插值 */
+    if(key < arrary[mid])       /* 若 key 值比预估的数小，则最大指针下标需要从 mid 处 -1(跳过重复的判断) */
+      hig = mid - 1;
+    else if (key > arrary[mid]) /* 若 key 值比预估的数大，则最小指针下标需要从 mid 处 +1(跳过重复的判断) */
+      low = mid + 1;
+    else                        /* 若最大和最小相等，则意味着 low 和 high 指针指向同一个下标，即找到了位置 */
+      return mid;
+  }
+
+  return -1;
+}
+
+int main(void) {
+  int arrary[] = { 0, 1, 16, 24, 35, 47, 59, 62, 73, 88, 99 };
+  binary_search(arrary, 62, sizeof(arrary) / sizeof(int));
+
+  return EXIT_SUCCESS;
+}
+```
+
+从时间复杂度来看，它也是 $O(n)$，但对于表长较大，而关键字分布又比较均匀的查找表来说，插值查找算法的平均性能比折半查找要好得多 ; 反之，数组中如果分布类似 $\{0,1,2,2000,2001,…,99998,9999\}$ 这种极端不均匀的数据，用插值查找未必是很合适的选择
+
+
+<br/>
+
+_*斐波那契查找*_
