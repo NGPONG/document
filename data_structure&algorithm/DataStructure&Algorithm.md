@@ -56,7 +56,8 @@
   - [Search](#Search)
     - [查找的种类](#查找的种类)
     - [顺序表查找](#顺序表查找)
-    - [有序表查找](#有序表查找)
+    - [线性索引查找](#线性索引查找)
+    - [二叉排序树](#二叉排序树)
 
 
 <br/>
@@ -3466,3 +3467,111 @@ _*倒排索引*_
 
 倒排索引的优点显然就是查找记录非常快，基本等于生成索引表后，查找时都不用去读取记录，就可以得到结果 ; 但它的<font color = "red">缺点是这个记录号不定长</font>，比如上图有7个单词的文章编号只有一个，而 "book" , "friend" , "good" 有两个文章编号，若是对多篇文章所有单词建立倒排索引，那每个单词都将对应相当多的文章编号，<font color = "red">维护比较困难，插入和删除操作都需要作相应的处理</font>
 
+
+<br/>
+
+#### 二叉排序树
+<span id = "二叉排序树"></span>
+
+对于<font color = "red">顺序存储结构</font>来说，其插入和删除的效率是可以接受的，但这样的表由于无序造成查找的效率很低 ; 那么对于<font color = "red">有序存储结构来说</font>，其虽然可以通过算法来解决查找效率低的问题，但是正因为它的有序，而导致了对其在插入或删除的时候就需要耗费大量的工作来完成
+
+考虑能够完成以上操作的结果实为<font color = "red">动态查找表</font>，那么现在的问题就是，是否拥有一个数据结构能够实现高效的动态查找表呢？那就是<font color = "red">二叉排序树</font>
+
+> 二叉排序树$(Binary \: Sort \: Tree)$，又称为<font color = "red">二叉查找树</font>，它可能是一颗空树，亦或者具有以下性质的二叉树
+> - 若它的左子树不空，则左子树上所有结点的值均小于它的根结构的值;
+> - 若它的右子树不空，则右子树上所有结点的值均大于它的根结点的值;
+> - 它的左、右子树也分别为二叉排序树;
+
+从二叉排序树的定义也可以知道 : 
+- 它前提是二叉树
+- 然后它采用了递归的定义方法
+- 再者，它的结点间满足一定的次序关系，左子树结点一定比其双亲结点小，右子树结点一定比其双亲结点大
+
+<font color = "red">当通过以上定义构造出一颗二叉排序树后，当我们对它进行中序遍历时，就可以得到一个完整的有序的序列</font>
+
+!!! info NOTE
+    构造一棵二叉排序树的目的，其实并不是为了排序，而是为了提高查找和插入删除关键字的速度 ; 不管怎么说，在一个有序数据集上的查找，速度总是要快于无序的数据集的，而二叉排序树这种非线性的结构，也有利于插入和删除的实现
+
+
+
+<br/>
+
+_*二叉排序树的结构*_
+
+为了避免树结构的复杂性，以下仅定义了一些最基本的树上节点的信息
+
+```c
+typedef struct bi_node {
+  int data;
+  struct bi_node *left;
+  struct bi_node *right;
+} bi_node, bi_tree;
+```
+
+<br/>
+
+_*二叉排序树的查找*_
+
+正因为二叉排序树其存储的特性(左子树上所有结点的值均小于其根结构的值，反之亦然)，我们对二叉排序树进行查找的时候其效率就会快很多，因为我们是可以通过所给定的键(key)去筛选过滤掉一些不必进行查找的结点内容以节省查询的时间
+
+```c
+bi_node *search_BST(bi_tree *tree, int key) {
+  if (tree == NULL) return tree;
+
+  if(tree->data == key) {
+    return tree;
+  } else if(tree->data < key) { /* 右子树 */
+    return search_BST(tree->right, key);
+  } else if(tree->data > key) { /* 左子树 */
+    return search_BST(tree->left, key);
+  } else { 
+    return NULL; /* 事实上，这一结果通常不存在，仅仅只是为了编译不会被警告(函数并未所有段返回) */
+  }
+}
+```
+
+<br/>
+
+_*二叉排序树的插入*_
+
+二叉排序树的插入无非就是需要找到一个适合当前操作key的结点进行插入，这里就可以引用查找的思想，一路向下搜索，直至无法再继续向下搜索的情境之下，那么该节点的位置就是适合当前所操作key的结点
+
+```c
+bool insert_BST(bi_tree *root, int key, bi_tree *prev) {
+  if(!root) {
+    if(!prev) { /* 函数初始调用的状态下就给定了一颗空树 */
+      return false;
+    } else {
+      root = (bi_node *)malloc(sizeof(bi_node));
+      memset(root, 0x0, sizeof(bi_node));
+      root->data = key;
+
+      if(prev->data < key) {
+        prev->right = root;
+      } else {
+        prev->left = root;
+      }
+
+      return true;
+    }
+  }
+
+  if(root->data == key) {        /* 防止相同结点的插入 */
+    return false; 
+  } else if (root->data < key) { /* 从右子树继续往下搜索合适的位置以插入key */
+    return insert_BST(root->right, key, root);
+  } else {                       /* 从左子树继续往下搜索合适的位置以插入key */
+    return insert_BST(root->left, key, root);
+  }
+}
+
+int main(void) {
+  bi_tree *tree = init();
+
+  int val = 42;
+  insert_BST(tree, val, NULL));
+
+  system("pause");
+  return EXIT_SUCCESS;
+} 
+```
