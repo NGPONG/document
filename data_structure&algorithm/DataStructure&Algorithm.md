@@ -11,6 +11,7 @@
   - [Arrary](#arrary)
     - [Basic Arrary](#basic-arrary)
     - [Dynamic Arrary](#dynamic-arrary)
+    - [Fibonacci Sequence](#Fibonacci-sequence)
   - [Linked List](#linked-list)
     - [链表与数组](#链表与数组)
     - [链表中的头节点和尾节点](#链表中的头节点和尾节点)
@@ -39,7 +40,7 @@
     - [二叉树的深度](#二叉树的深度)
     - [线索二叉树](#线索二叉树)
     - [树、森林与二叉树之间的转换](#树森林与二叉树之间的转换)
-    - [赫夫曼树](#赫夫曼树)
+    - [赫夫曼树(没有代码)](#赫夫曼树)
   - [Disjoint Set](#disjoint-set)
     - [并查集的使用](#并查集的使用)
     - [并查集的优化](#并查集的优化)
@@ -58,6 +59,7 @@
     - [顺序表查找](#顺序表查找)
     - [线性索引查找](#线性索引查找)
     - [二叉排序树](#二叉排序树)
+    - [AVL树](#AVL树)
 
 
 <br/>
@@ -480,6 +482,8 @@ int DestoryArrary(struct dynamicArrary *arrary) {
 <br/>
 
 #### Fibonacci sequence
+
+<span id = "Fibonacci-sequence"></span>
 
 如果一个数列中的数字遵循着 <font color = "red">"前面两项相邻之和用于构成后一项"</font> 这一规律，那么它就是一个斐波那契数列，如下图所示 : 
 
@@ -1409,7 +1413,7 @@ _*二叉树具有的五种基本形态：*_
 
 	![2020-3-8-13-17-55.png](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-3-8-13-17-55.png)
 
-2. 满二叉树
+1. 满二叉树
 	
 	!!! INFO Description
 		在一棵二又树中，如果所有分支结点都存在左子树和右子树，并且所有叶子都在同一层上，这样的二叉树树称为满二叉树
@@ -3575,3 +3579,105 @@ int main(void) {
   return EXIT_SUCCESS;
 } 
 ```
+
+<br/>
+
+_*二叉排序树的删除*_
+
+删除二叉排序树的结点稍显麻烦，我们需要分情况来考虑
+
+1. 删除的结点是叶子结点，那么我们只需要把叶子结点给删除就好
+
+    ![2020-11-08-00-34-33](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-08-00-34-33.png)
+
+2. 删除的结点仅拥有左子树或右子树的情况，那么我们除了要把目标节点删除外，还要把目标结点所派生的左子树或右子树衔接至删除结点的父节点上即可
+
+    ![2020-11-08-00-38-04](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-08-00-38-04.png)
+
+3. 对于同时拥有左子树和右子树的结点稍显麻烦，比较好的方案就是 : 根据当前树的中序遍历的结果，找到删除结点的直接前驱或后继，那么我们任选其一作为删除结点被删除后的替代结点，把它衔接至删除结点的位置，而衔接的结点所派生的子节点则衔接至衔接结点原先的父节点上即可，<font color = "red">这里要考虑如何查找中序遍历结果上的删除节点的直接前驱和后继的问题，对于这个问题就拿寻找直接前驱举例，直接前驱的寻找只需要找到当前结点左子树上一直往右走，直至没有路后，那么这个结点就属于前驱结点 ; 而对于后继结点反之亦然</font>
+
+    ![2020-11-08-01-11-30](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-08-01-11-30.png)
+
+以下则为二叉排序树删除的代码实现，这里使用到二级指针用于表示当前需要删除的结点，<font color = "red">目的是为了可以直接拿到其父节点上左/右子结点那块内存，以便删除的时候可以直接修改而不需要再返回上一层寻找其父节点，并且还要判断当前结点到底是属于父节点的左子结点还是右子节点</font>
+
+```c
+bool delete_BST(bi_node **cur_node, int key) {
+  if((*cur_node)->data == key) {
+
+    if((*cur_node)->left == NULL && (*cur_node)->right == NULL) { /* 叶结点 */
+      free(*cur_node);
+      *cur_node = NULL;
+    } else if ((*cur_node)->left == NULL) { /* 仅有右子树的结点 */
+      bi_node *tmp = (*cur_node)->right;
+      free(*cur_node); /* 释放掉父节点的左/右子结点的内存 */
+      *cur_node = tmp; /* 使父节点的左/右子节点内存区指向最开始结点 */
+    } else if ((*cur_node)->right == NULL) { /* 仅有左子树的结点 */
+      bi_node *tmp = (*cur_node)->left;
+      free(*cur_node); /* 释放掉父节点的左/右子结点的内存 */
+      *cur_node = tmp; /* 使父节点的左/右子节点内存区指向最开始结点 */
+    } else { /* 拥有左右子树的结点 */
+      /**
+       * 寻找要被删除结点 **cur_node 的直接前驱，即 **cur_node 左子树的最右边的尽头结点
+       * 反之，寻找直接后驱就是 **cur_node 右子树的最左边尽头的结点  
+      */
+      bi_node *par = *cur_node;
+      bi_node *new_root = (*cur_node)->left;
+      while (new_root->right) {
+        par = new_root;
+        new_root = new_root->right;
+      }
+
+      /**
+       * 由于上一步找到了 **cur_node 的直接前驱 new_root，也就是说
+       * new_root 是没有右孩子结点的，故可以直接把它的左孩子结点写到它
+       * 原先的位置来
+      */
+      bi_node *child = new_root->left;
+      par->right = child;
+
+      /* 替换掉需要删除的结点 */
+      new_root->left = (*cur_node)->left;
+      new_root->right = (*cur_node)->right;
+
+      free(*cur_node);
+
+      *cur_node = new_root;
+    }
+    
+    return true;
+
+  } else if ((*cur_node)->data < key) { /* 从右子树继续往下搜索合适的位置以插入key */
+    return delete_BST(&(*cur_node)->right, key);
+  } else {                              /* 从左子树继续往下搜索合适的位置以插入key */
+    return delete_BST(&(*cur_node)->left, key);
+  }
+}
+
+int main(void) {
+  bi_tree *tree = init();
+
+  delete_BST(&tree, 73);
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+_*小结*_
+
+二叉排序树是以链接的方式存储，保持了链接存储结构在执行插入或删除操作时不用移动元素的优点，只要找到合适的插入和删除位置后，仅需修改链接指针即可，<font color = "red">插入删除的时间性能比较好</font>
+
+而对于二叉排序树的查找，走的就是从根结点到要查找的结点的路径，<font color = "red">其比较次数等于给定值的结点在二叉排序树的层数</font>，极端情况，最少为 1 次，即根结点就是要找的结点，最多也不会超过树的深度，也就是说，<font color = "red">二叉排序树的查找性能取决于二叉排序树的形状</font>
+
+可问题就在于，<font color = "red">二叉排序树的形状是不确定的</font>，例如 $\{62，88，58，47，35，73，51，99，37，93\}$ 这样的数组，我们依照左小右大的原则可以构建出下左图这样形状的一个二叉排序树，但如果数组元素的次序是从小到大有序，如 $\{35,37,47,51,58,62，73,88,93,99\}$，继续依照左小右大的原则去构建，则二叉排序树就成了极端的右斜树，注意它依然是一棵二叉排序树，如下右图。此时，同样是查找结点99，左图只需要两次比较，而右图就需要 10 次比较才可以得到结果，二者差异很大
+
+![2020-11-08-23-35-47](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-08-23-35-47.png)
+
+也就是说，我们希望二叉排序树是比较平衡的，即其深度与完全二叉树相同，均为 $└log_{2^n}┘+1$，那么<font color = "red">查找的时间复杂也就为 $O(logn)$</font>，近似于折半查找(事实上，上左图也不够平衡，明显的左重右轻)，而不平衡的最坏情况就是像上右图的斜树，<font color = "red">查找时间复杂度为 $O(n)$</font>，这等同于顺序查找\
+
+<br/>
+
+#### AVL树
+<span id = "AVL树"></span>
+
