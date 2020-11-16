@@ -4,5 +4,6 @@
     "files.encoding": "utf8",
     "markdown.styles": [
         "style.css"
-    ]
+    ],
+    "svn.ignoreMissingSvnWarning": true
 }

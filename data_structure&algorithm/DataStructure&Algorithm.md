@@ -3685,3 +3685,276 @@ _*小结*_
 #### AVL树
 <span id = "AVL树"></span>
 
+为了解决[二叉排序树](#二叉排序树)所存在的平衡性的问题，有两位俄罗斯数学家 **G.M.Adelson-Velski** 和 **E.M.Landis** 在1962年共同发明一种解决二叉排序树平衡的算法，<font color = "red">这种特殊的树以二叉排序树的基准进行了扩展</font>，它称为<font color = "red">平衡二叉排序树</font>或<font color = "red">AVL树</font>
+
+!!! info 平衡二叉树的定义
+    平衡二叉树 $(Self-Balancing \:\: Binary \:\: Search \:\: Tree$ 或 $Height-Balanced \:\: Binary \:\: Search \:\: Tree)$ ，它是一种二叉排序树，<font color = "red">其中每一个节点的左子树和右子树的高度差至多等于 $1$</font>
+
+    平衡二叉树是一种高度平衡的二叉排序树，意思是说，要么它是一棵空树，要么它的左子树和右子树都是平衡二叉树，且左子树和右子树的深度之差的绝对值不超过 $1$
+    
+    我们将二叉树上结点的左子树深度减去右子树深度的值称为<font color = "red">平衡因子BF$(Balance Factor)$</font>，那么平衡二叉树上所有结点的平衡因子只可能是 $-1、0、1$，只要二叉树上有一个结点的平衡因子的绝对值大于 $1$，则该二叉树就是不平衡的
+
+    ![2020-11-17-01-50-57](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-17-01-50-57.png)
+
+<br/>
+
+_*最小不平衡树*_
+
+距离插入结点最近的，且平衡因子的绝对值大于 $1$ 的结点为根的子树，我们称为<font color = "red">最小不平衡子树</font>，如下图，当新插入结点 $37$ 时，距离它最近的平衡因子绝对值超过 $1$ 的结点是 $58$(即它的左子树高度 $2$ 减去右子树高度 $0$ )，所以从 $58$ 开始以下的子树为最小不平衡子树
+
+![2020-11-17-01-53-17](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-17-01-53-17.png)
+
+<br/>
+
+_*平衡二叉树的实现原理*_
+
+
+
+<br/>
+
+_*代码示例*_
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define L_H +1 /* 左高 */
+#define E_H +0 /* 等高 */
+#define R_H -1 /* 右高 */
+
+/** 
+ * @brief LL(left-left)调整，右单旋转，顺时针旋转
+ * @param 
+ *  - root 最小不平衡树
+ * @note 
+ *  - LL调整: 新结点在某个最小不平衡树上的左子节点的左子树上进行插入的
+ * 
+ *  - 将根节点的左子结点变为新的根节点
+ *  - 旧的根节点变为变为新的根节点的右结点，在这一步中，如果原先该位置已经存在结点，则直接替换，而被替换掉的结点则归纳为旧根节点的左子节点
+*/
+void right_rotate(bi_node **root) {
+  bi_node *left = (*root)->left;
+  (*root)->left = NULL;
+  if (left->right != NULL) (*root)->left = left->right;
+  left->right = *root;
+  *root = left;
+}
+
+/** 
+ * @brief RR(right-right)调整，左单旋转，逆时针旋转
+ * @param 
+ *  - root 最小不平衡树
+ * @note
+ *  - RR调整: 新结点在某个最小不平衡树上的右子节点的右子树上进行插入的
+ * 
+ *  - 将根节点的右子结点变为新的根节点
+ *  - 旧的根节点变为变为新的根节点的左结点，在这一步中，如果原先该位置已经存在结点，则直接替换，而被替换掉的结点则归纳为旧根节点的右子节点
+*/
+void left_rotate(bi_node **root) {
+  bi_node *right = (*root)->right;
+  (*root)->right = NULL;
+  if (right->left != NULL) (*root)->right = right->left;
+  right->left = *root;
+  *root = right;
+}
+
+/** 
+ * @brief 左平衡旋转处理，该函数的主要目的是集成修改最小不平衡树中结点的 bf 的功能
+ * @param
+ *  - root 最小不平衡树
+*/
+void left_balance(bi_tree **root) {
+  bi_tree *l_r_tree;
+  bi_tree *l_tree;
+
+  l_tree = (*root)->left;
+  switch (l_tree->bf) {
+    /**
+     * 判断最小不平衡树 [root] 的左子树的平衡因子来决定到底是需要 LL(右)旋 还是 LR(先左后右)旋.
+     * 
+     * 由于该函数是左平衡旋转的处理，所以判断是以根节点(最小不平衡树)的左子树为出发点
+     * 来进行，并且，判断的标准无非就是两个
+     *  - 根节点的左子节点的左子树高: 即符合右单旋转的前提条件，即新结点在某个最小不平衡树上的左子节点的左子树上进行插入的
+     *  - 根节点的左子结点的右子树高: 即符合LR旋转的前提条件，即新节点在某个最小不平衡树上的左子结点的右子树上进行插入的
+     *  - 这里不存在根节点的左子节点左右树等高的情况，因为必定是因为某个新节点的插入，才导致了这颗树的深度的增加，而正因为树
+     *    的深度的增加这个前提条件，才导致了是否需要对该出现不平衡的最小不平衡树进行旋转处理
+     * 
+     * 对于每种情况所改变的 [bf] 的规则，可以自己在本子上演练一遍，并统计结果的 [bf] 即可，最关键的是要掌握旋转的规则
+    */
+
+  case L_H:
+    /* 右单旋转，所改变的结点仅为 [根节点] 和 [跟结点的左孩子结点]，故仅需要调整其二者的 bf 即可 */
+    (*root)->bf = l_tree->bf = E_H;
+    right_rotate(root);
+    break;
+  case R_H:
+    l_r_tree = l_tree->right;
+
+    /* LR旋转，需要考虑 [根节点的左孩子的右子树] 的问题，即这里又涵盖了一层 switch，这种旋转方式需要把 [根节点的左孩子的右子树] 和 [剩下的树] 切分开来考虑 */
+
+    /* 对于 LR 旋转来说，该旋转会影响三种结点，分别是 [根节点], [跟结点的左孩子结点], [根节点的左孩子的右孩子] */
+
+    switch (l_r_tree->bf) {
+    case L_H:
+      (*root)->bf = R_H;
+      l_tree->bf = E_H;
+      break;
+    case R_H:
+      (*root)->bf = E_H;
+      l_tree->bf = L_H;
+      break;
+    case E_H:
+      (*root)->bf = l_tree->bf = E_H;
+      break;
+    }
+    l_r_tree->bf = E_H;
+    left_rotate(&(*root)->left);
+    right_rotate(root);
+    break;
+  }
+}
+
+/** 
+ * @brief 右平衡旋转处理，该函数的主要目的是集成修改最小不平衡树中结点的 bf 的功能
+ * @param
+ *  - root 最小不平衡树
+*/
+void right_balance(bi_tree **root) {
+  bi_tree *r_l_tree;
+  bi_tree *r_tree;
+
+  r_tree = (*root)->right;
+  switch (r_tree->bf) {
+    /**
+     * 判断最小不平衡树 [root] 的右子树的平衡因子来决定到底是需要 RR(左)旋 还是 RL(先右后左)旋.
+     * 
+     * 由于该函数是右平衡旋转的处理，所以判断是以根节点(最小不平衡树)的右子树为出发点
+     * 来进行，并且，判断的标准无非就是两个
+     *  - 根节点的右子节点的左子树高: 即符合左单旋转的前提条件，即新结点在某个最小不平衡树上的右子节点的右子树上进行插入的
+     *  - 根节点的右子结点的右子树高: 即符合RL旋转的前提条件，即新节点在某个最小不平衡树上的右子结点的左子树上进行插入的
+     *  - 这里不存在根节点的左子节点左右树等高的情况，因为必定是因为某个新节点的插入，才导致了这颗树的深度的增加，而正因为树
+     *    的深度的增加这个前提条件，才导致了是否需要对该出现不平衡的最小不平衡树进行旋转处理
+     * 
+     * 对于每种情况所改变的 [bf] 的规则，可以自己在本子上演练一遍，并统计结果的 [bf] 即可，最关键的是要掌握旋转的规则
+    */
+
+  case R_H:
+    /* 左单旋转，所改变的结点仅为 [根节点] 和 [跟结点的右孩子结点]，故仅需要调整其二者的 bf 即可 */
+    (*root)->bf = r_tree->bf = E_H;
+    left_rotate(root);
+    break;
+  case L_H:
+    r_l_tree = r_tree->left;
+
+    /* RL旋转，需要考虑 [根节点的右孩子的左子树] 的问题，即这里又涵盖了一层 switch，这种旋转方式需要把 [根节点的右孩子的左子树] 和 [剩下的树] 切分开来考虑 */
+
+    /* 对于 RL 旋转来说，该旋转会影响三种结点，分别是 [根节点], [跟结点的右孩子结点], [根节点的右孩子的左孩子] */
+
+    switch (r_l_tree->bf) {
+    case L_H:
+      (*root)->bf = E_H;
+      r_tree->bf = L_H;
+      break;
+    case R_H:
+      (*root)->bf = L_H;
+      r_tree->bf = E_H;
+      break;
+    case E_H:
+      (*root)->bf = r_tree->bf = E_H;
+      break;
+    }
+    r_l_tree->bf = E_H;
+    right_rotate(&(*root)->right);
+    left_rotate(root);
+    break;
+  }
+}
+
+/** 
+ * @brief 平衡二叉树结点插入
+ * @param 
+ *  -   tree 平衡二叉树
+ *  -    val 值
+ *  - taller 指示当前所插入的结点是否令树的高度增加
+*/
+bool insert_AVL(bi_tree **tree, int val, bool *taller) {
+  if (!*tree) {
+    *tree = (bi_tree *)malloc(sizeof(bi_node));
+    (*tree)->data = val;
+    (*tree)->left = (*tree)->right = NULL;
+    (*tree)->bf = E_H;
+    *taller = true;
+  } else {
+    if (val == (*tree)->data) {
+      *taller = false;
+      return false;
+    }
+
+    if (val < (*tree)->data) {
+      if (!insert_AVL(&(*tree)->left, val, taller))
+        return false;
+
+      if (*taller) {
+        switch ((*tree)->bf) {
+        case L_H:
+          left_balance(tree);
+          *taller = false;
+          break;
+        case E_H:
+          (*tree)->bf = L_H;
+          *taller = true;
+          break;
+        case R_H:
+          (*tree)->bf = E_H;
+          *taller = false;
+          break;
+        }
+      }
+    } else {
+      if (!insert_AVL(&(*tree)->right, val, taller))
+        return false;
+
+      if (*taller) {
+        switch((*tree)->bf) {
+          case L_H: /* 原先该节点的 bf 是 1，并且此次插入操作是针对该节点的右子结点进行插入的，那不就意味着此次插入并没有改变父节点的 bf 嘛 */
+                    /* 并且，既然原先在这个高度下就没有达成最小生成树的条件，那么高度不变的话，上层递归的函数就不需要再进行判断了 */
+            (*tree)->bf = E_H;
+            *taller = false;
+            break;
+          case E_H: /* 原先该节点的 bf 是 1，并且此次插入操作是针对该节点的右子结点进行插入的，那不就意味着此次插入使得树的高度增加了 1 嘛，所以父节点的 bf = -1 */
+                    /* 那是否证明其根节点的 bf 的绝对值一定 >=0 && <= 1 呢？这是不确定的，故这里还要再上层递归中进行判断 */
+            (*tree)->bf = R_H;
+            *taller = true;
+            break;
+          case R_H: /* 既然原先该节点的 bf 是 -1 了，那么此次增加的结点造成了树的高度的增加，所以该结点就属于最小不平衡树的根节点 */
+            right_balance(tree);
+            *taller = false;
+            break;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
+int main(void) {
+  int a[10] = { 3, 2, 1, 4, 5, 6, 7, 10, 9, 8 };
+  bi_tree *tree = NULL;
+  bool taller;
+  for (size_t i = 0; i < sizeof(a) / sizeof(int); ++i) {
+    insert_AVL(&tree, a[i], &taller);
+  }
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+_*小结*_
+
+平衡二叉树的思想并不难理解的，归根结底就是一句话 : <font color = "red">把不平衡消灭在最早时刻</font>(请好好体会)
+
+如果我们需要查找的集合本身没有顺序，在频繁查找的同时也需要经常的插入和删除操作，显然我们需要构建一棵二叉排序树，但是不平衡的二叉排序树，查找效率是非常低的，因此我们需要在构建时，就让这棵二叉排序树是平衡二叉树，此时我们的查找时间复杂度就为 $O(log_n)$，而插入和删除也为 $O(log_n)$，这显然是比较理想的一种<font color = "red">动态查找表算法</font>
