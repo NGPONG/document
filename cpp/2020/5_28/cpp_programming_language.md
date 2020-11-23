@@ -3038,3 +3038,1825 @@ int main(void) {
 <span id = "函数的扩展"></span>
 
 ## 函数的扩展
+
+<span id="内联函数"></span>
+
+### 内联函数
+
+--- 
+
+在c语言中，我们通常会把一些短并且执行频繁的计算写成 **_宏函数_** 以此避免函数调用所存在的出入栈开销，宏函数能够在c语言中进行广泛的使用并不是说宏函数就一定是完美无缺的，而是在c语言中似乎找不到第二个相似的特性以代替宏函数的功能，而宏对于 cpp 这种面向对象的语言来说，其存在的本身还是会存在着一些问题，比如 : 
+
+- 宏函数是属于预处理阶段供预处理器进行宏定义展开的工作，而<font color = "red">预处理器在 cpp 中是不允许访问类的成员(它们是运行时动态分配内存的)</font>，也就是说我们无法把某一个宏当作一个类中的成员来进行看待，简而言之，宏定义没有作用域的一个概念
+
+- 宏函数在特定情况下进行使用时，所拿到的结果可能并不是我们所预期的一种结果
+
+为了解决宏定义(宏函数)在c语言中所带来的一些历史性的遗留问题，cpp 中推出了 <font color = "red">$inline \:\: function$(内联函数)</font> 的概念
+
+<font color = "red">内联函数本身也是一个真正的函数，它具有普通函数的所有行为</font>，对比宏函数来说，内联函数会在适当的地方像预定义宏一样展开(具体要查看编译器的行为)，也就是说，内联函数和宏函数一样同样能够避免函数调用时候的压栈、跳转、返回的开销问题，除此之外，<font color = "red">由于内联函数本身也是一种真正的函数，也就意味着我们能够在其上下文中访问存在动态分配内存性质的一些成员，并且能够指定它声明在我们所需要的命名空间内以防止命名冲突的问题的同时又提升了程序的 oop 性</font>
+
+#### 内联函数的定义
+
+内联函数的定义方式很简单，在所需要定义为内联函数的开头添加 `inline` 关键字即可，<font color = "red">需要注意的是，当我们函数把一个函数分为声明和定义来实现的时候，我们必须要在声明和定义中都要添加上 `inline` 关键字才算生效</font>
+
+值得一提的是，对于在类中的成员函数编译器在编译的过程中都会自动添加上 `inline` 关键字
+
+那么，当我们为一个函数添加上了 `inline` 关键字，那该函数就被声明为了内联函数，但是内联函数是一定会生效的吗？这不一定，编译器会在编译的阶段考量内联函数的有效性，当这个内联函数符合一定的条件后，那么该函数的调用将采用内联编译 : 
+
+- 不能存在任何形式的循环语句
+
+- 不能存在过多的条件判断语句
+
+- 函数体不能过于庞大
+
+- 不能对函数进行取址操作
+
+对于内联函数来说，其本身只是提供给编译器的一种意见，那么具体是要把这个函数当成普通函数的方式来调用还是通过内联的方式来调用这都取决于编译器本身，可能一个我们所声明的内联函数符合一定的要求，但是编译器不会把它当成内联函数来看待，可能一个函数并没有声明为内联的形式，但是在它调用的过程中编译器都会对它做内联编译，其实对于开发人员来说，我们无需特地的去声明一个内联函数，这部分工作大多都是交给编译器来完成，我们只需要明白存在这一概念并遵循着内联编译前提条件的注意事项即可
+
+```cpp
+#include <iostream>
+using namespace std;
+
+inline void foo() {
+  cout << "hello,world" << endl;
+}
+```
+
+<br/>
+
+### 函数的参数默认值
+
+---
+
+```cpp
+void foo(int i = 0, char c = 'A', const char *str) {
+
+}
+```
+
+<br/>
+
+### 函数的重载
+
+---
+
+<font color = "red">函数的重载，即同一个作用域下，我们可以额外定义不同参数个数、不同参数类型、不同参数顺序的同名函数</font>
+
+由于 cpp 中需要对函数重载进行支持，故使用 cpp(g++, clang++) 的方式对源文件进行编译的过程中，会为我们所声明的定义亦或者所使用的函数额外添加一些其他的符号以区分函数重载的标识(根据不同编译器的实现不同而不同)，比方说我们在 cpp 文件中所定义的函数为 `foo()`，而在进行过编译后他可能就会重命名为 `_Z6Myfoo()`，对此就会存在一个问题，由于在c语言中是不支持函数的重载的，故函数的原名在使用c语言的方式(clang, gcc)进行编译后原名是不会发生改变的，假设我们目前我们有一个 cpp 的源文件 **_main.cpp_** 和 c语言 的源文件 **_test.c_** 还有一个源文件 test.c 所对应的头文件 **_test.h_**，如下面的代码 : 
+
+```cpp
+test.h-----------------------------
+#include <stdio.h>
+void fun_test(char *name);
+-----------------------------------
+
+
+test.c-----------------------------
+#include "test.h"
+void foo(char *name) {
+  printf("Hello,World!%s\n",name);
+} 
+-----------------------------------
+
+
+
+main.cpp---------------------------
+#include <iostream>
+#include "test.h"
+using namespace std;
+
+int main(void) {
+  foo("NGPONG");
+  cout << "OK!" << endl;
+  return 0;
+}     
+-----------------------------------
+```
+
+可以看到，我们在 cpp 的源文件中引用了 c语言 源文件 **_test.c_** 所对应的头文件 **_test.h_**，借助头文件 test.h 以完成对 c 语言所编写的函数 `foo(char *name)` 的调用
+
+但是这时候在进行编译时就会出现问题，因为我们是使用的 cpp(clang++, g++) 源文件工程进行编译的，也就是说编译器是以 cpp 的方式对文件进行编译和链接的，而头文件 test.h 虽然是对应着 c语言 源文件 test.c 的，但是它却在 cpp 源文件 main.cpp 被包含(#include)了进来的，也就意味着，当前头文件中的声明工作都要参与以 cpp 方式进行编译和链接的过程，前面提到过，cpp 由于需要对函数重载的支持，所以使用 cpp 的方式对文件进行编译的时候，都会把我们所声明定义的亦或者所使用的函数都会额外添加一些其他的符号以区分函数重载的标识，而这时候在头文件对于函数 `void foo(char *name)` 中的声明可能就会被改写成 `void _Z6foo(char *name)`，但是我们目前是没有任何一个函数的定义是 `_Z6foo` 的，所以函数 `void foo(char *name)` 在进行链接的过程中就无法找到这个函数的具体定义，提示无法找到外部符号
+
+那么产生这种问题的原因是因为 c语言 的源文件 test.h 参与了 cpp 编译的方式从而导致函数名变更而无法找到其原本在 c语言 文件 test.c 中所对应的函数定义所导致的，那么解决这种问题其实很简单，只要让它不参与 cpp 的方式进行编译即可，故我们只需要<font color = "red">对需要以 c语言 方式进行编译的函数前缀添加上关键字 **_extern "C"_**，当一个成员添加上该关键字后，那么编译器其编译和链接的方式则遵循 c语言 的规范来进行</font>，需要注意的是，该关键字是 cpp 中独有的，在 c语言 中无法使用，也就是说我 对于函数的声明方式就需要从原来在头文件 test.h 中改写在 main.cpp 身上，并且我们还需要把原来在 cpp 源文件中所包括的头文件 test.h 去掉，以防止 cpp 编译器检测到两种不同形式(头文件中是 `void foo(char *name)`，源文件中是 `extern "C" void foo(char *name)` ) 的声明而无法进行编译的情况，通过这样的改造后，我们就能够成功的在 cpp 源文件中使用 c语言 源文件中所提供的一些功能实现了，代码结构改写为下面的形式 :
+
+```cpp
+test.h-----------------------------
+#include <stdio.h>
+void foo(char *name);
+-----------------------------------
+
+
+
+test.c-----------------------------
+#include "test.h"
+void foo(char *name) {
+  printf("Hello,World!%s\n",name);
+} 
+-----------------------------------
+
+
+
+main.cpp---------------------------
+#include <iostream>
+using namespace std;
+
+extern "C" void foo(char *);
+
+int main(void) {
+  foo("NGPONG");
+  cout << "OK!" << endl;
+  return 0;
+}
+-----------------------------------
+```
+
+当我们在 cpp 中对于函数 foo 的声明引入了关键字后，它就不会再去参与 cpp 的编译和链接的方式，而是遵循 c 标准的编译和链接的方式来进行，那么在其进入链接的阶段，函数 foo 在 cpp 源文件中的声明就会尝试在其它文件中寻找其定义，并最终会在 test.c 中找到该函数的定义，并把在 main.cpp 中的声明隐式提升为定义，以让我们在 cpp 源文件中实现调用 c 源文件中的功能函数
+
+这里可能会发现一个问题，首先第一点，当 c 源文件中的函数过多的话，那不是 cpp 源文件中对于函数的声明不久爆满了？而且原来的头文件 test.h 由于在 cpp 源文件中去掉以防止重复不同类型的声明所出现的错误，那么 test.h 不就没有任何实际价值了？是的，至少目前这段改造来说这个头文件的确是没用了，但是我们还能继续再改造下，其实<font color = "red">关键字 `extern "C"` 不单单只用于声明一个成员的编译定义，还可以通过它来使用 `{}` 来包含一整段代码对于编译方式的定义</font>，但是相应的我们还是不能把它放在 cpp 源文件当中，我们会把它放在头文件当中去，但是由于该关键字是 cpp 语言所支持的功能，故直接在头文件中使用会出现错误，所以这里我们还需要引入一个宏定义以区分编译当前文件的编译器使用的是 cpp 的功能还是 c 的功能，这个宏定义则叫做: `__cplusplus`，我们来看下改造后的代码
+
+```cpp
+test.h-----------------------------
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <stdio.h>
+void foo(char *name);
+
+#ifdef __cplusplus
+}
+#endif
+-----------------------------------
+
+
+
+test.c-----------------------------
+#include "test.h"
+void foo(char *name) {
+  printf("Hello,World!%s\n",name);
+} 
+-----------------------------------
+
+
+
+main.cpp---------------------------
+#include <iostream>
+#include "test.h"
+using namespace std;
+
+int main(void) {
+  foo("NGPONG");
+  cout << "OK!" << endl;
+  return 0;
+}
+-----------------------------------
+```
+
+通过预处理指令 `#ifdef` 来区分当前是编译器所编译的功能是遵循 c 的规范还是 cpp 的规范，由于目前所编译的是 main.cpp 是属于 cpp 的规范，故该条件表达式是能够成功执行并且还是以 cpp 标准规范来进行处理，这样就可以使用 `extern "C"` 关键字了，并且我们还通过该关键字所提供的 `{}` 来完成在对 `{}` 内所有所有的成员都遵循 c 标准编译链接规范的目的，也就是说通过上面改造的代码，在 `extern "C" {}` 内的所有成员都会依照着 c 语言的规范来进行编译
+
+以上则为在 cpp 中实现调用 c 功能代码的方式，那么反过来可不可以呢？肯定是不行的，cpp 是对于 c 语言的扩展，故我们是能够在 cpp 中写入标准 c 的代码，但是 c 并不是 cpp 的扩展，故并不支持 cpp 中所扩展的关键字
+
+
+<br/>
+<br/>
+
+<span id = "运算符重载"></span>
+
+## 运算符重载
+
+运算符重载$(operator \:\: overloading)$只是一种 cpp 中提供给函数调用的一种 "语法糖"(并不觉得是糖)，虽然看着非常别扭，并且代码可读性也不高，但是<font color = "red">实际上它就是另一种函数的调用形式</font>
+
+<br/>
+
+### 什么是运算符重载函数
+
+--- 
+
+运算符重载函数的类别可以总体区分为以下两类
+
+   - 成员函数运算符重载
+
+   - 全局函数运算符重载
+
+定义重载的运算符就像定义函数，只是该函数的名字是 **_operator@_**，这里的 **_operator_** 是一个特殊的关键字，它和操作符 **_@_** 构成了针对于某个操作符下的一个运算符重载函数，<font color = "red">当我们定义好了一个运算符重载函数后，我们对于它的使用可以直接通过所定义的函数名来访问它(operator@)，当然如果还是通过这种方式来进行访问的话，那么所构建的运算符重载就无任何实际意义了</font>
+
+更准确的做法是，<font color = "red">当我们定义好一个运算符重载函数后，我们就能根据所定义的运算符所构成的表达式，并根据该运算符表达式中所录入的参数类型和参数个数(**_在表达式中根据运算符所修饰的参数从左到右映射至所定义的运算重载函数的形参列表当中_**)去匹配相符签名的运算符重载函数，以通过一段运算符的表达式就能够达到调用目标运算符重载函数的目的</font>，这里，我们只有保证在运算符表达式中所录入的参数是符合某个运算符表达式的形参签名列表才能够完成目标函数的调用<font color = "red">通过一段运算符表达式能够达到调用目标运算符重载函数的方式主要核心是通过一点，那就是 **_参数匹配_**</font>，那么对于一个运算符重载函数来说，其<font color = "red">参数保持在 **_0 ~ 2_** 个，具体个数取决于两个根本的因素</font>
+
+- 所重载的运算符(**_@_**)是属于 **_一元运算符(一个形参)_** 还是 **_二元运算符(两个形参)_**
+
+- 运算符重载函数是声明在 **_全局作用域下(上一个因素的结果保持不变)_** 还是 **_作为成员(非友元)声明在具体的某个类或结构体的内部(上一个因素的结果减一)_**
+
+在这里，<font color = "red">第二条因素依赖于第一条因素，原因是因为当我们把运算重载函数作为成员(非友元)定义在某个类或结构体的内部时，对应的运算符所构造的表达式其从左到右的第一个参数其实就是当前实例的本身</font>，故我们无需再去运算符重载函数的形参列表中又特定声明一个形参以映射至对应运算符(**_@_**)所构造的表达式其从左到右的第一个参数，举个例子，<font color = "red">当所重载的运算符是一个二元运算符(**_@_**)的时候，作为二元运算符表达式的左耳参数就是就是当前实例的本身，那么对应的，表达式中的右耳的参数则会映射到运算符重载函数中的形参列表中的第一个参数</font>，而当我们把一个运算符重载函数定义为全局，那么就意为该重载函数其实是不属于任何一个复合类型中的成员，所以这个运算符重载函数中的形参个数也需要依据着所重载的运算符(**_@_**)的元数来决定参数列表的个数，下面的代码展示了在一个二元运算符中，当我们把运算符重载函数声明在全局亦或者某个复合类型成员内部时的参数列表的不同体现
+
+```cpp
+#include <iostream>
+using namespace std;
+
+struct Person {
+  friend void operator+(Person &per_src, Person &per_des) { /* 友元函数属于全局作用域下 */
+    per_src.m_age += per_des.m_age;
+    return;
+  };
+
+public:
+  Person(int age)
+    : m_age(age) {}
+
+  Person(const Person &per) {
+    this->m_age = per.m_age;
+  }
+  ~Person() {
+    cout << "Person descturctor" << endl;
+  }
+
+public:
+  Person &operator+(int age) {
+    this->m_age += age;
+    return *this;
+  }
+
+public:
+  int m_age;
+};
+
+int main(void) {
+  Person per_src(0);
+  Person per_des(256);
+  per_src + 1 + 2 + per_des;
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+### 运算符重载的使用事项
+
+--- 
+
+- 对于声明为 **_成员函数运算符重载_** 受复合结构中的访问修饰符的间接调用限制
+
+- 运算符重载函数允许进行函数重载
+
+- 当运算符重载函数作为成员函数而出现时，不能声明为静态
+
+- 运算符重载函数的形参列表中，必须具有复合类型(类或结构体)或者枚举类型作为形参，所以，如果我们想单纯的通过运算符重载函数去改变内置数据类型(int, char, etc)的运算规则是不可行的
+
+- 保证在间接调用运算符重载函数时，保证运算符重载函数所在作用域的可被发现性
+
+  - 运算符重载函数理论上来说是可以声明在任意地方，但是我们需要注意的是，我们使用运算符重载函数的过程通常都是通过其所重载的具体的运算符所构造的表达式以映射到具体的运算符重载函数来完成它的调用，也就是说，<font color = "red">当我们使用指定的运算符所构建的表达式的代码位置是无法通过直接的方式访问本该我们所预想的该表达式所对应的运算符重载函数所在的作用域的时候，我们直接通过运算符表达式以完成对应的运算符重载函数的调用就会失败，因为我们在构建运算符表达式的时候是不能单独引用具体某个作用域的</font>
+
+
+- 尽量不要重载逻辑运算符 `&&, ||`
+
+  - <font color = "red">当我们对于逻辑运算符进行了重载，那么该运算符原来所保有的 **_短路求值_** 的特性就会被取消</font>，什么是短路求值，就 `&&` 来说，如果一旦表达式的左耳是一个假值得话，那么 `&&` 所构成得表达式整体就是一个假值，即 `&&` 表达式得右耳是无需进行计算的，而当我们进行了重载后，不管左耳是否是一个已经能够确定整个逻辑运算表达式的标识值，作为右耳函数还是会参与进行计算以匹配所重载的运算符函数的调用，这可能并不是我们想要得结果，并且在<font color = "red">一定程度上能够带来性能得损失(进行了无关紧要的计算)</font>
+
+- 保证运算符重载函数的定义在间接引用的时候不会产生二义性
+
+  - 前面提到过，运算符重载函数可定义在全局作用域下亦或者具体到某个类或结构体当中，那么我们假设在同一个命名空间这个大的、运算符重载函数可被发现的作用域之下分别书写了两个相同重载符号的运算符重载函数的时候，我们要保证所构建出来的表达式映射到具体的运算符重载函数时并不会出现二义性，如下面的代码则是一个典型的二义性的例子，我们所书写的表达式编译器不知道其具体是映射到类中所定义的运算符重载函数，还是在全局作用域下所定义的运算符重载函数，因为两者都是符合我们所构建的表达式的匹配，这就会造成一个二义性
+
+  ```cpp
+  #include <iostream>
+  using namespace std;
+
+  struct Person {
+    friend Person &operator+(Person &per, int age) {
+      per.m_age += age;
+      return per;
+    };
+
+  public:
+    Person(int age)
+      : m_age(age) {}
+    Person(const Person &per) {
+      this->m_age = per.m_age;
+    }
+
+  public:
+    int m_age;
+
+  public:
+    Person &operator+(int age) {
+      this->m_age += age;
+      return *this;
+    }
+  };
+
+  int main(void) {
+    Person per(0);
+    per + 1 + 2 + 3;
+
+    system("pause");
+    return EXIT_SUCCESS;
+  }
+  ```
+
+- 运算符重载函数可以作为一个类中的友元成员
+
+  - 当运算符重载函数作为一个类中的友元声明的时候，由于友元成员虽然需要被定义或声明在一个类的内部，但是它并不属于这个类中的一个成员，具体来讲，友元的定义是作用于全局作用域之下，故运算符重载函数中的形参个数要以声明在全局作用域下的运算符重载函数的角度来看待，相应的，和普通的运算符重载函数一样，对应的运算符表达式会在全局作用域下通过参数匹配的方式搜寻到该友元声明的具体定义
+  - 
+  ```cpp
+  #include <iostream>
+  using namespace std;
+
+  struct Person {
+    friend Person &operator+(Person &per, int age) {
+      per.m_age += age;
+      return per;
+    };
+
+  public:
+    Person(int age)
+      : m_age(age) {}
+    Person(const Person &per) {
+      this->m_age = per.m_age;
+    }
+
+  public:
+    int m_age;
+  };
+
+  int main(void) {
+    Person per(0);
+    per + 1 + 2 + 3;
+
+    system("pause");
+    return EXIT_SUCCESS;
+  }
+  ```
+
+
+<br/>
+
+### 各运算符重载时的约束
+
+--- 
+
+- `+`
+
+  - 返回值和形参没有特殊的条件限制
+
+  - 可以声明为任意运算符重载函数类别
+
+```cpp
+#include <iostream>
+using namespace std;
+
+#include <string.h>
+
+class Person {]
+  /* Person operator+(Person &per) 所返回的是右值，故这里需要使用右值引用 */
+  friend char *operator+(Person &&per, int num) {
+    per.m_age += num;
+    return (char *)"SUCCESS!";
+  }
+
+public:
+  Person(int age) {
+    this->m_age = age;
+  };
+  Person(const Person &per) {
+    this->m_age = per.m_age;
+  }
+  Person(Person &&per) {
+    this->m_age = per.m_age;
+    per.m_age = 0x0;
+  }
+
+public:
+  Person operator+(Person &per) {
+    this->m_age += per.m_age;
+    return *this;
+  }
+
+public:
+  int m_age;
+};
+
+int main(void) {
+  Person per_src = Person(4);
+  Person per_des = Person(8);
+
+  cout << ((per_src + per_des) + 10) << endl;
+
+  return EXIT_SUCCESS;
+}
+```
+
+- `<< >>`
+
+  - 返回值和形参没有特殊的条件限制
+
+  - 可以声明为任意运算符重载函数类别
+
+```cpp
+#include <iostream>
+using namespace std;
+
+#include <string.h>
+
+class Person {
+  friend ostream &operator<<(ostream &cout, Person *per) {
+    cout << "Person name = " << per->m_name << " ,Person age  = " << per->m_age;
+    return cout;
+  }
+
+public:
+  Person(int age, const char *name = "DEFAULT") {
+    this->m_age  = age;
+    this->m_name = new char[strlen(name) + 1];
+    strcpy(this->m_name, name);
+  }
+  Person(const Person &per) {
+    this->m_age  = per.m_age;
+    this->m_name = per.m_name;
+  }
+  ~Person() {
+    cout << "Person destructor" << endl;
+    delete[] this->m_name;
+  }
+
+public:
+  ostream &operator<<(ostream &cout) {
+    cout << "Person name = " << this->m_name << " ,Person age  = " << this->m_age;
+    return cout;
+  }
+
+private:
+  int m_age;
+  char *m_name;
+};
+
+int main(void) {
+  Person per_01(1024, "Hello,World!");
+  Person per_02(256, "NGPONG!");
+
+  per_01 << cout    /* call ostream &operator<<(ostream &cout) */
+         << endl
+         << &per_02 /* call friend ostream &operator<<(ostream &cout, Person *per) */
+         << endl;
+
+  system("pause");
+  return EXIT_SUCCESS;
+}
+```
+
+- `=`
+  - 通常用于作为 [拷贝语义和移动语义](#构造函数) 的展开
+
+  - 返回值和形参没有特殊的条件限制
+
+  - 只能够声明为成员函数运算符重载
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class Person {
+public:
+  Person(int age) {
+    this->m_age = age;
+  }
+
+public:
+  /* Person copy assignment operator */
+  Person &operator=(const Person &per) {
+    this->m_age = per.m_age;
+    return *this;
+  }
+  /* Person move assignment operator */
+  Person &operator=(Person &&per) {
+    this->m_age = per.m_age;
+    per.m_age = 0x0;
+    return *this;
+  }
+  /* Person assignment operator */
+  Person &operator=(int age) {
+    this->m_age = age;
+    return *this;
+  }
+
+public:
+  int m_age;
+};
+
+int main(void) {
+  Person per_a(0);
+  Person per_b(0);
+
+  /** TODO
+   * 
+   * 1. 0x400 create a temporary unnamed variable, m_age is 0x400
+   * 
+   * 2. Person(0) create a temporary unnamed variable, m_age is 0, 
+   * Then call the move assignment operator function to move the d
+   * ata 0x400 to Person(0)
+   * 
+   * 3. Call copy assignment operator to copy (Person(0) = 0x400) 
+   * data to per_a Because of move assignment operator function r
+   * eturn value type is lvalue
+   * 
+   * 4. Call copy assignment operator to copy per_a data to per_b 
+   * Because of per_a is lvalue
+   */
+  Person &per_b_ref = per_b = per_a = Person(0) = 0x400;
+
+  per_b_ref = 0x100;
+
+  cout << per_b_ref.m_age << endl;
+
+  system("pause");
+  return EXIT_SUCCESS;
+}
+```
+
+- `++ --`
+
+  - <font color = "red">如果是后置运算(i++, i--)，我们要保证形参列表中的保有一个 `int` 类型的 **_占位参数_** 并且其在参数列表中的最后的位置</font>，以告诉编译器该运算符重载函数是一个后置运算符重载函数 ; <font color = "red">对于前置运算符对于形参则无特殊的限制</font>
+
+  - 返回值没有特殊的条件限制
+
+  - 可以声明为任意运算符重载函数类别
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class Person {
+  friend ostream &operator<<(ostream &cout,const Person &per) {
+    cout << per.m_age;
+    return cout;
+  }
+
+public:
+  Person(int age) {
+    this->m_age = age;
+  }
+
+public:
+  /* preload-value-increment assignment operator */
+  Person &operator++() {
+    ++this->m_age;
+    return *this;
+  }
+  /** 
+   * post-value-increment assignment operator
+   *
+   * Argument of type int is a placeholder-argument, 
+   * It's designed to tell the compiler this function 
+   * is a post-value-increment assignment operator function.
+   */
+  Person operator++(int) {
+    Person temp(this->m_age);
+    ++this->m_age;
+    return temp;
+  }
+
+public:
+  int m_age;
+};
+
+
+int main(void) {
+  Person per(0x400);
+  cout << per++ << endl;
+  cout << per.m_age << endl;
+  cout << ++per << endl;
+
+  return EXIT_SUCCESS;
+}
+```
+
+- `()`
+
+  - 返回值和形参没有特殊的条件限制
+
+  - 只能够声明为成员函数运算符重载
+
+  - 该运算符所构造的重载调用更专业的名称为 : **_仿函数_**
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class printer {
+public:
+  void operator()(char *str) {
+    cout << str << endl;
+  }
+};
+
+int main(void) {
+  printer()((char *)"Hello,World!");
+
+  return EXIT_SUCCESS;
+}
+```
+
+- `== !=`
+
+  - 返回值和形参没有特殊的条件限制
+
+  - 可以声明为任意运算符重载函数类别
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class Person {
+public:
+  Person(int _age) : m_age(_age) {};
+
+public:
+  char *operator!=(Person &per_) {
+    if (this->m_age == per_.m_age)
+      return (char *)"!=:SUCCESS!";
+    else 
+      return (char *)"!=:FAILURE!";
+  }
+
+public:
+  int m_age;
+};
+
+bool operator==(Person &per_, int age_) {
+  return per_.m_age == age_;
+}
+
+int main(void) {
+  Person per_src(0x400);
+  Person per_des(0x80);
+
+  cout << (per_src != per_des) << endl;
+
+  if(per_src == 0x400) 
+    cout << "==:SUCCESS!" << endl;
+  else 
+    cout << "==:FAILURE!" << endl;
+
+  return EXIT_SUCCESS;
+}
+```
+
+- `[]`
+
+  - <font color = "red">[] 虽然是一个一元运算符，但是我们实际上需要把它当作一个二元表达式的形参格式来看待</font>
+
+  - 返回值无特殊的限制
+
+  - 只能够声明为成员函数
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class Arrary {
+private:
+  int *data;
+
+public:
+  Arrary(int _size) {
+    data = new int[_size];
+  }
+  ~Arrary() {
+    delete[] data;
+  }
+
+public:
+  int &operator[](int idx) {
+    return data[idx];
+  }
+};
+
+int main(void) {
+  int size = 0x400;
+
+  Arrary arrary(size);
+  for (size_t i = 0; i < size; ++i) {
+    arrary[i] = i;
+  }
+
+  cout << arrary[0x100] << endl;
+
+  return EXIT_SUCCESS;
+}
+```
+          
+- `*`
+
+  - 返回值和形参没有特殊的条件限制
+
+  - 可以声明为任意运算符重载函数类别
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class person {
+public:
+  person(int age, char *name) {
+    this->m_age = age;
+    this->m_name = name;
+  }
+
+public:
+  void print() {
+    cout << "person age = " << this->m_age << endl;
+    cout << "person name = " << this->m_name << endl;
+  }
+
+public:
+  int m_age;
+  char *m_name;
+};
+
+class smart_pointer {
+public:
+  smart_pointer(person *ptr) {
+    this->m_ptr = ptr;
+  };
+  ~smart_pointer() {
+    delete this->m_ptr;
+  }
+
+public:
+  person &operator*() {
+    return *this->m_ptr;
+  }
+
+public:
+  person *m_ptr;
+};
+
+int main(void) {
+  smart_pointer sp(new person(1024, (char *)"hello,world"));
+  (*sp).print();
+
+  person &per_ref = *sp;
+  per_ref.print();
+
+  cout << (*sp).m_name << endl;
+
+  return EXIT_SUCCESS;
+}
+```
+
+- `->`
+  - `->` 是一个一元运算符，故形参个数要按照一元表达式的形参格式来看待，但是它却不支持单独使用
+
+  - 返回值必须是某个复合类型的指针
+
+  - 既然 `->` 不支持单独使用，并且其返回值必须为某个对象的指针或引用，也就是说，它所构造出来的表达式在 `->` 之后必须使用该运算符重载函数所返回的某个对象的指针或引用来完成该对象内部成员的调用
+  
+  - 只能够声明为成员函数
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class person {
+public:
+  person(int age, char *name) {
+    this->m_age = age;
+    this->m_name = name;
+  }
+
+public:
+  void print() {
+    cout << "person age = " << this->m_age << endl;
+    cout << "person name = " << this->m_name << endl;
+  }
+
+public:
+  int m_age;
+  char *m_name;
+};
+
+class smart_pointer {
+public:
+  smart_pointer(person *ptr) {
+    this->m_ptr = ptr;
+  };
+  ~smart_pointer() {
+    delete this->m_ptr;
+  }
+
+public:
+  person *operator->() {
+    return this->m_ptr;
+  }
+
+public:
+  person *m_ptr;
+};
+
+int main(void) {
+  smart_pointer sp(new person(1024, (char *)"hello,world"));
+
+  sp->print();
+  cout << sp->m_name << endl;
+
+  /* faild */
+  /* Person *per = sp->; */
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+<br/>
+
+<span id = "模板"></span>
+
+## 模板
+
+> 模板技术是 **_泛型编程_** 的基础，模板能够把 **_函数或类_** 的上下文中要处理的数据类型进行参数化，表现为参数的多态性，并且由于模板所保有的 **_类型参数化_** 的特点，模板我们又称 **_参数模板_**
+
+<br/>
+
+### 模板的声明
+
+---
+
+<font color = "red">当一个 **_类或函数_** 的前置语义中出现了关键字 **_template<typename / class $T$>_** 的修饰，那么它就属于一种 **_模板成员_**，我们可以在模板成员的上下文中使用声明的 **_虚拟类型 $T$_** 来完成变量的声明以实现逻辑运算，并且编译器暂时放弃对使用到虚拟类型 $T$ 的地方做语法的检查，即暂时不考虑虚拟类型参数使用的有效性</font>
+
+当我们在使用这个模板成员(调用这个函数或者声明这个类)的时候我们就可以 <font color = "red">**_显示或隐式_**</font> 的指定虚拟类型 $T$ 的具体类型，<font color = "red">编译器会依照我们 **_显示或隐式_** 指定的具体的类型替换至当前上下文中使用到虚拟类型 $T$ 的地方 **_并新生成一个不同副本的函数或类_**，然后再针对此新生成的成员结果针对性的做一次完整语法校验的编译性工作</font>
+
+<font color = "red">我们是完全可以把 模板和宏联系在一起的，亦或者说模板是一种更加高级的宏</font>，因为对于模板来说，它并不是一种真实存在的成员，也就是说我们在不使用它的时候，他是不会编译进一个二进制文件当中的，而当我们真正的去使用这个定义好的模板成员并指定了其虚拟类型的具体类型时，编译器才会依照所指定的类型去新创建一个完全体的副本，而这个副本才会编译进一个二进制文件当中
+
+额外扩充一点，我们会发现模板所声明的虚拟类型 $T$ 前面还使用了 **_typename / class_** 关键字来进行修饰，其实二者的使用并无任何区别，只是我们都会自立约束，<font color = "red">对于 **_函数模板_** 的声明使用 **_typename_**</font> ; <font color = "red">而对于 **_类模板_** 的声明则使用 **_class_**</font>
+
+```cpp
+#include <iostream>
+using namespace std;
+
+template<typename T> 
+void foo(T value) {
+  value += 1;
+  cout << value << endl;
+}
+
+int main(void) {
+  foo<int>(0x200);
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+### 指定模板的虚拟类型 $T$
+
+---
+
+模板成员是无法单独进行使用的，我们必须要在其使用前指定模板中的虚拟类型 $T$ 的具体类型才能够进行使用，cpp 中提供了两种方式去指定一个模板虚拟类型的具体类型
+
+- 显示指定 : 在调用模板成员时通过操作符 `<Type>` 去显示的指定当前模板成员
+
+```cpp
+template<typename T>
+void foo(T val) {
+  cout << val << endl;
+}
+
+int main(void) {
+  foo<const char *>("hello,world");
+  return EXIT_SUCCESS;
+}
+```
+
+- 隐式指定 : 隐式指定的方式只能够针对于函数模板的使用(类模板不可用)
+
+  - 当在调用 函数模板 时，编译器会依照函数调用所录入的实参具体类型去 **_自动推导_** 出当前函数模板的虚拟类型的具体类型，即通过这种方式完成函数模板的调用是不需要显示的指定虚拟类型 $T$(`<Type>`)的具体类型的
+  ```cpp
+  template<typename _Func>
+  void foo_automatch_function_pointer(_Func invoker) {
+    cout << "Execute by foo_automatch_function_pointer" << endl;
+    invoker(0x400);
+  }
+
+  template<typename T>
+  void foo(T val) {
+    cout << val << endl;
+  }
+
+  bool __fun(int _val) {
+    cout << _val << endl;
+    return false;
+  }
+
+  int main(void) {
+    foo_automatch_function_pointer(__fun); /* _Func: [bool (*)(int)] */
+    foo("hello,world");                    /*     T: [const char *] */
+
+    return EXIT_SUCCESS;
+  }
+  ```
+
+  - 需要注意的是，我们要保证同一个虚拟类型下所对应函数形参在进行调用时所录入的实参并不会对其产生一个 **_二义性访问_**，如下面的代码则为一个典型的二义性访问，这时候编译器所提供的自动类型推导则会失效
+
+  ```cpp
+  template<typename T>
+  void foo(T var1, T var2) {
+    cout << "template function" << endl;
+    cout << var1 << endl;
+    cout << var2 << endl;
+  }
+
+  int main(void) {
+    foo(0x400, 'G');
+    return EXIT_SUCCESS;
+  }
+  ```
+
+  - 对于函数指针类型的自动推导上面的代码已经演示过，这种方式的推导能够把所传入的函数推导为一个完整的函数指针类型，事实上，对于函数指针而言其应用并不单单于此，<font color = "red">我们还可以通过拆分虚拟类型 $T$ 的方式来让编译器去自动推导出一个函数的返回值、形参的具体类型</font>，这种拆分推导函数指针中各个形参包括返回值的方式广泛被应用到 $STL$ 库当中
+
+  ```cpp
+  #include <iostream>
+  using namespace std;
+
+  template<typename _Arg, typename _Result>
+  void foo(_Result (*_invoker)(_Arg)) {
+    cout << "function result type = : " << typeid(_Result).name() << endl;
+    cout << "function arg type = : " << typeid(_Arg).name() << endl;
+    cout << "function type = : " << typeid(_invoker).name() << endl;
+  }
+
+  bool __fun(int _val) {
+    cout << _val << endl;
+    return false;
+  }
+
+  int main(void) {
+    foo(__fun);
+
+    return EXIT_SUCCESS;
+  }
+  ```
+
+
+<br/>
+
+### 指定虚拟类型 $T$ 的默认类型
+
+---
+
+我们可以在指定虚拟类型 $T$ 的同时指定它的一个默认类型，它并不作为虚拟类型 T 的录入约束，而是作为编译器为模板进行虚拟类型自动推导的时候提供更加便利的条件
+
+```cpp
+#include <iostream>
+using namespace std;
+
+template<class T = int>
+class Person {
+public:
+  Person(T _val)
+    : val(_val) {
+    cout << typeid(_val).name() << endl;
+  };
+
+  T val;
+};
+
+template<typename T = int>
+void foo(T val) {
+  cout << typeid(val).name() << endl;
+}
+
+int main(void) {
+  Person<> per(20);
+  foo(10);
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### 类模板使用默认类型时存在的限制
+
+由于<font color = "red">类模板并不提供模板类型自动推导的功能</font>，故它和函数模板针对该功能的使用上存在着一点区别
+
+- 类模板指定虚拟类型的默认类型时，存在默认类型的虚拟类型必须放在虚拟类型列表的末尾处，而函数模板无此限制
+
+- 类模板由于并不支持模板类型的自动推导，故哪怕一个类模板中仅有一个虚拟类型且指定了其默认类型，类模板在使用的使用同样要配合 `<>` 进行修饰，而函数模板无此限制
+
+```cpp
+#include <iostream>
+using namespace std;
+
+template<typename T, typename U = int>
+class cla_1 {
+public:
+  cla_1(T _t_val, U _u_val) {
+    cout << "t=" << typeid(_t_val).name() << " u=" << typeid(_u_val).name() << endl;
+  }
+};
+
+template<typename T = int>
+class cla_2 {
+public:
+  cla_2(T _val) {
+    cout << "t = " << typeid(_val).name() << endl;
+  }
+};
+
+int main() {
+  cla_1<int> c_1_1(1, 2);
+  cla_1<int, char> c_1_2(1, 'a');
+
+  cla_2<> c_2_1(1);
+  cla_2<char> c_2_2('a');
+}
+```
+
+值得一提的是，正因为<font color = "red">函数模板提供了自动推导的功能，所以搭配上函数参数的默认类型的功能那么该函数模板的使用则会呈现出多样化</font>
+
+```cpp
+#include <iostream>
+using namespace std;
+
+template<typename T, typename U = double>
+void foo(T t = 0, U u = 0) {
+  cout << "t=" << typeid(t).name() << " u=" << typeid(u).name() << endl;
+}
+
+int main() {
+  foo(4, 'a');      /* foo<int,char>(4,'a') */
+  foo(4);           /* foo<int,double>(4,0) */
+  foo();			      /* fault */
+  foo<int>();       /* foo<int,double>(0,0) */
+  foo<int, char>(); /* foo<int,char>(0,0) */
+}
+```
+
+<br/>
+
+### 模板成员的声明与实现
+
+---
+
+我们无法在实现一个函数模板的声明亦或者说类模板内部的成员声明时就去指定模板成员的虚拟类型的具体类型，可以简单的理解为，我们永远只能够在使用模板成员的时候才可以去指定该模板成员的虚拟类型的具体类型
+
+其次，就是关于模板成员的实现和声明 **_分文件编写_** 的问题，前面提到，对于模板成员来说，它并不是一个真实存在的成员，仅当我们真正的去使用使用了这个模板成员并指定了模板虚拟类型的具体类型后，编译器才会为我们生成一个真实存在的成员，那么<font color = "red">当一个模板成员的声明和实现并不是声明在同一个文件内亦或者被包含在一个文件内的情况下，编译时会报错，原因是因为编译器是属于独立单元进行的编译工作，当我们在一个编译单元内使用一个仅存在声明的模板成员时，由于对于模板成员来说，其符号链接仅仅只能够在当前编译单元中进行，无法扩展至其它的文件，故这时候我们在使用的时候就会出现错误</font>，解决方案则为把模板成员的声明和实现都写在同一个文件内，在 cpp 中针对这种需要被包含的，但是却存在实现的文件的后缀约定俗成的写为 **_*.hpp_**
+
+```cpp
+#include <iostream>
+using namespace std;
+
+/* Template class */
+template<class T = int>
+class Person {
+public:
+  Person(T _val)
+    : val(_val){};
+
+public:
+  /* Declare function members of the template class */
+  void p_print(T _plus);
+
+public:
+  T val;
+};
+/* Function member that implement the template class */
+template<class T>
+void Person<T>::p_print(T _plus) {
+  cout << this->val + _plus << endl;
+}
+
+
+/* Declare template function */
+template<typename T>
+void foo(T &per);
+/* Implement template function */
+template<typename T>
+void foo(T &var) {
+  var.p_print(0x100);
+}
+
+int main(void) {
+  Person<> per(0x200);
+  foo(per);
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+### 模板机制
+
+--- 
+
+#### 函数模板
+
+函数模板即 `<template>` 所修饰的成员为一个函数
+
+在隐式指定一个函数模板虚拟类型的具体类型的情况下(**_未使用 `<>` 语义进行修饰_**)，<font color = "red">如果函数模板的调用和现存上下文中的某个普通函数的调用存在二义性，则编译器会优先考虑普通函数</font>，除非更改为显示指定的方式亦或者在调用时声明空模板类型然后模板的虚拟参数类型则依照隐式方式去指定(**_使用 `<>` 语义进行修饰_**)，当然，如果函数模板对比普通函数的参数调用能够得到更适合的匹配，则编译器会优先调用函数模板
+
+**_函数模板的重载_**
+
+<font color = "red">函数模板可以存在重载</font>并且我们无需担心所重载的版本会和现存的普通函数会出现二义性冲突问题，因为编译器总会依照我们的代码去匹配最适合的函数的调用，<font color = "red">值得引起我们注意的是，在函数模板发生重载的情况，我们还是尽量注意配合模板默认类型的使用，否则可能会造成无法正确匹配的问题</font>
+
+```cpp
+#include <iostream>
+using namespace std;
+
+template<typename T, typename U>
+void foo(T t, U u) {
+  cout << "t=" << typeid(t).name() << " u=" << typeid(u).name() << endl;
+}
+
+template<typename T>
+void foo(T t) {
+  cout << typeid(t).name() << endl;
+}
+
+int main() {
+  foo(10);
+  foo(10, 'a');
+}
+```
+
+**_函数模板的具体化_**
+
+<font color = "red">在某些情况下，我们针对于某个 **_具体的类型_** 所引用的函数模板其内部实现可能不太满意，这时候我们可以针对这个 **_具体的类型_** 去提供该函数模板的另一个特殊的副本，这个副本就叫做 **_具体化函数模板_**</font>，即声明一个相同签名的函数，并使用空模板操作符 **_template<>_** 进行修饰，然后函数的形参列表由原有的所指定的虚拟类型直接替换为 **_具体的类型_** 即可，那么当我们在使用这个具体的类型去对函数模板进行调用时，所调用的实现则为我们所指定的具体化函数模板的实现
+
+<font color = "red">对于一个具体化的函数模板而言，其调用的优先级要高于其最原始的函数模板的副本</font>
+
+```cpp
+#include <iostream>
+using namespace std;
+
+template<typename T>
+void foo(T t) {
+  cout << typeid(t).name() << endl;
+}
+
+template<>
+void foo(int t) {
+  cout << "hello,world" << endl;
+}
+
+int main() {
+  foo(10);
+}
+```
+
+<br/>
+
+#### 类模板
+
+函数模板即 `<template>` 所修饰的成员为一个类
+
+值得注意的是，<font color = "red">类模板的具体类型为 : `class_name<Type>`</font>
+
+**_类模板的继承_**
+
+类模板同样是可以用于继承的，需要注意的是，类模板所派生的子类需要在继承语句时就需要指定其上级基类(类模板)的虚拟类型 $T$ 的具体类型 ; 当然我们同样可以把这个具体的类型扩展至当前派生类的虚拟类型以代替(当前派生也声明为一个类模板)，然后指定虚拟类型 $T$ 的工作则放在该派生类的声明工作上
+
+```cpp
+#include <iostream>
+using namespace std;
+
+template<typename U, typename T = int>
+class ANIMAL {
+public:
+  ANIMAL(U u_val ,T t_val) {
+    cout << "ANIMAL: u = " << typeid(u_val).name() << " t = " << typeid(t_val).name() << endl;
+  }
+};
+
+template<typename U, typename T>
+class DOG : public ANIMAL<U, T> {
+public:
+  DOG(U u_val, T t_val) : ANIMAL<U, T>(u_val, t_val) {
+    cout << "DOG: u = " << typeid(u_val).name() << " t = " << typeid(t_val).name() << endl;
+  }
+};
+
+class LION : public DOG<int, char> {
+public:
+  LION(int u_val, char t_val) : DOG<int, char>(u_val, t_val) {
+    cout << "LION" << endl;
+  }
+};
+
+class CAT : public ANIMAL<char> {
+public:
+  CAT() : ANIMAL<char>('A', 10) {
+    cout << "CAT" << endl;
+  }
+};
+
+int main() {
+  CAT cat;
+  DOG<int, int>(1, 2);
+  LION(1, 'a');
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### 模板中使用友元
+
+**_普通类中的模板友元成员_**
+
+一个普通类中友元函数能够赋以模板形式的声明而存在，对于一个声明为友元的模板函数来说，其同样需要遵循友元成员所需注意的要素，需要注意的一种情景时，<font color = "red">当该模板友元所修饰的是一段定义，并且其包含着当前类型的参数，那么我们在通过直接的方式去调用该友元成员的时候，我们是无法显示的指定模板虚拟类型的具体类型的，也就是说虚拟类型的匹配依赖至参数录入所触发的隐式指定机制上，除非我们在全局命名空间下对于该模板友元所修饰的成员做一次声明</font>，那么在这种情境之下我们才可以显示的指定模板友元虚拟类型的具体类型
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class Person {
+  template<typename T>
+  friend void fun_test_01(Person &per, T var) {
+    cout << "FUN_TEST_01" << endl;
+    cout << per.m_age + var << endl;
+  }
+
+  template<typename T>
+  friend void fun_test_02(Person &per, T var) {
+    cout << "FUN_TEST_02" << endl;
+    cout << per.m_age + var << endl;
+  }
+
+  template<typename T>
+  friend void fun_test_03(Person &per, T var);
+
+public:
+  Person(int _age)
+    : m_age(_age){};
+
+private:
+  int m_age;
+};
+
+template<typename T>
+void fun_test_02(Person &per, T var);
+
+template<typename T>
+void fun_test_03(Person &per, T var) {
+  cout << "FUN_TEST_03" << endl;
+  cout << per.m_age + var << endl;
+}
+
+int main(void) {
+  Person per(0x400);
+
+  fun_test_01(per, 0x200);
+
+  fun_test_02<int>(per, 0x200);
+
+  fun_test_03<int>(per, 0x100);
+
+  return EXIT_SUCCESS;
+}
+```
+
+**_模板类中的友元函数_**
+
+对于模板类中的友元函数，其形参列表中必须要包含当前模板类型的形参
+
+由于对于模板类中的友元函数来说，其必须要包含着当前模板类型的形参，故对于一个 **_友元所修饰的定义_** 我们是可以直接在外部中进行调用的
+
+```cpp
+#include <iostream>
+using namespace std;
+
+template<class T>
+class Person {
+public:
+  friend void fun_test(Person<T> &per,T var) {
+    cout << "FUN_TEST" << endl;
+    cout << var << endl;
+  }
+public:
+  Person(T _age)
+    : m_age(_age) {};
+private:
+  T m_age;
+};
+
+int main(void) {
+  Person<int> per_int(0x400);
+  fun_test(per_int, 0x400);
+  system("pause");
+  return EXIT_SUCCESS;
+}
+```
+
+当 **_友元仅为声明的形式_** 而存在时，我们为其构建定义的方式较为复杂，一般来说分为以下两种方式 :
+
+```cpp
+#include <iostream>
+using namespace std;
+
+/** STEP 4
+ * 由于 STEP 3 中使用了 Person<T>，但是 STEP 3 却定义在 Person<T> 之前，故还要在 STEP 3 之上为 Person<T> 做一次前置声明
+*/
+template<class T>
+class Person;
+
+/** STEP 3
+ * 为 STEP 2 中的定义再做一次声明，该行代码应该出现在 STEP 1 和 STEP 2 之上
+*/
+template<typename T>
+void fun_test(Person<T> &per, T var);
+
+template<class T>
+class Person {
+public:
+  /** STEP 1
+   * 指定该声明使用空模板类型，目的是为了能够准确的链接到 STEP 2 中的模板定义
+  */
+  friend void fun_test<>(Person<T> &per, T var);
+
+public:
+  Person(T _age)
+    : m_age(_age){};
+
+private:
+  T m_age;
+};
+
+/** STEP 2
+ * 为模板类中的友元所修饰的声明构造一个即将链接到的定义
+*/
+template<typename T>
+void fun_test(Person<T> &per, T var) {
+  cout << "FUN_TEST" << endl;
+  cout << per.m_age + var << endl;
+}
+
+int main(void) {
+  Person<int> per_int(0x400);
+  fun_test(per_int, 0x400);
+
+  return EXIT_SUCCESS;
+}
+```
+
+```cpp
+#include <iostream>
+using namespace std;
+
+/** STEP 3
+ * 由于 STEP 2 中使用了 Person<T>，但是 STEP 2 却定义在 Person<T> 之前，故还要在 STEP 2 之上为 Person<T> 做一次前置声明
+*/
+template<class T>
+class Person;
+
+/** STEP 2
+ * 为模板类中的友元所修饰的声明构造一个即将链接到的定义，该行代码应该出现在 STEP 1 之上
+*/
+template<typename T>
+void fun_test(Person<T> &per, T var) {
+  cout << "FUN_TEST" << endl;
+  cout << per.m_age + var << endl;
+}
+
+template<class T>
+class Person {
+public:
+  /** STEP 1
+   * 指定该声明使用空模板类型，目的是为了能够准确的链接到 STEP 2 中的模板定义
+  */
+  friend void fun_test<>(Person<T> &per, T var);
+
+public:
+  Person(T _age)
+    : m_age(_age){};
+
+private:
+  T m_age;
+};
+
+int main(void) {
+  Person<int> per_int(0x400);
+  fun_test(per_int, 0x400);
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+<br/>
+
+## 类型转换
+
+值得一提的是，对于强制类型转换还是典型的非强制类型转换，即使转换失败也不会在运行时发生错误，仅有的错误只是会得到一个错误的转换结果亦或者是编译级别时所发生的错误，cpp 为了保证类型转换功能的更加安全，其引入了多种类型转换的方式
+
+#### 静态类型转换 : static_cast<type>(expression)
+
+- 静态类型转换对于任何结果失败的转换都会在 **_编译时发生错误_**
+
+- 它可用于内置数据类型的 **_窄化或典型的非强制_** 转换
+
+- 它可用于内置数据类型的指针或引用的转换，除了 **_void *_** 类型的指针之间的转换，它都会针对表达式的指针类型与目标指针类型做匹配校验，如无法进行有效的匹配则转换失败
+
+- 它不可用于 **_自定义类型(类或结构体)_** 的转换，但是可用于继承结构中类型指针的 **_上行转换_** 和 **_下行转换_**，但是不支持没有任何继承体系的类型的指针之间的转换
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class BASE {};
+class DERIVED : public BASE {};
+class OTHER {};
+
+int main(void) {
+  /* 1. 基础数据类型转换 */
+  int a = 0x400;
+  long a_l = static_cast<long>(a); /* 典型的非强制转换 */
+  int b = 364;
+  char b_c = static_cast<char>(b); /* 窄化转换，可能会丢失精度 */
+
+  /* 2. 无法应用于自定义数据类型的转换 */
+  BASE base_01;
+  DERIVED derived_01 = static_cast<BASE>(base_01);
+
+  /* 3. 指针类型的转换，对于除了非 void * 的指针类型，对会 目标类型与表达式类型 之间的指针类型进行校验 */
+  char *c_p = static_cast<char *>(&a);  /* 失败，int * 与 char * 不匹配 */
+  void *p_01 = static_cast<void *>(&a); /* 成功，void * 指针类型不做检验 */
+  int *p_02 = static_cast<int *>(p_01); /* 成功，void * 指针类型不做检验 */
+  int *p_03 = static_cast<int *>(p_02); /* 成功，int * 与 int * 匹配 */
+
+  /* 4. 类指针的静态定位 */
+  BASE base;
+  DERIVED derived;
+  OTHER other;
+  BASE *p_base = static_cast<BASE *>(&derived);        /* 上行转换 */
+  DERIVED *p_derived = static_cast<DERIVED *>(p_base); /* 下行转换 */
+  OTHER *p_other = static_cast<OTHER *>(p_base);       /* 失败，转换对象间不存在继承体系 */
+
+  return EXIT_SUCCESS;
+}
+```
+
+#### 动态类型转换 : dynamic_cast<type>(expression)
+
+- 该转换在运行时需要一点额外的开销
+
+- 不支持 **_基础内置数据类型或者是基础内置数据类型的指针或引用_** 的转换，对于这些类的转换会在编译时抛出错误
+
+- 仅支持 **_存在虚成员_**(要保证 **_expression_** 是保有虚成员的表达式，否则会在编译时抛出错误) 的类的 **_指针或引用_** 之间的转换，<font color = "red">对于任何转换失败的结果并不会在编译时出现异常，仅仅会返回一个指向空的指针</font>
+
+- 动态类型转换常用于一段存在继承体系的类的 **_向上类型_** 或 **_向下类型_** 转换，<font color = "red">对于向下类型转换来说，仅当类型转换是正确且成功时，返回值是一个指向所需类型的指针，否则它将返回指向空的指针来表示转换失败</font>(**_expression_** 的本身并不是指向 **_derived_**)，我们可以理解为<font color = "red">动态类型转换对于向下类型转换来说多了一个运行时的检测功能</font>
+
+- 动态类型转换还可以用于存在 **_交叉继承体系的类_** 的转换
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class BASE {
+public:
+  virtual ~BASE(){};
+};
+
+class DERIVED : public BASE { };
+
+class OTHER {};
+
+int main(void) {
+  /* 基础类型的转换 */
+  int *p_a = new int(0x400);
+  long *p_b = dynamic_cast<long *>(p_a); /* 失败，动态类型转换不支持基础数据类型和基础数据类型指针间的转换 */
+
+
+  /* 类的指针/引用的转换 */
+  BASE *base_non_polymorphism = new BASE;
+  DERIVED *der_non_polymorphism = dynamic_cast<DERIVED *>(base_non_polymorphism); /* 失败，expression 无法构成多态，故向下类型转换失败，并返回一个空指针 */
+
+  BASE *base_polymorphism = new DERIVED();
+  DERIVED *der_polymorphism = dynamic_cast<DERIVED *>(base_polymorphism); /* 成功，expression 可以构成多态 */
+  BASE *base_more = dynamic_cast<BASE *>(der_polymorphism);               /* 成功，向上类型转换 */
+
+  OTHER *other = dynamic_cast<BASE *>(der_polymorphism); /* 失败，OTHER 和 expression 并不存在于同一条继承体系当中 */
+
+  return EXIT_SUCCESS;
+}
+```
+
+#### 常量类型转换 : const_cast<type>(expression)
+
+- 可以将 常量 转换为 非常量，非常量 转换为 常量
+
+- 仅支持 指针或引用 间的转换，对于非指针或引用的转换会在编译时抛出错误
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main(void) {
+  int a = 0x400;
+  /* const int a_c = const_cast<const int>(a); */ /* 失败，仅支持指针类型的转换 */
+
+  int *a_p = new int(0x400);
+  const int *a_p_c = const_cast<const int *>(a_p);
+  int *a_p_normal = const_cast<int *>(a_p_c);
+
+  int &a_r = *a_p;
+  const int &a_r_c = const_cast<const int &>(a_r);
+  int &a_r_normal = const_cast<int &>(a_r_c);
+
+  return EXIT_SUCCESS;
+}
+```
+
+#### 重定义转换 : reinterpret_cast<type>(expression)
+
+- 重定义转换是一种不安全的转换，它可以把非指针类型转换为指针，又可以把指针类型转化为非指针类型，<font color = "red">不推荐使用</font>
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main(void) {
+  int a = 0x400;
+  int *a_p = reinterpret_cast<int *>(a); /* unsafe:a_p->0x400 */
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+<br/>
+
+## 异常
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class EXCEPTION {
+public:
+  EXCEPTION() {
+    cout << "EXCEPTION CONSTRUCTOR" << endl;
+  }
+  EXCEPTION(const EXCEPTION &ex) {
+    cout << "EXCEPTION COPY CONSTRUCTOR" << endl;
+  }
+  EXCEPTION(EXCEPTION &&ex) {
+    cout << "EXCEPTION MOVE CONSTRUCTOR" << endl;
+  }
+  ~EXCEPTION() {
+    cout << "EXCEPTION DESTRUCTOR" << endl;
+  }
+};
+
+void fun_test() {
+  try {
+    throw EXCEPTION();
+  } catch(EXCEPTION ex) {
+    throw;
+  }
+}
+
+int main(void) {
+  try {
+    fun_test();
+  } catch (EXCEPTION ex) {
+    cout << "HELLO,EXCE" << endl;
+  } catch (int i) {
+    cout << i << endl;
+    cout << "HELLO,WORLD" << endl;
+  }
+
+  return EXIT_SUCCESS;
+}
+```
+
+#### 异常捕获 : try - catch(exception_type instance)
+
+- 尝试执行 **_try_** 块中的代码，仅当可能出现亦或者显示抛出(**_throw_**)的异常则最终会被捕获到 **_catch_** 块的内部
+
+- **_try_** 和 **_catch_** 必须是成对的出现，无法进行单独的使用，否则会造成编译级的报错
+
+- catch 块开始前必须要声明一个异常类型 **_exception_type_**，所抛出(throw)的异常(expression)最终会映射至声明了对应 **_exception_type_** 类型的 catch 块的上下文当中，需要注意的是，所 throw 的 expression 的类型必须和 catch 的 **_exception_type_** 的类型进行严格匹配，举个例子，所 throw 的 expression 的类型为 int 类型时，那么 catch 所指定的异常类型也必须为 int 类型，<font color = "red">如果一段异常的上下文中所 throw 的 expression 并没有一个有效 **_expression_** 的 catch 进行匹配，则直接终止程序</font>
+
+- <font color = "red">catch 块中可以指定 **_任意类型_** 的异常类型 exception_type</font>，当 exception_type 的类型为 *`...`* 时，则意味指定的异常类型为其它类型
+
+- catch 块所声明的异常类型 **_exception_type_** 的实例在 catch 块结束前会释放掉其在栈中的内存数据，<font color = "red">如果所声明的异常类型在堆中存有数据则需要我们进行手动的释放工作，否则会出现内存泄漏的问题</font>
+
+- 对于在一个 try 块中可能抛出的多种不同类型的异常，我们可以指定多种不同异常类型的 catch 块以匹配
+
+#### 抛出异常 : throw expression
+
+- **_throw expression_** 用于抛出一个异常，并指定一个异常类型为 **_exception_type_** 的实例 **_expression_**，异常实例可以是任意类型的值，我们要保证的是，一个 throw expression 最终都会有一个 try 进行异常侦测，相对应的，都会有一个声明了所 throw 的 **_exception_type_** 类型的 catch 块来完成 try 后的异常捕获工作，<font color = "red">如果 throw expression 所处的上下文中并没有一个合法的 try-catch 进行异常的捕获，那么会跳到其上级调用者的上下文中进行寻找，以此重复，直至找不到为止则程序终止</font>
+
+- 当 throw 不指定 expression 并且它出现在一个拥有合法异常类型声明的 catch 块中时，则会延续当前 catch 块中所声明的异常类型继续向上抛出异常，我要们要注意<font color = "red">它不可以出现在其他上下文中(仅能出现在 catch 块当中)，否则程序会直接终止</font>
+
+- catch 块中所声明的异常类型实例会依据所 throw 的对应类型的 expression 去进行构造，其实更细来讲的话，当我们 throw 一个 expression 时，编译器会根据这个 expression 为我们去构造一个<font color = "red">临时的、将亡的、左值变量</font>，没错，是一个临时、将亡的 左值 变量，然后对应 expression 类型的 catch 块的异常类型的声明则会根据这个左值变量去进行构造，并在当前 catch 上下文执行完毕后会显式的释放掉这个左值变量在栈中的内存，<font color = "red">如果 expression 所创建的临时的、无名的变量会在堆中存有数据(即一个指针)，由于该指针所指向的堆中的地址最终会映射至 catch 块中所声明的异常类型当中</font>(catch 块中的所声明的异常类型会依据所 throw 的 expression 去进行构造)，故在 catch 块结束时，编译器所构造的临时的、无名的、类型为左值的指针变量也仅仅会被释放掉其在栈中的数据，而在堆中的数据的生命周期则同步至 catch 块中所声明的异常类型去进行管控，也就是说我们要针对这个异常类型去进行手动的释放内存的工作，否则会出现内存泄漏的问题
+
+  ```cpp
+  #include <iostream>
+  using namespace std;
+
+  class EXCEPTION {
+  public:
+    EXCEPTION() {
+      cout << "EXCEPTION CONSTRUCTOR" << endl;
+    }
+    EXCEPTION(const EXCEPTION &ex) {
+      cout << "EXCEPTION COPY CONSTRUCTOR" << endl;
+    }
+    EXCEPTION(EXCEPTION &&ex) {
+      cout << "EXCEPTION MOVE CONSTRUCTOR" << endl;
+    }
+    ~EXCEPTION() {
+      cout << "EXCEPTION DESTRUCTOR" << endl;
+    }
+  };
+
+  int main(void) {
+    try {
+      throw new EXCEPTION();
+    } catch (EXCEPTION *ex) {
+      cout << "HELLO,EXCE" << endl;
+      delete ex;
+    }
+
+    return EXIT_SUCCESS;
+  }
+  ```
+
+- <font color = "red">从 try 代码块开始，到 throw 抛出异常之前，所有栈上的数据都会被释放掉，这一过程又称为 **_栈解旋_**</font>，<font color = "red">栈解旋 所保证的内存有效性的工作也仅仅针对栈上，对于堆中分配的内存我们在 throw 之前需要对其进行手动的释放，否则会出现可能的内存泄露的问题</font>
+
+- throw 可以写在构造函数当中
+
+#### 关于 catch 块中所声明的异常类型的效率问题
+
+我们都知道，throw expression 其实编译器会根据这个 expression 为我们构建一个临时、将亡的 左值 变量，并在最后，捕获到到这个异常的 catch 块中所声明的异常类型会依据这个 左值变量 去完成构造初始化工作，对于内置数据类型的异常类型而言似乎并无太大问题，但是对于一个自定义的异常类型的类来说，由于该类的构造是通过一个对应类型实例的左值变量来完成，故会调用该类型的拷贝构造函数来完成 catch 块中所声明的异常类型的初始化工作，由于在这里调用了拷贝构造函数，故可能会在某些程度上带来性能损失的问题，由于 throw 的 expression 虽然是一个临时的、将亡的变量，但是其实质是一个左值变量，故解决这一方案只需要把 catch 块中所声明的异常类型改为 **_左值引用_** 即可
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class EXCEPTION {
+public:
+  EXCEPTION() {
+    cout << "EXCEPTION CONSTRUCTOR" << endl;
+  }
+  EXCEPTION(const EXCEPTION &ex) {
+    cout << "EXCEPTION COPY CONSTRUCTOR" << endl;
+  }
+  EXCEPTION(EXCEPTION &&ex) {
+    cout << "EXCEPTION MOVE CONSTRUCTOR" << endl;
+  }
+  ~EXCEPTION() {
+    cout << "EXCEPTION DESTRUCTOR" << endl;
+  }
+};
+
+int main(void) {
+  try {
+    throw EXCEPTION();
+  } catch (EXCEPTION &ex) {
+    cout << "HELLO,EXCE" << endl;
+  }
+
+  return EXIT_SUCCESS;
+}
+```
+
+#### 系统标准异常接口 exception
+
+- exception : 所有标准异常类的父类
+
+  - bad_alloc : 当 `operator new` 或 `operator new[]`，请求分配内存失败时
+
+  - bad_exception : 这是个特殊的异常，如果函数的异常抛出列表里声明了 bad_exception 异常，当函数内部抛出了异常抛出列表中没有的异常，这是调用的unexpected函数中若抛出异常，不论什么类型，都会被替换为bad_exception类型
+  
+  - bad_typeid : 使用 `typeid` 操作符，操作一个NULL指针，而该指针是带有虚函数的类，这时抛出 `bad_typeid` 异常
+
+  - bad_cast : 使用 `dynamic_cast` 转换引用失败的时候
+
+  - ios_base::failure : I/0 操作过程出现错误
+
+  - logic_error : 逻辑错误，可以在运行前检测的错误
+    
+    - length_error : 试图生成一个超出该类型最大长度的对象时，例如 `vector` 的 `resize` 操作
+
+    - domain_error : 参数的值域错误，主要用在数学函数中，例如使用一个负值调用只能操作非负数的函数
+
+    - out_of_range : 超出有效范围
+
+    - invalid_argument : 参数不合适。在标准库中，当利用 `` 对象构造 `bitset` 时，而 `string` 中的字符不是 '0' 或 '1' 的时候，抛出该异常string
+
+    - runtime_error		运行时错误，仅在运行时才可以检测的错误
+
+  - runtime_error
+  
+    - range_error : 计算结果超出了有意义的值域范围
+
+    - overflow_error : 算术计算上溢
+
+    - underflow_error : 算术计算下溢
+
+    - invalid_argument : 参数不合适。在标准库中，当利用 `string` 对象构造 `bitset` 时，而 `string` 中的字符不是 '0' 或 '1' 的时候，抛出该异常
+
+
+<br/>
+<br/>
+
+## lambda
+
+cpp11 为了简化回调函数定义时繁琐的工作，提供了 **_lambda_** 表达式去用于 **_定义并创建匿名的函数对象_**，<font color = "red">在编译时，编译器则会依据 lambda 表达式的声明形式去构建出一个匿名函数</font>
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main(void) {
+  int (*invoker)(const char *) = [](const char *msg) mutable -> int {
+    cout << msg << endl;
+    return 0x400;
+  };
+
+  cout << invoker("hello,world") << endl;
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### lambda 表达式的构成
+
+```csharp
+[capture](parameters) mutable ->return_type {
+  statement
+}
+```
+
+**_[capture]_**
+
+[capture] 为 **_函数对象参数_**，标识着 lambda 表达式的开始，它无法省略
+
+一个 lambda 表达式虽然是支持写在一个函数体的上下文中，但是在<font color = "red">默认情况下，lambda 表达式内的上下文声明中是不可以显式的指定那些 **_从函数体开始到定义 lambda 为止范围内可见的局部变量_**(**_包括 lambda 表达式声明所在类的t his_**)</font>，因为 lamdba 表达式是编译器在编译时才会根据当前表达式的声明才创建的一种匿名函数，简而言之，lambda 表达式其内部上下文(**_statement_**)是根本就不被含纳在声明 lamdaba 本身所处的作用域内，除非我们<font color = "red">显式的指定 [capture]，以告诉编译器属于 lambda 本身所处的作用域内的变量需要以哪种形式去拷贝或引用到 lambda 表达式内部的上下文当中，以让 lambda 表达式内部的上下文中能够使用到非当前上下文作用域内的变量</font>
+
+- [] : 不使用任何声明 lambda 本身所处的作用域内的任何变量，即 lambda 表达式内部的上下文和外部作用域(非全局)处于一种隔离的状态
+
+- [=] : lambda 表达式内部上下文中 **_所使用到的_** 所有属于 lambda 表达式本身所处的作用域内的变量以 **_值拷贝的形式拷贝_** 到 lambda 表达式内部的上下文当中
+
+- [&] : lambda 表达式内部的上下文中 **_所使用到的_** 所有属于 lambda 表达式本身所处的作用域内的变量 **_以地址引用的形式引用_** 到 lambda 表达式内部的上下文当中
+
+- [this] : lambda 表达式内部的上下文中可以使用所处类的 this 指针去访问类中的成员
+
+- [variable] : lambda 表达式本身所处的作用域内的变量 **_variable_** 以 **_值拷贝的形式拷贝到_** lambda 表达式内部的上下文当
+
+- [&variable] : lambda 表达式本身所处的作用域内的变量 **_variable_** 以 **_地址引用的形式把它引用_** 到 lambda 表达式内部的上下文当中
+
+lambda 能够通过 [capture] 所指定的 **_函数对象参数([capture])_** 来决定 **_是否含纳、如何含纳_** 声明 lambda 表达式本身所在作用域内的变量至 lambda 表达式内部上下文的声明中，这种机制称之为 **_捕获_**，而应用了这一机制的 lambda 表达式也称为 **_捕获 lambda 表达式_**，需要注意的是，<font color = "red">捕获 lambda 所捕获的外部作用域下的变量都是以 **_只读_** 的方式存在于 lambda 表达式内部上下文的声明当中的</font>，这就可能存在一个问题，<font color = "red">当以值传递(未添加 **_mutable_** 修饰)的方式所 **_捕获_** 的外部作用域下的变量时，**_一切的修改都无法映射至外部作用域上的具体变量_**，即我们对其的修改仅仅只在当前 lambda 表达式内部上下文声明的作用域之内进行，而就引用传递来说，同样也是无法修改，只是无法修改的仅是引用的指向，而不是所引用的对象在内存中的数据</font>
+
+**_(parameters)_**
+
+匿名函数的形参列表，如当前匿名函数并没有形参，则可以省略
+
+**_mutable_**
+
+当函数对象参数是以 **_值传递_** 的形式而存在时，编译器都会把它们设为只读的变量，那么当我们加了该关键字后，编译器就不会把它们设置为只读变量了，即可以修改按值传递进来的拷贝，需要注意的是，这个修改同样还是不能映射回外部作用域下的具体变量，如无特殊要求可以省略
+
+**_return_type_**
+
+显式的指定当前匿名函数的返回值类型，当无返回值时，可以不需要指定
+
+**_{ statement }_**
+
+指定 lambda 表达式内部上下文的声明
+
+
+<br/>
+
+#### lambda 表达式与函数指针
+
+在没有使用 **_函数对象参数_** 的lambda表达式可以返回一个对应函数类型(形参和返回值类型)并指向刚刚所构建出来的匿名函数地址的 **_函数指针_**
+
+而使用了 **_函数对象参数_** 的 **_捕获 lambda 表达式_** 仅只能够隐式转换为一个 **_具体的、能够保存所捕获变量的状态的对象_**，在这里，更推荐的方式则为使用 `<functional>` 头文件下的 **_std::function<>_**，那么，为什么对于捕获lambda而言就需要使用这种特殊的存储方式而不仅仅只是一个单纯的函数指针，这就需要从捕获lambda的本质来谈起
+
+捕获lambda它能够把外部作用域下的变量纳入到当前lambda上下文的声明中，这并不是什么黑科技，<font color = "red">编译器只是把它所使用到的一些外部作用域下的变量通过不同的形式(值或者引用)把它们的状态保存起来并结合着当前lambda上下文的声明一同放入一个 **_'容器'_** 里去(**_实现了函数调用运算符的匿名类_**)</font>，而对于 lambda 的调用则会依托着这个容器来进行，那么在 lambda 内部上下文中对于原本隶属外部作用域下的变量的调用则更改为仅仅针对容器内部所维护的从外部作用域下 **_捕获进来_** 的临时变量的状态来进行，需要注意的是，<font color = "red">如果以 **_[&]_** 的方式在容器中维护的那些映射至外部作用域下的变量的状态在容器本身未释放之前，原本隶属于外部作用域下本身应该被释放的变量都会呈现着一种 **_闭包_** 的状态</font>
+
+需要扩充一点的是，我们都说使用 `[=]` 的 **_函数对象参数_** 不能改变外部作用域下的变量的值，因为这些变量放到lambda上下文的声明中仅仅只是以一个 **_值传递_** 的形式而存在，<font color = "red">虽然无法改变外部作用域下变量的值，**_但并不意味着在捕获lambda所构造的容器中内部所维护的对应的这个变量的值是无法改变的_**，即管理着这个lambda表达式和外部作用域下变量的状态的容器在其被释放前，所维护的变量的状态值一直都是一种有效值(这里指容器内部所维护的那个映射至外部作用域下变量状态的临时变量，**_它和外部作用域下的变量本身再无关系_**，仅仅只是维护它在被捕获前的状态，区别于 **_[&]_**)</font>
+
+```cpp
+#include <iostream>
+#include <functional>
+using namespace std;
+
+int main(void) {
+  int i = 10;
+
+  function<bool(void)> invoker = [&](void) -> bool {
+    i++;
+    return true;
+  };
+
+  if(invoker()) {
+    cout << "SUCCESS i = " << i << endl;
+  }
+
+  return EXIT_SUCCESS;
+}
+```
