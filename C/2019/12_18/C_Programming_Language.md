@@ -123,6 +123,21 @@
   - [信号的基本使用](#信号的基本使用)
   - [未决信号集和阻塞信号集](#未决信号集和阻塞信号集)
   - [信号集的使用](#信号集的使用)
+- [Socket 编程](#Socket-编程)
+  - [关于 Socket 的一些基本概念](#关于-Socket-的一些基本概念)
+  - [大小端字节序转换 API](#大小端字节序转换-API)
+    - [校验本机字节序的类别](#校验本机字节序的类别)
+    - [整形数据的字节序转换](#整形数据的字节序转换)
+    - [IP地址的转换](#IP地址的转换)
+  - [Socket API](#Socket-API)
+  - [IO 多路复用](#IO-多路复用)
+    - [linux中的IO模型](#linux中的IO模型)
+    - [什么是IO多路复用](#什么是IO多路复用)
+    - [select](#selectapi)
+    - [poll](#pollapi)
+    - [epoll](#epollapi)
+    - [再谈 select poll epoll](#再谈selectpollepoll)
+
 
 <br/>
 
@@ -1067,7 +1082,7 @@ LOW
 
 在单独使用一个定义好了的数组的数组名的时候，既然它是一个指向数组首元素地址的指针，那是不是意味着我们可以直接通过 [[*]] 操作对数组名进行解引用操作？答案是的，并且其也遵循在 [指针步长](#指针的类型) 这一小节中所强调的对于解引用时所需遵循的规律，还是拿最初所定义的 [[arrary]] 来说，[[arrary]] 作为一个数组变量，其类型为 <kbd>int []</kbd>，当我们使用这个数组名的时候，原来的类型就需要先去掉一个 <kbd>[]</kbd>，即 <kbd>int []</kbd> -> <kbd>int</kbd>，然后我们再进行解引用操作，即 [[*arrary]]，这时候其步长就需要参考 [[int]] 类型，即 [[4 Bytes]]，那么数组首元素的类型也是 [[int]] 类型，即此次解引用操作 [[*arrary]] 是能够完整的读取到这个数组首元素在内存中所存储的内容的，当然这里所解引用的是数组首元素的内容，那么对于其它下标的内容我们同样可以通过偏移的方式来获取，因为前面说到数组中的每个元素之间都是相隔且连续的，如我们想取下标为 [[1]] 的元素的内容那么我们直接在首地址的基础上再往后偏移 [[1]] 位即可获取到，如: [[*(arrary + 1)]] 即为获取当前数组下标为 [[1]] 的元素的内容
 
-我们都知道，<kbd>[n]</kbd> 是取数组下标为 [[n]] 的元素的内容，其实 <kbd>[]</kbd> 可以看作是一种语法糖的形式，其实它的实质也是通过对于数组名的偏移和解引用的操作来访问到具体某个下标的元素，即 <kbd>arrary[n]</kbd> 可以看作为 [[*(arrary + n)]] 的简写形式
+我们都知道，<kbd>[n]</kbd> 是取数组下标为 [[n]] 的元素的内容，其实 <kbd>[]</kbd> 可以看作是一种语法糖的形式，其实它的实质也是��过对于数组名的偏移和解引用的操作来访问到具体某个下标的元素，即 <kbd>arrary[n]</kbd> 可以看作为 [[*(arrary + n)]] 的简写形式
 
 虽然数组名其在大多数情况下都代表着一个指向当前数组首元素地址的指针，但是对于指针和数组我们是不能把它们混在一起的，数组名代表着指向数组首元素地址的指针这只是属于数组的一种特性，而数组本身是作为一段连续且有序的内存存储空间，对比指针来说，指针只是一个指向具体某个变量在内存的首地址的变量，其次，对于普通的指针来说，其做 [[++]] 操作是允许的，而数组名虽然也是存储着其首元素的内存地址，而做 [[++]] 操作的时候是不允许的，因为数组是一个 [[指针常量]]，最后，一个数组虽然只是声明，但是我们也能够对它进行解引用操作，因为一个数组一旦声明后编译器就能够为它初始化一段线性连续的内存用于存储，只是解引用后的结果可能是一个随机数罢了，而对于指针来说，我们只是声明的情况下我们对它解引用的时候是一种危险的操作，因为我们并未指定该指针的具体指向，故该指针可能是一个空指针抑或是编译器把这种指针初始化为了一个野指针
 
@@ -2547,7 +2562,7 @@ int main(void){
 
 当我们直接获取结构体变量 [[per]] 的内存地址的时候，该地址的步长参考则按照结构体本身的类型来，即 [[struct Person]]，而对于结构体首个成员 [[Age]] 的地址的步长参考的话，则是以该成员本身的类型来作为参考，即 [[int]]
 
-回过头来，刚才谈到结构体变量的地址和结构体首个成员的地址是相同的，那是不是意味着一个结构体变量就是一段连续的线性存储空间，其总大小就是结构体类型中所有成员大小的总和呢？对于数组来说，是的，数组中每个元素之间的地址互相之间偏移一个具体类型的单位，即步长，而对于结构体来说，该问题的答案就是 [[不一定]] 了，对于结构体其内部的成员所存放的内存首地址和所存放的长度还存在一个 [[地址补齐]] 的概念，在下一个节点会详细的探讨这一个概念
+回过头来，刚才谈到结构体变量的地址和结构体首个成员的地址是相同的，那是不是意味着一个结构体变量就是一段连续的线性存储空间，其总大小就是结构体类��中所有成员大小的总和呢？对于数组来说，是的，数组中每个元素之间的地址互相之间偏移一个具体类型的单位，即步长，而对于结构体来说，该问题的答案就是 [[不一定]] 了，对于结构体其内部的成员所存放的内存首地址和所存放的长度还存在一个 [[地址补齐]] 的概念，在下一个节点会详细的探讨这一个概念
 
 这里说到结构体的地址，不得不谈及结构体指针的概念，同样，既然我们能够获取到一个结构体变量的内存地址，那我们同样可以使用该结构体类型的指针用于接受，还是如上面的代码，假设我们使用了一个指针 [[struct Person *p_per]] 接受了结构体变量 [[per]] 的内存地址后，我们对于该结构体类型的指针 [[p_per]] 想去取结构体变量中某个成员的值得时候只需要解引用即可，如 [[(*per).Age]] 就是获取结构体成员 [[Age]] 在内存中所存储的值，除此之外，对于 [[(*per).Age]] 操作在 [[c]] 中有一个语法糖作为支持，即 [[(*per).Age]] --> [[per->Age]]
 
@@ -4774,6 +4789,273 @@ gcc -g source.c -o source
 
 <br/>
 
+### 项目构建工具
+<span id="项目构建工具"></span>
+
+---
+
+#### makefile
+<span id="makefile"></span>
+
+**makefile 是什么**
+
+makefile 是一个类似于 windows 上的批处理文件，其文件名就是 makefile(无后缀)，其内部定义了一系列的规则，这些规则通又能够映射到一些 shell 命令并在合适的情况下执行它们
+
+事实上，makefile 通常用于大型 c/c++ 的项目构建，一个工程中的源文件不计其数，并且按类型、功能、模块分别放在若干个目录中，makefile定义了一系列的规则来指定，哪些文件需要先编译，哪些文件需要后编译，哪些文件需要重新编译，甚至于进行更复杂的功能操作，因为 makefile 就像一个 shell 脚本一样，其中也可以执行操作系统的命令
+
+<br/>
+
+**make 命令**
+
+make 是一个用来解释 makefile 文件内部锁编写指令的 **_命令工具_**(一般来说，大多数的IDE都有这个命令，比如：Delphi 的 make，Visual C++ 的 nmake，Linux 下 GNU 的 make)
+
+make 命令十分简单，<font color = "red">当我们在一个工程目录下输入 `make` 时，它就会在当前目录下(仅在一级目录下搜索)寻找是否存在文件名为: **_GNUmakefile / Makefile / makefile_** 的文件，如果存在则打开该文件并逐行解析其内部所提前写入的指令，如果不存在则报错并返回</font>
+
+make 还能够执行 makefile 文件中单独的一个 <font color = "red">**target**</font>，其格式为 `make <target>`，关于这点现在说为时过早，后面还会继续提到
+
+<br/>
+
+**makefile 的规则**
+
+makefile 的规则是 makefile 的核心，理解它其实就离掌握 makefile 的编写成功了一大半，其定义如下 : 
+
+```makefile
+target [...] : prerequisites [...]
+    command
+    [...]
+    [...]
+```
+
+其中: 
+
+- `target` : 它标示着目标文件，当然我们也可以把它当成一个存粹的 `<label>`(标签)，作为一段规则中，它是必不可少的存在，因为<font color = "red">一个目标用来构成一条 makefile 规则</font>
+
+- `prerequisites` : 生成当前规则的 `target` 所依赖 `文件`(以 makefile 所在目录为根进行搜索，默认下仅为一级) 或 `其它target`，可以指定多个
+
+- `command` : 当前规则所执行的命令(shell)
+
+我们其实不难发现，<font color = "red">一段规则其实是在定义一段文件的依赖关系，即 : 构建目标(**_target_**)的前置条件(**_prerequisites_**)是什么，以及如何构建(**_command_**)</font>
+
+事实上，我们还需要细化为 : 
+
+1. 当输入 make 指令后，会在当前把目录下(仅为一级)找到文件名为 makefile/Makefile 的文件，如果找到则开始解释该文件中的规则，如果没找到，则指令报错并返回
+
+2. 默认情况下会翻译由上至下所编写的第一条规则，并设置当前规则的 **_target_** 属于最终目标文件，当然我们还可以强制 make 去执行我们所需执行的 **_targent_** 的规则，即 : `make <target>`
+
+3. 当前所翻译的规则是否存在前置条件(**_prerequisites_**)
+
+     - 不存在 :  检测当前目录下是否存在一个文件其文件名为当前规则的 **_target_**
+
+       - 不存在 : 执行当前规则下的 **_command_**，并设置 **_当前所遍历到的prerequisites_** 为 **_就绪状态_**(如果这一步是由上级 **_prerequisites_** 的遍历所派生下来的话)
+
+       - 存在 : 由于没有前置条件的规则无任何依赖，故会认为该文件是最新的，如果当前规则的 **_target_** 作为 **_最终目标文件_** 而存在，则会提示当前规则 **_target_** 所生成的文件已经是最新，否则会退回到上一步，并设置 **_当前所遍历到的prerequisites_** 为 **_就绪状态_**(如果这一步是由上级 **_prerequisites_** 的遍历所派生下来的话)
+
+     - 存在 : 遍历该规则的前置条件 **_prerequisites_**
+
+        - 所遍历的所有前置条件 **_prerequisites_** 是否已被置为 **_就绪状态_** ? 
+
+          - 是 : 检测当前目录下是否存在一个文件其文件名为当前规则的 **_target_**
+
+            - 是 : 对比所查找到的该文件的修改时间和当前规则下所有已呈现 **_就绪状态_** 的 **_prerequisites_** 所对应文件的修改时间
+  
+              - 后者中的 **_任意一个条目_** 是大于前者 : 执行当前规则下的 **_command_**，并设置 **_当前所遍历到的prerequisites_** 为 **_就绪状态_**(如果这一步是由上级 **_prerequisites_** 的遍历所派生下来的话)
+
+              - 前者大于后者中的 **_任意一个条目_** : 如果当前规则的 **_target_** 作为 **_最终目标文件_** 而存在，则会提示当前规则 **_target_** 所生成的文件已经是最新，否则会退回到上一步，并设置 **_当前所遍历到的prerequisites_** 为 **_就绪状态_**(如果这一步是由上级 **_prerequisites_** 的遍历所派生下来的话)
+  
+            - 否 : 直接执行当前规则下的 **_command_**，并设置 **_当前所遍历到的prerequisites_** 为 **_就绪状态_**(如果这一步是由上级 **_prerequisites_** 的遍历所派生下来的话)
+
+          - 否 : 在当前 makefile 中查找是否存在一个使用了以 **_当前所遍历到的prerequisites_** 作为 **_target_** 的规则
+  
+              - 存在 : 检测当前目录下是否存在一个文件其文件名为当前规则(即 : 当前所遍历的 **_prerequisites_**)
+  
+                - 不存在 / 存在 : 翻译所找到的这个规则，并回到 **_第三步_** 检测前置条件
+
+              - 不存在 : 检测当前目录下是否存在一个文件其文件名为当前所遍历的 **_prerequisites_**
+  
+                  - 不存在 : 指令报错并返回
+
+                  - 存在 : 设置 **_当前所遍历到的prerequisites_** 为 **_就绪状态_**，并回到 所遍历的所有前置条件 **_prerequisites_** 是否已被置为 **_就绪状态_** 这一步
+
+
+这就是整个 make 的依赖性，make 会一层又一层地去找文件的依赖关系，直到最终编译出第一个目标文件，在找寻的依赖过程中，如果出现错误，比如最后被依赖的文件找不到，那么 make 就会直接退出并报错，而对于所定义的命令的错误，或是编译不成功，make 根本不理，<font color = "red">因为 make 所关注的仅仅只是文件的依赖性</font>
+
+下面展示了 makefile 的一个最基本的用法，请使用它来生成一个 `makefile` 文件，并在终端中使用 `make` 命令以查看生成的顺序
+
+```makefile
+1: 2
+	touch 1
+
+2: 3 4
+	touch 2
+
+3: 5
+	touch 3
+
+4: 
+	touch 4
+
+5: 
+	touch 5
+
+clean:
+	@find ./ ! -name "makefile" ! -name "." -exec rm -rf {} \;
+	@echo "cleaned"
+```
+
+<br/>
+
+**makefile 中的变量**
+
+makefile 文件中可以定义我们所需要的变量，其定义方式呈键值对的格式，即: `name = value`
+
+需要注意的是，<font color = "red">在 makefile 中所定义的变量，make 解释器对其解释的顺序是呈上至下进行翻译的，也就是说如果我们在定义变量的位置之前使用了该变量，那么将无法正确的获取到它</font>
+
+```makefile
+object = 2 3
+
+1: $(object)
+	touch 1
+	@echo "hello,@(object)" # can't not used in string
+
+2: 
+	touch 2
+
+3: 
+	touch 3
+
+clean:
+	@find ./ ! -name "makefile" ! -name "." -exec rm -rf {} \;
+	@echo "cleaned"
+```
+
+<br/>
+
+**make 隐晦规则的自动推导**
+
+GNU 的 make 很强大，它可以自动推导文件以及文件依赖关系后面的命令，make 在解析 makefile 的过程中，只要看到一个规则的 `target` 呈现的是 `*.o` 的形式，如果该规则的 `prerequisites` 中并无显式的声明 `*.c` 的依赖，则在解释过程中就会自动为我们加上，并且，关于所执行的 `command` 也会自动被推导出来，正如下面的例子
+
+```makefile
+cc = gcc
+object = main.o common.o
+
+main: $(object)
+	$(cc) $(object) -o main
+
+main.o: common.h
+common.o: common.h
+
+.PHONY:
+clean:
+	@find ./ ! -name "makefile" ! -name "." ! -name "*.c" ! -name "*.h" -exec rm -rf {} \;
+	@echo "cleaned"
+```
+
+<br/>
+
+**引用其它 makefile**
+
+在 makefile 使用 `include` 关键字可以把别的 `makefile`(并无文件名要求) 包含进来，其语法格式为 : `include <filename>`
+
+其中，所指定的 `<filename>` 支持 shell 文件模式，即可以包含一个具体的路径亦或者通配符，此外，我们还在在该参数中引入 makefile 中所定义的变量吗，举个例子，有这样几个 makefile : a.m, b.m, c.m，还有一个文件叫 foo.make ，以及一个变量 $(bar) ，其包含了 e.m 和 f.m ，那么，`include foo.make *.m $(bar)` 其实就等价于 `include foo.make a.m b.m c.m e.m f.m`
+
+在执行 make 命令时，会找寻 `include` 所指出的其它 makefile，并把这些 makefile 的内容展开并安置在当前的位置，这就类似于 c/c++ 中的 `#include` 指令，如果我们在指定其它 makefile 的时候并没有指定路径，那么 make 会在当前目录下首先寻找，如果当前目录下没有找到，那么，make还会在下面的几个目录下找
+
+- 当前目录(仅为一级)
+
+- 如果 make 执行时，有 `-I` 或 `--include-dir` 参数，那么 make 就会在这个参数所指定的目录下去寻找
+
+- 如果目录 `<prefix>/include`(一般是 : `/usr/local/bin` 或 `/usr/include`)存在的话，make 也会去找
+
+<br/>
+
+**指定 make 搜索 prerequisites 时的目录**
+
+在一些大的工程中，有大量的源文件，我们通常的做法是把这许多的源文件分类，并存放在不同的目录中，所以，当 make 需要去找寻文件的依赖关系时，我们是可以直接在 prerequisites 中指定文件的路径的，但最好的方法是把一个路径告诉 make，让 make 在自动去找
+
+Makefile文件中的特殊变量 `VPATH` 就是完成这个功能的，如果没有指明这个变量，make只会在当前的目录中去找寻依赖文件和目标文件，如果定义了这个变量，那么，make就会在当前目录找不到的情况下，到所指定的目录中去找寻文件了，下面的代码指示了 make 在搜索依赖文件时，除了在当前目录寻找外，还要到 `./source` 和 `./header` 目录去找，其中，`:` 用于分隔需要查找的多个路径，值得一提的是，<font color = "red">即便指定了 VPATH，make 的优先寻找目录还是以当前 makefile 所在目录为准</font>
+
+```makefile
+#####################
+# ├── header
+# │   └── common.h
+# ├── main.c
+# ├── makefile
+# ├── mk
+# │   └── makefile
+# └── source
+#     └── common.c
+#####################
+
+VPATH = ./source:./header
+
+main: main.o common.o
+	cc main.o common.o -o main
+
+common.o: common.h common.c
+	cc -c ./source/common.c
+
+main.o: common.h main.c
+	cc -c main.c
+
+.PHONY:
+clean:
+	@find ./ ! -name "header" ! -name "*makefile*" ! -name "mk" ! -name "source" ! -name "." ! -name "*.c" ! -name "*.h" -exec rm -rf {} \;
+	@echo "cleaned"
+```
+
+另一个设置文件搜索路径的方法是使用make的 `vpath` 关键字(全小写),这和上面提到的那个VPATH变量很类似，但是它更为灵活，它可以指定不同的文件在不同的搜索目录中，这是一个很灵活的功能，它的使用方法有三种
+
+- `vpath <pattern> <directories>` : 为符合模式 `<pattern>` 的文件指定搜索目录 `<directories>`
+
+- `vpath <pattern>` : 清除符合模式 `<pattern>` 的文件的搜索目录
+
+- `vpath` : 清除所有已被设置好了的文件搜索目录
+
+vapth 使用方法中的 `<pattern>` 需要包含 `%` 字符，`%` 的意思是匹配零或若干字符，例如，`%.h` 表示所有以 `.h` 结尾的文件 ; `<pattern>` 指定了要搜索的文件集，而 `<directories>` 则指定了 `<pattern>` 的文件集的搜索的目录(`:` 同样可用于分隔需要查找的多个路径)
+
+```makefile
+#####################
+# ├── header
+# │   └── common.h
+# ├── main.c
+# ├── makefile
+# ├── mk
+# │   └── makefile
+# └── source
+#     └── common.c
+#####################
+
+vpath %.c source:bar
+vpath %.h header
+
+main: main.o common.o
+	cc main.o common.o -o main
+
+common.o: common.h common.c
+	cc -c ./source/common.c
+
+main.o: common.h main.c
+	cc -c main.c
+
+.PHONY:
+clean:
+	@find ./ ! -name "header" ! -name "*makefile*" ! -name "mk" ! -name "source" ! -name "." ! -name "*.c" ! -name "*.h" -exec rm -rf {} \;
+	@echo "cleaned"
+```
+
+<br/>
+
+**make 中的自动化变量**
+
+- `$@` : 获取当前规则中的 **_target_**
+
+- `$<` : 获取当前规则中的第一个 **_prerequisites_**
+
+- `$^` : 获取当前规则中的所有 **_prerequisites_**
+
+
+<br/>
+
 ### 预处理指令
 <span id="预处理指令"></span>
 
@@ -4807,6 +5089,7 @@ gcc -g source.c -o source
 
 - 宏常量
     - [[#define 宏名 宏值]]
+
     ```c
     #include <stdio.h>
 
@@ -4823,7 +5106,9 @@ gcc -g source.c -o source
 
 - 宏函数
     - [[#define 宏名(参数) 表达式]]
-    - 宏函数对比普通函数的调用的开销更小，因为宏函数的调用是不需要进行入栈和出栈操作，仅仅只是一个表达式替换，这种优势可以理解为 [[以空间换时间]]
+
+    - 宏函数对比普通函数的调用的开销更小，因为宏函数的调用是不需要进行入栈和出栈操作，仅仅只是一个 **_表达式替换_**，这种优势可以理解为 [[以空间换时间]]
+
     - 宏函数的定义一定要针对每个参数还有包括宏函数所定义的整个表达式都要带上括号，以保证这个宏函数定义的一个完整性
 
     ```c
@@ -4837,11 +5122,83 @@ gcc -g source.c -o source
     }
     ```
 
+    - 关于一些在 **_宏函数的表达式中_** 可使用的特殊定义宏 : 
+
+      - `__VA_ARGS__` : 可将宏函数中的可变参数 `...` 使用该宏来进行表示
+
+      ```c
+      #include <stdio.h>
+
+      #define DEBUG(format, ...) \
+        printf(format, __VA_ARGS__)
+
+      int main(int argc, char *argv[]) {
+        /* printf("%s[%d]", hello,world, 1024); */
+        DEBUG("%s[%d]", "hello,world", 1024);
+        
+        return EXIT_SUCCESS;
+      }
+      ```
+
+      - `#` : 可以将参数转换为字符串形式，即 `"x"`，需要注意的是，在使用该宏函数的时候，要保证使用了该特殊定义的参数录入不包含特殊字符 `','`
+
+      ```c
+      #define DEBUG(msg) #msg
+
+      int main(int argc, char *argv[]) {
+        /* const char *msg = "hello1024"; */
+        const char *msg = DEBUG(hello1024);
+        
+        return EXIT_SUCCESS;
+      }
+      ```
+
+      - `##` : 分隔连接的方式，可以将参数连接至表达式的某个地方
+
+      ```c
+      #define DEBUG(format, ...) \
+        printf(format, __VA_ARGS__)
+
+      #define FUNCTION(name, arg ,type) void test_##name(type arg)
+
+      /**
+       * void test_foo(int val) {
+       *   printf("%d", val);
+       * }
+      */
+      FUNCTION(foo, val, int) {
+        DEBUG("%d", val);
+      }
+
+      - `##__VA_ARGS__` : 当宏函数的调用并无录入可变参数时，并不会在使用了 `#__VA_ARGS__` 可变参数的前面添加 `','`
+
+      ```c
+      #include <stdio.h>
+
+      #define DEBUG(format, ...) \
+        printf(format, ##__VA_ARGS__)
+
+      int main(int argc, char *argv[]) {
+        /* printf("%s[%d]", "hello,world", 1024); */
+        /* 当录入了可变参数的情况，使用特殊宏定义 __VA_ARGS__ 时，会在参数前面添加 ',' */
+        DEBUG("%s[%d]", "hello,world", 1024);
+
+        /* printf("hello,world"); */
+        /* 当未使用可变参数时，则不会在前面添加 ',' */
+        DEBUG("hello,world");
+        
+        return EXIT_SUCCESS;
+      }
+      ```
+
 - 编译时定义的宏
+
   - 我们可以在编译时通过参数 [[-D]] 去指定编译器去创建一个编译级别时的宏 ( $gcc$ )
 
 - 卸载宏
+
     - [[#undef 宏名]]
+
     - 当我们可能通过某个头文件所引入的宏我们并不需要使用亦或者是我们所定义的宏需要进行卸载，则可以通过该表达式来指定所需要进行卸载的宏，当某一个宏在一个文件中进行了卸载，则该宏的作用域则在当前卸载宏的文件中将不复存在，即无法使用
 
     ```c
@@ -4858,6 +5215,7 @@ gcc -g source.c -o source
     ```
 
 - 一些系统为我们所定义好的 [[预定义动态宏]]
+
     - [[__FILE__]]：获取使用了当前宏名所在文件的路径
 
     - [[__LINE__]]：获取使用了当前宏名所在的行数
@@ -5825,7 +6183,7 @@ int main(int argc, char *argv[]) {
 
 不得不提的是，在 linux 下其实本并没有线程，只是为了迎合开发者口味，搞了个 **`轻量级进程`** 出来，他就是所谓的 **`Thread`**；在 linux 中，一个 **`Thread`** 会被当作是一个 **`Process`** 来看待，它同样也是一个 **`task_struct`** 结构体的实例，也拥有一个 **`PID`** 来作为当前操作系统而言的唯一身份标识 **`PID`**，**`kernel`** 并不针对线程去提供针对性的调度
 
-线程的创建同样需要依赖于一个父级进程，这个父级进程也可能是作为源程序所启动的第一个进程所派生下来的子进程也可能是第一个进程本身，但无论如何，**线程的创建往往都需要依赖于一个进程，但是不管该线程的创建是往下延续到多少层级的进程派生，其父进程 **`PPID`** 始终都是源程序所启动的第一个进程的 **`PID`**<span></span>**{style="color:red"}，我们可以理解为当前源程序的最上级进程的 **`PID`**；相对的，**对于线程来说区分它到底是属于哪个进程往下的派生通过一个属性 **`TGID`** 来确定，属于同一进程下派生出来的线程其 **`TGID`** 都为派生者的 **`PID`**<span></span>**{style="color:red"}，并且，**即便是往下延续派生了多个子线程 ( 例如，子线程中又创建了子线程 )，它们任然是属于一种同组平级的关系**{style="color:red"}，简而言之，一个进程组下的所有子线程，无论它们的创建到底是具体到了哪个层级来完成，它们都是属于一个平级的关系
+线程的创建同样需要依赖于一个父级进程，这个父级进程也可能是作为源程序所启动的第一个进程所派生下来的子进程也可能是第一个进程本身，但无论如何，**线程的创建往往都需要依赖于一个进程，但是不管该线程的创建是往下延续到多少层级的进程派生，其父进程 **`PPID`** 始终都是源程序所启动的第一个进程的 **`PID`**<span></span>**{style="color:red"}，我们可以理解为当前源程序的最上级进程的 **`PID`**；相对的，**对于线程来说区分它到底是属于哪个进程往下的派生通过一个属性 **`TGID`** 来确定，属于同一进程下派生出来的线程其 **`TGID`** 都为派生者的 **`PID`**<span></span>**{style="color:red"}，并且，**即便是往下延续派生了多个子线程 ( 例如，子线程中又创建了子线程 )，它们任然是属于一种同组平级的关系**{style="color:red"}，简而言之，一个线程组下的所有子线程，无论它们的创建到底是具体到了哪个层级来完成，它们都是属于一个平级的关系
 
 需要扩充的是，同一进程下的所有线程在调用 **`getpid()`** 时所获取到的 **`PID`** 是一样的， 因为对于多线程的程序来说，**`getpid()`** 系统调用获取的实际上是 **`TGID`**，因此隶属同一进程的多个线程看起来 **`PID`** 相同
 
@@ -6346,13 +6704,13 @@ int main(int argc, char *argv[]) {
 - **`attr`** : 指定所创建线程的一些属性，如果为 **`NULL`**，则采用默认属性来对线程进行构造
   - **`pthread_attr_t`** : 用于描述线程属性的结构体，对于线程属性的设置都需要基于该结构体实例的基准上去进行
   
-  -  **`int pthread_attr_init (pthread_attr_t* attr)`** : 用于初始化所构建出来的用于描述线程属性设置的 **`pthread_attr_t`** 的实例，一个新创建出来的 pthread_attr_t 的实例在开始应用于设置线程属性前，都需要先对其进行初始化，关于当前函数调用的更多信息请参考 [这里](https://linux.die.net/man/3/pthread_attr_init)
+    -  **`int pthread_attr_init (pthread_attr_t* attr)`** : 用于初始化所构建出来的用于描述线程属性设置的 **`pthread_attr_t`** 的实例，一个新创建出来的 pthread_attr_t 的实例在开始应用于设置线程属性前，都需要先对其进行初始化，关于当前函数调用的更多信息请参考 [这里](https://linux.die.net/man/3/pthread_attr_init)
 
-  - **`int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate)`** : 用于设置线程的分离状态的属性，关于当前函数调用的更多信息请参考 [这里](https://linux.die.net/man/3/pthread_attr_setdetachstate)
+    - **`int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate)`** : 用于设置线程的分离状态的属性，关于当前函数调用的更多信息请参考 [这里](https://linux.die.net/man/3/pthread_attr_setdetachstate)
 
-  - **`int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize)`** : 用于设置分配至线程的栈大小，关于当前函数调用的更多信息请参考 [这里](https://linux.die.net/man/3/pthread_attr_setstacksize)
+    - **`int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize)`** : 用于设置分配至线程的栈大小，关于当前函数调用的更多信息请参考 [这里](https://linux.die.net/man/3/pthread_attr_setstacksize)
 
-  - **`int pthread_attr_destroy(pthread_attr_t *attr)`** : 释放用于描述线程属性结构体所占用的资源，通常一个 **`pthread_attr_t`** 结构体的实例在使用完毕后 ( 已经创建线程 ) 我们需要通过该函数调用对其进行资源的释放工作，关于当前函数调用的更多信息请参考 [这里](https://linux.die.net/man/3/pthread_attr_destroy)
+    - **`int pthread_attr_destroy(pthread_attr_t *attr)`** : 释放用于描述线程属性结构体所占用的资源，通常一个 **`pthread_attr_t`** 结构体的实例在使用完毕后 ( 已经创建线程 ) 我们需要通过该函数调用对其进行资源的释放工作，关于当前函数调用的更多信息请参考 [这里](https://linux.die.net/man/3/pthread_attr_destroy)
 
 - **`start_routine`** : 一个函数指针，用于指定线程所执行的上下文
 
@@ -7029,42 +7387,54 @@ int main(int argc, char *argv[]) {
 #include <unistd.h>
 #include <wait.h>
 
-void *thread_start(void *arg) {
-  pthread_spinlock_t *locker = (pthread_spinlock_t *)arg;
+void *thread_start_1(void *arg) {
+  pthread_rwlock_t *rwlocker = (pthread_rwlock_t *)arg;
   
-  /* start lock */
-  pthread_spin_lock(locker);
-  /* int errno;                                               */
-  /* if ((errno = pthread_spin_trylock(locker)) != 0) {       */
-  /*   printf("[%lu] %s\n", pthread_self(), strerror(errno)); */
-  /*   pthread_exit(NULL);                                    */
-  /* }                                                        */
+  /* wait for read locker executed */
+  sleep(1);
 
-  usleep(500 * 1000);
+  /* start lock */
+  pthread_rwlock_wrlock(rwlocker);
+  printf("[%lu] Write lock\n", pthread_self());
+
+  sleep(2);
   
   /* end lock */
-  pthread_spin_unlock(locker);
+  pthread_rwlock_unlock(rwlocker);
 
-  printf("[%lu] child-thread executed\n", pthread_self());
+  printf("[%lu] Write locker executed\n", pthread_self());
   return NULL;
 }
+
+void *thread_start_2(void *arg) {
+  pthread_rwlock_t *rwlocker = (pthread_rwlock_t *)arg;
+
+  /* start lock */
+  pthread_rwlock_rdlock(rwlocker);
+  printf("[%lu] Read lock\n", pthread_self());
+  
+  sleep(2);
+  
+  /* end lock */
+  pthread_rwlock_unlock(rwlocker);
+
+  printf("[%lu] Read locker executed\n", pthread_self());
+  return NULL;
+}
+
+
 void foo(void) {
   pthread_spinlock_t locker;
   pthread_spin_init(&locker, PTHREAD_PROCESS_PRIVATE);
 
-  pthread_t threads[20] = { 0 };
-  for (size_t i = 0; i < 20; ++i) {
-    pthread_t t_id;
-    pthread_create(&t_id, NULL, thread_start, (void *)&locker);
+  pthread_t t_id_1;
+  pthread_create(&t_id_1, NULL, thread_start_1, (void *)&locker);
 
-    printf("[%lu] create child thread (%lu)\n", pthread_self(), t_id);
-    threads[i] = t_id;
-  }
+  pthread_t t_id_2;
+  pthread_create(&t_id_2, NULL, thread_start_1, (void *)&locker);
 
-  for (int i = 0; i < 20; ++i) {
-    pthread_join(threads[i], NULL);
-    printf("[%lu] Recyle (%lu)\n", pthread_self(), threads[i]);
-  }
+  pthread_join(t_id_1, NULL);
+  pthread_join(t_id_2, NULL);
 
   pthread_spin_destroy(&locker);
   pthread_exit(NULL);
@@ -7115,11 +7485,17 @@ int main(int argc, char *argv[]) {
     - **`int pthread_cond_signal(pthread_cond_t *cond)`**
 
       给使用了条件变量对象 **`cond`** 的线程发送一个唤醒通知，当函数成功调用时，返回 **`0`**，如果调用失败，则返回对应的 **`错误码`**
+      
+    - **`int pthread_cond_broadcast (pthread_cond_t *cond)`**
+
+      给所有使用了条件变量 **`cond`** 的线程广播发送唤醒通知，注意，这相当于是找到了使用了条件变量 **`cond`** 的线程数，并发送指定数量的唤醒通知，也就是说，<font color = "red">哪怕是广播唤醒，线程之间任然需要进入争夺 **mutex** 临界锁的局面，并且争夺失败的线程则会进入休眠的局面，并在每次获取到 CPU 时间片的时候判断临街锁是否被持有，如果没有则再次进入争夺临界锁的局面</font>
 
 - **`释放条件变量对象`**
     - **`int pthread_cond_destroy(pthread_cond_t *cond)`**
 
       释放掉条件变量对象 **`cond`**，当一个条件变量对象不再被任何一个线程所使用的时候，我们应该手动的对其进行释放，如成功则返回 0，否则返回对应的 **`错误码`**
+
+下面代码展示一个生产者消费者的模型应用
 
 ```c
 #include <math.h>
@@ -7215,6 +7591,112 @@ int main(int argc, char *argv[]) {
 
   return EXIT_SUCCESS;
 }
+```
+
+下面代码展示了广播唤醒下，各线程争夺临街锁的局面
+
+```c
+
+#include <math.h>
+#include <pthread.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+
+static pthread_mutex_t mutex;
+static pthread_cond_t cond;
+static char data[64] = {0};
+
+static void _init(void) {
+  pthread_mutex_init(&mutex, NULL);
+  pthread_cond_init(&cond, NULL);
+}
+
+static void _free(void) {
+  pthread_mutex_destroy(&mutex);
+  pthread_cond_destroy(&cond);
+}
+
+void *thread_start_main(void *_arg) {
+  sleep(4);
+
+  printf("main thread start lock\n");
+  pthread_mutex_lock(&mutex); /* Start lock */
+  
+  sleep(1);
+
+  pthread_mutex_unlock(&mutex); /* End lock */
+  printf("main thread end lock\n");
+
+  sleep(1);
+
+  printf("main thread send wakeup signal\n");
+  pthread_cond_broadcast(&cond);
+
+  return NULL;
+}
+
+void *thread_start_child(void *_arg) {
+  printf("child thread %d start lock\n", (int)pthread_self());
+  pthread_mutex_lock(&mutex); /* Start lock */
+
+  printf("child thread %d sleep and wait for wakeup signal arrived\n", (int)pthread_self());
+  pthread_cond_wait(&cond, &mutex);
+  
+  int idx = 0;
+  for (size_t i = 0; i < 5; ++i) {
+    printf("child thread %d say hello [%d]\n", (int)pthread_self(), idx++);
+    fflush(stdout);
+    sleep(1);
+  }
+
+  printf("child thread %d end lock\n", (int)pthread_self());
+  pthread_mutex_unlock(&mutex); /* End lock */
+
+  return NULL;
+}
+
+void foo(void) {
+  int t_ret;
+
+  _init();
+
+  pthread_t t_id_child_1;
+  if ((t_ret = pthread_create(&t_id_child_1, NULL, thread_start_child, NULL))) {
+    printf("%s\n", strerror(t_ret));
+    exit(EXIT_FAILURE);
+  }
+
+  pthread_t t_id_child_2;
+  if ((t_ret = pthread_create(&t_id_child_2, NULL, thread_start_child, NULL))) {
+    printf("%s\n", strerror(t_ret));
+    exit(EXIT_FAILURE);
+  }
+
+  pthread_t t_id_main;
+  if ((t_ret = pthread_create(&t_id_main, NULL, thread_start_main, NULL))) {
+    printf("%s\n", strerror(t_ret));
+    exit(EXIT_FAILURE);
+  }
+
+  /* Wait for all thread executed */
+  pthread_join(t_id_main, NULL);
+  pthread_join(t_id_child_1, NULL);
+  pthread_join(t_id_child_2, NULL);
+
+  _free();
+  pthread_exit(NULL);
+}
+
+int main(int argc, char *argv[]) {
+  foo();
+
+  return EXIT_SUCCESS;
+}
+
 ```
 
 
@@ -7395,8 +7877,9 @@ linux 中的进程其地址空间都是相互独立的，每个进程各自有�
 由于管道其实质属于一块缓冲区，故管道中的数据一旦被读取 ( **`read`** ) 则不复存在
 
 管道的读写两端默认情况下都是属于阻塞式的操作
-  - **`read`** : 针对于读端进行操作时，如管道没有数据，则读取操作则会发生阻塞
-  -  **`write`** : 针对于写端进行操作时，如管道数据已满，则写入操作则会发生阻塞
+  - **`read`** : 针对于读端进行操作时，如管道没有数据，则读取操作则会发生阻塞(**_Interruptible Sleep(S)_**)
+
+  -  **`write`** : 针对于写端进行操作时，如管道数据已满，则写入操作则会发生阻塞(**_Interruptible Sleep(S)_**)
 
 <br/>
 
@@ -8713,3 +9196,1583 @@ int main(int argc, char *argv[]) {
   return EXIT_SUCCESS;
 }
 ```
+
+<br/>
+
+## Socket 编程
+<span id="Socket-编程"></span>
+
+### 关于 Socket 的一些基本概念
+<span id="关于-Socket-的一些基本概念"></span>
+
+---
+
+TCP/IP 协议最早在 **_BSD UNIX_** 上实现，为 TCP/IP 协议设计的应用层编程接口称为 **_socket API(简称为 socket)_**
+
+**_Socket_** 本身有 **_'插座'_** 的意思，在 linux 环境下，用于<font color = "red">表示进程间网络通信的特殊文件类型，其本质为内核借助 **_缓冲区_** 形成的 **_伪文件_**</font>
+
+既然是文件，那么理所当然的，我们通过使用 **_文件描述符_** 来引用 socket，<font color = "red">linux 内核将 socket 封装成文件的目的是为了统一接口，使得读写 socket 和 **_读写文件(read(), write())的操作一致_**</font>
+
+在 TCP/IP 协议中，<font color = "red">**_'IP 地址 + TCP/UDP 端口号'_** 唯一标识网络通讯中的一个进程</font>，也就是说，<font color = "red">**_'IP 地址 + 端口号'_** 就对应一个 socket</font>，事实上，<font color = "red">两个主机间欲通过 socket 建立起连接，**_通信双方必定都会各持有一份 'socket'_**，这样的连接关系我们称之为 $Socket \:\: pair$，通过这一对 $Socket \:\: pair$，确立了通信双方网络连接上的一对一的关系</font>
+
+<font color = "red">每当一端的 socket 建立，内核都会为其在内核态中初始化两块缓冲区(读缓冲和写缓冲)</font>，这和 **_管道_** 类似，但是需要注意的是 : 
+
+- 管道主要应用于本地进程间通信，而套接字应用于网络进程间数据的传递 
+  
+- <font color = "red">socket 仅使用一个文件描述符就映射读写两端的缓冲区的操作，而管道的则为读写缓冲区两端各自映射了不同的文件描述符</font>
+
+- 针对 socket 伪文件的默认读写行为和管道保持一致，即 : 
+
+  - `read` : 针对于读端进行操作时，如管道没有数据，则读取操作则会发生阻塞(**_Interruptible Sleep(S)_**)
+
+  - `write` : 针对于写端进行操作时，如管道数据已满，则写入操作则会发生阻塞(**_Interruptible Sleep(S)_**)
+
+<br/>
+
+![2020-11-25-13-01-36](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-25-13-01-36.png)
+
+<br/>
+
+### 大小端字节序转换 API
+
+<span id="大小端字节序转换-API"></span>
+
+---
+
+<font color = "red">TCP/IP协议规定，网络数据流应采用 **_大端字节序_**</font>，一对建立连接的主机，发送方将写入缓冲区中的数据依内存地址从低到高的顺序发出，而接收方则将读取缓冲区中的数据依内存地址从低到高的顺序读入 ; <font color = "red">我们在使用 socket 进行通信的过程中，就要保证缓冲区中的数据是依照大端字节序进行排列的</font>
+
+> 事实上，大端字节序的应用仅仅在网络接口层校验 **_以太网帧_** 中的一些关键信息(目的地址, 原地址, 端口等)才需要依照这个顺序(大端字节序)进行排列，而<font color = "red">对于帧中所包含的需要被发出或接受的有效数据，网络接口层对其可能仅仅只是做数据长度的一个校验，而究竟所发出或接受的数据到底是大端字节序还是小端字节序，这个并无强制的要求</font>
+
+<br/>
+
+#### 校验本机字节序的类别
+
+<span id="校验本机字节序的类别"></span>
+
+```c
+#include <math.h>                       
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+union entity {
+  short s;
+  char c[sizeof(short)];
+};
+
+int main(int argc, char *argv[]) {
+  union entity obj;
+  obj.s = 0x0102;
+
+  if (obj.c[0] == 0x02) {
+    printf("least significant digit\n");
+  } else {
+    printf("most significant digit\n");
+  }
+
+  return EXIT_SUCCESS;
+}
+```
+
+
+<br/>
+
+#### 整形数据的字节序转换
+
+<span id="整形数据的字节序转换"></span>
+
+##### #include <arpa/inet.h>
+
+以下函数提供了32位长整型(**_int_**)和16位短整型(**_short_**)的转换工作
+
+如果主机是小端字节序，这些函数将参数做相应的大小端转换然后返回，如果主机是大端字节序，这些函数不做转换，将参数原封不动地返回
+
+- uint32_t htonl(uint32_t hostlong) : 将小端字节序 hostlong 转换为大端字节序并返回
+
+- uint16_t htons(uint16_t hostshort) : 将小端字节序 hostshort 转换为大端字节序并返回
+
+- uint32_t ntohl(uint32_t netlong) : 将大端字节序 netlong 转换为小端字节序并返回
+
+- uint32_t ntohs(uint32_t netshort) : 将大端字节序 netshort 转换为小端字节序并返回
+
+值得一提的是，关于这些函数的记忆方式 : **_h 表示 host(小端字节序), n 表示 network(大端字节序), l 表示 32 位长整数，s 表示 16 位短整数_**
+
+```cpp
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <arpa/inet.h>
+
+int main(int argc, char *argv[]) {
+  int i_most = htonl(0x12345678);
+  printf("0x%x\n", i_most);
+  int i_least = ntohl(i_most);
+  printf("0x%x\n", i_least);
+
+  short s_most = htons(0x1234);
+  printf("0x%x\n", s_most);
+  short s_least = ntohs(s_most);
+  printf("0x%x\n", s_least);
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### IP地址的转换
+
+<span id="IP地址的转换"></span>
+
+##### <arpa/inet.h>
+
+- int inet_pton(int af, const char *src, void *dst) : 将字符串 `src` 转换为大端字节序的数据并写入至 `dst` 所指向的内存中
+
+  - `af` : IP协议类型
+  
+    - AF_INET : IPV4
+
+    - AF_INET6 : IPV6
+
+  - `src` : 点分十进制的 IP 地址字符串
+
+  - `dst` : 转换结果所需写入的缓冲区，通常提供一个 32 位长整型大小的缓冲区即可
+
+  - `return` : 
+
+    - 1 : 转化成功
+
+    - 0 / -1 : 转换失败
+
+- const char *inet_ntop(int af, const void *src, char *dst, socklen_t size) : 将大端字节序的数据 `src` 转换为点分十进制的 IP 字符串并写入至 `dst` 所指向的内存中
+
+  - `af` : IP协议类型
+  
+    - AF_INET : IPV4
+
+    - AF_INET6 : IPV6
+
+  - `src` : 指向大端字节序数据的指针
+
+  - `dst` : 转换结果需要写入的缓冲区，通常提供一个 `3*4 + 3 + 1` 长度的空间即可
+
+  - `size` : 指定 `dst` 缓冲区的长度，防止缓冲区溢出的问题
+
+  - `return` : 
+
+    - 指向 `dst` 的指针 : 转化成功
+
+    - `NULL` : 转换失败
+
+```c
+#include <math.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <arpa/inet.h>
+
+int main(int argc, char *argv[]) {
+  struct sockaddr_in serv;
+  bzero(&serv, sizeof(serv));                            
+  serv.sin_family = AF_INET;
+  serv.sin_port = htons(8886);
+  inet_pton(AF_INET, "127.0.0.1", &serv.sin_addr.s_addr);
+
+  struct sockaddr_in client;                                                                                      
+  bzero(&client, sizeof(struct sockaddr_in));
+  socklen_t len = sizeof(struct sockaddr);
+  int cfd = accept(sfd, (struct sockaddr *)&client, &len);
+  char dest[16] = {0};
+  inet_ntop(AF_INET, &client.sin_addr.s_addr, dest, sizeof(dest));
+}
+```
+
+<br/>
+
+### Socket API
+<span id="Socket-API"></span>
+
+---
+
+#### 几个重要的结构体
+
+##### <arpa/inet.h>
+
+Socket API 中许多函数都离不开这几个结构体，它们通常用来表示两端连接上的一些头部信息
+
+![2020-11-25-19-15-06](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-25-19-15-06.png)
+
+- sockaddr
+
+  ```c
+  struct sockaddr {
+	  sa_family_t sa_family; 		/* address family, AF_xxx */
+	  char sa_data[14];			/* 14 bytes of protocol address */
+  };
+  ```
+
+- sockaddr_in
+
+  ```c
+  struct sockaddr_in {
+	  __kernel_sa_family_t sin_family; /* Address family */
+	  __be16 sin_port;                 /* Port number */
+	  struct in_addr sin_addr;         /* Internet address */
+
+	  /* Pad to size of `struct sockaddr'. */
+	  unsigned char sin_zero[sizeof (struct sockaddr)
+                                     - __SOCKADDR_COMMON_SIZE
+                                     - sizeof (in_port_t)
+                                     - sizeof (struct in_addr)];
+  };
+
+  struct in_addr {  /* Internet address. */
+  	__be32 s_addr;
+  };
+  ```
+
+- sockaddr_in6
+
+  ```c
+  struct sockaddr_in6 {
+	  unsigned short int sin6_family;     /* AF_INET6 */
+	  __be16 sin6_port; 					/* Transport layer port # */
+	  __be32 sin6_flowinfo; 				/* IPv6 flow information */
+	  struct in6_addr sin6_addr;			/* IPv6 address */
+	  __u32 sin6_scope_id; 				/* scope id (new in RFC2553) */
+  };
+
+  struct in6_addr {
+  	union {
+  		__u8 u6_addr8[16];
+  		__be16 u6_addr16[8];
+  		__be32 u6_addr32[4];
+  	} in6_u;
+  	#define s6_addr 		in6_u.u6_addr8
+  	#define s6_addr16 		in6_u.u6_addr16
+  	#define s6_addr32	 	in6_u.u6_addr32
+  };
+  ```
+
+- sockaddr_un
+
+  ```c
+  #define UNIX_PATH_MAX 108
+	struct sockaddr_un {
+	  __kernel_sa_family_t sun_family; 	/* AF_UNIX */
+	  char sun_path[UNIX_PATH_MAX]; 	/* pathname */
+  };
+  ```
+
+`strcut sockaddr` 很多网络编程函数诞生早于 `IPv4` 协议，那时候都使用的是 `sockaddr` 结构体,为了向前兼容，现在 `sockaddr` 退化成了(void *)的作用，简而言之就是，后面的结构体都是依据 `sockaddr` 来进行扩充的
+
+`IPv4` 和 `IPv6` 的地址格式定义在 `netinet/in.h` 中，`IPv4` 地址用 `sockaddr_in` 结构体表示，包括 16 位端口号和 32 位 IP 地址 ; `IPv6` 地址用 `sockaddr_in6` 结构体表示，包括 16 位端口号和 `128` 位 `IP` 地址和一些控制字段 ; `UNIX Domain Socket` 的地址格式定义在 `sys/un.h` 中，用 `sockaddr_un` 结构体表示
+
+各种socket地址结构体的开头都是相同的，前16位表示整个结构体的长度(并不是所有UNIX的实现都有长度字段，如Linux就没有)，后16位表示地址类型
+
+通常，Socket API 中都会提供一个参数来确定当前所连接的协议类型，通过该参数，只要取得某种 `sockaddr` 结构体的首地址，不需要知道具体是哪种类型的 `sockaddr` 结构体，就可以根据地址类型字段确定结构体中的内容，因此，Socket API 可以接受各种类型的 `sockaddr` 结构体指针做参数，但是，Socket API 的实现早于 ANSI C 标准化，那时还没有 `void *` 类型，因此 API 中的地址参数都用 `struct sockaddr *` 类型表示，在传递参数之前要强制类型转换一下
+
+<br/>
+
+#### int socket(int domain, int type, int protocol)
+
+##### <arpa/inet.h>
+
+打开一个 socket 网路通信端口，并返回其所对应的 **_文件描述符_** ; 在该函数调用完毕后，内核会在当前内核态中分别创建 **_读、写缓冲区_**，并将刚刚返回的文件描述符映射到这两个缓冲区身上
+
+对于需要作为被动态(listen)的 socket，需要注意的是，该函数调用完毕后所返回的文件描述符虽然能够映射到内核态中的读、写缓冲区，但是我们<font color = "red">在往 client 写入或读取数据时并不使用该文件描述符，**_该文件描述符针对声明为被动态 socket 的作用主要是用来监听客户端的连接和绑定工作_**</font>
+
+- `domain` : 指定 IP 协议类型
+
+  - `AF_INET` : IPv4
+
+  - `AF_INET6` : IPv6
+
+  - `AF_UNIX` : UNIX Domain Socket
+
+- `type` : 指定 socket 协议类型
+
+  - `SOCK_STREAM` : TCP 连接，面向顺序的、可靠的、数据完整的基于字节流的连接
+
+  - `SOCK_DGRAM` : UDP 连接，面向不可靠的、无连接的、固定长度的传输调用
+
+  - `SOCK_SEQPACKET` : 该协议是双线路的、可靠的连接，发送固定长度的数据包进行传输，必须把这个包完整的接受才能进行读取。
+
+  - `SOCK_RAW` : 使用 ICMP 公共协议
+
+  - `SOCK_RDM` : 较少使用，该协议主要提供给数据链路层接口访问
+
+- `protocol` : 0，即默认协议
+
+- `return` : socket 文件描述符
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <netinet/in.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int sfd = socket(AF_INET, SOCK_STREAM, 0x0);
+  if (sfd < 0) {
+    perror("create socket pair error");
+    exit(EXIT_FAILURE);
+  }
+
+  close(sfd);
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+
+##### <arpa/inet.h>
+
+绑定 `socket()` 函数所返回的 socket 文件描述符中的一些通信连接所监听的头部信息
+
+- `sockfd` : `socket()` 函数所返回的 socket 文件描述符
+
+- `addr` : 绑定所指定 socket 文件描述符 `sockfd` 中的一些监听的连接通信头部信息，如 : IP 地址，端口号等
+
+- `addrlen` : 指定 `addr` 的长度，防止缓冲区溢出的问题
+
+- `return` : 
+
+  - 0 : 绑定成功
+
+  - -1 : 绑定失败
+
+```c
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int sfd = socket(AF_INET, SOCK_STREAM, 0x0);
+  if (sfd < 0) {
+    perror("create socket pair error");
+    exit(EXIT_FAILURE);
+  }
+
+  struct sockaddr_in serv;
+  bzero(&serv, sizeof(serv));
+  serv.sin_family = AF_INET;
+  serv.sin_port = htons(8886);
+  /* servaddr.sin_addr.s_addr = htonl(INADDR_ANY);  INADDR_ANY: 任意地址IP，针对于主机存在多网卡的情况 */
+  inet_pton(AF_INET, "127.0.0.1", &serv.sin_addr.s_addr);
+  int bflg = bind(sfd, (const struct sockaddr *)&serv, sizeof(serv));
+  if (bflg < 0) {
+    perror("socket bind error");
+    exit(EXIT_FAILURE);
+  }
+
+  close(sfd);
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int listen(int sockfd, int backlog)
+
+##### <arpa/inet.h>
+
+使 **_sockfd_** 所对应的 socket 由 **_主动态_** 转换为 **_被动态_**，与此同时，内核还会创建两个队列，其分别为 **_请求连接队列_** 和 **_已连接队列_**，当该函数调用完毕后，当前主机允许被发现且连接，任何连接到该主机的 client 将被列入 **_已连接队列_** 并等待被取出
+
+绑定 `socket()` 函数所返回的 socket 文件描述符中的一些通信连接所监听的头部信息
+
+- `sockfd` : `socket()` 函数所返回的 socket 文件描述符
+
+- `backlog` : 同时请求连接的最大个数(还未真正建立连接，仅请求)
+
+- `return` : 
+
+  - 0 : 监听成功
+
+  - -1 : 监听失败
+
+```c
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int sfd = socket(AF_INET, SOCK_STREAM, 0x0);
+  if (sfd < 0) {
+    perror("create socket pair error");
+    exit(EXIT_FAILURE);
+  }
+
+  struct sockaddr_in serv;
+  bzero(&serv, sizeof(serv));
+  serv.sin_family = AF_INET;
+  serv.sin_port = htons(8886);
+  inet_pton(AF_INET, "127.0.0.1", &serv.sin_addr.s_addr);
+  int bflg = bind(sfd, (const struct sockaddr *)&serv, sizeof(serv));
+  if (bflg < 0) {
+    perror("socket bind error");
+    exit(EXIT_FAILURE);
+  }
+
+  listen(sfd, 0x400);
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
+
+##### <arpa/inet.h>
+
+从 **_已连接队列_** 中获取一个新的连接，并为之<font color = "red">创建一个新的 socket 文件描述符并返回，该 socket 文件描述符是真正意义上用来和 client 进行读写通信的文件描述符</font>
+
+如果已连接队列中没有任何连接，则阻塞当前函数的调用，需要注意的是，该阻塞所引起的进程状态为 **_Interruptible Sleep(S)_** 形式的阻塞，也就意味着，<font color = "red">一个信号的到达将中断该阻塞状态，此时该函数会返回 -1</font>
+
+- `sockfd` : `socket()` 函数所返回的 socket 文件描述符
+
+- `addr` : 当成功获取新的连接，则将连接的头部信息写入到该参数所指向的内存中
+
+- `addrlen` : 指定 `addr` 的长度，防止缓冲区溢出的问题
+
+- `return` : 
+
+  - 大于0的任意数 : 获取新连接成功
+
+  - -1 : 获取失败
+
+```c
+#include <arpa/inet.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int sfd = socket(AF_INET, SOCK_STREAM, 0x0);
+  if (sfd < 0) {
+    perror("create socket pair error");
+    exit(EXIT_FAILURE);
+  }
+
+  struct sockaddr_in serv;
+  bzero(&serv, sizeof(serv));
+  serv.sin_family = AF_INET;
+  serv.sin_port = htons(8886);
+  inet_pton(AF_INET, "127.0.0.1", &serv.sin_addr.s_addr);
+  int bflg = bind(sfd, (const struct sockaddr *)&serv, sizeof(serv));
+  if (bflg < 0) {
+    perror("socket bind error");
+    exit(EXIT_FAILURE);
+  }
+
+  listen(sfd, 0x400);
+
+  struct sockaddr_in client;
+  bzero(&client, sizeof(struct sockaddr_in));
+  socklen_t len = sizeof(struct sockaddr);
+  int cfd = accept(sfd, (struct sockaddr *)&client, &len);
+  if (cfd < 0) {
+    perror("accept connect error");
+    exit(EXIT_FAILURE);
+  }
+  char dest[16] = {0}; /* 4*3 + 3 + 1 */
+  printf("accept client [%s:%d]\n",
+         inet_ntop(AF_INET, &client.sin_addr.s_addr, dest, sizeof(dest)),
+         ntohs(client.sin_port));
+  
+  close(sfd);
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+
+依据 **_addr_** 中所指定的连接参数于一个主机建立起连接并为之<font color = "red">创建一个新的 socket 文件描述符并返回</font>，当一个成功建立连接后，双方才可以开始正式的通信，这通常是作为 `client` 的行为
+
+- `sockfd` : `socket()` 函数所返回的 socket 文件描述符
+
+- `addr` : 用于写入所需要连接主机的一些头部信息
+
+- `addrlen` : 指定 `addr` 的长度，防止缓冲区溢出的问题
+
+- `return` : 
+
+  - 0 : 成功建立连接
+
+  - -1 : 获取失败
+
+```c
+#include <arpa/inet.h>
+#include <ctype.h>
+#include <math.h>
+#include <netinet/in.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int cfd = socket(AF_INET, SOCK_STREAM, 0x0);
+  if (cfd < 0) {
+    perror("create socket pair error");
+    exit(EXIT_FAILURE);
+  }
+
+  struct sockaddr_in serv;
+  serv.sin_family = AF_INET;
+  serv.sin_port = htons(8886);
+  inet_pton(AF_INET, "127.0.0.1", &serv.sin_addr.s_addr);
+  int cflg = connect(cfd, (struct sockaddr *)&serv, sizeof(serv));
+  if (cflg < 0) {
+    perror("connect to server error");
+    exit(EXIT_FAILURE);
+  }
+  printf("success connect to server [%s:%d]\n", "127.0.0.1",
+         ntohs(serv.sin_port));
+  fflush(stdout);
+
+  close(cfd);
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### 基本的读写行为
+
+
+linux 内核将 socket 封装成文件的目的是为了统一接口，使得读写 socket 和 **_读写文件(read(), write())的操作一致_**，也就是说，我们针对成功建立连接的一端，只需要对需要通信的目标所映射的文件描述符进行常规文件的读写操作即可，下面的代码仅展示作为 client 端在成功与 server 端建立通信后其基本的读写行为
+
+关于基本的读写操作，还可以使用 **_recv()_**(`man recv`) 和 **_send()_**(`man send`)
+
+```c
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <arpa/inet.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int cfd = socket(AF_INET, SOCK_STREAM, 0x0);
+  if (cfd < 0) {
+    perror("create socket pair error");
+    exit(EXIT_FAILURE);
+  }
+
+  struct sockaddr_in serv;
+  serv.sin_family = AF_INET;
+  serv.sin_port = htons(8886);
+  inet_pton(AF_INET, "127.0.0.1", &serv.sin_addr.s_addr);
+  int cflg = connect(cfd, (struct sockaddr *)&serv, sizeof(serv));
+  if (cflg < 0) {
+    perror("connect to server error");
+    exit(EXIT_FAILURE);
+  }
+  printf("success connect to server [%s:%d]\n", "127.0.0.1",
+         ntohs(serv.sin_port));
+  fflush(stdout);
+
+  char buf[256] = {0};
+  while (true) {
+    bzero(buf, sizeof(buf));
+    int n = read(STDIN_FILENO, buf, sizeof(buf));
+
+    write(cfd, buf, n);
+
+    bzero(buf, sizeof(buf));
+    if (read(cfd, buf, sizeof(buf)) <= 0) {
+      printf("read error or server closed");
+      break;
+    }
+    printf("receive %s\n", buf);
+  }
+
+  close(cfd);
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### int shutdown(int sockfd, int how)
+
+<font color = "red">关闭当前通信端的读或写缓冲区</font>，可以实现 **_半关闭_**(即只保持读或写的操作与远程端进行通信) 状态的 socket 连接
+
+该函数可同时关闭读缓冲器和写缓冲区，当指定了该操作后，也就意味着当前端主动发起了连接关闭请求(**_FIN_**)(呈现 `FIN_WAIT_2` 的状态)，针对这点功能而言，似乎和 `close()` 保持一致，但是<font color = "red">需要注意的是，`close()` 始终都是针对文件描述符进行操作的，也就是说仅当该文件描述符的引用计数为 0 时，当前端才能够发起连接关闭的请求，而该函数可以无视这一约束</font>
+
+- `sockfd` : `socket()` 函数所返回的 socket 文件描述符
+
+- `how` : 
+  
+  - `SHUT_RD` : 关闭读缓冲区
+
+  - `SHUT_WR` : 关闭写缓冲区
+
+  - `SHUT_RDWR` : 关闭读写缓冲区，意味着当前端主动发起了连接关闭的操作
+
+- `return` : 
+
+  - 0 : 调用成功
+
+  - -1 : 调用失败
+
+```c
+#include <arpa/inet.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int cfd = socket(AF_INET, SOCK_STREAM, 0x0);
+
+  struct sockaddr_in serv;
+  serv.sin_family = AF_INET;
+  serv.sin_port = htons(8886);
+  inet_pton(AF_INET, "127.0.0.1", &serv.sin_addr.s_addr);
+  int cflg = connect(cfd, (struct sockaddr *)&serv, sizeof(serv));
+  printf("success connect to server [%s:%d]\n", "127.0.0.1",
+         ntohs(serv.sin_port));
+
+  char buf[256] = {0};
+  while (true) {
+    bzero(buf, sizeof(buf));
+    int n = read(STDIN_FILENO, buf, sizeof(buf));
+    
+    write(cfd, buf, n);
+
+    bzero(buf, sizeof(buf));
+    if (read(cfd, buf, sizeof(buf)) <= 0) {
+      printf("read error or server closed");
+      break;
+    }
+    printf("%s", buf);
+  }
+  
+  /* close(cfd); */
+  shutdown(cfd, SHUT_RDWR); 
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+### IO 多路复用
+<span id="IO-多路复用"></span>
+
+---
+
+#### linux 中的 IO 模型
+
+<span id="linux中的IO模型"></span>
+
+- **阻塞 IO**
+
+这是最常用的简单的IO模型，阻塞IO意味着当我们发起一次IO操作后一直等待成功或失败之后才返回，在这期间程序不能做其它的事情，阻塞IO操作只能对单个文件描述符进行操作，如默认属性的 [read()](#https://man7.org/linux/man-pages/man2/read.2.html) 或 [write()](#https://man7.org/linux/man-pages/man2/write.2.html)
+
+![2020-11-30-12-07-15](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-30-12-07-15.png)
+
+
+- **非阻塞式 IO**
+
+我们在发起IO时，通过对文件描述符设置 `O_NONBLOCK` 属性来指定该文件描述符的 IO 操作为非阻塞，非阻塞 IO 通常发生在一个 for 循环当中，因为每次进行 IO 操作时要么 IO 操作成功，要么当 IO 操作会阻塞时返回错误`EWOULDBLOCK / EAGAIN`，然后再根据需要进行下一次的 for 循环操作，这种类似轮询的方式会浪费很多不必要的CPU资源，是一种糟糕的设计，和阻塞IO一样，非阻塞IO也是通过调用[read()](#https://man7.org/linux/man-pages/man2/read.2.html) 或 [write()](#https://man7.org/linux/man-pages/man2/write.2.html)来进行操作的，也只能对单个描述符进行操作
+![2020-11-30-12-07-57](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-30-12-07-57.png)
+
+
+- **信号驱动 IO**
+
+信号驱动 IO 是利用 [信号](#https://man7.org/linux/man-pages/man7/signal.7.html) 机制，让内核告知应用程序文件描述符的相关事件
+
+信号驱动 IO 在网络编程的时候通常很少用到，因为在网络环境中，和 socket 相关的读写事件太多了，比如下面的事件都会导致 `SIGIO` 信号的产生 : 
+
+1. TCP连接建立
+2. 一方断开TCP连接请求
+3. 断开TCP连接请求完成
+4. TCP连接半关闭
+5. 数据到达TCP socket
+6. 数据已经发送出去(写 buffer 有空余空间)
+
+上面所有的这些都会产生 `SIGIO` 信号，但我们没办法在 `SIGIO` 对应的信号处理函数中区分上述不同的事件， `SIGIO` 只应该在 IO 事件单一情况下使用，比如说用来监听端口的 socket，因为只有客户端发起新连接的时候才会产生 `SIGIO` 信号
+
+![2020-11-30-12-06-09](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-30-12-06-09.png)
+
+- **异步 IO**
+
+异步 IO 和信号驱动 IO 差不多，但它比信号驱动 IO 可以多做一步 : 相比信号驱动 IO 需要在程序中完成数据从用户态到内核态(或反方向)的拷贝，异步 IO 可以把拷贝这一步也帮我们完成之后才通知应用程序，参见 : 
+
+1. [aio_read](#http://man7.org/linux/man-pages/man3/aio_read.3.html)
+2. [aio_write](#http://man7.org/linux/man-pages/man3/aio_write.3.html) 
+3. [linux 异步IO 那点事儿](#https://www.cnblogs.com/feisky/archive/2012/03/02/2377530.html)
+
+![2020-11-30-12-08-21](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-30-12-08-21.png)
+
+<br/>
+
+#### 什么是 IO 多路复用
+
+<span id="什么是IO多路复用"></span>
+
+应用程序通常需要处理来自多条事件流中的事件，比如现在用的电脑，需要同时处理键盘鼠标的输入、中断信号等等事件，再比如web服务器如nginx，需要同时处理来来自N个客户端的事件
+
+> 逻辑控制流在时间上的重叠叫做 <font color = "red">**并发**</font>
+
+CPU 的单核在某一时刻下仅能做一件事情，应对存在多条事件流的情景，一种解决方法就是对 CPU 进行 **_时分复用_**，也就是多个事件流将 CPU 切分为多个时间片，不同事件流的时间片交替执行，这就是所谓的 多线程/进程 的做法
+
+事实上，这种做法是存在成本的，其一就是 线程和进程 的创建是需要时间开销的，其次，在多个时间片轮流执行的情况下，会引发多次 $context \:\: switch$，那么，这种做法其实就大相径庭了
+
+而IO多路复用，<font color = "red">其本质就是使用一个 进程/线程 来处理多种事件流的方案(**_是一种同步 IO 模型_**)，即一个 进程/线程 可以监听多个文件描述符，一旦某个文件描述符就绪(事件的发生)，能够通知程序进行相应的操作</font>，它所解决的本质问题就是用更少的资源去做更多的事情
+
+![2020-11-30-12-07-38](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-30-12-07-38.png)
+
+<br/>
+
+
+#### select
+
+<span id="selectapi"></span>
+
+**_int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)_**
+
+**_<select.h>_**
+
+该函数指定文件描述符位图(集合)以让内核去监听多个文件描述符所指向文件的可读(`readfds`)、可写(`writefds`)、异常(`exceptfds`)事件的发生，其判断标准依赖于文件描述符其所指向的缓冲区的变化情况来决定，一旦某个 IO 模型事件的发生(缓冲区产生变化)，则该函数立即返回，并设置在当前时间下，存在变化的(缓冲区)文件描述符回填至输出参数(`readfds`, `writefds`, `exceptfds`)中
+
+- `nfds` : 需要监控的文件描述符位图(`readfds`, `writefds`, `exceptfds`)的范围，<font color = "red">它的值我们通常指定为当前所指定的文件描述符位图中，最大文件描述符值 +1</font>
+
+- `readfds` : 
+
+  - 输入 : 需要监听读行为的文件描述符所构造的位图，如不需要监听这一行为，则设置为 `NULL`
+
+  - 输出 : 当前时间下存在读行为的文件描述符重新构造出一个新的文件描述符位图并输出
+
+- `writefds` : 
+
+  - 输入 : 需要监听写行为的文件描述符所构造的位图，如不需要监听这一行为，则设置为 `NULL`
+
+  - 输出 : 当前时间下写缓冲区未满可写的文件描述符重新构造出一个新的文件描述符位图并输出
+
+- `exceptfds` : 
+
+  - 输入 : 需要监听异常行为的文件描述符所构造的位图，如不需要监听这一行为，则设置为 `NULL`
+
+  - 输出 : 当前时间下存在异常行为的文件描述符重新构造出一个新的文件描述符位图并输出
+
+- `timeout` : 
+
+  - `NULL` : 永久阻塞函数的调用，直到一个事件的发生
+
+  - `0` : 不阻塞，无论此刻是否发生新的事件，函数都立即返回
+
+  - `> 0` : 指定阻塞的时间 ; 若没有超过该事件则函数调用阻塞 ; 若在时间之内存在事件的发生，函数调用立即返回 ; 若阻塞时间大于该参数所指定的值，函数调用立即返回
+
+**_fd_set_**
+
+`fd_set` 是用于指定 select 具体需要监听的文件描述符的位图，它是一个结构体，其结构如下 : 
+
+```c
+typedef struct{
+/**
+ * XPG4.2 requires this member name.  
+ * Otherwise avoid the name from the global namespace.
+*/
+#ifdef __USE_XOPEN
+  __fd_mask fds_bits[__FD_SETSIZE / __NFDBITS];
+# define __FDS_BITS(set) ((set)->fds_bits)
+#else
+  __fd_mask __fds_bits[__FD_SETSIZE / __NFDBITS];
+# define __FDS_BITS(set) ((set)->__fds_bits)
+#endif
+} fd_set;
+```
+
+事实上，它仅仅只是一个一维数组的存在，我们需要关注的是这个数组的长度，通过继续往下刨析源码，该数组长度最终在宏定义展开后其值为 : `1024`
+
+由宏 `__FD_SETSIZE` 决定了该文件描述符位图的长度为 `1024`，也就意味着，我们无法通过一些 linux 内核的参数调整来改变这个值，即被固定为 `1024`，除非我们手动改写源码，再编译内核以使用
+
+<font color = "red">正因为该数组的长度为 `1024`，也就意味着，select 函数最多仅支持对一种监听行为的文件描述符的监听个数仅被固定在了 `1024`，这也属于 select 函数的缺陷之一</font>
+
+**_操作 fd_set_**
+
+在头文件 `select.h` 中提供了以下四种 **_宏函数_** 来完成对文件描述符位图 `fd_set` 的操作
+
+- void FD_CLR(int fd, fd_set *set) : 将 fd 从 文件描述符位图 set 中移除
+
+- int FD_ISSET(int fd, fd_set *set) : 判断 fd 是否在文件描述符位图 set 中，如果存在则返回1，否则返回0 ; 该宏函数用来判断 `select` 函数返回后，用于检测 `select` 函数的本次返回是否因为指定文件描述符 fd 所产生的行为事件所导致的
+
+- void FD_SET(int fd, fd_set *set) : 将fd设置到文件描述符位图 set 中
+
+- void FD_ZERO(fd_set *set) : 初始化文件描述符位图 set
+
+**_select 的使用_**
+
+下面的代码展示了 select 用于监听 socket 伪文件所指向的缓冲区中是否存在事件(变化)的发生，主要针对于是否有新连接的加入导致产生了监听描述符产生了读事件，是否有连接的新数据的写入导致了通信描述符产生了读事件
+
+<font color = "red">事实上，`select` 函数是针对文件描述符所指向的缓冲区来完成监听工作，也就意味着，只要存在该特性(例如管道，stdin，stdout等等)，都可以使用 `select` 函数来完成某一项工作事件的监听</font>
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <errno.h>
+#include <select.h>
+
+int main(int argc, char *argv[]) {
+  int sfd = socket(AF_INET, SOCK_STREAM, 0x0);
+
+  struct sockaddr_in serv;
+  bzero(&serv, sizeof(serv));
+  serv.sin_family = AF_INET;
+  serv.sin_port = htons(8886);
+  inet_pton(AF_INET, "127.0.0.1", &serv.sin_addr.s_addr);
+  int bflg = bind(sfd, (const struct sockaddr *)&serv, sizeof(serv));
+  
+  listen(sfd, 0x400);
+  printf("[INFO] server start listen\n");
+
+  fd_set tmp_fds, read_fds;
+  FD_ZERO(&tmp_fds);
+  FD_ZERO(&read_fds);
+
+  FD_SET(sfd, &read_fds);
+
+  char buf[0x400] = { 0 };
+  int conn_count = 0;
+  /**
+   * 初始以监听文件描述符作为最大描述符，
+   * 并在这个描述符的基础上，添加客户端
+   * 读写的描述符
+  */
+  int max_fd = sfd;
+  while (true) {
+    /**
+     * 为什么需要一个 temp 来暂存？
+     *
+     * 因为 select 函数返回后，都会改变 fd_set 原本所设置
+     * 的文件描述符的状态
+    */
+    tmp_fds = read_fds;
+
+    int nready = select(max_fd + 1, &tmp_fds, NULL, NULL, NULL);
+    if(nready < 0) continue;
+    printf("%d\n", nready);
+    
+    if (FD_ISSET(sfd, &tmp_fds)) {
+      struct sockaddr_in client;
+      bzero(&client, sizeof(struct sockaddr_in));
+      socklen_t len = sizeof(struct sockaddr);
+
+      int cfd = accept(sfd, (struct sockaddr *)&client, &len);
+      if (cfd < 0) {
+        if (errno == ECONNABORTED || errno == EINTR) {
+          continue;
+        }
+        break;
+      }
+      char dest[16] = {0};
+      printf("accept client [%s:%d]\n",inet_ntop(AF_INET, &client.sin_addr.s_addr, dest, sizeof(dest)), ntohs(client.sin_port));
+      
+      /* 这里这样写是有风险的，会造成服务器 TIME_WAIT 过多，一个 ddos 就完了 */
+      if (++conn_count == FD_SETSIZE) {
+        close(cfd);
+        continue;
+      }
+      
+      /* 新创建的用于与 client 进行沟通的文件描述符转交由 select 进行监控 */
+      FD_SET(cfd, &read_fds);
+      if(max_fd < cfd) max_fd = cfd;
+
+      /* 表示此刻仅仅只是监听到了连接请求，并无数据写入请求 */
+      if (nready == 1) continue;
+    }
+
+    /**
+     * 处理用于 client 通信文件描述符产生变化的情景
+     *
+     * 这里只需要操作用于跟 client 进行读写通信的文
+     * 件描述符即可，更因为通信文件描述符的创建必定
+     * 会在文件描述符之后，故初始下标仅需设置为监听
+     * 描述符后面一位即可
+    */
+    for (size_t i = sfd + 1; i <= max_fd; ++i) {
+      int cfd = i;
+      if (!FD_ISSET(cfd, &tmp_fds)) continue;
+      
+      bzero(buf, sizeof(buf));
+      int n = read(cfd, buf, sizeof(buf));
+      if (n <= 0) {
+        printf("read over or client is closed\n");
+        FD_CLR(cfd, &read_fds);
+        close(cfd);
+      }
+
+      printf("receive %s", buf);
+      write(cfd, buf, n);
+
+      /* 本次仅有一个读写请求，故无需遍历后面的元素 */
+      if (nready == 0) break;
+    }
+  }
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### poll
+
+<span id="pollapi"></span>
+
+**_int poll(struct pollfd *fds, nfds_t nfds, int timeout)_**
+
+**_<poll.h>_**
+
+该函数和 select 的功能一致(包括其底层实现)，依赖于一个包含事件信息的集合 `fds`，其中每个元素包含了需要监听的文件描述符和需要监听的多种 IO事件(**_读、写、异常等等_**)，当该集合中某一个元素(**_文件描述符_**)其缓冲区发生了变化(**_产生事件_**)，则该函数立刻返回，并设置存此刻下缓冲区存在变化的文件描述符至输出参数 `fds` 当中(设置对应元素的 **_revents_** 成员)
+
+- `fds` : 监听事件信息的集合，其元素类型为 `struct pollfd`，该结构体中包含了需要监听的文件描述符和需要具体监听的 IO事件
+  
+- `nfds` : 需要监听的文件描述符的个数，<font color = "red">它映射至 fds 集合中，已经成功初始化的元素(设置了监听行为的)的个数 +1</font>
+
+- `timeout` : 
+
+  - `-1` : 永久阻塞函数的调用，直到一个事件的发生
+
+  - `0` : 不阻塞，无论此刻是否发生新的事件，函数都立即返回
+
+  - `> 0` : 指定阻塞的时间 ; 若没有超过该事件则函数调用阻塞 ; 若在时间之内存在事件的发生，函数调用立即返回 ; 若阻塞时间大于该参数所指定的值，函数调用立即返回
+
+值得一提的是，虽然 poll 和 select 的底层实现是类似的，<font color = "red">但是 poll 无法实现跨平台，反观 select 是支持跨平台编码的</font> ; 其次，<font color = "red">poll 对于需要监听的文件描述符是允许突破 1024 个的限制的，具体多少取决于当前操作系统中对于一个进程最大允许打开的文件描述符的限制(可通过参数配置)</font>
+
+**_struct pollfd_**
+
+```c
+/* Data structure describing a polling request.  */
+struct pollfd {
+  int fd;             /* File descriptor to poll.  */
+  short int events;   /* Types of events poller cares about.  */
+  short int revents;  /* Types of events that actually occurred.  */
+};
+```
+
+- `fd` : 需要通知内核进行监听的文件描述符，当它初始化为 `-1` 时，则代表着通知内核取消对当前下标元素的监听工作
+
+- `events` : 指定需要监听的 IO事件类型，当需要指定内核对该描述符的多种 IO事件 进行监听时，可以通过 **_异或操作符_** 对需要监听的事件类型进行分割
+
+- `revents` : 属于 `poll` 函数调用的返回参数，当 poll 函数返回后，如果是由于当前文件描述符 `fd` 的缓冲区存在变化所导致的，则会回填具体所触发的 IO 事件到该成员中，否则该成员会被置为 `0`(不是因为此描述符的 IO事件 触发所导致 poll 函数的返回)
+
+- `IO-EVENTS`
+
+  - `POLLIN` : 有数据可读(常用)
+　
+  - `POLLRDNORM` : 有普通数据可读
+
+  - `POLLRDBAND` : 有优先数据可读
+
+  - `POLLPRI` : 有紧迫数据可读
+
+  - `POLLOUT` : 写数据不会导致阻塞(缓冲区空余)(常用)
+
+  - `POLLWRNORM` : 写普通数据不会导致阻塞
+
+  - `POLLWRBAND` : 写优先数据不会导致阻塞
+
+  - `POLLMSGSIGPOLL` : 消息可用
+
+  - `POLLER` : 指定的文件描述符发生错误
+  
+  - `POLLHUP` : 指定的文件描述符挂起事件
+
+  - `POLLNVAL` : 指定的文件描述符非法
+
+**_poll 的使用_**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <errno.h>
+#include <poll.h>
+
+int main(int argc, char *argv[]) {
+  int sfd = socket(AF_INET, SOCK_STREAM, 0x0);
+
+  struct sockaddr_in serv;
+  bzero(&serv, sizeof(serv));
+  serv.sin_family = AF_INET;
+  serv.sin_port = htons(8886);
+  inet_pton(AF_INET, "127.0.0.1", &serv.sin_addr.s_addr);
+  int bflg = bind(sfd, (const struct sockaddr *)&serv, sizeof(serv));
+  
+  listen(sfd, 0x400);
+  printf("[INFO] Server start listen in [127.0.0.1:8888]\n");
+
+  struct pollfd fds[0x400];
+  for (size_t i = 0; i < 0x400; ++i) fds[i].fd = -1;
+  
+  /* monitor connection file descriptor */
+  fds[0].fd = sfd;
+  fds[0].events = POLLIN;
+  int max_fd = 0;
+
+  char buffer[0x400] = { 0 };
+  while (true) {
+    int nready = poll(fds, max_fd + 1, -1);
+    if (nready < 0) continue;
+
+    /* new connection arrived */
+    if (fds[0].revents == POLLIN) {
+      struct sockaddr_in client;
+      bzero(&client, sizeof(struct sockaddr_in));
+      socklen_t len = sizeof(struct sockaddr);
+
+      int cfd = accept(sfd, (struct sockaddr *)&client, &len);
+      if (cfd < 0) {
+        if (errno == ECONNABORTED || errno == EINTR) {
+          continue;
+        }
+        break;
+      }
+      char dest[16] = {0};
+      printf("accept client [%s:%d]\n",inet_ntop(AF_INET, &client.sin_addr.s_addr, dest, sizeof(dest)), ntohs(client.sin_port));
+      
+      int i = 0;
+      for (i = 0; i < 0x400; ++i) {
+        if (fds[i].fd == -1) {
+          fds[i].fd = cfd;
+          fds[i].events = POLLIN;
+          break;
+        }
+      }
+
+      if (i == 0x400) {
+        printf("Arrived the max limit connection, please wait a monents\n");
+        close(cfd); /* This code has security risks. */
+        continue;
+      }
+      if (max_fd < i) {
+        max_fd = i;
+      }
+      /**
+       * It's means that only one connection event occurs at the moment,
+       * so we dont't need to executed flowing code at all
+      */
+      if (nready == 1) {
+        continue;
+      }
+    }
+
+    /* Process the read data event */
+    for (size_t i = 1; i <= max_fd; ++i) {
+      if (fds[i].fd == -1) continue;
+      if (fds[i].revents != POLLIN) continue;
+
+      int cfd = fds[i].fd;
+      bzero(buffer, sizeof(buffer));
+
+      int n = read(cfd, buffer, sizeof(buffer));
+      if (n <= 0) {
+        shutdown(cfd, SHUT_RDWR);
+        fds[i].fd = -1;
+        printf("[INFO] Read error or client closed\n");
+        continue;
+      } else {
+        printf("receive %s", buffer);
+        write(cfd, buffer, n);
+      }
+
+      if (nready == 1) break;
+    }
+  }
+
+  shutdown(sfd, SHUT_RDWR);
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+#### epoll
+
+<span id="epollapi"></span>
+
+epoll 是 linux 下IO多路复用接口 select,poll 的增强版本，它能显著提高程序在大量并发连接中只有少量活跃的情况下的系统CPU利用率，就使用方式而言，它和 select,poll 并无较大的区别，其本质还是让一个文件描述符绑定一个 IO 事件以交由内核去进行监听工作，仅当所监听的文件描述符的某一个事件发生时，内核才会将发生事件的文件描述符连同一些附带的信息返回至内核态的用户程序
+
+目前 epoll 是 linux 大规模并发网络程序中的热门首选模型
+
+epoll 和 select 一致，<font color = "red">对于需要监听的文件描述符是允许突破 1024 个的限制的</font>，具体多少取决于当前操作系统中对于一个进程最大允许打开的文件描述符的限制(可通过参数配置)
+
+**_int epoll_create(int size)_**
+
+**_<epoll.h>_**
+
+创建 epoll 其内部所维护的红黑树的树根，并返还指向这个树根的文件描述符
+
+<font color = "red">epoll 内部使用红黑树来维护添加进来需要交由内核进行对应 IO事件 监控的文件描述符</font>
+
+- `size` : 最大节点数, 此参数在linux 2.6.8已被忽略, 但必须传递一个大于0的数
+
+- `return` : 
+
+  - `0` : 调用成功
+
+  - `-1` : 调用失败，并设置 `errno`
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/epoll.h>
+
+#define LISTEN_MAX_LIMIT 0x400
+
+int main(int argc, char *argv[]) {
+  int epfd = epoll_create(LISTEN_MAX_LIMIT);
+  
+  return EXIT_SUCCESS;
+}
+```
+
+**_int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)_**
+
+**_<epoll.h>_**
+
+提供对 epoll 内部所维护的红黑树进行节点的 添加,修改,删除 操作，简而言之就是操作内核针对文件描述符的监控操作
+
+- `epfd` : epoll 内部所维护的红黑树其树根所指向的文件描述符
+
+- `op` : 执行的操作，使用以下宏定义来表示
+
+  - EPOLL_CTL_ADD : 将文件描述符 `fd` 和其需要被监听的IO事件(由 `event` 参数所指定)添加进 epoll 内部所维护的红黑树当中
+	
+  - EPOLL_CTL_MOD : 在 epoll 内部所维护的红黑树当中修改文件描述符 `fd` 和其需要被监听的IO事件(由 `event` 参数所指定)
+
+  - EPOLL_CTL_DEL : 从 epoll 内部所维护的红黑树当中删除文件描述符 `fd` 所映射的节点，也意味着让内核取消对该文件描述符 IO 事件的监听工作(对于删除而言，无需另外指定 `event` 参数)
+
+- `fd` : 设置需要交由内核进行 IO事件 监听的文件描述符
+
+- `event` : 一个结构体，用于存储指定描述符 `fd` 需要被监听的具体的 IO事件 和一些需要被存储的附加信息(<font color = "red">具体所指定的形参仅只是在函数内部做了一个数据的拷贝</font>)
+
+  - `struct epoll_event`
+
+    - `events` : 设置需要具体被监听的 IO 事件，如需指定多种行为可用 异或操作符 进行分割
+
+      - `EPOLLIN` : 表示对应的文件描述符所指向的缓冲区存在可读
+
+      - `EPOLLOUT` : 表示对应的文件描述符所指向的缓冲区存在空间可写
+
+      - `EPOLLPRI` : 表示对应的文件描述符有紧急的数据可读(这里应该表示有带外数据到来)
+
+      - `EPOLLERR` : 表示对应的文件描述符发生错误
+
+      - `EPOLLHUP` : 表示对应的文件描述符被挂断
+
+      - `EPOLLET` :	将EPOLL设为边缘触发$(Edge \:\: Triggered)$模式，这是相对于水平触发$(Level \:\: Triggered)$而言的
+
+      - `EPOLLONESHOT` : 只监听一次事件，当监听完这次事件之后，如果还需要继续监听某个文件描述符的话，需要再次把这个文件描述符添加进 epoll 内部所维护的红黑树当中
+
+    - `data` : 指定当前文件描述符 `fd` 在 epoll 内部所维护的红黑树中所对应节点的一些附加信息，它是一个共用体，其结构如下
+
+    ```c
+    typedef union epoll_data {
+      void *ptr;
+      int fd;
+      uint32_t u32;
+      uint64_t u64;
+    } epoll_data_t;
+    ```
+
+    ```c
+    struct epoll_event {
+      uint32_t events;    /* Epoll events */
+     epoll_data_t data;  /* User data variable */
+    }
+    ```
+
+- `return` : 
+
+  - `0` : 调用成功
+
+  - `-1` : 调用失败，并设置 `errno`
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <sys/epoll.h>
+#include <arpa/inet.h>
+#include <errno.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int sfd = socket(AF_INET, SOCK_STREAM, 0x0);
+
+  struct sockaddr_in serv;
+  bzero(&serv, sizeof(serv));
+  serv.sin_family = AF_INET;
+  serv.sin_port = htons(8886);
+  inet_pton(AF_INET, "127.0.0.1", &serv.sin_addr.s_addr);
+  int bflg = bind(sfd, (const struct sockaddr *)&serv, sizeof(serv));
+  
+  listen(sfd, 0x400);
+  printf("[INFO] server start listen\n");
+
+  int ep_fd = epoll_create(1024);
+
+  struct epoll_event ev;
+  ev.data.fd = sfd;
+  ev.events = EPOLLIN;
+  epoll_ctl(ep_fd, EPOLL_CTL_ADD, sfd, &ev);
+
+  close(ep_fd);
+  close(sfd);
+  return EXIT_SUCCESS;
+}
+```
+
+**_int epoll_wait (int epfd, struct epoll_event *events, int maxevents, int timeout);_**
+
+**_<epoll.h>_**
+
+依照 epoll 内部所维护的红黑树其内部的节点(需要被监听的文件描述符)，等待某一个节点的 IO 事件的发生，并将此刻发生 IO事件 的节点信息回填至 `events` 数组中(会预先对该形参做一次初始化)，并返回此刻具体引发 IO 事件的节点数
+
+- `epfd` : epoll 内部所维护的红黑树其树根所指向的文件描述符
+
+- `events` : 输出参数，当函数调用返回时，会将此刻引发 IO 事件的节点回填至该参数中(函数内部会预先对该形参做一次初始化)，该数组的长度则设置为我们需要 epoll 对文件描述符进行 IO事件 监听的最大数量即可
+
+- `maxevents` : 设置为我们需要 epoll 对文件描述符进行 IO事件 监听的最大数量
+
+- `timeout` : 
+
+  - `-1` : 永久阻塞函数的调用，直到一个事件的发生
+
+  - `0` : 不阻塞，无论此刻是否发生新的事件，函数都立即返回
+
+  - `> 0` : 指定阻塞的时间 ; 若没有超过该事件则函数调用阻塞 ; 若在时间之内存在事件的发生，函数调用立即返回 ; 若阻塞时间大于该参数所指定的值，函数调用立即返回
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <sys/epoll.h>
+#include <arpa/inet.h>
+#include <errno.h>
+#include <unistd.h>
+
+
+int main(int argc, char *argv[]) {
+  int sfd = socket(AF_INET, SOCK_STREAM, 0x0);
+
+  struct sockaddr_in serv;
+  bzero(&serv, sizeof(serv));
+  serv.sin_family = AF_INET;
+  serv.sin_port = htons(8886);
+  inet_pton(AF_INET, "127.0.0.1", &serv.sin_addr.s_addr);
+  int bflg = bind(sfd, (const struct sockaddr *)&serv, sizeof(serv));
+  
+  listen(sfd, 0x400);
+  printf("[INFO] server start listen\n");
+
+  int ep_fd = epoll_create(1024);
+
+  struct epoll_event ev;
+  ev.data.fd = sfd;
+  ev.events = EPOLLIN;
+  epoll_ctl(ep_fd, EPOLL_CTL_ADD, sfd, &ev);
+
+  struct epoll_event events[1024] = { 0 };
+  char buffer[1024] = { 0 };
+  while (true) {
+    int nready = epoll_wait(ep_fd, events, 1024, -1);
+    if(nready < 0) continue;
+
+    for (size_t i = 0; i < nready; ++i) {
+      /* new client connection */
+      if (events[i].data.fd == sfd) {
+        struct sockaddr_in client;
+        bzero(&client, sizeof(struct sockaddr_in));
+        socklen_t len = sizeof(struct sockaddr);
+
+        int cfd = accept(sfd, (struct sockaddr *)&client, &len);
+        if (cfd < 0) {
+          if (errno == ECONNABORTED || errno == EINTR) {
+            continue;
+          }
+          break;
+        }
+        char dest[16] = {0};
+        printf("accept client [%s:%d]\n", inet_ntop(AF_INET, &client.sin_addr.s_addr, dest, sizeof(dest)), ntohs(client.sin_port));
+        
+        ev.data.fd = cfd;
+        ev.events = EPOLLIN;
+        epoll_ctl(ep_fd, EPOLL_CTL_ADD, cfd, &ev);
+
+        continue;
+      }
+
+      /* Process the read data event */
+      int cfd = events[i].data.fd;
+      bzero(buffer, sizeof(buffer));
+
+      int n = read(cfd, buffer, sizeof(buffer));
+      if (n <= 0) {
+        printf("Read error or connection closed\n");
+        close(cfd);
+        epoll_ctl(ep_fd, EPOLL_CTL_DEL, cfd, NULL);
+        continue;
+      }
+      
+      printf("receive %s", buffer);
+      write(cfd, buffer, n);
+    }
+  }
+  
+  close(ep_fd);
+  close(sfd);
+  return EXIT_SUCCESS;
+}
+```
+
+**_epoll 的两种工作模式_**
+
+epoll 对其内部所维护的红黑树节点进行监听的方式拥有两种模式 : $LT(level \:\: trigger)$ 和 $ET(edge \:\: trigger)$，而其中，LT模式模式为 epoll 的默认行为
+
+- LT : 是一种缺省的工作方式，<font color = "red">可支持 blocked 和 non-blocked 文件描述符的操作</font>，在这种做法中，内核会告知某个文件描述符是否就绪了(事件发生)，如果本次(`epoll_wait` 返回)不作任何操作，在下一次执行 `epoll_wait()` 时内核还是会继续重复上一次的通知
+
+- ET : 是一种高速工作的方式，<font color = "red">仅支持 non-blocked 文件描述的操作</font>，在这种模式下，epoll 对于被监听的文件描述符其 IO事件 的发生仅做一个状态的通知，并不保证引起该 IO事件 的源头是否已经被处理，也就是说，即便该文件描述符因为某些原因而引发 IO事件 的原因即便还未处理完毕，epoll 也不会再在做任何通知，除非针对该文件描述符新事件的到来才会让内核重新返回该文件描述符的通知
+
+  - ET 模式在很大程度上减少了 epoll 事件被重复触发的次数，因此效率要比 LT 模式高
+
+  - epoll 工作在 ET 模式的时候，相关描述符必须使用非阻塞式调用，以避免由于一个文件描述符的阻塞导致多个文件描述符的任务饿死
+
+  - 设置 ET 模式很简单，只需要在对相关文件描述符进行事件属性设置(`epoll_ctl()`)时，使用异或操作符添加 `EPOLLET` 宏定义即可
+
+
+**_epoll 反应堆_**
+
+epoll 反应堆是一种开发模式，其借鉴封装的思想，简单的说就是当某个事情发生了，自动的去处理这个事情 ; 这样的思想对我们的编码来说就是 **_设置回调_**，将文件描述符对应的事件和事件产生时的处理函数捆绑在一起，这样当某个文件描述符的事件发生了，回调函数会自动被触发，这就是所谓的反应堆思想
+
+反应堆的核心是 **_回调函数_**，在调用 `epoll_ctrl()` 时，参数 `struct epoll_event` 中的成员 `union epoll_data` 就可以用来指定该文件描述符所绑定的一些信息，借此我们就可以封装一个属于自己的结构体，然后在结构体内部再声明回调函数的成员，以此完成文件描述符和回调函数的封装捆绑操作
+
+下面的代码展示了一个简易版本的 epoll 反应堆
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <sys/epoll.h>
+#include <arpa/inet.h>
+#include <errno.h>
+#include <unistd.h>
+
+#define LISTEN_MAX_LIMIT 0x400
+
+typedef struct ev_handler {
+  void (*invoker)(int, void *);
+  int fd;
+  char buffer[128];
+} ev_handler;
+
+static ev_handler handlers[LISTEN_MAX_LIMIT] = { 0 };
+static int sfd = 0;
+static int epfd = 0;
+
+void write_data(int cfd, void *arg);
+void read_data(int cfd, void *arg);
+void accept_new_client(int sf, void *arg);
+
+void write_data(int cfd, void *arg) {
+  ev_handler *handler = (ev_handler *)arg;
+
+  if (strlen(handler->buffer) > 0) {
+    write(cfd, handler->buffer, 128);
+  }
+
+  struct epoll_event ev;
+  ev.events = EPOLLIN;
+  handler->invoker = read_data;
+  ev.data.ptr = handler;
+  
+  /* 当写入完毕后，改变当前 cfd 未监听缓冲区是否可读行为 */
+  epoll_ctl(epfd, EPOLL_CTL_MOD, cfd, &ev);
+}
+
+void read_data(int cfd, void *arg) {
+  ev_handler *handler = (ev_handler *)arg;
+
+  bzero(handler->buffer, 128);
+  int n = read(cfd, handler->buffer, 128);
+  if (n <= 0) {
+    printf("Read error or connection closed\n");
+
+    handler->fd = -1;
+    close(cfd);
+    epoll_ctl(epfd, EPOLL_CTL_DEL, cfd, NULL);
+  }
+  
+  struct epoll_event ev;
+  ev.events = EPOLLOUT;
+  handler->invoker = write_data;
+  ev.data.ptr = handler;
+  
+  /* 当读取完毕后，改变当前 cfd 为监听缓冲区是否可写的行为 */
+  epoll_ctl(epfd, EPOLL_CTL_MOD, cfd, &ev);
+}
+
+void accept_new_client(int sf, void *arg) {
+  struct sockaddr_in client;
+  bzero(&client, sizeof(struct sockaddr_in));
+  socklen_t len = sizeof(struct sockaddr);
+
+  int cfd = accept(sfd, (struct sockaddr *)&client, &len);
+  if (cfd < 0) exit(EXIT_FAILURE);
+
+  char dest[16] = {0};
+  printf("accept client [%s:%d]\n", inet_ntop(AF_INET, &client.sin_addr.s_addr, dest, sizeof(dest)), ntohs(client.sin_port));
+
+  int idx = 0;
+  for (;idx < LISTEN_MAX_LIMIT; ++idx) if (handlers[idx].fd == -1) break;
+    
+  handlers[idx].fd = cfd;
+  handlers[idx].invoker = read_data;
+
+  struct epoll_event ev;
+  ev.events = EPOLLIN;
+  ev.data.ptr = &handlers[idx];
+
+  epoll_ctl(epfd, EPOLL_CTL_ADD, cfd, &ev);
+}
+
+void init_socket() {
+  sfd = socket(AF_INET, SOCK_STREAM, 0x0);
+  if (sfd < 0) exit(EXIT_FAILURE);
+
+  struct sockaddr_in serv;
+  bzero(&serv, sizeof(serv));
+  serv.sin_family = AF_INET;
+  serv.sin_port = htons(8886);
+  inet_pton(AF_INET, "127.0.0.1", &serv.sin_addr.s_addr);
+  int bflg = bind(sfd, (const struct sockaddr *)&serv, sizeof(serv));
+  
+  listen(sfd, LISTEN_MAX_LIMIT);
+  printf("[INFO] Server start listen at [127.0.0.1:8886]\n");
+}
+
+void init_epoll() {
+  for (size_t i = 0; i < LISTEN_MAX_LIMIT; ++i) handlers[i].fd = -1;
+
+  epfd = epoll_create(LISTEN_MAX_LIMIT);
+
+  ev_handler *handler = &handlers[LISTEN_MAX_LIMIT - 1];
+  handler->fd = sfd;
+  handler->invoker = accept_new_client;
+
+  struct epoll_event ev;
+  ev.events = EPOLLIN;
+  ev.data.ptr = (void *)handler;
+
+  epoll_ctl(epfd, EPOLL_CTL_ADD, sfd, &ev);
+}
+
+int main(int argc, char *argv[]) {
+  init_socket();
+  init_epoll();
+
+  struct epoll_event events[LISTEN_MAX_LIMIT];
+  while (true) {
+    int nready = epoll_wait(epfd, events, LISTEN_MAX_LIMIT, -1);
+
+    for (size_t i = 0; i < nready; ++i) {
+      ev_handler *handler = (ev_handler *)events[i].data.ptr;
+      handler->invoker(handler->fd, handler);
+    }
+  }
+
+  close(epfd);
+  close(sfd);
+  
+  return EXIT_SUCCESS;
+}
+```
+
+
+<br/>
+
+#### 再谈 select poll epoll
+
+<span id="再谈selectpollepoll"></span>
+
+**_select_**
+
+- <font color = "red">内核中实现 select 是用轮询方法，即每次检测都会遍历所有 FD_SET中 中所保有的文件描述符的状态(检测是否有事件发生)</font>，显然，select 函数执行时间与 FD_SET 中的文件描述符的个数呈线性上升的关系，即交由 select 所监控的文件描述符的个数越多，那么效率就越低，其<font color = "red">时间复杂度为 $O(n)$</font>
+
+- <font color = "red">其次，select 的每次调用都需要把 FD_SET 集合从用户态拷贝到内核态</font>，这个开销在同样在 FD_SET 的元素较多时开销很大
+
+- 虽然 select 能够支持跨平台的编码，但是其 FD_SET 集合的长度取决于一个内置的宏定义来完成，即其长度固定为 1024
+
+- select 提供精度更高(微妙)的超时时间
+
+**_poll_**
+
+poll 和 select 的实现其实是非常类似的，存在不同的是 :
+
+- poll 不支持跨平台编码，仅支持 linux 平台
+
+- poll 解锁了最大监听文件描述符的个数
+  
+- select 比 poll 提供了更高精度的超时时间
+
+**_epoll_**
+
+epoll 作为 select 和 poll 的一个进阶引用，它改进了作为前者而言所存在的诸多弊端，而改进这些弊端都绕不开和 epoll 的底层实现息息相关的三种关键要素 : **_红黑树、mmap、双向链表_**
+
+- 对于产生用户态到内核态亦或者反之的数据拷贝情景(需要交由内核监听的文件描述符和其事件拷贝至内核态，亦或者当某一个事件发生时，从内核态拷贝发生相应事件的文件描述符和一些附带信息到用户空间)，epoll 使用了 [mmap](#共享映射区的使用) 来减少了在这上面开销
+
+- 注册到 epoll 的文件描述符和其需要被监听的事件信息将封装成一个树上的节点并插入到 epoll 内部所实现的 **_红黑树_** 中进行维护，当添加或者删除一个节点时(`epoll_ctl`)性能较好，时间复杂度 $O(log_n)$，也正因为红黑树属于一颗平衡二叉树，所以重复添加的节点没有用的
+
+- 每当我们需要将一个文件描述符和其需要被监听的 IO 事件注册进 epoll 时，都会遍历一遍目前已注册在 epoll 进行监听的文件描述符，挨个找到每个文件描述符所对应设备的 **_等待队列_** 并将当前进程挂在进这个队列当中，并为止还注册了一个 **_回调函数_**(该回调函数在内核中称为 : `ep_poll_callback`，其主要功能就是把当前因为事件发生被唤醒的文件描述符添加到一个双向队列 `rdllist` 当中)，每当一个设备的就绪则唤起等待设备队列中的进程，并在这期间就会完成这个回调函数的调用。<font color = "red">那么每当我们使用 `epoll_wait()` 所造成的阻塞操作其内部其实就是对这个双向队列做检查，一旦这个队列中存在被添加进来的文件描述符和其所绑定的事件(当队列为空的话，则调用 `schedule_timeout()` 让当前进程休眠一会)，则函数立即返回，并将双向队列中的数据通过 [mmap](#共享映射区的使用) 拷贝至用户空间以供应用程序进行操作</font>，这里对比 select 和 poll 省去了遍历所有被注册到内核进行监听的文件描述符的工作，在这里的时间复杂度可以理解为 $O(1)$，简而言之，epoll 这一特性可以总结为 : <font color = "red">它只管你 **_'活跃'_** 的设备，而跟 **_设备总数_** 无关</font>
+ 
+- epoll 除了默认使用传统的 $LT(level \:\: trigger)$ 模型以外，还提供了 $ET(edge \:\: trigger)$ 模式，很大程度上减少了 epoll 事件被重复触发的次数
+
+- epoll 和 poll 同样解锁了最大监听文件描述符的个数，并且两者间被影响的参数都指向同一个
+
+- epoll 并不支持跨平台编码
+
+**_三者的 benchmark_**
+
+![2020-11-30-11-59-40](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-30-11-59-40.jpg)
+
