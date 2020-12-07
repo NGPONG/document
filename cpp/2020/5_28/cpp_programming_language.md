@@ -71,6 +71,46 @@
     - [纯虚函数](#纯虚函数)
     - [友元成员](#友元成员)
 - [函数的扩展](#函数的扩展)
+  - [内联函数](#内联函数)
+    - [内联函数的定义](#内联函数的定义)
+  - [函数的参数默认值](#函数的参数默认值)
+  - [函数的重载](#函数的重载)
+- [运算符重载](#运算符重载)
+  - [什么是运算符重载函数](#什么是运算符重载函数)
+  - [运算符重载的使用事项](#运算符重载的使用事项)
+  - [各运算符重载时的约束](#各运算符重载时的约束)
+- [模板](#模板)
+  - [模板的声明](#模板的声明)
+  - [指定模板的虚拟类型 T](#指定模板的虚拟类型)
+  - [指定虚拟类型 T 的默认类型](#指定虚拟类型的默认类型)
+  - [类模板使用默认类型时存在的限制](#类模板使用默认类型时存在的限制)
+  - [模板成员的声明与实现](#模板成员的声明与实现)
+  - [模板机制](#模板机制)
+    - [函数模板](#函数模板)
+    - [类模板](#类模板)
+    - [模板中使用友元](#模板中使用友元)
+- [类型转换](#类型转换)
+  - [静态类型转换](#静态类型转换)
+  - [动态类型转换](#动态类型转换)
+  - [常量类型转换](#常量类型转换)
+  - [重定义转换](#重定义转换)
+- [异常](#异常)
+  - [异常捕获](#异常捕获)
+  - [抛出异常](#抛出异常)
+  - [关于 catch 块中所声明的异常类型的效率问题](#关于catch块中所声明的异常类型的效率问题)
+  - [系统标准异常接口](#系统标准异常接口)
+- [lambda](#lambda)
+  - [lambda表达式的构成](#lambda表达式的构成)
+  - [lambda表达式与函数指针](#lambda表达式与函数指针)
+- [自动推导类型](#自动推导类型)
+  - [auto](#auto)
+  - [decltype](#decltype)
+- [智能指针](#智能指针)
+  - [auto_ptr](#auto_ptr)
+  - [unique_ptr](#unique_ptr)
+  - [shared_ptr](#shared_ptr)
+  - [weak_ptr](#weak_ptr)
+
 
 <br/>
 
@@ -832,7 +872,7 @@ int main(void) {
 
 --- 
 
-匿名对象的初始化通过语法 <font color = "red">类型(值)</font> 来完成，其作为一个表达式中的右操作数存在
+匿名对象的初始化通过语法 <font color = "red">type(value)</font> 来完成，其作为一个表达式中的右操作数存在
 
 - 当匿名对象所指定的数据类型为 **_基础数据类型_** 时，`()` 内的值则直接录入到所创建的变量所处的内存空间当中
 
@@ -2777,7 +2817,7 @@ HEITAN::$vftable@:
 
 #### 纯虚函数
 
-<font color = "red">纯虚函数即声明的虚函数的实现赋值为 0，在这种情况之下，作为其下级派生则 **_必须_** 要对其进行重写，否则会导致编译不通过</font>，并且，<font color = "red">一个类中一旦出现了一个纯虚函数，那么这个类就被编译器认作为一个 抽象类，在 cpp 中对于抽象类的特性仅有不能实例化自身这一点</font>
+<font color = "red">纯虚函数即声明的虚函数的实现赋值为 0，在这种情况之下，作为其下级派生则 **_必须_** 要对其进行重写，否则会导致编译不通过</font>，并且，<font color = "red">一个类中一旦出现了一个纯虚函数，那么这个类就被编译器认作为一个 抽象类</font>，在 cpp 中对于抽象类的特性有仅有一点，即无法使用该抽象类型作为一个声明，即包括: 普通的声明、函数的形参、返回值，<font color = "red">我们是可以理解为，出现抽象类的地方，它只能够以指针或引用的形式而存在</font>
 
 对于纯虚函数而言，它其实和普通的虚函数是一样的，只是对于纯虚函数而言多了一条限制是其往下的派生必须要对该纯虚进行重写，否则会编译不通过
 
@@ -2865,6 +2905,8 @@ int main(void) {
   return EXIT_SUCCESS;
 }
 ```
+
+
 
 <br/>
 
@@ -3057,6 +3099,8 @@ int main(void) {
 
 #### 内联函数的定义
 
+<span id="内联函数的定义"></span>
+
 内联函数的定义方式很简单，在所需要定义为内联函数的开头添加 `inline` 关键字即可，<font color = "red">需要注意的是，当我们函数把一个函数分为声明和定义来实现的时候，我们必须要在声明和定义中都要添加上 `inline` 关键字才算生效</font>
 
 值得一提的是，对于在类中的成员函数编译器在编译的过程中都会自动添加上 `inline` 关键字
@@ -3086,6 +3130,8 @@ inline void foo() {
 
 ### 函数的参数默认值
 
+<span id="函数的参数默认值"></span>
+
 ---
 
 ```cpp
@@ -3095,6 +3141,8 @@ void foo(int i = 0, char c = 'A', const char *str) {
 ```
 
 <br/>
+
+<span id="函数的重载"></span>
 
 ### 函数的重载
 
@@ -3228,6 +3276,8 @@ int main(void) {
 
 <br/>
 
+<span id = "什么是运算符重载函数"></span>
+
 ### 什么是运算符重载函数
 
 --- 
@@ -3289,6 +3339,8 @@ int main(void) {
 ```
 
 <br/>
+
+<span id = "运算符重载的使用事项"></span>
 
 ### 运算符重载的使用事项
 
@@ -3387,6 +3439,8 @@ int main(void) {
 
 
 <br/>
+
+<span id = "各运算符重载时的约束"></span>
 
 ### 各运算符重载时的约束
 
@@ -3873,6 +3927,8 @@ int main(void) {
 
 <br/>
 
+<span id = "模板的声明"></span>
+
 ### 模板的声明
 
 ---
@@ -3903,6 +3959,8 @@ int main(void) {
 ```
 
 <br/>
+
+<span id = "指定模板的虚拟类型"></span>
 
 ### 指定模板的虚拟类型 $T$
 
@@ -3996,6 +4054,8 @@ int main(void) {
 
 <br/>
 
+<span id = "指定模板的虚拟类型"></span>
+
 ### 指定虚拟类型 $T$ 的默认类型
 
 ---
@@ -4031,6 +4091,8 @@ int main(void) {
 ```
 
 <br/>
+
+<span id = "类模板使用默认类型时存在的限制"></span>
 
 #### 类模板使用默认类型时存在的限制
 
@@ -4091,6 +4153,8 @@ int main() {
 
 <br/>
 
+<span id = "模板成员的声明与实现"></span>
+
 ### 模板成员的声明与实现
 
 ---
@@ -4143,9 +4207,13 @@ int main(void) {
 
 <br/>
 
+<span id = "模板机制"></span>
+
 ### 模板机制
 
 --- 
+
+<span id = "函数模板"></span>
 
 #### 函数模板
 
@@ -4204,6 +4272,8 @@ int main() {
 
 <br/>
 
+<span id = "类模板"></span>
+
 #### 类模板
 
 函数模板即 `<template>` 所修饰的成员为一个类
@@ -4258,6 +4328,8 @@ int main() {
 ```
 
 <br/>
+
+<span id = "模板中使用友元"></span>
 
 #### 模板中使用友元
 
@@ -4444,9 +4516,14 @@ int main(void) {
 <br/>
 <br/>
 
+<span id = "类型转换"></span>
+
 ## 类型转换
 
 值得一提的是，对于强制类型转换还是典型的非强制类型转换，即使转换失败也不会在运行时发生错误，仅有的错误只是会得到一个错误的转换结果亦或者是编译级别时所发生的错误，cpp 为了保证类型转换功能的更加安全，其引入了多种类型转换的方式
+
+
+<span id = "静态类型转换"></span>
 
 #### 静态类型转换 : static_cast<type>(expression)
 
@@ -4495,6 +4572,8 @@ int main(void) {
 }
 ```
 
+<span id = "动态类型转换"></span>
+
 #### 动态类型转换 : dynamic_cast<type>(expression)
 
 - 该转换在运行时需要一点额外的开销
@@ -4540,6 +4619,8 @@ int main(void) {
 }
 ```
 
+<span id = "常量类型转换"></span>
+
 #### 常量类型转换 : const_cast<type>(expression)
 
 - 可以将 常量 转换为 非常量，非常量 转换为 常量
@@ -4566,6 +4647,8 @@ int main(void) {
 }
 ```
 
+<span id = "重定义转换"></span>
+
 #### 重定义转换 : reinterpret_cast<type>(expression)
 
 - 重定义转换是一种不安全的转换，它可以把非指针类型转换为指针，又可以把指针类型转化为非指针类型，<font color = "red">不推荐使用</font>
@@ -4583,6 +4666,8 @@ int main(void) {
 
 <br/>
 <br/>
+
+<span id = "异常"></span>
 
 ## 异常
 
@@ -4628,6 +4713,8 @@ int main(void) {
 }
 ```
 
+<span id = "异常捕获"></span>
+
 #### 异常捕获 : try - catch(exception_type instance)
 
 - 尝试执行 **_try_** 块中的代码，仅当可能出现亦或者显示抛出(**_throw_**)的异常则最终会被捕获到 **_catch_** 块的内部
@@ -4641,6 +4728,8 @@ int main(void) {
 - catch 块所声明的异常类型 **_exception_type_** 的实例在 catch 块结束前会释放掉其在栈中的内存数据，<font color = "red">如果所声明的异常类型在堆中存有数据则需要我们进行手动的释放工作，否则会出现内存泄漏的问题</font>
 
 - 对于在一个 try 块中可能抛出的多种不同类型的异常，我们可以指定多种不同异常类型的 catch 块以匹配
+
+<span id = "抛出异常"></span>
 
 #### 抛出异常 : throw expression
 
@@ -4686,6 +4775,8 @@ int main(void) {
 
 - throw 可以写在构造函数当中
 
+<span id = "关于catch块中所声明的异常类型的效率问题"></span>
+
 #### 关于 catch 块中所声明的异常类型的效率问题
 
 我们都知道，throw expression 其实编译器会根据这个 expression 为我们构建一个临时、将亡的 左值 变量，并在最后，捕获到到这个异常的 catch 块中所声明的异常类型会依据这个 左值变量 去完成构造初始化工作，对于内置数据类型的异常类型而言似乎并无太大问题，但是对于一个自定义的异常类型的类来说，由于该类的构造是通过一个对应类型实例的左值变量来完成，故会调用该类型的拷贝构造函数来完成 catch 块中所声明的异常类型的初始化工作，由于在这里调用了拷贝构造函数，故可能会在某些程度上带来性能损失的问题，由于 throw 的 expression 虽然是一个临时的、将亡的变量，但是其实质是一个左值变量，故解决这一方案只需要把 catch 块中所声明的异常类型改为 **_左值引用_** 即可
@@ -4720,6 +4811,8 @@ int main(void) {
   return EXIT_SUCCESS;
 }
 ```
+
+<span id = "系统标准异常接口"></span>
 
 #### 系统标准异常接口 exception
 
@@ -4761,6 +4854,8 @@ int main(void) {
 <br/>
 <br/>
 
+<span id = "lambda"></span>
+
 ## lambda
 
 cpp11 为了简化回调函数定义时繁琐的工作，提供了 **_lambda_** 表达式去用于 **_定义并创建匿名的函数对象_**，<font color = "red">在编译时，编译器则会依据 lambda 表达式的声明形式去构建出一个匿名函数</font>
@@ -4782,6 +4877,8 @@ int main(void) {
 ```
 
 <br/>
+
+<span id = "lambda表达式的构成"></span>
 
 #### lambda 表达式的构成
 
@@ -4830,6 +4927,8 @@ lambda 能够通过 [capture] 所指定的 **_函数对象参数([capture])_** �
 
 <br/>
 
+<span id = "lambda表达式与函数指针"></span>
+
 #### lambda 表达式与函数指针
 
 在没有使用 **_函数对象参数_** 的lambda表达式可以返回一个对应函数类型(形参和返回值类型)并指向刚刚所构建出来的匿名函数地址的 **_函数指针_**
@@ -4860,3 +4959,670 @@ int main(void) {
   return EXIT_SUCCESS;
 }
 ```
+
+<br/>
+<br/>
+
+<span id = "自动推导类型"></span>
+
+## 自动推导类型
+
+<span id = "auto"></span>
+
+### auto
+
+---
+
+**_C++98 auto_**
+
+早在 **_C++98_** 标准中就存在了 auto 关键字，那时的 auto 用于声明变量为自动变量，自动变量意为拥有自动的生命期，但这是多余的，因为就算不使用 auto 声明，变量依旧拥有自动的生命期
+
+```cpp
+int a =10 ;        /* 拥有自动生命期 */
+auto int b = 20 ;  /* 拥有自动生命期 */
+static int c = 30; /* 延长了生命期 */
+```
+
+**_C++11 auto_**
+
+C++98 中的 auto 多余且极少使用，**_C++11_** 已经删除了这一用法，取而代之的是全新的功能 : **_变量的自动类型推断_**，auto 可以在<font color = "red">声明变量的时候根据变量初始值的类型自动为此变量选择匹配的类型</font>
+
+这种用法就类似于 C# 中的 **_var_** 关键字，auto <font color = "red">的自动类型推断发生在编译期</font>，所以使用 auto 并不会造成程序运行时效率的降低，而<font color = "red">是否会造成编译期的时间消耗，我认为是不会的，在未使用 auto 时，编译器也需要得知右操作数的类型，再与左操作数的类型进行比较，检查是否可以发生相应的转化，是否需要进行隐式类型转换</font>
+
+**_auto 的具体使用_**
+
+- 局部变量和全局变量
+
+  ```cpp
+  #include <iostream>
+  using namespace std;
+
+  auto a = 10; /* int */
+
+  auto b = "hello,world"; /* const char * */
+
+  int main(void) {
+    auto c = 10.0; /* double */
+    static auto d = 'a'; /* char */
+
+    cout << typeid(a).name() << endl;
+    cout << typeid(b).name() << endl;
+    cout << typeid(c).name() << endl;
+    cout << typeid(d).name() << endl;
+  }
+  ```
+
+- lambda表达式声明类型, 参数类型, 返回值类型 (**_仅 c++14 支持_**)
+
+  ```cpp
+  #include <iostream>
+  using namespace std;
+
+  int main(void) {
+    auto closure = [](auto x, auto y)->auto { 
+      cout << typeid(x).name() << endl;
+      cout << typeid(y).name() << endl;
+
+      return 10.0;
+    };
+
+    auto var = closure(0x400, "hello,world");
+    cout << typeid(var).name() << endl;
+
+    return EXIT_SUCCESS;
+  }
+  ```
+
+- 定义模板函数时，用于声明依赖模板参数的变量类型
+
+  ```cpp
+  #include <iostream>
+  using namespace std;
+
+  template<typename _Tx, typename _Ty>
+  void multiply(_Tx x, _Ty y) {
+    auto v = x * y;
+    cout << typeid(v).name() << endl;
+  }
+
+  int main(void) {
+    multiply(10.0, 0x400);
+
+    return EXIT_SUCCESS;
+  }
+  ```
+
+- 模板函数依赖于模板参数的返回值
+
+  在 **_c++11_** 时(auto 标准刚出现的版本)，针对于模板函数的返回值类型亦然无法使用 auto 在编译代码前确定模板参数的类型，除非结合 **_decltype_** 关键字来显式的声明返回值类型，当然，<font color = "red">这一标准在 c++14 时已经改进了，在 c++14 时就可以直接通过 auto 在编译期间确定模板函数的返回值类型</font>
+
+  ```cpp
+  template <typename _Tx, typename _Ty>
+  auto multiply(_Tx x, _Ty y)->decltype(_Tx*_Ty) {
+      return x*y;
+  }
+  ```
+
+**_使用 auto 时的注意事项_**
+
+- auto 变量必须在定义时初始化，这类似于const关键字
+
+- 定义在一个 auto 序列的变量必须始终推导成同一类型
+
+```cpp
+auto a4 = 10, a5 = 20, a6 = 30;    /* 正确 */
+auto b4 = 10, b5 = 20.0, b6 = 'a'; /* 错误,没有推导为同一类型 */
+```
+
+- 无法在普通函数中使用 auto 作为函数的形参类型和返回值类型(**_但是可以用于 lambda 表达式_**)
+
+- 不要滥用 auto！
+  
+  - 其一可能会降低代码的可读性
+  
+  - 其二，对于含有 **_proxy class_** 的 class，auto 可能无法正确的获取到正确的用意，正如 **_vector<bool>_**，这是一个特殊的类型，它的返回值并不是 **_bool_** 而是一个 **_proxy bool_**，指示使用的时候只是做了一次强制类型转换所以我们无法发现，那么对其返回值使用 auto 推导，将会得到一个表示单独 **_bool_** 引用的 **_proxy class_**
+
+```cpp
+#include <iostream>
+#include <vector>
+using namespace std;
+
+
+int main(void) {
+  vector<bool> v;
+  v.push_back(true);
+
+  /* class std::_Vb_reference<struct std::_Wrap_alloc<class std::allocator<unsigned int> > > */
+  auto var = v[0];
+  cout << typeid(var).name() << endl;
+
+  return EXIT_SUCCESS;
+}
+```
+
+- 使用auto关键字做类型自动推导时，依次施加一下规则
+
+  1. 如果初始化表达式是引用，则去除引用语义
+
+  ```cpp
+  #include <iostream>
+  using namespace std;
+
+  int main(void) {
+    int a = 10;
+    printf("0x%p\n", &a);
+
+    int &b = a;
+    printf("0x%p\n", &b);
+
+    auto c = b;   /* c -> int */
+    printf("0x%p\n", &c);
+
+    auto &d = b;  /* d -> int & */
+    printf("0x%p\n", &d);
+
+    return EXIT_SUCCESS;
+  }
+  ```
+
+  2. 如果初始化表达式为 const 或 volatile(或者两者兼有)，则除去 const/volatile 语义
+
+  ```cpp
+  #include <iostream>
+  using namespace std;
+
+  int main(void) {
+    const int a = 10;
+    auto b = a;        /* b -> int */
+    const auto c = a;  /* c -> const int */
+    b = 100;           //合法
+    c = 100;           //非法
+
+    return EXIT_SUCCESS;
+  }
+  ```
+
+  3. 如果 auto 关键字带上 & 号，则不去除 const 语意
+
+  ```cpp
+  #include <iostream>
+  using namespace std;
+
+  int main(void) {
+    const int a = 10;
+    auto &b = a; /* b -> const int & */
+
+    return EXIT_SUCCESS;
+  }
+  ```
+
+  4. 初始化表达式为数组时，auto 关键字推导类型为指向数组首元素的指针
+
+  ```cpp
+  #include <iostream>
+  using namespace std;
+
+  int main(void) {
+    int a[3] = { 1, 2, 3 };
+    auto b = a; /* b -> int * */
+    cout << typeid(b).name() << endl;
+
+    return EXIT_SUCCESS;
+  }
+  ```
+
+  5. 若表达式为数组且 auto 带上 &，则推导类型为 **_数组类型_**，这相当于对整个数组取地址(&)
+
+  ```cpp
+  #include <iostream>
+  using namespace std;
+
+  int main(void) {
+    int a[3] = { 1, 2, 3 };
+    auto &b = a; /* b -> int[3] */
+    cout << typeid(b).name() << endl;
+
+    return EXIT_SUCCESS;
+  }
+  ```
+
+<br/>
+
+<span id = "decltype"></span>
+
+### decltype
+
+---
+
+decltype 与 auto 关键字一样，用于进行编译时类型推导，不过它与 auto 还是有一些区别的，decltype 的类型推导并不是像 auto 一样是从变量声明的初始化表达式获得变量的类型，<font color = "red">而是总是以一个普通表达式作为参数，返回该表达式的类型,而且 decltype 并不会对表达式进行求值</font>
+
+**_decltype 的使用_**
+
+- 推导出表达式类型
+
+```cpp
+int i = 4;
+decltype(i) a; /* a -> int */
+```
+
+- 与 using / typedef 合用，用于定义类型
+
+```cpp
+using size_t = decltype(sizeof(0));//sizeof(a)的返回值为size_t类型
+using ptrdiff_t = decltype((int*)0 - (int*)0);
+using nullptr_t = decltype(nullptr);
+```
+```cpp
+vector<int >vec;
+typedef decltype(vec.begin()) vectype;
+for (vectype i = vec.begin; i != vec.end(); i++) {
+}
+```
+
+- 重用匿名类型
+
+```cpp
+#include <iostream>
+#include <vector>
+using namespace std;
+
+struct {
+  int d ;
+  doubel b;
+} anon_s;
+
+int main(void) {
+  decltype(anon_s) as;
+
+  return EXIT_SUCCESS;
+}
+```
+
+- 更多信息参考[这里](#https://www.cnblogs.com/QG-whz/p/4952980.html)
+
+
+<br/>
+<br/>
+
+<span id = "智能指针"></span>
+
+## 智能指针
+
+> 智能指针的作用是管理一个指针，因为存在以下这种情况 : 申请的内存空间在堆中并且在函数结束时忘记显式的释放，造成内存泄漏，使用智能指针可以很大程度上的避免这个问题，因为<font color = "red">智能指针是一个类，当超出了类的实例对象的作用域并无结束时的显式引用(**_作为函数返回值类型并以右值的形式将其生命周期延续到上一个栈帧中_**)时，会自动调用对象的析构函数，析构函数会自动释放资源</font>
+> 
+> C++ 里提供了四种智能指针 : **_auto_ptr_**, **_unique_ptr_**, **_shared_ptr_**, **_weak_ptr_**，就其为我们管理指针的释放时机而言，都大同小异，简单来说，都回依赖于栈帧结束后自动释放栈上的内存以管理，而就使用方式而言，也是大相径庭，都是可以通过其示例的 `get()` 函数获取该容器所管理的指针(<font color = "red">部分指针重载了 **_->_** 和 **_*_** 操作符</font>)，但是它们就实现和使用场景来说还是存在着很大的区别
+
+<br/>
+
+<span id = "auto_ptr"></span>
+
+### auto_ptr
+
+---
+
+auto_ptr 是一种 <font color = "red">**拥有严格对象所有权语义的智能指针**</font>，虽说采用的是 **_所有权_**，但事实上，其所有权仅在运行时能够体现，<font color = "red">在编译期不做任何校验</font>，这就在运行时会产生潜在的内存崩溃问题，就如转移所有权来说，当一个智能指针的所有权转移给了一个新的智能指针的实例，那么旧的将不再使用(留下悬挂的指针)，但是如果再显式引用的话，则会导致内存崩溃，所以<font color = "red">这种智能指针的方案再 **_c++11_** 标准时已被抛弃</font>
+
+```cpp
+#include <iostream>
+#include <memory>
+using namespace std;
+
+int main(void) {
+  auto_ptr<string> ap_1(new string("hello,world"));
+
+  /**
+   * 使用 auto_ptr 内部的移动构造语义，将 ap_1 容器内部
+   * 所维护的指针生命周期的所有权转移至 ap_2，那么 ap_1 此
+   * 时则作为一个非法内存访问的存在
+  */
+  auto_ptr<string> ap_2 = ap_1;
+
+  cout << *ap_1 << endl; /* runtim error: Segmentation fault */
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+<span id = "unique_ptr"></span>
+
+### unique_ptr
+
+---
+
+unique_ptr 由 c++11 中引进，其作为替换 auto_ptr 的存在，它实现了独占式拥有或严格拥有概念，即在运行时<font color = "red">保证同一时间内只有一个智能指针可以指向该对象</font>，它对于避免资源泄露特别有用
+
+既然 unique_ptr 在运行时提供了这一保障，那么对于独占是拥有的保证就需要在编译期做功夫了，是的，该指针提供了编译期完成 auto_ptr 原先在运行时可能产生的错误的校验，即显式的将一个智能指针的所有权转移给了一个新的智能指针的实例，使旧的智能指针成为了一个悬挂指针，在调用它时则必定会产生内存崩溃的风险
+
+```cpp
+#include <iostream>
+#include <memory>
+using namespace std;
+
+int main(void) {
+  unique_ptr<string> ap_1(new string("hello,world"));
+
+  /* 编译时产生错误，无法将左值转移至新的智能指针实例，避免产生悬挂指针的风险 */
+  unique_ptr<string> ap_2 = ap_1;
+
+  return EXIT_SUCCESS;
+}
+```
+
+unique_ptr 提供一个更加人性化的地方就是，<font color = "red">对于源操作数是将亡右值的存在，编译期是允许新操作数对原操作的所有权转移的</font> ; <font color = "red">而对于源操作数可能会存在一定时间的情况(左值)，编译期是不允许这种操作的，这也就映射了上面代码所反馈的情景，也就是可能会产生悬挂指针的情况</font>
+
+对于源操作数是将亡右值的存在就允许所有权转移这一特性是合理的，因为一个右值在诞生之初就需要存在一个容器(新实例)来将其在内存中的数据显式的移动到容器内部，那么对于智能指针而言，随同移动的也就包括其原本所管理的指针在内存中的生命周期，这只是换了个人暂时管理而已
+
+那么对于使用 `move()` 语义来完成左值所有权的转移其实也是允许的，但是这种方式同样会造成源操作数会产生悬挂指针的情景，但是就这一点而言，我们使用 `move()` 语义是我们自己所决定的(避免了 auto_ptr 隐式完成)，所以这点风险也应当由负责这段代码的编写人员来承担
+
+```cpp
+#include <iostream>
+#include <memory>
+using namespace std;
+
+class test {
+  int idx;
+
+public:
+  test(int _idx) {
+    this->idx = _idx;
+  };
+
+  test(const test &te) {
+    this->idx = te.idx;
+  }
+
+  test(test &&te) {
+    this->idx = te.idx;
+    te.idx = 0;
+  }
+
+  ~test() {
+    printf("test destructor\n");
+  }
+  
+};
+
+unique_ptr<test> foo() {
+  test *p = new test(1024);
+  printf("0x%p\n", p);
+
+  return unique_ptr<test>(p);
+}
+
+int main(void) {
+  unique_ptr<test> up_1 = foo();
+
+  unique_ptr<test> up_2(new test(1024)); /* 悬挂指针 */
+  unique_ptr<test> up_3 = move(up_2);    /* 显式的将 up_2 的所有权移动至 up_3 */
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+<span id = "shared_ptr"></span>
+
+### shared_ptr
+
+---
+
+shared_ptr 实现 **_共享式拥有_** 概念，多个 shared_ptr 可以共同引用至同一个资源，仅当 **_最后一个引用该资源的 shared_ptr 被销毁_** 时，该资源才真正被释放
+
+为了维持智能指针对于资源的引用计数的关系，每个 shared_ptr 内部除了管理着一块内存(地址)的生命周期外，还拥有着一个引用计数，<font color = "red">**_当一个新的 shared_ptr 使用一个源 shared_ptr 完成了构造_**，那就意味着这个新的 shared_ptr 和源 shared_ptr 内部共同维护着同一块内存生命周期，并且两者间其内部对于该资源的引用计数就会 +1(默认是 1 的话那构造完毕后，引用计数则为 2)，这也表示着，这块内存生命周期目前由两个 shared_ptr 所维护着，当某一方放弃了对该资源的引用(**_shared_ptr 被释放亦或者显式调用_** `reset()`)，则该引用计数则会 -1，仅当引用计数为 0 时，这块资源才真正的被释放</font>
+
+```cpp
+#include <iostream>
+#include <memory>
+using namespace std;
+
+class test {
+public:
+  int idx;
+
+  test(int _idx) : idx(_idx){};
+ 
+  ~test() {
+    printf("0x%p\n", this);
+    cout << "test destructor" << endl;
+  }
+};
+
+void foo() {
+  /*
+  +-----+
+  | ps1 |
+  +--+--+
+     |
+     |
+     |
+     |  +----+
+     +--> t1 |
+        +----+
+  */
+  shared_ptr<test> ps_1 = make_shared<test>(0x400);
+
+  /*
+  +-----+    +-----+
+  | ps1 |    | ps2 |
+  +--+--+    +--+--+
+     |          |
+     |          |
+     |          |
+     |  +----+  |
+     +--> t1 <--+
+        +----+
+  */
+  shared_ptr<test> ps_2 = ps_1;
+
+  /*
+  +-----+    +-----+               +-----+
+  | ps1 |    | ps2 |               | ps3 |
+  +--+--+    +--+--+               +--+--+
+     |          |                     |
+     |          |                     |
+     |          |                     |
+     |  +----+  |             +----+  |
+     +--> t1 <--+             | t2 <--+
+        +----+                +----+
+  */
+  shared_ptr<test> ps_3 = make_shared<test>(0x200);
+
+  /*
+  +-----+    +-----+               +-----+
+  | ps3 |    | ps2 |               | ps1 |
+  +--+--+    +--+--+               +--+--+
+     |          |                     |
+     |          |                     |
+     |          |                     |
+     |  +----+  |             +----+  |
+     +--> t1 <--+             | t2 <--+
+        +----+                +----+
+  */
+  swap(ps_1, ps_3);
+
+  /*
+       +-----+    +-----+    +-----+
+       | ps3 |    | ps2 |    | ps1 |
+       +--+--+    +--+--+    +--+--+
+          |          |          |
+          |          |          |
+          |          |          |
+  +----+  |          |  +----+  |
+  | t1 <--+          +--> t2 <--+
+  +----+                +----+
+  */
+  ps_2 = ps_1;
+
+  /*
+       +-----+    +-----+    
+       | ps3 |    | ps2 |    
+       +--+--+    +--+--+    
+          |          |        
+          |          |        
+          |          |        
+  +----+  |          |  +----+
+  | t1 <--+          +--> t2 |
+  +----+                +----+
+  */
+  ps_1.reset();
+
+  /**
+   * 由于栈帧的特性，故该函数的栈帧在出栈时，其释放顺序是从下到上来完成，
+   * 也就是说，释放的时候先释放的 ps_3，这时候检查 ps_3 内部的引用计数
+   * 为 1，这时候就会把 ps_3 内部所维护的资源也一起释放，然后再释放 ps_2
+   * 检查 ps_2 内部的引用计数为 1，这时候就会释放掉 ps_2 内部所维护的资源，
+   * 最后释放 ps_1，由于 ps_1 已经经过了 reset，故其内部没有维护任何内存的
+   * 生命周期，故它只是完成了其自身的释放工作
+  */
+}
+
+int main(void) {
+  foo();
+
+  return EXIT_SUCCESS;
+}
+```
+
+这里要重点强调的是这个引用计数，<font color = "red">引用计数的增加需要一个新的 shared_ptr 使用一个源 shared_ptr 完成了构造后才会增加的，单纯新的 shared_ptr 在构造时只是使用了和源 shared_ptr 内部所维护的相同资源是无法完成 shared_ptr 内部的引用计数的正确计算的</font>，虽然该方式称之为资源被多少个智能指针所引用，但这只是一个抽象的概念，真正完成引用计数的计量还是要依靠 shared_ptr 自身，那么反过来，<font color = "red">对于引用计数的减少也是需要依赖于 shared_ptr 实例本身的释放才能够完成引用计数的减少，单纯的去释放掉所引用的资源是无法完成引用计数的减少的</font>
+
+如下面的代码，由于新的 shared_ptr 的构造仅仅只是使用具体的资源来完成而不是使用源 shared_ptr 来完成，那么这两个智能指针虽然会共同维护着一块资源，但是它们内部对于该资源的引用计数都是 1，也就意味着，函数退出后则会产生资源被重复释放的问题
+
+```cpp
+#include <iostream>
+#include <memory>
+using namespace std;
+
+class test {
+public:
+  ~test() {
+    cout << "test destructor" << endl;
+  }
+};
+
+void foo() {
+  test *p = new test();
+
+  shared_ptr<test> sp_1(p);
+  shared_ptr<test> sp_2(p);
+
+  cout << sp_1.use_count() << endl;
+  cout << sp_2.use_count() << endl;
+}
+
+int main(void) {
+  /* 重复释放 */
+  foo();
+
+  return EXIT_SUCCESS;
+}
+```
+
+需要注意的是，<font color = "red">当两个对象相互使用一个 shared_ptr 成员变量指向对方，会造成循环引用，使引用计数失效，从而导致内存泄漏</font>，正如下面的例子，当函数在出栈后，pa 和 pb 得到了释放，故其内部所维护的引用计数都各自 -1，但是由于 pa 和 pb 内部所维护的内存其内部又各自维护了一个指向对方的 shared_ptr，故这时候由于 pa 和 pb 所维护的资源其引用计数还是 1，所以这两个资源无法释放，故产生内存泄露
+
+```cpp
+#include <iostream>
+#include <memory>
+using namespace std;
+
+class B;
+
+class A {
+public:
+  shared_ptr<B> pb_;
+
+  ~A() {
+    cout << "A destructor\n";
+  }
+};
+
+class B {
+public:
+  shared_ptr<A> pa_;
+
+  ~B() {
+    cout << "B destructor\n";
+  }
+};
+
+void foo() {
+  shared_ptr<B> pb(new B());
+  shared_ptr<A> pa(new A());
+  cout << pb.use_count() << endl; /* 1 */
+  cout << pa.use_count() << endl; /* 1 */
+  pb->pa_ = pa;
+  pa->pb_ = pb;
+  cout << pb.use_count() << endl; /* 2 */
+  cout << pa.use_count() << endl; /* 2 */
+}
+
+int main(void) {
+  foo();
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+<span id = "weak_ptr"></span>
+
+### weak_ptr
+
+---
+
+在 shared_ptr 一节的最后还提到了一种内存泄漏的例子，这是由于 shared_ptr 拥有着 **_强引用资源_** 的特性所导致的，即 : 只要一个新的 shared_ptr 使用源 shared_ptr 进行构造，那么其 "内部所维护的资源的引用计数就必定会 +1"(抽象概念来说)
+
+在这里，c++11 还提供了一种支持 **_弱引用资源_** 的指针，即 weak_ptr，weak_ptr 是一种不控制对象生命周期的智能指针, 它指向了一个 shared_ptr 管理的对象，对于该对象进行内存管理的还是 shared_ptr(<font color = "red">**_weak_ptr 可以通过特殊手段来获取 shared_ptr 以完成内存的管理工作_**</font>)， weak_ptr 只是提供了对管理对象的一个访问手段(<font color = "red">**_其内部并没有重载 * 和 ->_**</font>)
+
+weak_ptr 设计的目的是为配合 shared_ptr 而引入的一种智能指针来协助 shared_ptr 工作, 它只可以从一个 shared_ptr 或另一个 weak_ptr 对象构造, <font color = "red">它的构造和析构不会引起引用记数的增加或减少</font>，具体来说，不会引起减少的仅仅只是属于 shared_ptr 的引用计数，而对于 weak_ptr 其内部自成一套引用计数的体系，也就是说，增加或者减少的仅仅只是 weak_ptr 内部的那个引用计数，而对于 shared_ptr 无影响
+
+weak_ptr 是对对象的一种弱引用，不会增加对象的引用计数，和 shared_ptr 之间可以相互转化，shared_ptr 可以直接赋值给它，它也可以通过调用 `lock()` 来获得 shared_ptr 以完成管理内存的操作
+
+下面的代码使用了 weak_ptr 进行了改进就避免了 shared_ptr 由于循环引用导致的内存泄漏的问题，我们声明了 pb_ 的类型为 weak_ptr，那么当 `pa->pb_ = pb;` 时，并不会引起 pb 其内部的引用计数的减少，也就是在函数栈帧出栈时，pb 的引用计数为 1，这时候就会引起 class B 的释放，随着 class B 的释放，其内部所维护的的 pa 的引用计数就会 -1，再加上函数栈帧出栈时，pa 的引用计数又 -1，所以会引起 class A 的释放，因为 class A 的释放，连同的还带着 pb_ 的释放，又由于 pb_ 在前面已经是放过，故该 weak_ptr 其内部的 shared_ptr 的引用计数已经是 0，故不会进行任何操作(不会重复释放内存)
+
+```cpp
+#include <iostream>
+#include <memory>
+using namespace std;
+
+class B;
+
+class A {
+public:
+  weak_ptr<B> pb_;
+
+  ~A() {
+    cout << "A destructor\n";
+  }
+};
+
+class B {
+public:
+  shared_ptr<A> pa_;
+
+  ~B() {
+    cout << "B destructor\n";
+  }
+};
+
+void foo() {
+  shared_ptr<B> pb(new B());
+  shared_ptr<A> pa(new A());
+  cout << pb.use_count() << endl; /* 1 */
+  cout << pa.use_count() << endl; /* 1 */
+  pb->pa_ = pa;
+  pa->pb_ = pb;
+  cout << pb.use_count() << endl; /* 1 */
+  cout << pa.use_count() << endl; /* 2 */
+}
+
+int main(void) {
+  foo();
+
+  return EXIT_SUCCESS;
+}
+```
+
