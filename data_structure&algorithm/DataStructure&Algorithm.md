@@ -1114,7 +1114,37 @@ int Destory(struct Stack *stack) {
 
 #### KMP
 
-KMP 算法的核心在于匹配串 $partten$ 的 $Prefix-table$，即字符前缀表，<font color = "red">它的值为匹配串挨字节拆分出所有的字串的最大公共前后缀的值</font>
+KMP 算法的核心在于匹配串 $partten$ 的 $Prefix-table$，即字符前缀表，<font color = "red">它的值为匹配串挨字节拆分出所有的字串的最大公共前后缀(比原始串的长度要短)的值</font>
+
+> 什么是最长公前后缀？
+> 
+> 就拿字符串 **_"abab"(0,1,2,3)_** 来说，它的前缀 **_"ab"(0,1)_** 和 后缀 **_"ab"(2,3)_** 是一样的，所以 **_"ab"_** 就属于 **_"abab"_** 的最长公共前后缀，即它的长度为 **_2_**
+> 
+> 挨字节拆分是什么意思？
+> 
+> 比如说待匹配串 partten 为 **_"ababc"_**，那么挨字节拆分就有以下情况
+> 1. (0) a 
+> 2. (0) ab 
+> 3. (1) aba
+> 4. (2) abab
+> 5. (0) ababc
+> 
+> 那么，我们就需要依据每种情况去计算出它的最长公共前后缀的长度并保存至一个一维数组(顺序则为拆分出来的字串由短至长的顺序)
+> 
+> 所以这 $Prefix-table$ 按匹配串 patten 的位置就是如下的情况
+> 
+> ```text
+> a b a b c
+> 0 0 1 2 0
+> ```
+> 
+> 
+> 事实上，最后一个拆分出来的子串 (**_"ababc"_**) 我们通常不会用，并且为了后面的计算方便，我们会让整体的 $Prefix-table$ 后移一位，然后第一位以 **_-1_** 来填充，所以真正使用的时候，我们的 $Prefix-table$ 按匹配串 patten 的位置就是如下的情况
+> 
+> ```text
+>  a b a b c
+> -1 0 1 2 0
+> ```
 
 在正式匹配字符串步骤时，就可以使用上一步所计算出来的匹配串的 $Prefix-table$ ; 挨字符匹配，当存在一个字符不相同时，指向匹配串的指针则依据当前锁定为到的匹配串的下标更改为 $Prefix-table$ 中找到的值，这时候其实我们就会发现，<font color = "red">原始串的位置和匹配串的位置无非就是跳过了前面一些已经匹配过的内容，并使用匹配串的前缀对齐到了原始串的后缀，是的，KMP算法的核心就是跳过一些没必要匹配的内容来完成的字符串匹配算法</font>
 
@@ -1939,16 +1969,6 @@ bool union_set_quick(int x, int y) {
   return true;
 }
 
-void initialise_disjoint_set() {
-  /* rank */
-  memset(rank, 0x0, sizeof(rank));
-
-  /* parent_set */
-  for (size_t i = 0; i < VERTICES; ++i) {
-    parent[i] = i;
-  }
-}
-
 /* @breif 查找一副图是否存在环 */
 void find_cycle_in_graph(void) {
   /**
@@ -2101,7 +2121,7 @@ _*无向图*_
 
 若一张图的顶点 $V_i$ 到顶点 $V_j$ 之间的边<span style='color:red'>没有方向</span>，则称这条边为<span style='color:red'>无向边</span> $(Edge)$
 
-无向边所连接的两个顶点 $V_i$ 与 $V_j$，这条无向边表示为<span style='color:red'>无序对</span> $: (V_i ,V_j)$，也正因为它是一条无向边，故我们还可以表示为 $: (V_j ,V_i)$
+无向边所连接的两个顶点 $V_i$ 与 $V_j$，这条无向边表示为<span style='color:red'>无序对</span> $: (V_i ,V_j)$
 
 若一张图中的任意两个顶点之间的边都属于无向边，那么这张图就是一张<span style='color:red'>无向图</span> $(Undirected$ $graphs)$
 
@@ -2115,7 +2135,7 @@ _*有向图*_
 
 若一张图的顶点 $V_i$ 到顶点 $V_j$ 之间的边<span style='color:red'>有方向</span>，则称这条边为<span style='color:red'>有向边</span>，更多的，我们会称它为<span style='color:red'>弧</span> $(Arc)$
 
-有向边所连接的两个顶点，其中 $V_i$ 指向 $V_j$，那么这条弧表示为<span style='color:red'>有序偶</span> $: (V_i ,V_j)$，$V_i$ 称为<span style='color:red'>弧尾</span> $(Tail)$，$V_j$ 称为<span style='color:red'>弧头</span> $(Head)$
+有向边所连接的两个顶点，其中 $V_i$ 指向 $V_j$，那么这条弧表示为<span style='color:red'>有序偶</span> $: <V_i ,V_j>$，$V_i$ 称为<span style='color:red'>弧尾</span> $(Tail)$，$V_j$ 称为<span style='color:red'>弧头</span> $(Head)$
 
 若一张图中的任意两个顶点之间的边都属于有向边，那么这张图就是一张<span style='color:red'>有向图</span> $(Directed$ $graphs)$
 
@@ -3042,7 +3062,7 @@ void dijkstra(n_graph *G) {
         /* 当前顶点入队 */
         node tmp;
         tmp.idx = j;
-        tmp.priority = G->arc[j][pre.idx]
+        tmp.priority = pre.priority + G->arc[pre.idx][j];
         push(&queue, tmp);
 
         /* 纳入最短路径的顶点之中 */
@@ -3319,29 +3339,43 @@ _*折半查找*_
 ![2020-11-04-23-58-07](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-04-23-58-07.png)
 
 ```c
-int binary_search(int *arrary, int key, int size) {
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+int binary_search(int *arrary, int key, int len) {
   int low = 0;
-  int hig = size - 1;
+  int high = len - 1;
 
-  while (low <= hig) {
-    int mid = (low + hig) / 2;  /* 取中间下标 */
-    if(key < arrary[mid])       /* 若 key 值比预估的数小，则最大指针下标需要从 mid 处 -1(跳过重复的判断) */
-      hig = mid - 1;
-    else if (key > arrary[mid]) /* 若 key 值比预估的数大，则最小指针下标需要从 mid 处 +1(跳过重复的判断) */
+  int mid = 0;
+  while (true) {
+    mid = (low + high) / 2;
+
+    if (arrary[mid] < key) {
       low = mid + 1;
-    else                        /* 若最大和最小相等，则意味着 low 和 high 指针指向同一个下标，即找到了位置 */
+    } else if (arrary[mid > key]) {
+      high = mid - 1;
+    } else if(arrary[mid] == key) {
       return mid;
+    } else {
+      return -1;
+    }
   }
-
-  return -1;
 }
 
 int main(void) {
   int arrary[] = { 0, 1, 16, 24, 35, 47, 59, 62, 73, 88, 99 };
-  binary_search(arrary, 62, sizeof(arrary) / sizeof(int));
+  
+  int idx = 0;
+  if((idx = binary_search(arrary, 89, sizeof(arrary) / sizeof(int))) != -1) {
+    printf("dected [%d]\n", idx);
+  } else {
+    printf("none\n");
+  }
 
   return EXIT_SUCCESS;
 }
+
 ```
 
 在前面二叉树的性质小节中，有过对 "具有 $n$ 个结点的完全二叉树的深度为 $└log2^n┘ + 1$ 性质的推导过程，在这里尽管折半查找判定二叉树并不是完全二叉树，但同样相同的推导可以得出，最坏情况是查找到关键字或查找失败的次数为$└log2^n┘ + 1$，对于最好的情况，，当然是1次了。因此最终我们<font color = "red">折半算法的时间复杂度为 $O(logn)$</font>，它显然远远好于顺序查找的 $O(n)$ 时间复杂度了
