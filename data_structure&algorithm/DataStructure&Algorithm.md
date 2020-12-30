@@ -1624,6 +1624,58 @@ int Postorder_Traverse_BinaryTree(Binary_Tree *tree) {
 
 <br/>
 
+_*递推式遍历*_
+
+```c
+int Preorder_Traverse_BinaryTree_WithoutRecursion(Binary_Tree *tree) {
+  if (tree == 0x0)
+    return -1;
+
+  struct Stack *stack = init_stack();
+
+  /* 1st Step: Push the root element into stack */
+  push(stack, tree);
+
+  /* Start traverse - Preorder */
+  while (1) {
+    /* End of traverse means all tree node was accessed */
+    if (stack->s_size == 0) {
+      break;
+    }
+
+    /*
+     * We need to pop the top element in stack at first time,
+     * When the member flag is 1, it means that this element needs to be output
+     */
+    stack_element *element = pop(stack);
+    if (element->tag == 1) {
+      printf("\n[*] Traverse Binary-tree: Value = %c, Address = %p\n\n",
+             element->data, element);
+      element->tag = 0;
+      continue;
+    } else {
+      element->tag = 1;
+      if (element->right != NULL) {
+        push(stack, element->right);
+      }
+      if (element->left != NULL) {
+        push(stack, element->left);
+      }
+      /* Put the element that just popped on the top of the stack again */
+      push(stack, element);
+
+      continue;
+    }
+  }
+
+  destory_stack(stack);
+
+  return 0;
+}
+```
+
+<br/>
+
 _*遍历结果的推理*_
 
 - 已知前序遍历序列和中序遍历序列，可以唯一确定一棵二叉树
@@ -1639,6 +1691,7 @@ _*遍历结果的推理*_
 	关于推理过程请查看 《大话数据结构》 6.8.6 章节
 
 <br/>
+
 
 #### 二叉树的建立
 
@@ -1768,6 +1821,8 @@ int Preorder_Create_BinaryTree(Binary_Tree **tree, Binary_Tree *parent) {
 
 <span id = "二叉树的深度"></span>
 
+_*递归建立*_
+
 ```c
 /* The deep for Binary-Tree */
 int BinaryTree_Deep(struct binary_node *node) {
@@ -1786,6 +1841,42 @@ int BinaryTree_Deep(struct binary_node *node) {
 
   return deep;
 }
+```
+
+_*非递归建立*_
+
+非递归建立类似于，$BFS$ 的思想，即逐层将节点写入到一个队列中，然后在下一次循环的时候取出再重复这个操作，只要在每次循环的开始判断这个队列不为空，则代表着树的高度需要增加 1
+
+```cpp
+#include <queue>
+#include <iostream>
+
+#include "binary_tree.h"
+
+int main(void) {
+  tree_node *root = NULL;
+  postorder_create_binaryTree(root);
+
+  std::queue<tree_node *> q;
+  q.push(root);
+
+  uint32_t depth = 0;
+  while (!q.empty()) {
+    ++depth;
+
+    int count = q.size();
+    for (int i = 0; i < count; ++i) {
+      tree_node *node = q.front(); q.pop();
+      if (node->left) q.push(node->left);
+      if (node->right) q.push(node->right);
+    }
+  }
+
+  std::cout << depth << std::endl;
+  
+  return EXIT_SUCCESS;
+}
+
 ```
 
 <br/>
