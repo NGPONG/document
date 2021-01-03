@@ -36,7 +36,10 @@
     - [语义使用时必须要注意的问题](#语义使用时必须要注意的问题)
     - [语义用于修饰一个数组类型的构造](#语义用于修饰一个数组类型的构造)
     - [布置-new](#布置-new)
+    - [关于内存不足时的错误处理动作](#关于内存不足时的错误处理动作)
+    - [无异常 new](#nothrow-new)
   - [delete](#delete)
+  - [new/delete vs. malloc/free](#newdeletevsmallocfree)
 - [类](#类)
   - [访问权限符](#访问权限符)
   - [this-和-base](#this-和-base)
@@ -1009,15 +1012,17 @@ int main(void) {
 
 ---
 
-new 是一个修饰语义，其语义可以拆分为 : <font color = "red">new 类型声明方式</font>，它通常<font color = "red">用于修饰一个匿名对象亦或者一个具体的类型的创建</font>，并作为一段代码表达式中的右操作数而存在，一个完整的 new 表达式整体来说干了三件事情 :
+new 是一个修饰语义，它是一种 **_运算符_**，其语义可以拆分为 : <font color = "red">new 类型声明方式</font>，它通常<font color = "red">用于修饰一个匿名对象亦或者一个具体的类型的创建</font>，并作为一段代码表达式中的右操作数而存在，一个完整的 new 表达式整体来说干了三件事情 :
 
-- 根据它所修饰的 **_匿名对象亦或者具体类型_** 的长度(大小)在 **_堆_** 中创建一段相应长度的内存空间并判断是否成功创建
+- 根据它所修饰的 **_匿名对象亦或者具体类型_** 的长度(大小)在 **_自由存储区_** $(free \:\: store)$ 中创建一段相应长度的内存空间并判断是否成功创建，<font color = "red">当自由存储区的内存空间不足时，默认行为下的 new 语义则是抛出一个异常以供上层捕获</font>
 
-- 依据 new 关键字所修饰的 **_类型声明方式_** 去初始化刚刚所创建的内存空间(new 关键字所修饰的表达式可以是仅仅作为一个类型而存在，当 new 所修饰的表达式仅仅是作为一个类型存在的时候，我们要保证相应的类型是存在默认的构造函数以供 new 在申请了一块堆空间后可供调用以初始化这块堆空间，否则会造成编译失败，对于这个默认的构造函数，通常值得我们考虑的仅为自定义对象这类的复合类型，对于基础数据类型的默认构造函数看编译器实现的不同而不同，但是通常都是初始化为 0)
+- 依据 new 关键字所修饰的 **_类型声明方式_** 去初始化 ( <font color = "red">通过调用构造函数的方式</font> ) 刚刚所创建的内存空间 ( <font color = "red">new 关键字所修饰的表达式可以是仅仅作为一个类型而存在</font>，当 new 所修饰的表达式仅仅是作为一个类型存在的时候，我们要保证相应的类型是存在默认的构造函数以供 new 在申请了一块堆空间后可供调用以初始化这块堆空间，否则会造成编译失败，对于这个默认的构造函数，通常值得我们考虑的仅为自定义对象这类的复合类型，对于基础数据类型的默认构造函数看编译器实现的不同而不同，但是通常都是初始化为 0 )
 
-- 最后它会返回在堆中所创建的内存空间段的首地址(new 关键字所修饰类型的指针)
+- 最后它会返回在堆中所创建的内存空间段的首地址 ( <font color = "red">new 关键字所修饰类型的指针</font> )
 
-需要提及的是，对于 new 来说它和 `malloc()` 的作用似乎很相似，其实不然，<font color = "red">new 所做的工作就是属于 malloc 上的延伸</font>，对于单独使用 malloc 而言虽然也能够完成动态内存的管理，但是我们都知道 malloc 本身也是存在着许许多多的让开发人员不爽的问题，诸如 : 每次申请内存都需要具体指定一个申请内存空间的大小，并且申请完成后我们还需手动点判断下是否内存申请失败，最重要的是，由于 cpp 引入了 OOP 的概念和开发模式，<font color = "red">故单纯的使用 malloc 申请内存并不支持指定一个我们所需要的构造函数(如果存在的话)去完成 malloc 后的内存空间的初始化工作(编译器并没有提供)</font>，故在 cpp 中对于内存的管理方式官方更加的推荐我们使用 new 去完成
+!!! info
+
+    上面提到了 **_自由存储区_**，该区域其实是 c++ 中的一种抽象的概念，<font color = "red">它具体所指代的位置需要看编译器对 new 关键字的实现，它可以存在于 **_堆_** 中也可以存在于 **_静态存储区_** 中</font>
 
 ```cpp
 class Test {
@@ -1038,14 +1043,15 @@ int main(void) {
 }
 ```
 
+<br/>
 
 <span id = "语义使用时必须要注意的问题"></span>
 
 #### new 语义使用时必须要注意的问题
 
-使用 new 语义所创建的对象(拥有动态存储期的对象)，其生命周期持续到使用 delete 语义释放掉 new 表达式所返回的指针位置，<font color = "red">我们要保证 new 所返回的的内存地址总会有一个相对应的 delete 进行释放，否则会造成内存泄漏</font>
+使用 new 语义所创建的对象(拥有动态存储期的对象)，其生命周期持续到使用 `delete` 语义释放掉 new 表达式所返回的指针位置，<font color = "red">我们要 new 所声明的空间总会配对一个 `delete` 对其进行释放，否则会造成内存泄漏</font>
 
-值得一提的是，new 表达式是一种 **_右值表达式_**，即其在声明之初就需要面领着要被销毁的风险，如果我们并没有对其所创建的临时无名变量在内存中所存储的数据(即堆中的内存地址)进行显式的移动亦或者引用的话，那么该声明是毫无意义的，更严重的是，由于其是存在自毁的特性，但是自毁仅仅是自毁 new 表达式所构造出来的、初始化在栈上的 临时无名变量 的内存，并不意味着那块在堆中所申请的内存也会随同一起销毁，简而言之就是会存在野内存出现的情况(无法再拿到那个在 堆 中的地址，即无法再使用 delete 去显式的单堆那块内存进行释放)，如下面的代码 :
+值得一提的是，<font color = "red">new 表达式是一种 **_右值表达式_**</font>，即其在声明之初就需要面领着要被销毁的风险，如果我们并没有对其所创建的临时无名变量在内存中所存储的数据(即堆中的内存地址)进行显式的移动亦或者引用的话，那么该声明是毫无意义的，更严重的是，由于其是存在自毁的特性，但是自毁仅仅是自毁 new 表达式所构造出来的、初始化在栈上的 临时无名变量 的内存，并不意味着那块在堆中所申请的内存也会随同一起销毁，简而言之就是会存在野内存出现的情况(无法再拿到那个在 堆 中的地址，即无法再使用 delete 去显式的单堆那块内存进行释放)，如下面的代码 :
 
 ```cpp
 class Test {
@@ -1066,6 +1072,8 @@ int main(void) {
 }
 ```
 
+<br/>
+
 <span id = "语义用于修饰一个数组类型的构造"></span>
 
 #### new 语义用于修饰一个数组类型的构造
@@ -1074,7 +1082,7 @@ int main(void) {
 
 既然所构建的对象数组使用的是 `new []` 语义所修饰，那么相应的，这块在堆中所构造出来的内存同样要使用 `delete []` 语义进行释放才行，<font color = "red">如果单纯的仅使用 `delete` 语义来完成释放工作的话，那么其仅仅只会释放这个数组的首元素所使用的内存，而后面下标的元素所占用的内存则会成为野内存</font>
 
-需要注意的是，<font color = "red">当我们使用 new [] 去构造一个对象的数组时，new [] 所修饰的不能是一个匿名表达式，只能够是一个具体的类型</font>，这也就意味着我们无法通过匿名表达式来指定具体的值或构造函数以完成堆这段内存空间的初始化操作，<font color = "red">编译器仅仅只会帮我们为数组中的每一个成员赋予一个默认值或者是调用数组中每个元素对象默认的无参构造函数以完成对这段内存空间的初始化工作</font>
+需要注意的是，<font color = "red">当我们使用 new [] 去构造一个对象的数组时，new [] 所修饰的不能是一个匿名表达式，只能够是一个具体的类型，**_这也就意味着我们无法通过匿名表达式来指定具体的值或构造函数以完成堆这段内存空间的初始化操作_**，编译器仅仅只会帮我们为数组中的每一个成员赋予一个默认值或者是调用数组中每个元素对象默认的无参构造函数以完成对这段内存空间的初始化工作</font>
 
 ```cpp
 class Person {
@@ -1096,6 +1104,8 @@ int main(void) {
 }
 ```
 
+<br/>
+
 <span id = "布置-new"></span>
 
 #### 布置 new (Placement new)
@@ -1103,7 +1113,7 @@ int main(void) {
 布置 new 的语义为 <font color = "red">new (地址) 类型声明方式</font>
 
 前面说到 new 语义在背后其实为我们做了三件事: 
-- 在堆中开辟一个新的内存空间
+- 在自由存储区中开辟一个新的内存空间
 
 - 根据 new 所修饰 **_类型声明方式_** 的去初始化这段内存空间
 
@@ -1111,7 +1121,9 @@ int main(void) {
 
 <font color = "red">而布置 new 可以的跳过第一个步骤，即人为的指定一块内存地址来进行初始化 ; 可用于对一个没有初始化过的内存依照 **_类型声明方式_** 进行一次初始化工作，那么相对的，也可以对原有内存中的数据进行一次覆盖</font>
 
-需要注意的是，布置 new 所构造的表达式是能够允许单独出现的，并且我们在某些场合下是可以不用 delete 的，这和单独的 new 关键字不同，原因在于单独的 new 语义所构建内存的空间必须在 堆 当中，并且我们在初始情况下是不知道其所构造的内存段的首地址到底是多少，而反观 布置new，如果我们所指定的地址是在栈中的话那我们就无需手动的进行 delete 了，并且所指定的地址是由开发人员自己指定，故我们是能够追索到地址的原址的，是否因为 new 表达式的单独出现而导致无法追朔到所创建的内存段的地址而导致无法 delete 的问题由开发人员来决定了
+需要注意的是，<font color = "red">布置 new 所构造的表达式是能够允许单独出现的</font>，并且我们在某些场合下是可以不用 delete 的，这和单独的 new 关键字不同，原因在于单独的 new 语义所构建内存的空间必须在 自由存储区 当中，并且我们在初始情况下是不知道其所构造的内存段的首地址到底是多少，而反观 布置new，如果我们所指定的地址是在栈中的话那我们就无需手动的进行 delete 了，并且所指定的地址是由开发人员自己指定，故我们是能够追索到地址的原址的，是否因为 new 表达式的单独出现而导致无法追朔到所创建的内存段的地址而导致无法 delete 的问题由开发人员来决定了
+
+最后一提的是，<font color = "red">placement new 不支持数组式 ( `new []` ) 的构造</font>
 
 ```cpp
 class Person {
@@ -1139,19 +1151,76 @@ int main(void) {
 
 <br/>
 
+<span id = "关于内存不足时的错误处理动作"></span>
+
+#### 关于内存不足时的错误处理动作
+
+为了能够满足程序的进一步健壮性，<font color = "red">当一段 new 语义在自由存储区中构造新的内存空间时如遇到内存空间不足等问题并即将抛出一个异常以反映一个未获得满足的需求之前，会先调用一个错误处理函数</font>，它就是 `new-handler`；在标准库中，它被定义为一个函数指针
+
+```cpp
+namespace std {
+  typedef void (*new_handler)();
+}
+```
+
+这个函数指针指向了一个由编译器所实现的无参无返回值的函数地址，当然我们也可以通过 `set_new_handler` 来手动的去改变默认函数的实现行为
+
+```cpp
+namespace std {
+  new_handler set_new_handler(new_handler p) throw();
+}
+```
+
+该函数能够通过我们自定义的 `new_handler p` 来覆盖无法分配内存时所需调用的默认实现，其返回值为 `new-handler` 被替换前的默认函数实现
+
+
+<br/>
+
+<span id = "nothrow-new"></span>
+
+#### 无异常 new (nothrow-new)
+
+[默认行为下的 new 语义](#new) 在遇到无法无法满足的需求时 ( 内存空间不足 ) 会抛出一个异常以供上层进行捕获，而另一个版本的 new 语义则能够避免这一行为，<font color = "red">在任何无法满足需求的情况发生时仅会返回一个空指针以指示异常行为的发生，这种 new 语义则为 `nothorw-new`，其依赖于头文件 `<new>` 并用作为 **_new (std::nothrow) 类型声明方式_**</font>
+
+```cpp
+#include <iostream>
+#include <new>
+
+class base {
+public:
+};
+
+int main() {
+  int *p = new (std::nothrow) int(1024);
+  if (p == nullptr) {
+    std::cout << "memory alloc error" << std::endl;
+  }
+
+  base *b = new (std::nothrow) base();
+  if (b == nullptr) {
+    std::cout << "memory alloc error" << std::endl;
+  }
+
+  return EXIT_SUCCESS;
+}
+```
+
+
+<br/>
+
 <span id="delete"></span>
 
 ### delete
 
 ---
 
-delete 的实现其实就是 free 函数，简而言之，它是 free 函数的一种语法糖形式，<font color = "red">通常我们使用它取释放掉依据 new 语义所构造的在堆中的内存空间</font>(这块内存空间使用 malloc 所构造出来的同样能够适用，因为 delete 的实现就是 free 函数)
+delete 是一种关键字，其语义为 : `delete address` ; <font color = "red">delete 能够释放掉由 new 所构造出来的在自由存储区中的空间，并在**这段内存空间即将被释放前，会调用所构造实体的析构函数已完成 $Full \:\: delete$ 的工作** ( 如果是数组式构造 `new []`，则使用数组式释放 `delete []` 则会挨个调用数组中每个元素的析构函数 )，我们要保证每一个 new 语义都拥有一个与之对应的 delete 语义</font>
 
-因为 delete 语义的底层实现使用的 free 函数来完成，如果所指定的地址其内存占用实在栈上，那么该调用必定会报错
+<font color = "red">请不要 delete 存储于栈空间上的地址，该调用必定会产生运行时的错误</font>
 
-我们要保证 delete 语义所搭配的指针类型不属于 `void *`，否则会 delete 失败(只是单纯的无法完成内存空间的释放)
+我们要<font color = "red">保证 delete 语义所搭配的指针类型不属于 `void *`</font>，否则会 delete 失败 ( 只是单纯的无法完成内存空间的释放，并不会产生运行时的错误 )
 
-需要说明的是，如果需要释放掉使用 `new []` 构造出来的内存空间，那么该语义使用时则必须加上 `[]` 即 `delete []`，原因是因为我们使用 new [] 所开辟的一块内存空间会有一个长度记录，只有我们指定 `delete []` 时才会去查找所记录的长度并决定接下来要根据 delete 表达式所指定的地址决定接下来要释放的长度，当我们只是单一的指定 delete 的时候则只会释放掉这段数组空间的首元素的数据
+需要说明的是，<font color = "red">如果需要释放掉使用 `new []` 构造出来的内存空间，那么该语义使用时则必须加上 `[]` 即 `delete []`</font>，原因是因为我们使用 new [] 所开辟的一块内存空间会有一个长度记录，只有我们指定 `delete []` 时才会去查找所记录的长度，并决定接下来 delete 语义需要释放的空间长度，当我们只是单一的指定 delete 的时候则只会释放掉这段数组空间的首元素的数据，即紧跟着的后面的元素都会产生内存泄漏的问题
 
 ```cpp
 class Person {
@@ -1172,6 +1241,38 @@ int main(void) {
   return 0;
 }
 ```
+
+<br/>
+
+<span id="newdeletevsmallocfree"></span>
+
+### new/delete vs. malloc/free
+
+---
+
+针对 new/delete 和 malloc/free 可提供给程序进行内存空间动态扩容和释放这一机制而言，两者的所达到的目标式一致的
+
+这种一致性，能够让我们所看到的效果便是 : <font color = "red">使用 `new` 所构造的内存空间(非数组型构造 `new []`)可以使用 `free` 来进行释放，反之，使用 `malloc` 所构造的内存空间我们同样可以使用 `delete` 来释放</font>
+
+<font color = "red">即便如此，我们还是不应该保有这一 **_未定义_** 的行为，也不应该错误认为 new/delete 的底层实现由 malloc/free 来完成，因为 new 和 delete 所操作的内存空间是在 c++ 所抽象出来的 自由存储区 之上的，它可以由 堆 来实现但是也可以在其它地方，而 malloc 和 free 所操作的内存空间则必定存储于 堆 上，所以，这一未定义的行为即不能保证这一用法是否会发生内存崩溃的问题</font>
+
+malloc 是 c 语言提供的 API，在 cpp 中使用该 API 来完成动态内存的扩容并不是一种程序健壮性的行为，并且 new 关键字本身还提供了诸多适用于 cpp 的功能，例如自动调用类型的构造函数来完成内存初始化工作等等，所以，在 cpp 中，我们应当避免使用 malloc/free 来完成内存空间的动态扩容和释放的工作
+
+对于 malloc 和 new 而言，其不同总结如下 : 
+
+| 特征                 | new/delete                            | malloc/free                          |
+| -------------------- | ------------------------------------- | ------------------------------------ |
+| 分配内存的位置       | 自由存储区                            | 堆                                   |
+| 内存分配成功的返回值类型 | new 语义所修饰类型的指针                          | void *                                |
+| 内存分配失败时的动作 | 调用 `new-handler` 默认动作为抛出异常以供上层处理；也可以通过 `nothrow` 来保有和 malloc 一样的行为                          | 返回 NULL                             |
+| 分配内存的大小       | 由编译器根据类型计算得出              | 必须显式指定字节数                   |
+| 处理数组             | new[] / delete[]              | 需要上层来完成精准的计算 |
+| 已分配内存的扩充     | 不确定，估计无法直观地处理                        | 使用 `realloc`                  |
+| 分配内存时内存不足   | 客户能够指定处理函数或重新制定分配器  | 无法通过用户代码进行处理             |
+| 重载             | 允许运算符重载，以制定适合自己的 new/delete 的动作                                  | 不允许                               |
+| 构造函数与析构函数   | new 会调用构造函数，new [] 不会；delete/delete [] 都会调用目标对象的析构函数                                  | 不调用                               |
+
+
 
 <br/>
 <br/>
@@ -3709,7 +3810,9 @@ int main(void) {
 
 - `== !=`
 
-  - 返回值和形参没有特殊的条件限制
+  - 形参必须保有一个 class 或 enumeration 类型的成员
+
+  - 返回值没有特殊的条件限制
 
   - 可以声明为任意运算符重载函数类别
 
@@ -3915,6 +4018,58 @@ int main(void) {
   return EXIT_SUCCESS;
 }
 ```
+
+
+- `new`
+  - 针对不同的 new 语义需要使用不同的参数列表，但是<font color = "red">必须保有第一个参数类型为 size_t，其指示为某个需要分配内存的对象的长度</font>
+    - void *operator new(std::size_t size) throw (std::bad_alloc);
+
+    - void *operator new(std::size_t size, const std::nothrow_t& nothrow_value) throw();
+  
+    - void *operator new(std::size_t size, void *ptr) throw();
+
+    - void *operator new[](std::size_t size) throw (std::bad_alloc);
+
+    - void *operator new[](std::size_t size, const std::nothrow_t& nothrow_value) throw();
+  
+  - 返回值必须为 `void *`
+
+  - 可以声明为任意运算符重载函数类别
+
+```cpp
+#include <iostream>
+
+#define GIGABYTE (1024 * 1024 * 1024)
+
+#define ALLOC                               \
+  auto p = malloc(size);                    \
+  if (p == nullptr) throw std::bad_alloc(); \
+  return p;
+
+class base {
+public:
+  char space[GIGABYTE] = { 0 };
+
+  void *operator new[](std::size_t size) {
+    ALLOC;
+  }
+};
+
+void *operator new(std::size_t size) {
+  ALLOC;
+}
+
+int main() {
+  base *bs = new base[5];
+  delete[] bs;
+
+  int *p = new int(1024);
+  delete p;
+
+  return EXIT_SUCCESS;
+}
+```
+
 
 <br/>
 <br/>
@@ -4247,7 +4402,7 @@ int main() {
 
 **_函数模板的具体化_**
 
-<font color = "red">在某些情况下，我们针对于某个 **_具体的类型_** 所引用的函数模板其内部实现可能不太满意，这时候我们可以针对这个 **_具体的类型_** 去提供该函数模板的另一个特殊的副本，这个副本就叫做 **_具体化函数模板_**</font>，即声明一个相同签名的函数，并使用空模板操作符 **_template<>_** 进行修饰，然后函数的形参列表由原有的所指定的虚拟类型直接替换为 **_具体的类型_** 即可，那么当我们在使用这个具体的类型去对函数模板进行调用时，所调用的实现则为我们所指定的具体化函数模板的实现
+<font color = "red">在某些情况下，我们针对于某个 **_具体的类型_** 所引用的函数模板其内部实现可能不太满意，这时候我们可以针对这��� **_具体的类型_** 去提供该函数模板的另一个特殊的副本，这个副本就叫做 **_具体化函数模板_**</font>，即声明一个相同签名的函数，并使用空模板操作符 **_template<>_** 进行修饰，然后函数的形参列表由原有的所指定的虚拟类型直接替换为 **_具体的类型_** 即可，那么当我们在使用这个具体的类型去对函数模板进行调用时，所调用的实现则为我们所指定的具体化函数模板的实现
 
 <font color = "red">对于一个具体化的函数模板而言，其调用的优先级要高于其最原始的函数模板的副本</font>
 
@@ -4522,6 +4677,7 @@ int main(void) {
 
 值得一提的是，对于强制类型转换还是典型的非强制类型转换，即使转换失败也不会在运行时发生错误，仅有的错误只是会得到一个错误的转换结果亦或者是编译级别时所发生的错误，cpp 为了保证类型转换功能的更加安全，其引入了多种类型转换的方式
 
+<br/>
 
 <span id = "静态类型转换"></span>
 
@@ -4572,6 +4728,8 @@ int main(void) {
 }
 ```
 
+<br/>
+
 <span id = "动态类型转换"></span>
 
 #### 动态类型转换 : dynamic_cast<type>(expression)
@@ -4619,6 +4777,8 @@ int main(void) {
 }
 ```
 
+<br/>
+
 <span id = "常量类型转换"></span>
 
 #### 常量类型转换 : const_cast<type>(expression)
@@ -4646,6 +4806,8 @@ int main(void) {
   return EXIT_SUCCESS;
 }
 ```
+
+<br/>
 
 <span id = "重定义转换"></span>
 
@@ -4713,6 +4875,8 @@ int main(void) {
 }
 ```
 
+<br/>
+
 <span id = "异常捕获"></span>
 
 #### 异常捕获 : try - catch(exception_type instance)
@@ -4730,6 +4894,8 @@ int main(void) {
 - 对于在一个 try 块中可能抛出的多种不同类型的异常，我们可以指定多种不同异常类型的 catch 块以匹配
 
 <span id = "抛出异常"></span>
+
+<br/>
 
 #### 抛出异常 : throw expression
 
@@ -4775,6 +4941,8 @@ int main(void) {
 
 - throw 可以写在构造函数当中
 
+<br/>
+
 <span id = "关于catch块中所声明的异常类型的效率问题"></span>
 
 #### 关于 catch 块中所声明的异常类型的效率问题
@@ -4811,6 +4979,8 @@ int main(void) {
   return EXIT_SUCCESS;
 }
 ```
+
+<br/>
 
 <span id = "系统标准异常接口"></span>
 
@@ -4973,7 +5143,7 @@ int main(void) {
 
 ---
 
-**_C++98 auto_**
+#### C++98 auto
 
 早在 **_C++98_** 标准中就存在了 auto 关键字，那时的 auto 用于声明变量为自动变量，自动变量意为拥有自动的生命期，但这是多余的，因为就算不使用 auto 声明，变量依旧拥有自动的生命期
 
@@ -4983,13 +5153,17 @@ auto int b = 20 ;  /* 拥有自动生命期 */
 static int c = 30; /* 延长了生命期 */
 ```
 
-**_C++11 auto_**
+<br/>
+
+#### C++11 auto
 
 C++98 中的 auto 多余且极少使用，**_C++11_** 已经删除了这一用法，取而代之的是全新的功能 : **_变量的自动类型推断_**，auto 可以在<font color = "red">声明变量的时候根据变量初始值的类型自动为此变量选择匹配的类型</font>
 
 这种用法就类似于 C# 中的 **_var_** 关键字，auto <font color = "red">的自动类型推断发生在编译期</font>，所以使用 auto 并不会造成程序运行时效率的降低，而<font color = "red">是否会造成编译期的时间消耗，我认为是不会的，在未使用 auto 时，编译器也需要得知右操作数的类型，再与左操作数的类型进行比较，检查是否可以发生相应的转化，是否需要进行隐式类型转换</font>
 
-**_auto 的具体使用_**
+<br/>
+
+#### auto 的具体使用_**
 
 - 局部变量和全局变量
 
@@ -5063,7 +5237,9 @@ C++98 中的 auto 多余且极少使用，**_C++11_** 已经删除了这一用�
   }
   ```
 
-**_使用 auto 时的注意事项_**
+<br/>
+
+#### 使用 auto 时的注意事项
 
 - auto 变量必须在定义时初始化，这类似于const关键字
 
@@ -5196,7 +5372,7 @@ int main(void) {
 
 decltype 与 auto 关键字一样，用于进行编译时类型推导，不过它与 auto 还是有一些区别的，decltype 的类型推导并不是像 auto 一样是从变量声明的初始化表达式获得变量的类型，<font color = "red">而是总是以一个普通表达式作为参数，返回该表达式的类型,而且 decltype 并不会对表达式进行求值</font>
 
-**_decltype 的使用_**
+#### decltype 的使用
 
 - 推导出表达式类型
 
@@ -5634,7 +5810,7 @@ int main(void) {
 ## STL
 
 
-> STL 是 cpp 标准的一部分，是 $Standard template library$ 的简称
+> STL 是 cpp 标准的一部分，是 $Standard \:\: template \:\: library$ 的简称
 > 
 > STL 从广义上分为了容器$(container)$, 算法$(algorithm)$, 迭代器$(iterator)$，其中，容器和算法之间通过迭代器进行了无缝的链接 ; 如果需要进一步的细分，具体来说 STL 其实提供了六大组件，彼此之间可以组合套用，这六大组件分别是
 > 
@@ -5651,3 +5827,1633 @@ int main(void) {
 > - 空间配置器 : 负责空间的配置与管理 ; 从实现角度看，配置器是一个实现了 动态空间配置、空间管理、空间释放 的 class tempalte
 > 
 > STL六大组件的交互关系，容器通过空间配置器取得数据存储空间，算法通过迭代器存储容器中的内容，仿函数可以协助算法完成不同的策略的变化，适配器可以修饰仿函数
+
+
+<br/>
+
+<span id = "容器"></span>
+
+### 容器
+
+---
+
+> STL 针对不同的数据结构提供了不同的容器，根据不同的数据结构的排列特性，划分为了 **_序列式容器_** 和 **_关联式容器_**
+> 
+> - 序列式容器 : 元素排列强调值的排序，序列式容器中的每个元素均有固定的位置，除非用删除或插入的操作改变这个位置(vector, deque, list, ... )
+> 
+> - 关联式容器 : 元素排列是非线性的树结构，各元素之间没有严格的物理上的顺序关系，也就是说元素在容器中并没有保存元素置入容器时的逻辑顺序，关联式容器另一个显著特点是 : 在值中选择一个值作为关键字key，这个关键字对值起到索引的作用，方便查找 (set, multiset, map, multimap )
+> 
+> <font color = "red">STL 所提供的所有容器内部所维护的数据结构使用的内存都是在 堆 的基准上进行扩展</font>，虽然牺牲了线程栈上快速的存取速度但是换来更加灵活的内存空间的使用，<font color = "red">作为容器的使用者，我们无需关心当前容器内部所维护的元素在堆中开辟内存，它们都由容器本身来进行管控其在内存中的生命周期，也就是说这些在堆中的元素会随着容器本身的释放也一并释放掉他们所占用的内存</font>
+
+<br/>
+
+<span id = "string"></span>
+
+#### string
+
+STL 针对原始在 c 语言中操作字符串 ( char * ) 时所存在的诸多痛点，提供了 string 容器以替代
+
+string 是一个类，其隶属于头文件 `<string>` 当中，其内部自维护了一个字符串数组并自管理该字符串数组内存的动态扩容和释放，即开发人员使用 string 去操作字符串时并不需要关心内存的释放和溢出的问题
+
+**_CONSTRUCTOR_**
+
+- string()
+  
+  默认构造，构建一个空的 string 容器
+
+- string(const string &str)
+  
+  拷贝构造函数，依据已有的 string 实例内部所管控的字符串去构造新的 string 容器的实例
+
+- string(const char *str)
+  
+  使用 char * 类型的字符串进行构造
+
+- string(int n, char _ch)
+  
+  使用 n 个字符 _ch 进行构造
+
+```cpp
+#include <iostream>
+#include <string>
+
+int main(void) {
+    std::string str_01;
+    std::string str_02("HELLO,WORLD!");
+    std::string str_03 = "HELLO,WORLD!";
+    std::string str_04 = str_03;
+    std::string str_05(str_04);
+    std::string str_06(5, 'A');
+
+    return EXIT_SUCCESS;
+}
+```
+
+**_ASSIGNMENT_**
+
+- string &operator=(const char *str)
+  
+  根据字符指针 str 去重新构造新的 string 实例内部所管控的字符串
+
+- string &operator=(const string &str)
+  
+  根据拷贝语义去重新构造新的 string 实例内部所管控的字符串
+
+- string &operator=(char ch)
+  
+  根据字符 ch 去重新构造新的 string 实例内部所管控的字符串
+
+- string &assign(const char *str)
+  
+  根据字符指针 str 去重新构造当前 string 实例内部所管控的字符串
+
+- string &assign(const char *str, int n)
+  
+  截取字符指针 str 的前 n 个字符去重新构造当前 string 实例内部所管控的字符串
+
+- string &assign(const string &str)
+  
+  根据 string 实例 str 内部所管控的字符串去重新构造新当前例内部所管控的字符串
+
+- string &assign(int n, char ch)
+  
+  使用 n 个字符 ch 去重新构造当前 string 实例内部所管控的字符串
+
+- string &assign(const string &str, int start, int n)
+  
+  根据 string 实例 str 内部所管控的字符串从 start 下标开始的 n 个字符去重新构造当前实例内部所管控的字符串
+
+```cpp
+#include <iostream>
+#include <string>
+
+int main(void) {
+  std::string str_source;
+  std::string str_dest = "HELLO,WORLD";
+  std::str_source = "NGPONG!";
+  std::str_source = str_dest;
+  std::str_source = 'A';
+  std::str_source.assign("HELLO,NGPONG!");
+  std::str_source.assign("HELLO,NGPONG!", 2);
+  std::str_source.assign(str_dest);
+  std::str_source.assign(10, 'A');
+  std::str_source.assign(str_dest, 6, 5);
+  std::return EXIT_SUCCESS;
+}
+```
+
+**_ACQUIRE_**
+
+- char &operator[](int n)
+  
+  返回字符串 string 下标为 n 的字符的引用，<font color = "red">当 n 超出当前字符串最大长度时，程序会直接结束</font>
+
+- char &at(int n)
+  
+  获取字符串 string 下标为 n 的字符的引用，<font color = "red">当 n 超出当前字符串最大长度时，则抛出 **out_of_range** 的异常</font>
+
+!!! NOTE
+
+    通过下标获取 API 去获取 string 内部所管控字符串中的具体某个 **_字符_** 是属于对该字符的一个 **_引用_**，<font color = "red">当 string 容器内部所维护的字符串所占用的内存背重新分配后，原有的引用则会失效</font>
+
+```cpp
+#include <iostream>
+#include <string>
+
+int main(void) {
+  std::string str = "HELLO,WORLD";
+
+  std::cout << str[5] << std::endl;
+
+  try {
+    str.at(0x400);
+  } catch (out_of_range ex) {
+    cout << ex.what() << endl;
+  }
+
+  return EXIT_SUCCESS;
+}
+```
+
+**_APPEND_**
+
+- string &operator+=(const string &str)
+  
+  将已有 string 实例 str 内部所管控的字符串追加到当前 string 实例内部所管控的字符串的末尾处
+ 
+- string &operator+=(const char *str)
+  
+  将字符指针 str 追加到当前 string 实例内部所管控的字符串的末尾处
+  
+- string &operator+=(const char ch)
+  
+  将字符 ch 追加到当前 string 实例内部所管控的字符串的末尾处
+  
+- string &append(const char *str)
+
+  将字符指针 str 追加到当前 string 实例内部所管控的字符串的末尾处
+  
+- string &append(const char *str, int n)
+
+  将字符指针 str 的前 n 个字符追加到 string 实例内部所管控的字符串的末尾处
+  
+- string &append(const string &str)
+
+  将已有 string 实例 str 内部所管控的字符串追加到当前 string 实例内部所管控的字符串的末尾处
+  
+- string &append(const string &str, int start, int n)
+
+  将已有 string 实例 str 内部所管控的字符串的 start 下标开始的 n 个字符追加到当前 string 实例内部所管控的字符串的末尾处
+  
+- string &append(int n, char ch)
+
+  在当前 string 实例内部所管控的字符串的末尾处追加 n 个字符 ch
+
+```cpp
+#include <iostream>
+#include <string>
+
+int main(void) {
+  std::string str_src = "HELLO,WORLD";
+  std::string str_dest = "NGPONG";
+
+  str_src += ",";
+  str_src += str_dest;
+  str_src += '!';
+
+  str_src.append(1, ',');
+  str_src.append("hahaha");
+  str_src.append(",GET,UP!", 5);
+  str_src.append(str_dest);
+  str_src.append(str_dest, 0, 2);
+
+  return EXIT_SUCCESS;
+}
+```
+
+**_FIND_**
+
+- int find(const string &str, int pos = 0) const
+
+  在当前 string 实例内部所管控的字符串的的 pos 下标开始，**从左到右** 查找 str 第一次出现下标，如未找到则返回 -1
+
+- int find(const char *str, int pos = 0) const
+
+  在当前 string 实例内部所管控的字符串的的 pos 下标开始，**从左到右** 查找 str 第一次出现下标，如未找到则返回 -1
+
+- int find(const char *str, int pos, int n) const
+
+  在当前 string 实例内部所管控的字符串的的 pos 下标开始，**从左到右** 查找字符串 str 的前 n 个字符第一次出现的下标，如未找到则返回 -1
+
+- int find(const char ch, int pos = 0) const
+
+  在当前 string 实例内部所管控的字符串的 pos 下标开始，**从左到右** 查找字符 ch 第一次出现下标，如未找到则返回 -1
+
+- int rfind(const string &str, int pos = str_size) const
+  
+  在在当前 string 实例内部所管控的字符串的的 pos 下标开始，**从右到左** 查找字符 ch 第一次出现下标，如未找到则返回 -1
+
+- int rfind(const char *str, int pos = str_size) const
+
+  在当前 string 实例内部所管控的字符串中的 pos 下标开始，**从右到左** 查找 str 第一次出现下标，如未找到则返回 -1
+
+- int rfind(const char *str, int pos, int n) const
+
+  当前 string 实例内部所管控的字符串中的 pos 下标开始，**从右到左** 查找字符串 str 的前 n 个字符第一次出现的下标，如未找到则返回 -1
+
+- int rfind(const char ch, int pos = str_size) const
+
+  在当前 string 实例内部所管控的字符串的 pos 下标开始，**从右到左** 查找字符 ch 第一次出现下标，如未找到则返回 -1
+
+
+```cpp
+#include <iostream>
+#include <string>
+
+int main(void) {
+  std::string str_src = "HELLO,WORLOD";
+  std::string str_fi = "WOR";
+
+  std::cout << str_src.find(str_fi, 0) << std::endl;
+  std::cout << str_src.find("LO", 0) << std::endl;
+  std::cout << str_src.find("LO", 5, 2) << std::endl;
+  std::cout << str_src.find('E', 0) << std::endl;
+
+  std::cout << str_src.rfind(str_fi, str_src.size()) << std::endl;
+  std::cout << str_src.rfind("LK", str_src.size()) << std::endl;
+  std::cout << str_src.rfind("LO", 5, 2) << std::endl;
+  std::cout << str_src.rfind('E', str_src.size()) << std::endl;
+      
+  return EXIT_SUCCESS;
+}
+```
+
+**_REPLACE_**
+- string &replace(int pos, int n, const string &str)
+  
+  将当前 string 实例内部所管控的字符串的 pos 下标开始的前 n 个字符，替换为字符串 str
+
+- string &replace(int pos, int n, const char* str)
+  
+  将当前 string 实例内部所管控的字符串的 pos 下标开始的前 n 个字符，替换为字符串 str
+
+```cpp
+#include <iostream>
+#include <string>
+
+int main(void) {
+  std::string str_src = "HELLO,WORLD";
+  std::string str_rep = "NGPONG!";
+
+  str_src.replace(str_src.find(',') + 1, str_src.size() - (str_src.find(',') + 1),  str_rep);
+  str_src.replace(6, 7, "wupeng!");
+
+  return EXIT_SUCCESS;
+}
+```
+
+**_COMPARE_**
+
+- int compare(const string &str) const
+  
+  当前 string 实例内部所管控的字符串与字符串 str，进行比较
+
+- int compare(const char *str) const
+  
+  当前 string 实例内部所管控的字符串与字符串 str，进行比较
+
+- 比较结果
+  - 原始 < 目标 : -1
+
+  - 原始 > 目标 :  1
+
+  - 原始 = 目标 :  0
+
+```cpp
+#include <iostream>
+#include <string>
+
+int main(void) {
+  std::string str_cp_01 = "BCDEFG";
+  std::string str_cp_02 = "AWERT";
+
+  std::cout << str_cp_01.compare(str_cp_02) << std::endl;
+
+  return EXIT_SUCCESS;
+}
+```
+
+**_SUBSTRING_**
+
+- string substr(int pos = 0, int n = str_size) const
+  
+  截取当前 string 实例内部所管控的字符串从 pos 下标开始的前 n 个字符，并返回新 string 容器的实例，需要注意的是，<font color = "red">新容器实例内部所维护的字符串数组其内存空间并不是以旧字符串的内存空间为基准的，而是创建了一块新的内存空间，并将截取结果拷贝到这块新的内存空间当中</font>
+
+```cpp
+#include <iostream>
+#include <string>
+
+int main(void) {
+  std::string str = "HELLO,WORLD";
+
+  std::string str_sub = str.substr(0, str.find(','));
+
+  std::cout << str_sub << std::endl;
+
+  return EXIT_SUCCESS;
+}
+```
+
+**_INSERT_**
+
+- string &insert(int pos, const char *str)
+  
+  从当前 string 实例内部所管控的字符串的下标 pos 处插入字符串 str
+
+- string &insert(int pos, const string &str)
+  
+  从当前 string 实例内部所管控的字符串的下标 pos 处插入字符串 str
+
+- string &insert(int pos, int n, char ch)     
+  
+  从当前 string 实例内部所管控的字符串的下标 pos 处插入 n 个字符 ch
+
+
+```cpp
+#include <iostream>
+#include <string>
+
+int main(void) {
+  std::string str_src = "HELLO,WORLD";
+  std::string str_des = "NGPONG,";
+
+  str_src.insert(str_src.find(',') + 1, str_des);
+  str_src.insert(2, "OO");
+  str_src.insert(0, 3, 'A');
+
+  /* AAAHEOOLLO,NGPONG,WORLD */
+  std::cout << str_src << std::endl;
+
+  return EXIT_SUCCESS;
+}
+```
+
+**_DELETE_**
+
+- string &erase(int pos, int n = str_size)
+  
+  删除当前当前实例内部所管控的字符串从下标 pos 开始的 n 个字符
+
+```cpp
+#include <iostream>
+#include <string>
+
+int main(void) {
+  std::string str = "HELLO,WORLD";
+
+  str.erase(0, 6);
+
+  std::cout << str << std::endl;
+
+  return EXIT_SUCCESS;
+}
+```
+
+**_COMMON_**
+
+- size_t size()
+  
+  获取字符串的真实长度
+
+- size_t length()
+  
+  获取字符串的真实长度
+
+- const char *c_str()
+  
+  获取 string 容器内部所维护的字符指针 char *
+
+```cpp
+#include <iostream>
+#include <string>
+
+int main() {
+  std::string str = "hello";
+
+  auto p = str.c_str();
+
+  std::cout << str.length() << std::endl;
+  
+  std::cout << str.size() << std::endl;
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+<span id = "vector"></span>
+
+#### vector
+
+
+需要强调的是，<font color = "red">使用 vector 作为存储媒介时无需关心 vector 内部所使用的那一段在 自由存储区 中的内存的生命周期，因为 vector 本身提供了内存管理的功能</font>
+
+<font color = "red">vector 容器的设计是一种 **_单端数组_**</font>，为符合常数项时间复杂度的新增和删除，vector 容器内部所提供的新增和删除元素的 API 都是仅针对数组中的尾元素所进行的，当然这并不代表着我们无法对该数组进行随机性的插入和删除操作，作为容器本身也提供了这些 API 用于支持，由于 vector 内部所维护的动态数组是真正意义上的连续性的存储空间，那么对于长度越长并且越接近于首部元素下标的新增和删除操作，所带来的性能损耗的确是灾难性的，当我们理解了这一点，自然也明白为什么 vector 会被抽象为一种单端型的数组了
+
+<font color = "red">vector 所谓的动态扩容并不会在原空间的基础上延续新空间</font> ( 因为无法保证旧空间之后尚有可配置的空间 ) ，而是会另外申请一块更大的内存空间，然后将原数据拷贝至新的内存空间，最后再释放掉旧内存空间中的数据，因此，<font color = "red">对 vector 的任何操作，一旦引起空间的重新配置，任何由原始空间所延伸出来的部件都将会失效</font>
+
+<font color = "red">一个 vector 的 "容量" 永远大于或等于其 "大小"，一旦容量等于大小，便是满载，下一个元素的新增将会导致整个 vector 容器另觅居所</font>
+
+vector 所提供的迭代器是一种 **_随机访问迭代器_**，它们总是会指向容器数组阵列的首元素和尾元素的位置
+
+
+**_关于 vector 迭代器失效的问题_**
+
+1. 当 vector 第一次插入元素时，在插入前所获取的 `begin` 和 `end` 迭代器将失效
+
+2. 当 vector 随机 ( 非尾部 ) 插入元素时，插入点之后 ( 包括插入点 ) 的所有元素延伸出的 [iterator] [poiner] [reference] 都将失效
+
+3. 当 vector 在尾部 ( push_back ) 插入元素时，`end` 迭代器将失效
+
+4. 一旦 vector 发生了内存空间的重新配置(动态扩容)，那么在空间重新配置前所获取到的关于 vector 的 [iterator] [poiner] [reference] 都将失效，<font color = "red">该动作需要考虑的优先级高于 1, 2, 3 条</font>
+
+5. 当 vector 随机 ( 非尾部 ) 删除元素时，删除点之后 ( 包括删除点 ) 的所有元素延伸出的 [iterator] [poiner] [reference] 都将失效
+
+6. 当 vector 删除尾部元素时，`end` 迭代器将失效，尾元素延伸出的 [iterator] [poiner] [reference] 都将失效
+
+7. <font color = "red">如果 2, 5 条所指明的 "失效" 动作未发生 vector 内存空间的重新配置，则该 "失效" 并不是真正意义上关于内存释放所引发的失效</font>，而是由于元素的位置发生了偏移而无法再通过旧的位置获取到相同元素的值的失效，既然无法获取到，那么再去通过旧元素的位置去获取旧元素时就属于一个 **_未定义_** 的行为，故归纳为 "失效"
+
+
+**_CONSTRUCTOR_**
+
+- vector<T>()
+
+  默认构造，构建一个空的 vector 容器
+
+- vector<T>(V begin, V end)
+  
+  该构造函数是一个存在虚拟类型为 V 的模板函数，V 的具现化于所接受的能够指示一段线性数组 $[ \: begin, \: end \: )$ 开闭区间的迭代器 ( 隶属于容器的 ) 亦或者地址所指示的类型，并使用它来完成当前容器内部所管控的动态数组的初始化工作
+
+- vector<T>(int n, T element)
+  
+  该构造函数使用 n 个 _element 用于容器内部动态数组的初始化构造工作
+
+- vector(const vector &vec)
+  
+  拷贝语义，将已有容器实例内部所管控的动态数组中的 "有效元素" 拷贝至当前容器实例内部所管控的动态数组中
+
+
+```cpp
+#include <iostream>
+#include <vector>
+
+int main() {
+  /* vector<T>() */
+  vector<int> ve_empty;
+
+  /* vector<T>(V begin, V end) */
+  vector<int> ve_01(ve_empty.begin(), ve_empty.end());
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  vector<int> ve_02(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  /* vector<T>(n, T _element) */
+  vector<int> ve_03(10, 23);
+
+  /* vector(const vector &_vec) */
+  vector<int> ve_04(ve_02);
+
+  return EXIT_SUCCESS;
+}
+```
+
+**_ASSIGNMENT_**
+
+- void assign(V begin, V end)
+                
+  该函数是一个存在虚拟类型为 V 的模板函数，V 的具现化于所接受的能够指示一段线性数组 $[ \: begin, \: end \: )$ 开闭区间的迭代器 ( 隶属于容器的 ) 亦或者地址所指示的类型，并使用它来完成当前 vector 容器实例内部所管控的动态数组的重新赋值的工作
+                
+- void assign(int n, element)
+  
+  该函数使用 n 个 element 用于容器内部动态数组的重新赋值的工作
+
+- vector &operator=(const vector &vec)
+  
+  拷贝赋值运算符，依据已有 vector 的实例内部所管控的动态数组中的 "有效元素" 去重新构造当前容器实例本身内部所管控的动态数组
+
+- void swap(vector &vec)
+  
+  交换目标 vector 容器 vec 与当前 vector 容器其内部指向动态数组的指针，并重新更新双方容器内部所管控的关于动态数组的 `size` 和 `capacity`
+
+```cpp
+#include <iostream>
+#include <vector>
+
+int main() {
+  int nums_src[5] = { 1, 2, 3, 4, 5 };
+  vector<int> ve_src;
+
+  /* void assign(V _begin, V _end) */
+  ve_src.assign(nums_src, nums_src + (sizeof(nums_src) / sizeof(int)));
+
+  /* void assign(n, _element) */
+  ve_src.assign(10, 1024);
+
+  vector<int> ve_des;
+
+  /* vector& operator=(const vector &_vec) */
+  ve_des = ve_src;
+
+  /* void swap(vector &_vec) */
+  ve_des.swap(ve_src);
+}
+```
+
+**_ITERATOR_**
+
+- 正序迭代器  
+
+  ```text
+  +---+---+---+---+---+
+  | 1 | 2 | 3 | 4 | 5 |
+  +-+-+---+---+---+---+
+    ^                    ^
+    |                    |
+  begin                 end
+  ```
+  
+  - vector<int>::iterator begin()
+  
+    获取 vector 容器的正序起始迭代器，正序起始迭代器所指向的是 vector 内部所管控的动态数组中的首元素的位置
+
+  - vector<int>::iterator end()
+  
+    获取 vector 容器的正序结束迭代器，正序结束迭代器所指向的是 vector 内部所管控的动态数组中的最后一个元素的下一个位置，该迭代器通常也称为 `off-the-end`
+
+- 逆序迭代器
+
+  ```text
+      +---+---+---+---+---+
+      | 1 | 2 | 3 | 4 | 5 |
+      +---+---+---+---+-+-+
+    ^                   ^
+    |                   |
+  rend                rbegin
+  ```
+
+  - vector<int>::reverse_iterator rbegin()
+  
+    获取 vector 容器的逆序起始迭代器，逆序起始迭代器所指向的是 vector 内部所管控的动态数组中的最后一个元素的位置
+
+  - vector<int>::reverse_iterator rend()
+
+    获取 vector 容器的逆序结束迭代器，逆序结束迭代器所指向的是 vector 内部所管控的动态数组中的首元素的上一个位置
+
+
+```cpp
+#include <iostream>
+#include <vector>
+
+int main() {
+  std::vector<int> v;
+  for (size_t i = 0; i < 10; ++i) {
+    v.push_back(i);
+  }
+  
+  /* begin / end */
+  for (std::vector<int>::iterator i = v.begin(); i != v.end(); ++i) {
+    printf("[0x%p] %d\n", &*i, *i);
+  }
+
+  /* rbegin / rend */
+  for (std::vector<int>::reverse_iterator i = v.rbegin(); i != v.rend(); ++i) {
+    printf("[0x%p] %d\n", &*i, *i);
+  }
+
+  return EXIT_SUCCESS;
+}
+```
+
+**_CAPACITY_**
+- size_t size()
+  
+  返回 vector 容器内部动态数组的 "有效元素" 个数
+
+- bool empty()
+  
+  判断是否是一个空容器 ( 无任何 "有效元素" 的录入 )
+
+- size_t capacity()
+  
+  获取 vector 容器内部动态数组的 "真实容量"
+
+- void resize(int n)
+  
+  重新指定 vector 容器内部动态数组的 有效元素 的个数 ( 长度 ) 为 n，如果 n 较调用前的长度大，则以默认值填充超出的位置；如果 n 较调用前的长度小，则末尾超出数组长度的元素被删除 ( 所删除的仅仅只是 "有效元素"，并无法缩减内部动态数组的 "真实容量" )
+
+- void resize(int n, T element)
+  
+  重新指定 vector 容器内部动态数组的 有效元素 的个数 ( 长度 ) 为 n，如果 n 较调用前的长度大，则以拷贝所指定的 element 去填充超出的位置；如果 n 较调用前的长度小，则末尾超出数组长度的元素被删除 ( 所删除的仅仅只是 "有效元素"，并无法缩减内部动态数组的 "真实容量" )
+
+- void reserve(int len)
+  
+  调整 vector 容器内部动态数组的 "真实容量" 至 len，所新增出来的预留位置并未进行过初始化，即不可被访问，也不可执行随机插入操作 ( 仅仅允许插入有效元素至当前动态数组尾元素的下一个元素的位置 )，简而言之，它们都不是 "有效元素"；当 len 所指定的长度要小于当前 vector 容器内部动态数组的 "真实容量" 时，则该函数调用无任何结果
+
+```cpp
+#include <iostream>
+#include <vector>
+
+int main() {
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  vector<int> _ve(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  /* size_t size() */
+  size_t _ve_size = _ve.size();
+
+  /* size_t capacity() */
+  size_t _ve_capacity = _ve.capacity();
+
+  /* bool empty() */
+  bool is_empty = _ve.empty();
+
+  /* void resize(int n) */
+  _ve.resize(10);
+
+  /* void resize(int n, T _element) */
+  _ve.resize(7, 0x400);
+
+  /* void reserve(int len) */
+  _ve.reserve(0x400);
+}
+```
+
+**_INDEX_**
+
+- T &at(int _idx)
+  
+  返回 vector 容器内部所维护的动态数组的下标为 _idx 的元素的引用，如果 _idx 超出内部数组的有效元素个数，则抛出 `out_of_range` 异常
+
+- T &operator[_idx]
+  
+  返回 vector 容器内部所维护的动态数组的下标为 _idx 的元素的引用，如果 _idx 超出内部数组的有效元素个数，则程序崩溃
+
+- T &front()
+  
+  返回 vector 容器内部所维护的动态数组的首元素的引用
+
+- T &back()
+  
+  返回 vector 容器内部所维护的动态数组的尾元素的引用
+
+```cpp
+#include <iostream>
+#include <vector>
+
+int main() {
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  vector<int> _ve(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  int &num_01 = _ve.at(0);
+  int &num_02 = _ve[1];
+  int &num_03 = _ve.front();
+  int &num_04 = _ve.back();
+}
+```
+
+**_INSERT_**
+
+- void insert(const_iterator pos,T _element)
+  
+  根据迭代器 pos 所指向的元素的下标往 vector 容器内部的动态数组插入一个元素 _elemenet，如果迭代器 pos 所指向的元素下标超出了动态数组的真实容量，则程序崩溃
+
+- void push_back(T _element)
+  
+  往 vector 容器内部的动态数组的尾部插入元素 _element
+
+```cpp
+#include <iostream>
+#include <vector>
+
+int main() {
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  vector<int> _ve(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  /* void insert(const_iterator pos,T _element) */
+  _ve.insert(_ve.begin() + 2, 0x400);
+
+  /* void push_back(T _element) */
+  _ve.push_back(0x200);
+}
+```
+
+**_DELETE_**
+
+- void pop_back()
+  
+  删除 vector 容器内部的动态数组中的尾元素
+
+- void erase(const_iterator start, const_iterator end)
+  
+  删除 vector 容器内部的动态数组中，迭代器 start 和 迭代器 end 所指向的下标之间的所有的 "真实元素"
+
+- void erase(const_iterator pos)
+  
+  删除 vector 容器内部的动态数组中，迭代器 pos 所指向的 "真实元素"
+
+- void clear()
+  
+  删除 vector 容器内部的动态数组中的所有的 "真实元素"
+
+```cpp
+#include <iostream>
+#include <vector>
+
+int main() {
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  vector<int> _ve(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  /* void pop_back() */
+  _ve.pop_back();
+
+  /* void erase(const_iterator start, const_iterator end) */
+  _ve.erase(_ve.begin(), _ve.begin() + 2);
+
+  /* void erase(const_iterator pos) */
+  _ve.erase(_ve.begin() + 1);
+
+  /* void clear() */
+  _ve.clear();
+}
+```
+
+**_降低 vector 内部所管控的动态数组的扩容次数_**
+
+vector 容器内部的数组的动态扩容机制总是琢磨不定的，因为其由 vector 内置的一套算法来完成，那么在一个高额新增操作的时候，动态数组就需要不断地经历销毁内存、构建新的内存、拷贝旧内存中的数据至新内存当中，这就会造成较大的性能损失，解决办法就是在有效的范围内先通过 `reserve` 函数来调整更多的动态数组的真实容量，并在此基础上再进行元素的插入操作即可
+
+```cpp
+#include <iostream>
+#include <vector>
+
+int main() {
+  /* 记录两次不同的处理方式，vector 内部的动态数组的扩容次数 */
+
+  int num_01 = 0;
+  vector<int> _ve_01;
+  int *p_temp_01 = nullptr;
+  for (size_t i = 0; i < 1000000; ++i) {
+    _ve_01.push_back(i);
+
+  /**
+   * 每一次 vector 内部所管控的动态数组的扩容都会使用一块新的内存地址，
+   * 故通过此机制来判断下一次插入数据后的元素首地址是否等于上一次元素的首地址来判断
+   * 当前插入操作是否引起了动态数组的扩容操作
+  */
+    if (p_temp_01 != &_ve_01.at(0)) {
+      p_temp_01 = &_ve_01.at(0);
+      ++num_01;
+    }
+  }
+  cout << num_01 << endl;
+
+  int num_02 = 0;
+  vector<int> _ve_02;
+  int *p_temp_02 = nullptr;
+  _ve_02.reserve(1000000); /* 在可控范围内，预先调整 vector 内部动态数组的长度 */
+  for (size_t i = 0; i < 1000000; ++i) {
+    _ve_02.push_back(i);
+    if (p_temp_02 != &_ve_02.at(0)) {
+      p_temp_02 = &_ve_02.at(0);
+      ++num_02;
+    }
+  }
+  cout << num_02 << endl;
+}
+```
+
+**_缩减 vector 的真实容量，避免空间的浪费_**
+
+vector 容器能够保证其内部所管控的数组在长度不足的情况下提供动态扩容的机制以防止内存长度溢出的问题，但是却无法提供动态数组的 "真实容量" 的动态收缩的策略吗；在某些情况我们需要缩减动态数组的 "真实容量" 以保证内存空间的足够性
+
+```cpp
+#include <iostream>
+#include <vector>
+
+void main() {
+  vector<int> _ve;
+  for (size_t i = 0; i < 100000; ++i) {
+    _ve.push_back(i);
+  }
+
+  /** 
+   * resize 函数仅仅只能够缩减 vector 内部动态数组中的真实元素的长度，
+   * 但是动态数组的真实容量却并不会缩减，简而言之，我们虽然把它的真实元素的长度缩减至 5 个，
+   * 但是动态数组其真实容量还是在进行了 100000 新增操作后的容量，这里就会造成内存空间浪费的问题
+  */
+  _ve.resize(10);
+  cout << _ve.capacity() << endl;
+
+  /** 
+   * 通过匿名对象调用 vector 容器的拷贝构造函数，把已有 vector 实例 _ve 内部的动态数组的真实元素（5个）拷贝至
+   * 匿名对象内部所构造的动态数组中，由于仅仅指示拷贝的原始动态数组中的 真实元素，故该匿名对象 vector 内部所管控
+   * 的动态数组的长度也仅仅是以元素动态数组的真实元素的个数为单位，这时候我们再通过 swap() 函数来交换匿名对象内部
+   * 所管控的动态数组和元素动态数组之间在内存动态存储区中的地址，以让原始 vector 内部指向的数组为 匿名对象 所构造
+   * 出来的动态数组，并且被交换后的、长度更长的动态数组由于匿名对象在调用完毕后就会进行销毁，故其也进行了销毁，以此
+   * 来完成了 静态缩减 容量的目的
+  */
+  vector<int>(_ve).swap(_ve);
+  cout << _ve.capacity() << endl;
+}
+```
+
+<br/>
+
+<span id = "deque"></span>
+
+#### deque
+
+deque 是 STL 提供的一种支持任意类型存储的 **_序列式容器_**，和 vector 一样，deque 同样也可以作为一种 动态数组 使用，其所使用的存储区域同样也是以 自由存储区 作为基准，作为容器本身，它在 自由存储区 中所使用的内存自然也由 deque 容器自身来进行管理和释放
+
+<font color = "red">deque 其内部所维护的其实并不是一段真正意义上的 连续性 存储空间，它的真正的存储模型是以不同区域段的内存空间所组合而成，一旦 deque 需要对所维护的存储空间进行动态扩容时，便会申请出一段在自由存储区中的内存空间，并把它串接在 deque 所维护的 **_中控器_** 的首端亦或者尾端</font>
+
+<font color = "red">所谓中控器，其实是一个使用着一小块连续内存空间的 `map`，其中每个元素都是一个指针，分别指向了刚刚所提到的不同区域段的内存空间，deque 以这块真正连续性存储空间 map 为基准，把这些不同区域段的内存空间延续起来</font>，带给使用者误认为所使用的是一种连续性内存空间的假象
+
+![2021-01-02-22-44-55](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2021-01-02-22-44-55.gif)
+
+不可否认的是，<font color = "red">这种数据结构能够带来的最大的好处就是，对于内存空间的动态扩容机制就可以巧妙的避开了像 vector 那样总需要经历 [ 申请一块更大的内存空间、旧内存空间的数据拷贝至新内存空间当中、释放掉旧内存空间 ] 的轮回</font>，但是相对的，<font color = "red">由于该数据结构的复杂性，所以 deque 需要更多的工作在这个复杂的数据结构的上位置分段连续的内存空间连续性的假象，这就造成了其所内置的迭代器相较于 vector 所内置的迭代器其复杂度根本不是一个量级的，这当然也会影响到了使用 deque 进行运算时的各个层面</font>，因此，除非有必要，我们应该尽可能的使用 vector，而不是 deque，就如对 deque 进行的排序操作，为了最高效率，可将 deque 先完整的复制到一个 vector 中，对 vector 容器进行排序，再复制回 deque
+
+也正因为 deque 数据结构的这一特性，所以 deque 和 vector 有一点更大的区别是，<font color = "red">deque 本身并没有 "容量" 这一概念</font>，值得一提的是，这个 容量 的概念是上升至整个容器所维护的内存段本身的，对于 vector 而言，由于其使用的是一个真正的延续性的内存空间，故这段空间是存在容量的，而对于 deque 来说，它的内存的都是以段式进行存储，它随时可以增加一段新的空间并通过中控器链接起来，故没有完整意义上的 "容量" 的概念
+
+<font color = "red">deque 的这种数据结构所带来的另一种特性就是，它能够被抽象为一种 **_双端式的数组_**</font>，deque 容器内部所提供的新增和删除元素的 API 既可以针对数组中的首元素进行，也可以针对尾元素进行的，相较于 vector，由于是线性存储空间的特性，故对于首部元素的插入和删除的操作会带来较大的性能损失，反观 deque，由于它所使用的是分段式内存存储的机制，所以对于数组首部元素的新增和删除的操作较 vector 来说会更容易实现，换句话说，deque 允许使用常数项时间的方式对头端进行元素的插入和删除操作，这也是为什么它会被抽象为一种 双端式数组 的原因
+
+deque 所提供的迭代器是一种 **_随机访问迭代器_**，它们总是会指向容器数组阵列的首元素和尾元素的位置
+
+
+**_关于 deque 迭代器失效的问题_**
+
+1. 当 deque 第一次插入元素时，在插入前所获取的 `begin` 和 `end` 迭代器将失效
+
+2. 当插入点位于首元素附近时，则插入点之前的所有元素延伸出的 [iterator] [poiner] [reference] 都将失效；当插入点位于尾元素附近时，则插入点之后 ( 包括插入点 ) 的所有元素延伸出的 [iterator] [poiner] [reference] 都将失效
+
+3. 当 deque 在尾部 ( push_back ) 插入元素时，`end` 迭代器将失效；当 deque 在首部 ( push_front ) 插入元素时，`start` 迭代器将失效
+
+4. 当 deque 删除尾部元素 ( pop_back ) 时，`end` 迭代器将失效，尾元素延伸出的 [iterator] [poiner] [reference] 都将失效；当 deque 删除首部元素 ( pop_front ) 时，首元素延伸出的 [iterator(start)] [poiner] [reference] 都将失效
+
+5. 当删除点位于首元素附近时，则删除点之前 ( 包括删除点 ) 的所有元素延伸出的 [iterator] [poiner] [reference] 都将失效；当删除点位于尾元素附近时，则删除点之后 ( 包括删除点 ) 的所有元素延伸出的 [iterator] [poiner] [reference] 都将失效
+
+
+**_CONSTRUCTOR_**
+
+- deque<T>()
+  
+  默认构造，构建一个空的 deque 容器
+
+- deque<T>(V _begin, V _end)
+  
+  该构造函数是一个存在虚拟类型为 V 的模板函数，V 的具体化用于接收能够指示一段线性数组 [begin, end) 开闭区间的迭代器(隶属于容器的)亦或者地址，并使用它来完成当前 deque 容器内部所维护的动态数组的初始化工作
+
+- deque<T>(int n, T _element)
+  
+  该构造函数使用 n 个 _element 用于 deque 容器内部动态数组的初始化构造工作
+
+- deque(const vector &_vec)
+  
+  拷贝构造函数，将已有 deque 容器实例内部所维护的动态数组中的元素拷贝至当前 deque 容器实例内部所维护的动态数组中
+
+```cpp
+#include <iostream>
+#include <deque>
+
+void main() {
+  /* deque<T>() */
+  std::deque<int> dq_empty;
+
+  /* deque<T>(V _begin, V _end) */
+  std::deque<int> dq_01(dq_empty.begin(), dq_empty.end());
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  std::deque<int> dq_02(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  /* deque<T>(int n, T _element) */
+  std::deque<int> dq_03(10, 23);
+
+  /* deque(const vector &_vec) */
+  std::deque<int> dq_04(dq_02);
+}
+```
+
+**_ASSIGNMENT_**
+
+- void assign(V _begin, V _end)
+  
+  该函数是一个存在虚拟类型为 V 的模板函数，V 的具体化用于接收能够指示一段线性数组 [begin, end) 开闭区间的迭代器(隶属于容器的)亦或者地址，并使用它来完成当前 deque 容器实例内部所维护的动态数组的重新赋值的工作
+
+- void assign(int n, _element)
+  
+  该函数使用 n 个 _element 用于 deque 容器内部所维护的动态数组的重新赋值的工作
+
+- deque &operator=(const deque &_deq)
+  
+  拷贝赋值运算符，依据已有 deque 的实例内部所维护的动态数组中的元素去重新构造当前 deque 容器实例本身内部所维护的动态数组
+
+- void swap(deque &_deq)
+  
+  交换目标 deque 容器与当前 deque 容器内部指向着用于管控分段式内存区域的中控器的指针，并重新更新双方容器内部所维护的动态数组的 size
+
+```cpp
+#include <iostream>
+#include <deque>
+
+void main() {
+  int nums_src[5] = { 1, 2, 3, 4, 5 };
+  deque<int> dq_src;
+
+  /* void assign(V _begin, V _end) */
+  dq_src.assign(nums_src, nums_src + (sizeof(nums_src) / sizeof(int)));
+
+  /* void assign(int n, _element) */
+  dq_src.assign(10, 1024);
+
+  deque<int> dq_des;
+
+  /* deque &operator=(const deque &_deq) */
+  dq_des = dq_src;
+
+  /* void swap(vector &_vec) */
+  dq_des.swap(dq_src);
+}
+```
+
+**_CAPACITY_**
+
+- size_t size()
+  
+  返回 deque 容器内部动态数组的元素个数
+  
+- bool empty()
+  
+  判断是否是一个空容器（无任何有效元素的录入）
+
+- void resize(int n)
+  
+  重新指定 deque 容器内部所维护的动态数组的长度为 n，如果 n 较调用前的长度大，则以默认值填充超出的位置，如果 n 较调用前的长度小，则末尾超出数组长度的元素被删除
+
+- void resize(int n, T _element)
+  
+  重新指定 deque 容器内部动态数组的长度为 n，如果 n 较调用前的长度大，则以拷贝所指定的 _element 去填充超出的位置，如果 n 较调用前的长度小，则末尾超出数组长度的元素被删除
+
+```cpp
+#include <iostream>
+#include <deque>
+
+void main() {
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  deque<int> _dq(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  /* size_t size() */
+  size_t _dq_size = _dq.size();
+
+  /* bool empty() */
+  bool is_empty = _dq.empty();
+
+  /* void resize(int n) */
+  _dq.resize(10);
+
+  /* void resize(int n, T _element) */
+  _dq.resize(7, 0x400);
+}
+```
+
+**_INDEX_**
+
+- T &at(int _idx)
+  
+  返回 deque 容器内部所维护的动态数组的下标为 _idx 的元素的引用，如果 _idx 超出内部数组的有效元素个数，则抛出out_of_range异常
+
+- T &operator[_idx]
+  
+  返回 deque 容器内部所维护的动态数组的下标为 _idx 的元素的引用，如果 _idx 超出内部数组的有效元素个数，则程序崩溃
+
+- T &front()
+  
+  返回 deque 容器内部所维护的动态数组的首元素的引用
+
+- T &back()
+  
+  返回 deque 容器内部所维护的动态数组的尾元素的引用
+
+```cpp
+#include <iostream>
+#include <deque>
+
+void main() {
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  deque<int> _dq(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  int &num_01 = _dq.at(0);
+  int &num_02 = _dq[1];
+  int &num_03 = _dq.front();
+  int &num_04 = _dq.back();
+}
+```
+
+**_INSERT_**
+
+- void insert(const_iterator pos,T _element)
+  
+  根据迭代器 pos 所指向的元素的下标往 deque 容器内部所维护的动态数组中插入一个元素 _elemenet，如果迭代器 pos 所指向的元素下标超出了动态数组的真实容量，则程序崩溃
+  
+- void push_back(T _element)
+  
+  往 deque 容器内部的动态数组的尾部插入元素 _element
+
+- void push_front(T _element)
+  
+  往 deque 容器内部的动态数组的首部插入元素 _element
+
+```cpp
+#include <iostream>
+#include <deque>
+
+void main() {
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  deque<int> _dq(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  /* void insert(const_iterator pos,T _element) */
+  _dq.insert(_dq.begin() + 2, 0x400);
+
+  /* void push_back(T _element) */
+  _dq.push_back(0x200);
+
+  /* void push_front(T _element) */
+  _dq.push_front(0x100);
+}
+```
+
+**_DELETE_**
+
+- void pop_back()
+  
+  删除 deque 容器内部的动态数组中的尾元素
+
+- void pop_front()
+  
+  删除 deque 容器内部的动态数组中的首元素
+
+- void erase(const_iterator start, const_iterator end)
+  
+  deque 容器内部所维护的动态数组中删除迭代器 start 和 迭代器 end 所指向的下标之间的所有的元素
+
+- void erase(const_iterator pos)
+  
+  deque 容器内部所维护的动态数组中删除迭代器 pos 所指向的元素
+
+- void clear()
+  
+  删除 deque 容器内部的动态数组中的所有的元素
+
+```cpp
+#include <iostream>
+#include <deque>
+
+void main() {
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  deque<int> _dq(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  /* void pop_back() */
+  _dq.pop_back();
+
+  /* void pop_front() */
+  _dq.pop_front();
+
+  /* void erase(const_iterator start, const_iterator end) */
+  _dq.erase(_dq.begin(), _dq.begin() + 2);
+
+  /* void erase(const_iterator pos) */
+  _dq.erase(_dq.begin() + 1);
+
+  /* void clear() */
+  _dq.clear();
+}
+```
+
+<br/>
+
+<span id = "stack"></span>
+
+#### stack
+
+stack 是 STL 所提供的一种支持任意类型的存储的 **_序列式容器_**，该容器的内部设计非常简单，其遵循 栈 的 FILO 的存储结构而进行设计，我们的对于该容器中元素的访问和插入永远只能从 栈顶 开始，<font color = "red">**_并且 STL 并没有提供针对此容器的迭代器_**，换言之，stack 容器是不允许存在遍历的型为的</font>
+
+为保证最大内存的可用性，该容器所使用的内存区域是以 自由存储区 作为基准，并且作为容器本身，它在 自由存储区 中所使用的内存也由 stack 自身来进行管理和释放
+
+**_CONSTRUCTOR_**
+
+- stack<T>()
+  
+  默认构造，构建一个空的 stack 容器
+
+- stack(const stack &_st)
+  
+  拷贝构造函数，将已有 stack 容器实例内部所维护的元素拷贝至当前 stack 容器实例内部
+
+```cpp
+#include <iostream>
+#include <stack>
+
+void main() {
+  /* stack<T>() */
+  std::stack<int> __st;
+
+  /* stack(const stack &_st) */
+  std::stack<int> __st_cpy(__st);
+}
+```
+
+**_ASSIGNMENT_**
+
+- stack &operator=(const stack &_st)
+  
+  拷贝赋值运算符，依据已有 stack 的实例内部所维护的元素去重新构造当前 stack 实例
+
+```cpp
+#include <iostream>
+#include <stack>
+
+void main() {
+  std::stack<int> __st_src;
+  std::stack<int> __st_cpy;
+
+  __st_src = __st_cpy;
+}
+```
+
+**_OPERATION_**
+
+- void push(T _element)
+  
+  向栈顶添加元素 _element
+
+- void pop()
+  
+  从栈顶移除第一个元素
+
+- T &top()
+  
+  返回栈顶元素的引用
+
+```cpp
+#include <iostream>
+#include <stack>
+
+void main() {
+  std::stack<int> __st;
+
+  /* void push(T _element) */
+  __st.push(0x100);
+  __st.push(0x200);
+  __st.push(0x300);
+
+  /* T &top() */
+  int _val = __st.top();
+  std::cout << _val << std::endl;
+
+  /* void pop() */
+  __st.pop();
+}
+```
+
+**_CAPACITY_**
+- bool empty()
+  
+  判断 stack 容器内部是否为空
+
+- size_t size()
+  
+  获取 stack 容器内部所维护的元素的个数
+
+```cpp
+#include <iostream>
+#include <stack>
+
+void main() {
+  std::stack<int> __st;
+
+  /* bool empty() */
+  bool flag = __st.empty();
+
+  /* size_t size() */
+  size_t cout = __st.size();
+}
+```
+
+
+<br/>
+
+<span id = "queue"></span>
+
+#### queue
+
+queue 是 STL 所提供的一种支持任意类型的存储的 **_序列式容器_**，该容器的内部设计非常简单，其遵循 队列 的 FIFO 的存储结构而进行设计，我们的对于该容器中元素的访问永远只能从 队头 开始而对于元素的插入操作永远只能从 队尾 进行，<font color = "red">**_并且 STL 并没有提供针对此容器的迭代器_**，换言之，queue 容器是不允许存在遍历的型为的</font>
+
+为保证最大内存的可用性，该容器所使用的内存区域是以 自由存储区 作为基准，并且作为容器本身，它在 自由存储区 中所使用的内存也由 queue 自身来进行管理和释放
+
+**_CONSTRUCTOR_**
+
+- queue<T>()
+  
+  默认构造，构建一个空的 queue 容器
+
+- queue(const queue &_qe)
+  
+  拷贝构造函数，将已有 queue 容器实例内部所维护的元素拷贝至当前 queue 容器实例内部
+
+```cpp
+#include <iostream>
+#include <queue>
+
+void main() {
+  /* queue<T>() */
+  std::queue<int> __qe;
+
+  /* queue(const queue &_qe) */
+  std::queue<int> __qe_cpy(__qe);
+}
+```
+
+**_ASSIGNMENT_**
+
+- queue &operator=(const queue &_qe)
+  
+  拷贝赋值运算符，依据已有 queue 的实例内部所维护的元素去重新构造当前 queue 实例
+
+```cpp
+#include <iostream>
+#include <queue>
+
+void main() {
+  std::queue<int> __qe_src;
+  std::queue<int> __qe_cpy;  
+
+  /* queue &operator=(const queue &_qe) */
+  __qe_src = __qe_cpy;
+}
+```
+
+**_OPERATION_**
+- void push(T _element)
+  
+  向队尾添加元素 _element
+
+- void pop()
+  
+  从队头移除第一个元素
+
+- T &back()
+  
+  返回对尾的元素的引用
+
+- T &front()
+  
+  返回队头的元素的引用
+
+```cpp
+#include <iostream>
+#include <queue>
+
+void main() {
+  std::queue<int> __qe;
+
+  /* void push(T _element) */
+  __qe.push(0x100);
+  __qe.push(0x200);
+  __qe.push(0x300);
+
+  /* T &back() */
+  int val_back = __qe.back();
+
+  /* T &front() */
+  int val_front = __qe.front();
+            
+  /* void pop() */
+  __qe.pop();
+}
+```
+
+**_CAPACTIY_**
+- bool empty()
+  
+  判断 queue 容器内部是否为空
+
+- size_t size()
+  
+  获取 queue 容器内部所维护的元素的个数
+
+```cpp
+#include <iostream>
+#include <queue>
+
+void main() {
+  std::queue<int> __qe;
+
+  /* bool empty() */
+  bool flag = __qe.empty();
+
+  /* size_t size() */
+  size_t cout = __qe.size();
+}
+```
+
+<br/>
+
+<span id = "list"></span>
+
+#### list
+
+list 是 STL 所提供的一种支持任意类型存储的 **_序列式容器_**，其内部所维护的是一张以 自由存储区 作为内存基础去进行节点的动态扩展的 **_双向循环链表_**，开发人员使用 list 时无需节点的内存管理和释放的工作，其都转交 list 容器本身来进行管控
+
+作为一张链表，list 对比相同长度的数组其查询元素所消耗的空间复杂度要大得多，好处在于使用 list 去执行新增和删除操作时，其总是能够通过常数项时间来完成，因为对于 list 来说，其新增和删除元素仅仅只需要改变两端节点的指针指向即可完成，反观数组，对于元素的随机性删除或新增往往需要大量的 向后 / 向前 移动元素，这就造成了较大的性能损失，并且对于 list 来说，因为每一个节点都是一块新的内存空间，故其新增结点时所使用的内存总是那么针对性的，反观数组，list 在内存空间的利用率体现了绝对的优势
+
+<font color = "red">**_list 所提供的迭代器并不是一种随机访问迭代器_**，这由于 链表 本身的特性所导致的，所提供的迭代器仅仅只能够完成单步自增 / 自减的操作</font>
+
+除此之外，由于 链表 本身的特性还让使用 list 执行插入操作和删除操作时都不会造成原有 list 迭代器的失效，因为对于链表来说其新增和删除节点时总是针对那一块独立的内存空间，并不会因为当前操作而导致整个 链表 维护的所有节点所使用的内存空间需要一次全局的置换，即便会发生变化，也仅仅只是针对当前操作所指定的节点所在的迭代器而言
+
+**_关于 list 迭代器失效的问题_**
+
+1. 当 list 第一次插入元素时，在插入前所获取的 `start` 迭代器将失效
+
+2. 当 list 插入首部元素 ( push_front ) 时，`start` 迭代器将失效
+
+3. 当 list 删除首部元素 ( pop_front ) 时，`start` 迭代器将失效
+
+
+**_CONSTRUCTOR_**
+
+- list<T>()
+  
+  默认构造，构建一个空的 list 容器
+
+- list<T>(V _begin, V _end)
+  
+  该构造函数是一个存在虚拟类型为 V 的模板函数，V 的具体化用于接收能够指示一段线性数组 [begin, end) 开闭区间的迭代器(隶属于容器的)亦或者地址，并使用它来完成当前 list 容器内部所维护的双向循环链表的初始化工作
+
+- list(int n, T _element)
+  
+  该构造函数使用 n 个 _element 用于 list 容器内部双向循环链表的初始化构造工作
+
+- list(const list &_li)
+  
+  拷贝构造函数，将已有 list 容器实例内部所维护的双向循环链表中的节点拷贝至当前 list 容器实例内部所维护的双向循环链表中
+
+```cpp
+#include <iostream>
+#include <queue>
+
+void main() {
+  /* list<T>() */
+  std::list<int> li_empty;
+
+  /* list<T>(V _begin, V _end) */
+  std::list<int> li_01(li_empty.begin(), li_empty.end());
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  std::list<int> li_02(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  /* list<T>(int n, T _element) */
+  std::list<int> li_03(10, 23);
+
+  /* list(const list &_li) */
+  std::list<int> li_04(li_02);
+}
+```
+
+**_ASSIGNMENT_**
+- void assign(V _begin, V _end)
+  
+  该函数是一个存在虚拟类型为 V 的模板函数，V 的具体化用于接收能够指示一段线性数组 [begin, end) 开闭区间的迭代器(隶属于容器的)亦或者地址，并使用它来完成当前 list 容器实例内部所维护的双向循环链表的重新赋值的工作
+  
+- assign(int n, _element)
+  
+  该函数使用 n 个 _element 用于 list 容器内部所维护的双向循环链表的重新赋值的工作
+  
+- list &operator=(const list &_li)
+  
+  拷贝赋值运算符，依据已有 list 的实例内部所维护的双向循环链表中的节点去重新构造当前 list 容器实例本身内部所维护的双向循环链表
+  
+- void swap(list &_li)
+  
+  交换目标 list 容器与当前 list 容器内部指向着存在于堆中的双向循环链表的指针，并重新更新双方容器内部所维护的双向循环链表的 size
+
+```cpp
+#include <iostream>
+#include <queue>
+
+void main() {
+  int nums_src[5] = { 1, 2, 3, 4, 5 };
+  std::list<int> li_src;
+
+  /* void assign(V _begin, V _end) */
+  li_src.assign(nums_src, nums_src + (sizeof(nums_src) / sizeof(int)));
+
+  /* void assign(int n, _element) */
+  li_src.assign(10, 1024);
+
+  std::list<int> li_des;
+
+  /* list &operator=(const list &_li) */
+  li_des = li_src;
+
+  /* void swap(list &_li) */
+  li_des.swap(li_src);
+}
+```
+
+**_CAPACITY_**
+
+- size_t size()
+  
+  返回 list 容器内部双向循环链表的节点个数
+
+- bool empty()
+  
+  判断是否是一个空容器（无任何节点的链接）
+
+- void resize(int n)
+  
+  重新指定 list 容器内部所维护的双向循环链表的节点链接长度为 n，如果 n 较调用前的长度大，则以默认值填充超出的位置，如果 n 较调用前的长度小，则删除超出链表长度 n 的节点
+
+- void resize(int n, T _element)
+  
+  重新指定 list 容器内部所维护的双向循环链表的节点链接长度为 n，如果 n 较调用前的长度大，则拷贝所指定的 _element 去填充超出的位置，如果 n 较调用的长度小，则删除超出链表长度 n 的节点
+
+```cpp
+#include <iostream>
+#include <queue>
+
+void main() {
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  std::list<int> _li(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  /* size_t size() */
+  size_t _li_size = _li.size();
+
+  /* bool empty() */
+  bool is_empty = _li.empty();
+
+  /* void resize(int n) */
+  _li.resize(10);
+
+  /* void resize(int n, T _element) */
+  _li.resize(7, 0x400);
+}
+```
+
+**_INSERT_**
+- void push_back(T _element)
+  
+  从 list 容器内部的双向循环链表的尾处新增数据域为 _element 的节点
+
+- void push_front(T _element)
+  
+  从 list 容器内部的双向循环链表的首处新增数据域为 _element 的节点
+
+- void insert(const_iterator pos,T _element)
+  
+  根据迭代器 pos 所指向的节点的下标往 list 容器内部所维护的双向循环链表中插入一个数据域为 _elemenet 的节点，如果迭代器 pos 所指向的元素下标超出了双向循环链表的长度，则程序崩溃
+
+```cpp
+#include <iostream>
+#include <queue>
+
+void main() {
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  std::list<int> _li(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  /* void insert(const_iterator pos,T _element) */
+  _li.insert(++_li.begin(), 0x400);
+
+  /* void push_back(T _element) */
+  _li.push_back(0x200);
+
+  /* void push_front(T _element) */
+  _li.push_front(0x100);
+}
+```
+
+**_DELETE_**
+
+- void pop_back()
+  
+  删除 list 容器内部的双向循环链表中的尾节点
+
+- void pop_front()
+  
+  删除 list 容器内部的双向循环链表中的首节点
+
+- void clear()
+  
+  删除 list 容器内部的双向循环链表中的所有的节点
+
+- void erase(list<T>::const_iterator start, list<T>::const_iterator end)
+  list 容器内部所维护的双向循环链表中删除迭代器 start 和 迭代器 end 所指向的下标之间的所有的节点
+
+- void erase(list<T>::const_iterator pos)
+  
+  list 容器内部所维护的双向循环链表中删除迭代器 pos 所指向的节点
+
+```cpp
+#include <iostream>
+#include <queue>
+
+void main() {
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  std::list<int> _li(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  /* void pop_back() */
+  _li.pop_back();
+
+  /* void pop_front() */
+  _li.pop_front();
+
+  /* void erase(const_iterator start, const_iterator end) */
+  _li.erase(_li.begin(), ++_li.begin());
+
+  /* void erase(const_iterator pos) */
+  _li.erase(++_li.begin());
+
+  /* void clear() */
+  _li.clear();
+}
+```
+
+**_FUNCTIONAL_**
+- T &front()
+  
+  返回 list 容器内部所维护的双向链表的首节点数据域的引用
+
+- T &back()
+  
+  返回 list 容器内部所维护的双向链表的尾节点数据域的引用
+
+
+```cpp
+#include <iostream>
+#include <queue>
+
+bool __sort(int &num_01, int &num_02) {
+  return num_01 < num_02;
+}
+
+void main() {
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  std::list<int> _li(nums, nums + (sizeof(nums) / sizeof(int)));
+  int &num_03 = _li.front();
+  int &num_04 = _li.back();
+
+  /* sort(T __fu) */
+  _li.sort(__sort);
+
+  /* reverse() */
+  _li.reverse();
+}
+```
+
+<br/>
+
+<span id = "pair"></span>
+
+#### pair
+
+pair 又称为对组，它可以将一对可具有不同类型的值，组合为一个值，并将它们分别映射到 pair 的公共属性 frist 和 second 的访问上
+
+pair 所使用的内存是以 自由存储区 作为基准，并由 pair 本身来负责管理在堆中所使用的内存和其释放，开发人员无需关心会产生内存泄漏亦或者超出的问题
+
+**_USEAGE_**
+
+```cpp
+/** 
+ * constructor
+ *   pair<T,V>(T _t, V _v)                指定 pair 所需维护的两个具体的值来进行 pair 实例的初始化构造
+ *   pair<T,V>(const pair<T,V> &__p)      拷贝构造函数，依据已有的 pair 实例内部所维护的两个可存在不同类型的值去构造当前 pair 的实例
+ * 
+ * function
+ *   pair<T,V> make_pair<T,V>(T _t, V_v)  该函数用于接受两个可存在不同类型的值，并返回相应类型的 pair
+ * 
+ * member
+ *   first                                获取 pair 所维护的第一个值
+ *   second                               获取 pair 所维护的第二个值                                     
+*/
+void foo(void) {
+  /* pair<T,V>(T _t, V _v) */
+  pair<string, int> __p_1("HELLO,WORLD", 0x400);     
+
+  /* pair<T,V> make_pair<T,V>(T _t, V_v) */
+  pair<char, string> __p_2 = make_pair('A', "NGPONG!");   
+
+  /* pair<T,V>(const pair<T,V> &__p) */
+  pair<string, int> __p_3 = __p_1;     
+
+  /* first  */
+  cout << __p_1.first << endl;    
+
+  /* second */
+  cout << __p_1.second << endl;
+}
+```

@@ -165,7 +165,6 @@ img {
   border-style: none;
 }
 
-code,
 kbd,
 pre {
   font-family: monospace, monospace;
@@ -318,7 +317,7 @@ dd {
 }
 
 code {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-family: Fira code,Sarasa Term Slab SC;
   font-size: 12px;
 }
 
