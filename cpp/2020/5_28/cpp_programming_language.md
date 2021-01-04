@@ -113,7 +113,15 @@
   - [unique_ptr](#unique_ptr)
   - [shared_ptr](#shared_ptr)
   - [weak_ptr](#weak_ptr)
-
+- [STL](#STL)
+  - [容器](#容器)
+    - [string](#string)
+    - [vector](#vector)
+    - [deque](#deque)
+    - [stack](#stack)
+    - [queue](#queue)
+    - [list](#list)
+    - [pair](#pair)
 
 <br/>
 
@@ -6552,13 +6560,13 @@ int main() {
   
   删除 vector 容器内部的动态数组中的尾元素
 
-- void erase(const_iterator start, const_iterator end)
+- iterator erase(const_iterator start, const_iterator end)
   
-  删除 vector 容器内部的动态数组中，迭代器 start 和 迭代器 end 所指向的下标之间的所有的 "真实元素"
+  删除 vector 容器内部的动态数组中，迭代器 start 和 迭代器 end 所指向的下标之间的所有的 "真实元素"，并返回距离删除点下一个可用元素位置的迭代器
 
-- void erase(const_iterator pos)
+- iterator erase(const_iterator pos)
   
-  删除 vector 容器内部的动态数组中，迭代器 pos 所指向的 "真实元素"
+  删除 vector 容器内部的动态数组中，迭代器 pos 所指向的 "真实元素"，并返回距离删除点下一个可用元素位置的迭代器
 
 - void clear()
   
@@ -6898,13 +6906,13 @@ void main() {
   
   删除 deque 容器内部的动态数组中的首元素
 
-- void erase(const_iterator start, const_iterator end)
+- iterator erase(const_iterator start, const_iterator end)
   
-  deque 容器内部所维护的动态数组中删除迭代器 start 和 迭代器 end 所指向的下标之间的所有的元素
+  deque 容器内部所维护的动态数组中删除迭代器 start 和 迭代器 end 所指向的下标之间的所有的元素，并返回距离删除点下一个可用元素位置的迭代器
 
-- void erase(const_iterator pos)
+- iterator erase(const_iterator pos)
   
-  deque 容器内部所维护的动态数组中删除迭代器 pos 所指向的元素
+  deque 容器内部所维护的动态数组中删除迭代器 pos 所指向的元素，并返回距离删除点下一个可用元素位置的迭代器
 
 - void clear()
   
@@ -7182,7 +7190,7 @@ list 是 STL 所提供的一种支持任意类型存储的 **_序列式容器_**
 
 2. 当 list 插入首部元素 ( push_front ) 时，`start` 迭代器将失效
 
-3. 当 list 删除首部元素 ( pop_front ) 时，`start` 迭代器将失效
+3. 当 list 随机删除元素时，`start` 迭代器将失效，删除点元素延伸出的 [iterator] [poiner] [reference] 都将失效
 
 
 **_CONSTRUCTOR_**
@@ -7351,12 +7359,12 @@ void main() {
   
   删除 list 容器内部的双向循环链表中的所有的节点
 
-- void erase(list<T>::const_iterator start, list<T>::const_iterator end)
-  list 容器内部所维护的双向循环链表中删除迭代器 start 和 迭代器 end 所指向的下标之间的所有的节点
+- iterator erase(list<T>::const_iterator start, list<T>::const_iterator end)
+  list 容器内部所维护的双向循环链表中删除迭代器 start 和 迭代器 end 所指向的下标之间的所有的节点，并返回距离删除点下一个可用元素位置的迭代器
 
-- void erase(list<T>::const_iterator pos)
+- iterator erase(list<T>::const_iterator pos)
   
-  list 容器内部所维护的双向循环链表中删除迭代器 pos 所指向的节点
+  list 容器内部所维护的双向循环链表中删除迭代器 pos 所指向的节点，并返回距离删除点下一个可用元素位置的迭代器
 
 ```cpp
 #include <iostream>
@@ -7457,3 +7465,72 @@ void foo(void) {
   cout << __p_1.second << endl;
 }
 ```
+
+
+<br/>
+
+<span id = "set/multiset"></span>
+
+#### set / multiset / unorder_set
+
+set 是 STL 所提供的一种支持任意类型存储的 **_关联式容器_**，其内部采用 **_红黑树_** 作为实现，其拥有一个十分重要的特性即是，<font color = "red">set 内部维护的树所新增的节点，由于二叉树排序树的特性，它都会依据该节点的 键值 进行自动的排序(**_默认是正序排序，也可手动指定排序规则_**)</font>；这里需要扩充一下的是，set 中的节点内部所存有的数据既可作为 键 也可以作为 值，二者放在 set 中的节点元素而言并不是分开的一种概念；并且<font color = "red"> set 不允许元素内部出现重复的键值，对于用户重复插入的键值，set 会保证此次的插入操作是一个无效操作，简而言之就是插入失败</font>
+
+set 内部所维护的这颗 红黑树 和其它容器一样，都是存储在 自由存储区 中的，并且由容器本身去负责管理这棵树在堆中所使用内存的申请和释放
+
+set 由于使用的是 红黑树 作为存储模型，故使用 set 去针对节点进行插入、删除、查找时所消耗的时间复杂度都接近 $O(logN)$，其中，$N$ 与树的高度相关
+
+set 并不提供针对节点的键值进行修改的操作，具体体现则为其对外仅提供了 只读性质的迭代器，需要 补充的是，set 所提供的并不是一种提供随机访问性的迭代器，其只能够完成单步自增/减的操作，那么我们不妨在总结一下，<font color = "red">set 所提供的迭代器是一种只读单步自增/减的迭代器</font>
+
+set 对于节点进行插入或者删除操作时，所操作的元素永远都是存在针对性的，即这些新增和删除的操作并不会引起整棵树的内存置换
+
+相对 set 而言还有另一种容器跟它相呼应，那就是 `multiset` 和 `unorder_set`
+
+- <font color = "red">作为 multiset 而言，它和 set 所存在的唯一的区别就是 multiset 允许节点的键值重复</font>，其余相较于 set 不管是功能性而言还是内置结构都是一模一样的
+
+- 而 unorder_set 虽然也能够<font color = "red">保有不允许元素重复的特性</font>，但是其内部实现对比 set / multiset 而言可谓是大相径庭，unorder_set 其内部实现采用了 **_哈希表_**，既然采用了 哈希表，那么它该数据结构所耗费的时间复杂度就要高出红黑树许多，并且还<font color = "red">无法满足元素自动排序的特性</font>，但是相对的，<font color = "red">对于元素的查找、删除和新增所消耗的时间复杂度都能够在常数阶(最好 $O(1)$，最坏需要处理哈希冲突，即 $O(N)$)去完成</font>
+
+**_关于 set 迭代器失效的问题_**
+
+1. 当 set 每个新节点的插入，在插入前所获取的 `start` 迭代器将失效
+   
+2. 当 set 随机删除元素时，删除点元素延伸出的 [iterator] [poiner] [reference] 都将失效
+
+**_CONSTRUCTOR_**
+
+- set<T,F = less<T>>()
+  
+  默认构造，构建一个空的 set 容器
+
+- set<T,F = less<T>>(V, V _end)
+  
+  该构造函数是一个存在虚拟类型为 V 的模板函数，V 的具体化用于接收能够指示一段线性数组 $[begin, \: end)$ 开闭区间的迭代器(隶属于容器的)亦或者地址，并使用它来完成当前 set 容器内部所维护的红黑树的初始化工作)
+  
+- set(const set &__s)
+  
+  拷贝构造函数，将已有 set 容器实例内部所维护的红黑树的节点拷贝至当前 set 容器实例内部所维护的红黑树当中
+
+```cpp
+#include <iostream>
+#include <set>
+
+/* binary functor */
+template<class _Ty>
+struct __DESC {
+  constexpr bool operator()(const _Ty &left, const _Ty &right) {
+    return left > right;
+  }
+};
+
+int main(void) {
+  /* set<T,F = less<T>>() */
+  set<int> __s_nor;
+
+  /* set<T,F = less<T>>((V _begin, V _end) */
+  int nums[5] = { 3, 1, 5, 2, 4 };
+  set<int, __DESC<int>> __s(nums, nums + sizeof(nums) / sizeof(int));
+
+  /* set(const set &__s) */
+  set<int, __DESC<int>> __s_des(__s);
+}
+```
+
