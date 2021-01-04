@@ -7523,14 +7523,14 @@ struct __DESC {
 
 int main(void) {
   /* set<T,F = less<T>>() */
-  set<int> __s_nor;
+  std::set<int> __s_nor;
 
   /* set<T,F = less<T>>((V _begin, V _end) */
   int nums[5] = { 3, 1, 5, 2, 4 };
-  set<int, __DESC<int>> __s(nums, nums + sizeof(nums) / sizeof(int));
+  std::set<int, __DESC<int>> __s(nums, nums + sizeof(nums) / sizeof(int));
 
   /* set(const set &__s) */
-  set<int, __DESC<int>> __s_des(__s);
+  std::set<int, __DESC<int>> __s_des(__s);
 }
 ```
 
