@@ -9904,6 +9904,7 @@ int main(int argc, char *argv[]) {
 - **非阻塞式 IO**
 
 我们在发起IO时，通过对文件描述符设置 `O_NONBLOCK` 属性来指定该文件描述符的 IO 操作为非阻塞，非阻塞 IO 通常发生在一个 for 循环当中，因为每次进行 IO 操作时要么 IO 操作成功，要么当 IO 操作会阻塞时返回错误`EWOULDBLOCK / EAGAIN`，然后再根据需要进行下一次的 for 循环操作，这种类似轮询的方式会浪费很多不必要的CPU资源，是一种糟糕的设计，和阻塞IO一样，非阻塞IO也是通过调用[read()](#https://man7.org/linux/man-pages/man2/read.2.html) 或 [write()](#https://man7.org/linux/man-pages/man2/write.2.html)来进行操作的，也只能对单个描述符进行操作
+
 ![2020-11-30-12-07-57](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-30-12-07-57.png)
 
 

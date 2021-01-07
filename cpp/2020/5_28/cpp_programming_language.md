@@ -122,8 +122,8 @@
     - [queue](#queue)
     - [list](#list)
     - [pair](#pair)
-    - [set](#set)
-    - [map](#map)
+    - [set/multiset/unorder_set](#set)
+    - [map/multimap/unorder_map](#map)
 
 <br/>
 
@@ -1465,8 +1465,8 @@ public:
 
 void foo() {
   /* 通过一个实例的依赖去获取成员函数在内存中的地址 */
-  TEST __t;
-  bool (TEST::*invoker_instance)(int) = __t.m_foo;
+  TEST t;
+  bool (TEST::*invoker_instance)(int) = t.m_foo;
 
   /* 通过 :: 操作符去引用至具体某个类型下并拿到成员函数的名字同样也可以用作获取成员函数地址的一种方式 */
   bool (TEST::*invoker_none)(int) = TEST::m_foo;
@@ -1487,13 +1487,13 @@ public:
 
 void foo() {
   /* 通过一个实例的依赖去获取成员函数在内存中的地址 */
-  TEST __t;
-  bool (TEST::*invoker_instance)(int) = __t.m_foo;
-  (__t.*invoker_instance)(10);
+  TEST t;
+  bool (TEST::*invoker_instance)(int) = t.m_foo;
+  (t.*invoker_instance)(10);
 
   /* 通过 :: 操作符去引用至具体某个类型下并拿到成员函数的名字同样也可以用作获取成员函数地址的一种方式 */
   bool (TEST::*invoker_none)(int) = TEST::m_foo;
-  (__t.*invoker_none)(10);
+  (t.*invoker_none)(10);
 }
 ```
 
@@ -2197,7 +2197,7 @@ person_base::m_gender <---+     +-----------> 0x00000002
                                 +-----------> 0x00000000
 ```
 
-通过 vs 开发人员工具输入 `cl /d1 reportSingleClassLayout__(类型) __(文件名)` 来查看的结果
+通过 vs 开发人员工具输入 `cl /d1 reportSingleClassLayout(类型) (文件名)` 来查看的结果
 
 ```text
 class student   size(12):
@@ -2295,7 +2295,7 @@ int main(void) {
 
 - 派生类和基类中存在名字相同的成员的时候，调用会存在二义性，编译器会直接隐藏掉基类中会因为此次调用而造成二义性冲突的成员(如果是所冲突的成员为函数，则隐藏掉其包括所有重载的版本)，也就意味着可能我们本次针对该成员的调用是想访问在其基类实例中该成员的信息，但是实际上获取到的却是当前派生类实例中该成员的信息
 
-- 派生类所继承的多个基类中存在同名成员时，调用会存在二义性，因为编译器并不知道该调用到底是针对派生类继承的基类 **__basicA_** 中的成员亦或者说继承的基类 **__basicB_** 中的成员，故针对这种情况下编译器会直接报错，导致编译不通过
+- 派生类所继承的多个基类中存在同名成员时，调用会存在二义性，因为编译器并不知道该调用到底是针对派生类继承的基类 **basicA_** 中的成员亦或者说继承的基类 **basicB_** 中的成员，故针对这种情况下编译器会直接报错，导致编译不通过
 
 - 当一个派生类中同时存在以上两种情况的继承关系时，第一种情景会优先覆盖掉第二种情景所发生的问题
 
@@ -2596,7 +2596,7 @@ HYBIRD::$vbtable@CAT@:
 ```
 
 
-我们会发现，原本 `HYBIRD` 的内存首段信息本该出现的 `DOG` 和 `CAT` 的数据都替换为 **_vbptr_** 的形式了，而本该出现的两个 `SEX` 成员变成了只有一个(共享机制)并被放在派生类成员��始化的数据往后延生的内存段上(virtual base ANIMAL)，<font color = "red">当我们想访问 `BYBIRD` 的基类所继承下来的 `SEX` 数时，会依据指针 **_vbptr_** 所指向的 **_vbtable_**，在里头找到该 **_vbptr_** 指针在内存中的首地址到虚基类中的成员信息的偏移量，然后再依据这个偏移量从派生类的首地址开始偏移，以找到仅有的 SEX 成员</font>，保证调用不会存在二义性，我们可以简单的理解为 : <font color = "red">不管采用什么样的方式去调用(直接通过子类的实例亦或者通过 :: 去引用具体某个基类的作用域)基类中的成员信息，所获取到的始终都是同一个最上级虚基类的成员信息</font>
+我们会发现，原本 `HYBIRD` 的内存首段信息本该出现的 `DOG` 和 `CAT` 的数据都替换为 **_vbptr_** 的形式了，而本该出现的两个 `SEX` 成员变成����只有一个(共享机制)并被放在派生类成员��始化的数据往后延生的内存段上(virtual base ANIMAL)，<font color = "red">当我们想访问 `BYBIRD` 的基类所继承下来的 `SEX` 数时，会依据指针 **_vbptr_** 所指向的 **_vbtable_**，在里头找到该 **_vbptr_** 指针在内存中的首地址到虚基类中的成员信息的偏移量，然后再依据这个偏移量从派生类的首地址开始偏移，以找到仅有的 SEX 成员</font>，保证调用不会存在二义性，我们可以简单的理解为 : <font color = "red">不管采用什么样的方式去调用(直接通过子类的实例亦或者通过 :: 去引用具体某个基类的作用域)基类中的成员信息，所获取到的始终都是同一个最上级虚基类的成员信息</font>
 
 稍微扩展一下的是，`DOG` 和 `CAT` 都是采用的虚继承的方式去继承了 `ANIMAL`，也就是说放在他们各自的角度来看，`CAT` 和 `DOG` 的实例都各自维护了各自的 **_vbptr_** 的指针和各自的 **_vbtable_**，而同时派生自 `DOG` 和 `CAT` 的派生类 `HYBIRD` 来说，由于继承的传递性那么它就分别拥有了 `DOG` 和 `CAT` 各自维护的 `vbptr` 和 `vbtable`，也就是说 `HYBIRD` 的最终内存模型是拥有两个 **_vbptr_** 和 **_vbtable_** 的，但是由于该 **_vbptr_** 所维护的都是同属于一个虚基类中的成员信息，所以就算最下级派生类中出现了重复的 **_vbptr_** 和 **_vbtable_** 也不会造成二义性的调用，因为其最终的调用都会依据当前 **_vbptr_** 所在的地址和不同的偏移量去找到共同的最上级虚基类中的成员信息
 
@@ -3331,18 +3331,18 @@ int main(void) {
 
 当我们在 cpp 中对于函数 foo 的声明引入了关键字后，它就不会再去参与 cpp 的编译和链接的方式，而是遵循 c 标准的编译和链接的方式来进行，那么在其进入链接的阶段，函数 foo 在 cpp 源文件中的声明就会尝试在其它文件中寻找其定义，并最终会在 test.c 中找到该函数的定义，并把在 main.cpp 中的声明隐式提升为定义，以让我们在 cpp 源文件中实现调用 c 源文件中的功能函数
 
-这里可能会发现一个问题，首先第一点，当 c 源文件中的函数过多的话，那不是 cpp 源文件中对于函数的声明不久爆满了？而且原来的头文件 test.h 由于在 cpp 源文件中去掉以防止重复不同类型的声明所出现的错误，那么 test.h 不就没有任何实际价值了？是的，至少目前这段改造来说这个头文件的确是没用了，但是我们还能继续再改造下，其实<font color = "red">关键字 `extern "C"` 不单单只用于声明一个成员的编译定义，还可以通过它来使用 `{}` 来包含一整段代码对于编译方式的定义</font>，但是相应的我们还是不能把它放在 cpp 源文件当中，我们会把它放在头文件当中去，但是由于该关键字是 cpp 语言所支持的功能，故直接在头文件中使用会出现错误，所以这里我们还需要引入一个宏定义以区分编译当前文件的编译器使用的是 cpp 的功能还是 c 的功能，这个宏定义则叫做: `__cplusplus`，我们来看下改造后的代码
+这里可能会发现一个问题，首先第一点，当 c 源文件中的函数过多的话，那不是 cpp 源文件中对于函数的声明不久爆满了？而且原来的头文件 test.h 由于在 cpp 源文件中去掉以防止重复不同类型的声明所出现的错误，那么 test.h 不就没有任何实际价值了？是的，至少目前这段改造来说这个头文件的确是没用了，但是我们还能继续再改造下，其实<font color = "red">关键字 `extern "C"` 不单单只用于声明一个成员的编译定义，还可以通过它来使用 `{}` 来包含一整段代码对于编译方式的定义</font>，但是相应的我们还是不能把它放在 cpp 源文件当中，我们会把它放在头文件当中去，但是由于该关键字是 cpp 语言所支持的功能，故直接在头文件中使用会出现错误，所以这里我们还需要引入一个宏定义以区分编译当前文件的编译器使用的是 cpp 的功能还是 c 的功能，这个宏定义则叫做: `cplusplus`，我们来看下改造后的代码
 
 ```cpp
 test.h-----------------------------
-#ifdef __cplusplus
+#ifdef cplusplus
 extern "C" {
 #endif
 
 #include <stdio.h>
 void foo(char *name);
 
-#ifdef __cplusplus
+#ifdef cplusplus
 }
 #endif
 -----------------------------------
@@ -4162,13 +4162,13 @@ int main(void) {
     cout << val << endl;
   }
 
-  bool __fun(int _val) {
+  bool fun(int _val) {
     cout << _val << endl;
     return false;
   }
 
   int main(void) {
-    foo_automatch_function_pointer(__fun); /* _Func: [bool (*)(int)] */
+    foo_automatch_function_pointer(fun); /* _Func: [bool (*)(int)] */
     foo("hello,world");                    /*     T: [const char *] */
 
     return EXIT_SUCCESS;
@@ -4204,13 +4204,13 @@ int main(void) {
     cout << "function type = : " << typeid(_invoker).name() << endl;
   }
 
-  bool __fun(int _val) {
+  bool fun(int _val) {
     cout << _val << endl;
     return false;
   }
 
   int main(void) {
-    foo(__fun);
+    foo(fun);
 
     return EXIT_SUCCESS;
   }
@@ -6971,10 +6971,10 @@ stack 是 STL 所提供的一种支持任意类型的存储的 **_序列式容�
 
 void main() {
   /* stack<T>() */
-  std::stack<int> __st;
+  std::stack<int> st;
 
   /* stack(const stack &_st) */
-  std::stack<int> __st_cpy(__st);
+  std::stack<int> st_cpy(st);
 }
 ```
 
@@ -6989,10 +6989,10 @@ void main() {
 #include <stack>
 
 void main() {
-  std::stack<int> __st_src;
-  std::stack<int> __st_cpy;
+  std::stack<int> st_src;
+  std::stack<int> st_cpy;
 
-  __st_src = __st_cpy;
+  st_src = st_cpy;
 }
 ```
 
@@ -7015,19 +7015,19 @@ void main() {
 #include <stack>
 
 void main() {
-  std::stack<int> __st;
+  std::stack<int> st;
 
   /* void push(T _element) */
-  __st.push(0x100);
-  __st.push(0x200);
-  __st.push(0x300);
+  st.push(0x100);
+  st.push(0x200);
+  st.push(0x300);
 
   /* T &top() */
-  int _val = __st.top();
+  int _val = st.top();
   std::cout << _val << std::endl;
 
   /* void pop() */
-  __st.pop();
+  st.pop();
 }
 ```
 
@@ -7045,13 +7045,13 @@ void main() {
 #include <stack>
 
 void main() {
-  std::stack<int> __st;
+  std::stack<int> st;
 
   /* bool empty() */
-  bool flag = __st.empty();
+  bool flag = st.empty();
 
   /* size_t size() */
-  size_t cout = __st.size();
+  size_t cout = st.size();
 }
 ```
 
@@ -7082,10 +7082,10 @@ queue 是 STL 所提供的一种支持任意类型的存储的 **_序列式容�
 
 void main() {
   /* queue<T>() */
-  std::queue<int> __qe;
+  std::queue<int> qe;
 
   /* queue(const queue &_qe) */
-  std::queue<int> __qe_cpy(__qe);
+  std::queue<int> qe_cpy(qe);
 }
 ```
 
@@ -7100,11 +7100,11 @@ void main() {
 #include <queue>
 
 void main() {
-  std::queue<int> __qe_src;
-  std::queue<int> __qe_cpy;  
+  std::queue<int> qe_src;
+  std::queue<int> qe_cpy;  
 
   /* queue &operator=(const queue &_qe) */
-  __qe_src = __qe_cpy;
+  qe_src = qe_cpy;
 }
 ```
 
@@ -7130,21 +7130,21 @@ void main() {
 #include <queue>
 
 void main() {
-  std::queue<int> __qe;
+  std::queue<int> qe;
 
   /* void push(T _element) */
-  __qe.push(0x100);
-  __qe.push(0x200);
-  __qe.push(0x300);
+  qe.push(0x100);
+  qe.push(0x200);
+  qe.push(0x300);
 
   /* T &back() */
-  int val_back = __qe.back();
+  int val_back = qe.back();
 
   /* T &front() */
-  int val_front = __qe.front();
+  int val_front = qe.front();
             
   /* void pop() */
-  __qe.pop();
+  qe.pop();
 }
 ```
 
@@ -7162,13 +7162,13 @@ void main() {
 #include <queue>
 
 void main() {
-  std::queue<int> __qe;
+  std::queue<int> qe;
 
   /* bool empty() */
-  bool flag = __qe.empty();
+  bool flag = qe.empty();
 
   /* size_t size() */
-  size_t cout = __qe.size();
+  size_t cout = qe.size();
 }
 ```
 
@@ -7408,7 +7408,7 @@ void main() {
 #include <iostream>
 #include <queue>
 
-bool __sort(int &num_01, int &num_02) {
+bool sort(int &num_01, int &num_02) {
   return num_01 < num_02;
 }
 
@@ -7418,8 +7418,8 @@ void main() {
   int &num_03 = _li.front();
   int &num_04 = _li.back();
 
-  /* sort(T __fu) */
-  _li.sort(__sort);
+  /* sort(T fu) */
+  _li.sort(sort);
 
   /* reverse() */
   _li.reverse();
@@ -7442,7 +7442,7 @@ pair 所使用的内存是以 自由存储区 作为基准，并由 pair 本身�
 /** 
  * constructor
  *   pair<T,V>(T _t, V _v)                指定 pair 所需维护的两个具体的值来进行 pair 实例的初始化构造
- *   pair<T,V>(const pair<T,V> &__p)      拷贝构造函数，依据已有的 pair 实例内部所维护的两个可存在不同类型的值去构造当前 pair 的实例
+ *   pair<T,V>(const pair<T,V> &p)      拷贝构造函数，依据已有的 pair 实例内部所维护的两个可存在不同类型的值去构造当前 pair 的实例
  * 
  * function
  *   pair<T,V> make_pair<T,V>(T _t, V_v)  该函数用于接受两个可存在不同类型的值，并返回相应类型的 pair
@@ -7453,19 +7453,19 @@ pair 所使用的内存是以 自由存储区 作为基准，并由 pair 本身�
 */
 void foo(void) {
   /* pair<T,V>(T _t, V _v) */
-  pair<string, int> __p_1("HELLO,WORLD", 0x400);     
+  pair<string, int> p_1("HELLO,WORLD", 0x400);     
 
   /* pair<T,V> make_pair<T,V>(T _t, V_v) */
-  pair<char, string> __p_2 = make_pair('A', "NGPONG!");   
+  pair<char, string> p_2 = make_pair('A', "NGPONG!");   
 
-  /* pair<T,V>(const pair<T,V> &__p) */
-  pair<string, int> __p_3 = __p_1;     
+  /* pair<T,V>(const pair<T,V> &p) */
+  pair<string, int> p_3 = p_1;     
 
   /* first  */
-  cout << __p_1.first << endl;    
+  cout << p_1.first << endl;    
 
   /* second */
-  cout << __p_1.second << endl;
+  cout << p_1.second << endl;
 }
 ```
 
@@ -7508,7 +7508,7 @@ set 对于节点进行插入或者删除操作时，所操作的元素永远都�
   
   该构造函数是一个存在虚拟类型为 V 的模板函数，V 的具现化于所接受的能够指示一段线性数组 $[ \: begin, \: end \: )$ 开闭区间的迭代器 ( 隶属于容器的 ) 亦或者地址所指示的类型，并使用它来完成当前 set 容器内部所维护的红黑树的初始化工作；虚拟类型 $F$ 的默认值为一个提供了 **正序排序** 的功能的二元仿函数 `less<K>`，如有需要，我们可以显示的指定它
   
-- `set(const set &__s)`
+- `set(const set &s)`
   
   拷贝构造函数，将已有 set 容器实例内部所维护的红黑树的节点拷贝至当前 set 容器实例内部所维护的红黑树当中
 
@@ -7532,7 +7532,7 @@ int main(void) {
   int nums[5] = { 3, 1, 5, 2, 4 };
   std::set<int, DESC<int>> s(nums, nums + sizeof(nums) / sizeof(int));
 
-  /* set(const set &__s) */
+  /* set(const set &s) */
   std::set<int, DESC<int>> s_des(s);
 }
 ```
@@ -7553,16 +7553,16 @@ int main(void) {
 
 int main(void) {
   int nums_01[5] = { 3, 1, 5, 2, 4 };
-  std::set<int> __s_01(nums_01, nums_01 + sizeof(nums_01) / sizeof(int));
+  std::set<int> s_01(nums_01, nums_01 + sizeof(nums_01) / sizeof(int));
 
   int nums_02[5] = { 9, 6, 10, 8, 7 };
-  std::set<int> __s_02(nums_02, nums_02 + sizeof(nums_02) / sizeof(int));
+  std::set<int> s_02(nums_02, nums_02 + sizeof(nums_02) / sizeof(int));
 
-  /* void swap(set &__s) */
-  __s_01.swap(__s_02);
+  /* void swap(set &s) */
+  s_01.swap(s_02);
 
-  /* set &operator=(const set &__s) */
-  __s_01 = __s_02;
+  /* set &operator=(const set &s) */
+  s_01 = s_02;
 }
 ```
 
@@ -7581,13 +7581,13 @@ int main(void) {
 
 int main(void) {
   int nums[5] = { 3, 1, 5, 2, 4 };
-  std::set<int> __s(nums, nums + sizeof(nums) / sizeof(int));
+  std::set<int> s(nums, nums + sizeof(nums) / sizeof(int));
 
   /* size_t size() */
-  int cout = __s.size();
+  int cout = s.size();
 
   /* bool empty() */
-  bool flag = __s.empty();
+  bool flag = s.empty();
 }
 ```
 
@@ -7603,10 +7603,10 @@ int main(void) {
 
 int main(void) {
   int nums[5] = { 3, 1, 5, 2, 4 };
-  std::set<int> __s(nums, nums + sizeof(nums) / sizeof(int));
+  std::set<int> s(nums, nums + sizeof(nums) / sizeof(int));
 
   /* pair<set<T>::iterator, bool> insert(T _key) */
-  std::pair<set<int>::iterator, bool> result = __s.insert(0x400);
+  std::pair<set<int>::iterator, bool> result = s.insert(0x400);
 }
 ```
 
@@ -7635,19 +7635,19 @@ int main(void) {
 
 int main(void) {
   int nums[5] = { 3, 1, 5, 2, 4 };
-  std::set<int> __s(nums, nums + sizeof(nums) / sizeof(int));
+  std::set<int> s(nums, nums + sizeof(nums) / sizeof(int));
 
   /* void erase(set<T>::const_iterator pos) */
-  __s.erase(__s.begin(), ++__s.begin());
+  s.erase(s.begin(), ++s.begin());
 
   /* void erase(set<T>::const_iterator start, set<T>::const_iterator end) */
-  __s.erase(__s.begin());
+  s.erase(s.begin());
 
   /* void erase(T _key) */
-  __s.erase(5);
+  s.erase(5);
 
   /* void clear() */
-  __s.clear();
+  s.clear();
 }
 ```
 
@@ -7678,22 +7678,22 @@ int main(void) {
 
 int main(void) {
   int nums[5] = { 3, 1, 5, 2, 4 };
-  std::set<int> __s(nums, nums + sizeof(nums) / sizeof(int));
+  std::set<int> s(nums, nums + sizeof(nums) / sizeof(int));
                 
   /* set<T>::const_iterator find(T _key) */
-  std::set<int>::const_iterator it_find = __s.find(2);
+  std::set<int>::const_iterator it_find = s.find(2);
                 
   /* size_t count(T _key) */
-  size_t count = __s.count(3);
+  size_t count = s.count(3);
                 
   /* set<T>::const_iterator lower_bound(T _key) */
-  std::set<int>::const_iterator it_lower = __s.lower_bound(3);
+  std::set<int>::const_iterator it_lower = s.lower_bound(3);
                 
   /* set<T>::const_iterator upper_bound(T _key) */
-  std::set<int>::const_iterator it_uppler = __s.upper_bound(3);
+  std::set<int>::const_iterator it_uppler = s.upper_bound(3);
                 
   /* pair<set<int>::const_iterator, set<int>::const_iterator> equal_range(T _key) */
-  std::pair<set<int>::const_iterator, set<int>::const_iterator> _res = __s.equal_range(3);
+  std::pair<set<int>::const_iterator, set<int>::const_iterator> _res = s.equal_range(3);
 }
 ```
 
@@ -7719,14 +7719,14 @@ map 内部所维护的这颗 红黑树 和其它容器一样，都是存储在 �
 
 - <font color = "red">作为 multimap 而言，它和 map 所存在的唯一的区别就是 multimap 允许节点的键重复</font>，其余相较于 map 不管是功能性而言还是内置结构都是一模一样的
 
-- <font color = "red">而 unorder_map 虽然也能够保有不允许元素重复的特性</font>，但是其内部实现对比 map / multimap 而言可谓是大相径庭，unorder_map 其内部实现采用了 <font color = "red">**_哈希表_**</font>，既然采用了 哈希表，那么它该数据结构所耗费的时间复杂度就要高出红黑树许多，并且还<font color = "red">无法满足元素自动排序的特性</font>，但是相对的，<font color = "red">对于元素的查找、删除和新增所消耗的时间复杂度都能够在常数阶(最好 $O(1)$，最坏需要处理哈希冲突，即 $O(N)$)去完成</font>
+- <font color = "red">而 unorder_map 虽然也能够保有不允许元素重复的特性</font>，但是其内部实现对比 map / multimap 而言可谓是大相径庭，unorder_map 其内部实现采用了 <font color = "red">**_哈希表_**</font>，既然采用了 哈希表，那么它该数据结构所耗费的时间复杂度就要高出红黑树许多，并且还<font color = "red">无法满足元素自动排序的特性</font>，但是相对的，<font color = "red">对于元素的查找、删除和新增所消耗的时间复杂度都能够在常数阶(������ $O(1)$，最坏需要处理哈希冲突，即 $O(N)$)去完成</font>
 
 
 - `map<K, V, F = less<K>>()`
   
   默认构造，构建一个空的 map 容器；虚拟类型 $F$ 的默认值为一个提供了 **正序排序** 的功能的二元仿函数 `less<K>`，如有需要，我们可以显示的指定它
 
-- `map(const set &__m)`
+- `map(const set &m)`
   
   拷贝构造函数，将已有 map 容器实例内部所维护的红黑树的节点拷贝至当前 map 容器实例内部所维护的红黑树当中
 
@@ -7735,7 +7735,7 @@ map 内部所维护的这颗 红黑树 和其它容器一样，都是存储在 �
 #include <map>
 
 template<class _Ty>
-struct __DESC {
+struct DESC {
   constexpr bool operator()(const _Ty &left, const _Ty &right) {
     return left > right;
   }
@@ -7743,20 +7743,20 @@ struct __DESC {
 
 int main(void) {
   /* map<K, V, F = less<K>>() */
-  std::map<std::string, int, __DESC<string>> __m_nor;
+  std::map<std::string, int, DESC<string>> m_nor;
       
-  /* set(const set &__s) */
-  std::map<std::string, int, __DESC<string>> __m_des(__m_nor);
+  /* set(const set &s) */
+  std::map<std::string, int, DESC<string>> m_des(m_nor);
 }
 ```
   
 **_ASSIGNMENT_**
 
-- `map &operator=(const map &__m)`
+- `map &operator=(const map &m)`
 
   拷贝赋值运算符，依据已有 map 的实例内部所维护的红黑书的节点去重新构造当前 map 容器实例本身内部所维护的红黑树
 
-- `void swap(map &__m)`
+- `void swap(map &m)`
   
   交换目标 map 容器与当前 map 容器内部指向着存在于堆中的红黑树的指针，并重新更新双方容器内部所维护的红黑树的 size
 
@@ -7765,25 +7765,25 @@ int main(void) {
 #include <map>
 
 template<class _Ty>
-struct __DESC {
+struct DESC {
   constexpr bool operator()(const _Ty &left, const _Ty &right) {
     return left > right;
   }
 };
 
 int main(void) {
-  std::map<string, int> __m_src;
-  __m_src["C"] = 3;
-  __m_src.insert(std::make_pair("A", 1));
-  __m_src.insert(std::map<std::string, int>::value_type("B", 2));
+  std::map<string, int> m_src;
+  m_src["C"] = 3;
+  m_src.insert(std::make_pair("A", 1));
+  m_src.insert(std::map<std::string, int>::value_type("B", 2));
 
-  std::map<string, int> __m_des;
+  std::map<string, int> m_des;
 
-  /* void swap(set &__s) */
-  __m_src.swap(__m_des);
+  /* void swap(set &s) */
+  m_src.swap(m_des);
 
-  /* set &operator=(const set &__s) */
-  __m_src = __m_des;
+  /* set &operator=(const set &s) */
+  m_src = m_des;
 }
 ```
 
@@ -7802,21 +7802,21 @@ int main(void) {
 #include <map>
 
 int main(void) {
-  std::map<string, int> __m;
+  std::map<string, int> m;
                 
   /* size_t size() */
-  int cout = __m.size();
+  int cout = m.size();
                 
   /* bool empty() */
-  bool flag = __m.empty();
+  bool flag = m.empty();
 }
 ```
 
 **_INSERT_**
 
-- `pair<map<K,V>::iterator, bool> insert(pair<const K,V> __p)`
+- `pair<map<K,V>::iterator, bool> insert(pair<const K,V> p)`
 
-  向 map 容器内部所维护的红黑树中新增一个节点，并赋予该节点的键为对组 __p 的第一元素，该节点的值为对组 __p 的第二元素，最后返回能够标识当前所插入的节点在整个数中的位置的迭代器和是否插入成功所结合而成的对组
+  向 map 容器内部所维护的红黑树中新增一个节点，并赋予该节点的键为对组 p 的第一元素，该节点的值为对组 p 的第二元素，最后返回能够标识当前所插入的节点在整个数中的位置的迭代器和是否插入成功所结合而成的对组
 
 - `V &operator[](const K &_key)`
   
@@ -7829,15 +7829,15 @@ int main(void) {
 int main(void) {
   using namespace std;
 
-  map<string, int> __m;
+  map<string, int> m;
 
-  /* pair<map<K,V>::iterator, bool> insert(pair<const K,V> __p) */
-  pair<map<string, int>::iterator, bool> result_01 = __m.insert(pair<string, int>("C", 3));
-  pair<map<string, int>::iterator, bool> result_02 = __m.insert(make_pair("A", 1));
-  pair<map<string, int>::iterator, bool> result_03 = __m.insert(map<string, int>::value_type("D", 4));
+  /* pair<map<K,V>::iterator, bool> insert(pair<const K,V> p) */
+  pair<map<string, int>::iterator, bool> result_01 = m.insert(pair<string, int>("C", 3));
+  pair<map<string, int>::iterator, bool> result_02 = m.insert(make_pair("A", 1));
+  pair<map<string, int>::iterator, bool> result_03 = m.insert(map<string, int>::value_type("D", 4));
 
   /* V &operator[](const K &_key) */
-  __m["B"] = 2;
+  m["B"] = 2;
 }
 ```
 
@@ -7864,23 +7864,23 @@ int main(void) {
 #include <map>
 
 int main(void) {
-  std::map<string, int> __m;
-  __m["C"] = 3;
-  __m["A"] = 1;
-  __m["D"] = 4;
-  __m["B"] = 2;
+  std::map<string, int> m;
+  m["C"] = 3;
+  m["A"] = 1;
+  m["D"] = 4;
+  m["B"] = 2;
 
   /* map<K,V>::iterator erase(map<K,V>::iterator pos) */
-  __m.erase(__m.begin(), ++(++__m.begin()));
+  m.erase(m.begin(), ++(++m.begin()));
 
   /* map<K,V>::iterator erase(map<K,V>::iterator start, map<K,V>::iterator end) */
-  __m.erase(__m.begin());
+  m.erase(m.begin());
 
   /* void erase(K _key) */
-  __m.erase("C");
+  m.erase("C");
 
   /* void clear() */
-  __m.clear();
+  m.clear();
 }
 ```
 
@@ -7914,26 +7914,864 @@ int main(void) {
 int main(void) {
   using namespace std;
 
-  map<string, int> __m;
-  __m["C"] = 3;
-  __m["A"] = 1;
-  __m["D"] = 4;
-  __m["B"] = 2;
+  map<string, int> m;
+  m["C"] = 3;
+  m["A"] = 1;
+  m["D"] = 4;
+  m["B"] = 2;
                 
   /* map<K,V>::iterator find(K _key) */
-  map<string, int>::iterator it_find = __m.find("B");
+  map<string, int>::iterator it_find = m.find("B");
                 
   /* size_t count(K _key) */
-  size_t count = __m.count("A");
+  size_t count = m.count("A");
                 
   /* map<K,V>::iterator lower_bound(K _key) */
-  map<string, int>::iterator it_lower = __m.lower_bound("C");
+  map<string, int>::iterator it_lower = m.lower_bound("C");
                 
   /* map<K,V>::iterator upper_bound(T _key) */
-  map<string, int>::iterator it_uppler = __m.upper_bound("C");
+  map<string, int>::iterator it_uppler = m.upper_bound("C");
                 
   /* pair<map<K,V>::iterator, map<K,V>::iterator> equal_range(K _key) */
-  pair<map<string, int>::iterator, map<string, int>::iterator> _res = __m.equal_range("C");
+  pair<map<string, int>::iterator, map<string, int>::iterator> _res = m.equal_range("C");
 }
 ```
+
+<br/>
+
+<span id = "仿函数"></span>
+
+### 仿函数
+
+---
+
+> <font color = "red">重载了函数调用操作符的类，其使用方式类似于一个函数调用，针对拥有此特性的类，我们通常也称它们为 : **函数对象**、**仿函数**</font>；仿函数的定义通常有一条并不成文的规定，我们在定义仿函数的时候通常是不需要去定义该类的构造和析构
+> 
+> <font color = "red">函数调用操作符所重载的函数其形参列表中的形参个数能够划分仿函数的**元级**</font>，即该仿函数是一个几元仿函数；对于大多数情况而言，我们更多使用的是 **一元仿函数$(unary \:\: functor)$** 和 **二元仿函数$(binary \:\: functor)$**
+> 
+> 如果仿函数的返回值为 bool 类型，那么我们也可以称这个仿函数为 : **谓词**，并且根据仿函数的具体元数来划分这个谓词的元数
+> 
+> 仿函数更多的和 STL 绑定起来使用，在 STL 中，通过仿函数可以非常方便的去为某一种**容器**亦或者**算法**去提供我们所自定义的操作逻辑
+> 
+> 由于仿函数的真正核心是属于一个类中的成员函数，故对于仿函数的使用其实都能够享有 **内联函数** 所带来的好处的，对比一般的函数调用而言可能在某些情况下仿函数会更显示出性能优势；除此之外，使用仿函数能够把一个函数的调用也进行抽象化，即增强了代码的通用性，并且也是因为 类 的本身，如有需要的话，仿函数是可以拥有属于自己的状态的
+> 
+> ```cpp
+> #include <iostream>
+> 
+> class adder {
+> public:
+>   int operator()(int x, int y) {
+>     return x + y;
+>   }
+> };
+> 
+> struct comparer {
+>   bool operator()(int x, int y) {
+>     return x < y;
+>   }
+> };
+> 
+> template<class A, class C>
+> void foo(int x, int y) {
+>   std::cout << C()(A()(x, y), 1024) << std::endl;
+> }
+> 
+> int main(void) {
+>   foo<adder, comparer>(10, 10000);
+> 
+>   return EXIT_SUCCESS;
+> }
+> ```
+
+STL 为了保证统一性，其内建了一些仿函数，它们大致划分为 : 算数类函数对象、关系运算类函数对象、逻辑运算类函数对象，这些由 STL 内建的仿函数都划分在 `functional` 这个头文件当中
+
+- 算数类函数对象
+
+  - 加法仿函数 : `template<class T> T plus<T>`
+
+  - 减法仿函数 : `template<class T> T minus<T>`
+
+  - 乘法仿函数 : `template<class T> T multiplies<T>`
+
+  - 除法仿函数 : `template<class T> T divides<T>`
+
+  - 取模仿函数 : `template<class T> T modulus<T>`
+  
+  - 取反仿函数 : `template<class T> T negate<T>`
+
+- 关系运算类函数对象
+
+  - 等于 : `template<class T> bool equal_to<T>`
+  
+  - 不等于 : `template<class T> bool not_equal_to<T>`
+  
+  - 大于 : `template<class T> bool greater<T>`
+  
+  - 大于等于 : `template<class T> bool greater_equal<T>`
+  
+  - 小于 : `template<class T> bool less<T>`
+  
+  - 小于等于 : `template<class T> bool less_equal<T>`
+
+- 逻辑运算类运算函数
+
+  - 逻辑与 : `template<class T> bool logical_and<T>`
+  
+  - 逻辑或 : `template<class T> bool logical_or<T>`
+  
+  - 逻辑非 : `template<class T> bool logical_not<T>`
+
+```cpp
+#include <set>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <functional>
+
+using namespace std;
+
+template<class T>
+class set_printer {
+public:
+  void operator()(const T &_val) {
+    cout << _val << endl;
+  }
+};
+
+void foo(void) {
+  set<int, greater<int>> s;
+  s.insert(4);
+  s.insert(2);
+  s.insert(5);
+  s.insert(1);
+  s.insert(3);
+              
+  vector<int> v;
+  v.push_back(3);
+  v.push_back(5);
+  v.push_back(1);
+  v.push_back(4);
+  v.push_back(2);
+  sort(v.begin(), v.end(), less<int>());
+              
+  for_each(s.begin(), s.end(), set_printer<int>());
+  for_each(v.begin(), v.end(), set_printer<int>());
+}
+```
+
+<br/>
+
+<span id = "适配器"></span>
+
+### 适配器
+
+---
+
+
+<span id = "仿函数适配器"></span>
+
+#### 仿函数适配器
+
+在某些 API 需要指定一个一元仿函数但是现有只有二元仿函数时，亦或者反之，这时候可以使用函数适配器针对仿函数进行适配工作
+
+`binder2nd bind2nd(const _Function &f_binary, const _Type &val)`
+
+- PARAMETER
+
+  - f_binary ： 需要是一个继承自 `binary_function<T1 arg_01, T2 arg_02, R ret>` 二元仿函数(重载的函数调用操作符的函数需要声明为 **常函数**，因为最终会通过一个常函数来调用仿函数)
+
+  - val : 需要和 f_binary 进行绑定的值
+
+- RETURN
+
+  - binder2nd : 一个一元仿函数，所实现的重载函数调用操作符的函数的返回值同步至所指定的仿函数 f_binary，形参列表接收所指定的二元仿函数 f_binary 的第一个形参的类型的形参 val_src 的输入，并在其内部实现中又调用了我们所录入的仿函数 f_binary，并在调用 f_binary 时会输入两个参数，它们分别是 val_src 和 bind2nd 构造时所录入的实参 val
+
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+class print_m : public binary_function<int, int, void> {
+public:
+  void operator()(int _val_01, int _val_02) const {
+    cout << _val_01 + _val_02 << endl;
+  }
+};
+
+void foo(void) {
+  int nums[5] = { 1, 2, 3, 4, 5 };
+  vector<int> v(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  for_each(v.begin(), v.end(), bind2nd(print_m(), 1000));
+}
+
+int main(void) {
+  foo();
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+<span id = "仿函数适配器"></span>
+
+#### 取反适配器
+
+当我们针对某种返回 bool 类型的仿函数的真实取值结果并不满意时，我们可以通过取反适配器的适配结果，在不更改原仿函数的源代码的前提下完成对其取值结果的取反工作
+
+`unary_negate not1(const _Function &f_unary)`
+
+- PARAMETER
+
+  - f_unary：需要一个继承自 `unary_function<T1 arg, R ret>` 返回值为 bool 类型的一元仿函数
+
+- RETURN
+
+  - unary_negate : 一个一元仿函数，重载的函数调用操作符的函数的返回值和形参列表同步至所指定的仿函数 f_unary，其内部实现中会调用所录入的一元仿函数 f_unary 的取反结果并返回
+
+`binary_negate not2(const _Function &f_unary)`
+
+- PARAMETER
+
+  - f_unary：需要一个继承自 `binary_function<T1 arg_01, T2 arg_02, R ret>` 返回值为 bool 类型的二元仿函数
+
+- RETURN
+
+  - binary_negate : 一个二元仿函数，重载的函数调用操作符的函数的返回值和形参列表同步至所指定的仿函数 f_binary，其内部实现中会调用所录入的二元仿函数 f_binary 的取反结果并返回
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+void foo(void) {
+  int nums[5] = { 3, 2, 4, 1, 5 };
+  vector<int> v(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  sort(v.begin(), v.end(), not2(less<int>()));
+
+  auto result = find_if(v.begin(), v.end(), not1(bind2nd(greater<int>() , 2)));
+  cout << *result << endl;
+}
+
+int main(void) {
+  foo();
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+<span id = "函数适配器"></span>
+
+#### 函数适配器
+
+将一个普通的函数转换为声明为 const 的仿函数
+
+`pointer_to_unary_function ptr_fun(unary_function invoker)`
+
+- PARAMETER
+
+  - invoker : 接收一个返回值为任意类型，但是只有一个任意类型形参的函数指针
+
+- RETURN
+
+  - pointer_to_unary_function : 一个 一元仿函数，重载函数调用操作符的函数是一个形参列表和返回值类型同步至函数指针并且声明为 cost 的常函数，其内部实现中会调用函数指针 invoker
+
+`pointer_to_binary_function ptr_fun(binary_function invoker)`
+
+- PARAMETER
+
+  - invoker : 接收一个返回值为任意类型，但是有两个任意类型形参的函数指针
+
+- RETURN
+
+  - pointer_to_binary_function : 一个 二元仿函数，重载函数调用操作符的函数是一个形参列表和返回值类型同步至函数指针并且声明为 cost 的常函数，其内部实现中会调用函数指针 invoker
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+bool f_sort(int &_left,int &_right) {
+  return _left > _right;
+}
+void foo(void) {
+  int nums[5] = { 3, 2, 4, 1, 5 };
+  vector<int> v(nums, nums + (sizeof(nums) / sizeof(int)));
+
+  sort(v.begin(), v.end(), ptr_fun(::f_sort));
+}
+
+int main(void) {
+  foo()
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+<span id = "成员函数适配器"></span>
+
+#### 成员函数适配器
+
+该适配器能够将一个成员函数适配为仿函数，其内部实现依赖于成员函数和函数指针之间的转换关系来完成，简而言之该函数的调用还是要依赖于成员函数所在类型实例的本身才能够完成调用
+
+`mem_fun_ref_t mem_fun_ref(member_function_none invoker)`
+
+- PARAMETER
+
+  - invoker : 接受一个任意类型返回值但是无形参的属于某个类的成员函数
+
+- RETURN
+
+  - mem_fun_ref_t : 一个 一元仿函数，重载函数调用操作符的函数其返回值同步至成员函数 invoker，形参列表接收一个 成员函数 所在类的类型的形参 src，所指定的成员函数 invoker 依赖形参 src 的实例化完成其调用操作
+
+`mem_fun1_ref_t mem_fun_ref(member_function_unary invoker)`
+
+- PARAMETER
+
+  - invoker : 接受一个任意类型返回值但是只有一个形参的属于某个类的成员函数
+
+- RETURN
+
+  - mem_fun1_ref_t : 一个 二元仿函数，重载函数调用操作符的函数其返回值同步至成员函数 invoker，形参列表接收 成员函数 所在类的类型的形参 src 和 成员函数 第一个形参的类型的形参 arg，所指定的成员函数 invoker 依赖形参 src 的实例化并在调用时录入形参 arg 完成其调用操作
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+class Person {
+public:
+  Person(int _age)
+    : m_age(_age){};
+public:
+  void speak(string _words) {
+    cout << _words << " age = " << this->m_age << endl;
+  }
+  void Do() {
+    cout << "DO! AGE = " << this->m_age << endl;
+  }
+            
+public:
+  int m_age;
+};
+
+void foo(void) {
+  vector<Person> v;
+  v.push_back(Person(1));
+  v.push_back(Person(2));
+  v.push_back(Person(3));
+  v.push_back(Person(4));
+  v.push_back(Person(5));
+            
+  for_each(v.begin(), v.end(), bind2nd(mem_fun_ref(Person::speak), "HELLO,WORLD"));
+
+  for_each(v.begin(), v.end(), mem_fun_ref(Person::Do));
+}
+
+int main(void) {
+  foo()
+
+  return EXIT_SUCCESS;
+}
+```
+
+<br/>
+
+<span id = "算法"></span>
+
+### 算法
+
+---
+
+> STL收录的算法经过了数学上的效能分析与证明，是极具复用价值的，包括常用的排序，查找等等；特定的算法往往搭配特定的数据结构，算法与数据结构相辅相成
+
+<br/>
+
+<span id = "遍历算法"></span>
+
+#### 遍历算法
+
+- `_Function for_each(_InputIterator start, _InputIterator end, _Function _fn)`
+
+  遍历容器指定范围(迭代器 start 和 end 划分的范围)内的元素，把它们作为实参逐个输入至所指定的 一元仿函数或者函数指针 当中，最后会返回所指定的 一元仿函数或者函数指针
+
+  ```cpp
+  void printer_for_each(const int &_val) {
+    cout << _val << endl;
+  }
+
+  void foo_for_each(void) {
+    vector<int> v;
+    for (size_t i = 0; i < 10; ++i) {
+      v.push_back(i + 1);
+    }
+
+    void (*invoker)(const int &) = for_each(v.begin(), v.end(), printer_for_each);
+  }
+  ```
+
+- `void transform(_InputIterator start, _InputIterator end, _OutputIterator start_des, _UnaryOperation unary_op)`
+
+  遍历容器指定范围(迭代器 start 和 end 划分的范围)内的元素，把它们作为实参逐个输入至所指定的 返回值和形参类型为容器元素类型的一元仿函数或者函数指针 unary_op 当中，并把此次遍历的结果输入至迭代器 start_des 所指向的目标容器中
+
+  该函数的调用必须要保证目标迭代器 start_des 所指向的容器中是含有 **有效元素** 的，否则会调用失败
+
+  ```cpp
+  int f_transform(int &_val) {
+    return _val + 1;
+  }
+
+  void foo_transform(void) {
+    vector<int> v_src;
+    for (size_t i = 0; i < 10; ++i) {
+      v_src.push_back(i + 1);
+    }
+
+    vector<int> v_des;
+    v_des.resize(v_src.size());
+    transform(v_src.begin(), v_src.end(), v_des.begin(), f_transform);
+  }
+  ```
+
+<br/>
+
+<span id = "查找算法"></span>
+
+#### 查找算法
+
+- `iterator_pos find(iterator start, iterator end, T _val)`
+  
+  在容器指定范围(迭代器 start 和 end 划分的范围)内的元素中查找值为 _val 的元素并返回第一次找到该元素所在下标的迭代器，若不存在，则返回 `end` 迭代器
+
+  ```cpp
+  void foo_find(void) {
+    vector<int> v;
+    for (size_t i = 0; i < 10; ++i) {
+      v.push_back(i);
+    }
+
+    vector<int>::iterator _pos = find(v.begin(), v.end(), 4);
+    if (_pos != v.end()) cout << *_pos << endl;
+  }
+  ```
+
+- `iterator_pos find_if(iterator start, iterator end, _Function _fn)`
+
+  遍历容器指定范围(迭代器 start 和 end 划分的范围)内的元素，把它们作为实参逐个输入至返回值为bool类型的一元仿函数或者函数指针 _fn 当中，当 _fn 所返回的结果为 true 时，则该函数返回当前元素所在下标的迭代器，若不存在，则返回 `end` 迭代器
+
+  ```cpp
+  void foo_find_if(void) {
+    vector<int> v;
+    for (size_t i = 0; i < 10; ++i) {
+      v.push_back(i);
+    }
+
+    vector<int>::iterator _result = find_if(v.begin(), v.end(), [](int &_val) { return _val > 3; });
+
+    if (_result != v.end()) 
+      cout << *_result << endl;
+  }
+  ```
+
+- `iterator_pos adjacent_find(iterator start, iterator end)`
+  
+  遍历容器指定范围(迭代器 start 和 end 划分的范围)内的元素，并寻找间隔相邻且值重复的元素，如果存在，则返回所重复元素的上一个元素所在下标的迭代器，若不存在，则返回 end 迭代器
+
+  ```cpp
+  void foo_adjacent_find(void) {
+    vector<int> v;
+    v.push_back(1);
+    v.push_back(2);
+    v.push_back(3);
+    v.push_back(3);
+    v.push_back(4);
+
+    vector<int>::iterator _result = adjacent_find(v.begin(), v.end());
+    if (_result != v.end()) cout << *_result << endl;
+  }
+  ```
+
+- `bool binary_search(iterator start, iterator end, const T &_val)`
+
+  使用 **二分查找法** 查找容器指定范围(迭代器 start 和 end 划分的范围)内的元素，并判断是否存在值为 _val 的元素，如果存在则返回 true，如果不存在则返回false
+
+  由于该算法使用的是二分查找法，为了该算法的运行不会失效，我们需要保证指定的容器内部所存储的元素是一个 有序序列
+
+  ```cpp
+  void foo_binary_search(void) {
+    vector<int> v;
+    for (size_t i = 0; i < 10; ++i) {
+      v.push_back(i);
+    }
+
+    bool _result = binary_search(v.begin(), v.end(), 3);
+    cout << _result << endl;
+  }
+  ```
+
+- `int binary_search(iterator start, iterator end, const T &_val)`
+
+  遍历容器指定范围(迭代器 start 和 end 划分的范围)内的元素，并统计值为 _val 的元素所出现的次数并返回
+
+  ```cpp
+  void foo_count(void) {
+    vector<int> v;
+    v.push_back(1);
+    v.push_back(2);
+    v.push_back(3);
+    v.push_back(3);
+    v.push_back(4);
+
+    int _count = count(v.begin(), v.end(), 3);
+  }
+  ```
+
+- `int count_if(iterator start, iterator end, _Function _fn)`
+  
+  遍历容器指定范围(迭代器 start 和 end 划分的范围)内的元素，把它们作为实参逐个输入返回值为 bool 类型的一元仿函数或者函数指针 _fn 当中，并统计 _fn 返回值为 true 的次数，最后返回所统计的结果
+
+  ```cpp
+  void foo_count_if(void) {
+    vector<int> v;
+    for (size_t i = 0; i < 10; ++i) {
+      v.push_back(i);
+    }
+
+    int _count = count_if(v.begin(), v.end(), [](int &_val) { 
+      return _val > 5; 
+    });
+    cout << _count << endl;
+  }
+  ```
+
+<br/>
+
+<span id = "排序算法"></span>
+
+#### 排序算法
+
+- `void sort(iterator start, iterator end, _Function _fn)`
+
+  对容器内指定范围(迭代器 start 和 end 划分的范围)内的元素，依照二元仿函数或函数指针 _fn 所指定的规则去进行排序
+
+  ```cpp
+  void foo_sort(void) {
+    vector<int> v;
+    v.push_back(4);
+    v.push_back(1);
+    v.push_back(5);
+    v.push_back(2);
+    v.push_back(3);
+
+    sort(v.begin(), v.end(), [](int &_left, int &_right) { return _left > _right; });
+  }
+  ```
+
+- `void random_shuffle(iterator start, iterator end)`
+  
+  随机置乱容器指定范围(迭代器 start 和 end 划分的范围)内的元素的原始次序
+  
+  ```cpp
+  void foo_random_shuffle(void) {
+    vector<int> v;
+    for (size_t i = 0; i < 5; ++i) {
+      v.push_back(i);
+    }
+
+    random_shuffle(v.begin(), v.end());
+
+    for_each(v.begin(), v.end(), [](int &_val) { cout << _val << endl; });
+  }
+  ```
+
+- `void reverse(iterator start, iterator end)`
+
+  反转容器中指定范围(迭代器 start 和 end 划分的范围)内的元素的次序
+
+  ```cpp
+  void foo_reverse(void) {
+    vector<int> v;
+    for (size_t i = 0; i < 5; ++i) {
+      v.push_back(i);
+    }
+
+    reverse(v.begin(), v.end());
+  }
+  ```
+
+<br/>
+
+<span id = "拷贝替换合并算法"></span>
+
+#### 拷贝/替换/合并算法
+
+- `void merge(iterator src_start_1, iterator src_end_1, iterator src_start_2, iterator src_end_2, iterator des_start)`
+
+  合并指定范围内(两个容器的开始和起始迭代器 src_start_1、src_end_1、src_start_2、src_end_2)的两个容器的元素，并重新赋值给目标容器(迭代器 des_start 所指向的容器)当中
+
+  尽量要保证原始合并的两个数据源是有序序列，否则合并后的结果将可能会出现相较之前的乱序
+  
+  目标容器在合并前要保证其内部元素中是含有 **有效元素** 的，否则会调用失败
+
+  ```cpp
+  void foo_merge(void) {
+    vector<int> v_src_1;
+    v_src_1.push_back(1);
+    v_src_1.push_back(2);
+    v_src_1.push_back(3);
+    v_src_1.push_back(4);
+    v_src_1.push_back(5);
+
+    vector<int> v_src_2;
+    v_src_2.push_back(6);
+    v_src_2.push_back(7);
+
+    vector<int> v_des;
+    v_des.resize(v_src_1.size() + v_src_2.size());
+    merge(v_src_1.begin(), v_src_1.end(), v_src_2.begin(), v_src_2.end(), v_des.begin());
+  }
+  ```
+
+- `void copy(iterator src_start, iterator src_end, iterator des_start)`
+  
+  拷贝原始容器中指定范围(迭代器 start 和 end 划分的范围)内的元素并重新赋值给目标容器(迭代器 des_start 所指向的容器)当中
+  
+  目标容器在拷贝前要保证其内部元素中是含有 **有效元素** 的，否则会调用失败
+
+  ```cpp
+  void foo_copy(void) {
+    vector<int> v_src;
+    for (size_t i = 0; i < 5; ++i) {
+      v_src.push_back(i);
+    }
+  
+    vector<int> v_des;
+    for (size_t i = 5; i < 10; ++i) {
+      v_des.push_back(i);
+    }
+    copy(v_src.begin(), v_src.end(), v_des.begin());
+  
+    copy(v_des.begin(), v_des.end(), ostream_iterator<int>(cout, " "));
+  }
+  ```
+
+- `void replace(iterator start, iterator end, const T &_old_val, const T &_new_val)`
+
+  查找容器中指定范围(迭代器 start 和 end 划分的范围)内值为 _old_val 的元素，并修改其值为 _new_val
+
+  ```cpp
+  void foo_replace(void) {
+    vector<int> v;
+    v.push_back(1);
+    v.push_back(2);
+    v.push_back(2);
+    v.push_back(3);
+    v.push_back(4);
+
+    replace(v.begin(), v.end(), 2, 0x400);
+  }
+  ```
+
+- `void replace_if(iterator start, iterator end, function _fn, const T &_new_val)`
+
+  遍历容器指定范围(迭代器 start 和 end 划分的范围)内的元素，把它们作为实参逐个输入返回值为 bool，形参类型为容器中的元素的类型的一元仿函数或者函数指针 _fn 当中，当该 _fn 返回 true 时，则当前所操作的元素的值替换为 _new_val
+
+  ```cpp
+  bool m_replace(int &_old_val) {
+    return _old_val > 2;
+  }
+  void foo_replace_if(void) {
+    vector<int> v;
+    for (size_t i = 0; i < 5; ++i) {
+      v.push_back(i);
+    }
+
+    replace_if(v.begin(), v.end(), m_replace, 0x400);
+  }
+  ```
+
+- `void swap(Container c_src, Container c_des)`
+  
+  交换两个容器(相同容器类型)的内部用于管控数据空间的指针所指向的地址
+
+  ```cpp
+  void foo_swap(void) {
+    vector<int> v_1;
+    for (size_t i = 0; i < 5; ++i) {
+      v_1.push_back(i);
+    }
+
+    vector<int> v_2;
+    for (size_t i = 5; i < 10; ++i) {
+      v_2.push_back(i);
+    }
+
+    swap(v_1, v_2);
+  }
+  ```
+
+<br/>
+
+<span id = "算数生成算法"></span>
+
+#### 算数生成算法
+
+
+- `T accumulate(iterator start, iterator end, const T &_init_val)`
+  
+  以 _init_val 作为初始化数据，在此基础上累加容器指定范围(迭代器 start 和 end 划分的范围)内的元素的值，最后返回累加后的结果
+
+  ```cpp
+  void foo_accumulate(void) {
+    vector<int> v;
+    for (size_t i = 0; i < 5; ++i) {
+      v.push_back(i);
+    }
+
+    int num = accumulate(v.begin(), v.end(), 100);
+    cout << num << endl;
+  }
+  ```
+
+- `void fill(iterator start, iterator end, const T &_val)`
+  
+  容器指定范围(迭代器 start 和 end 划分的范围)内的元素的值替换为 _val
+
+  ```cpp
+  void foo_fill(void) {
+    vector<int> v;
+    for (size_t i = 0; i < 5; ++i) {
+      v.push_back(i);
+    }
+
+    fill(v.begin(), v.begin() + 2, 0x400);
+  }
+  ```
+
+<br/>
+
+<span id = "集合算法"></span>
+
+#### 集合算法
+
+- `iterator set_intersection(iterator src_start_1, iterator src_end_1, iterator src_start_2, iterator src_end_2, iterator des_start)`
+
+  该算法提供查找 **并集** 的功能
+  
+  查找指定范围内(两个容器的开始和起始迭代器 src_start_1、src_end_1、src_start_2、src_end_2)的两个容器的元素中元素的值相同的元素，并把它重新赋值给目标容器(迭代器 des_start 所指向的容器)当中，最后会返回目标容器的 end 迭代器
+  
+  我尽量要保证原始的两个容器的数据源是有序序列，否则目标容器所获取到的结果将可能会出现乱序
+  
+  目标容器在赋值前要保证其内部元素中是含有 **有效元素** 的，否则会调用失败
+
+  ```cpp
+  void foo_set_intersection(void) {
+    vector<int> v_src_1;
+    vector<int> v_src_2;
+    for (size_t i = 0; i < 10; ++i) {
+      v_src_1.push_back(i);
+      v_src_2.push_back(i + 5);
+    }
+
+    vector<int> v_des;
+    v_des.resize(v_src_1.size(), v_src_2.size());
+
+    vector<int>::iterator i_end = set_intersection(v_src_1.begin(), v_src_1.end(), v_src_2.begin(), v_src_2.end(), v_des.begin());
+  }
+  ```
+
+- iterator set_union(iterator src_start_1, iterator src_end_1, iterator src_start_2, iterator src_end_2, iterator des_start)
+  
+  该算法提供查找 **交集** 的功能
+  
+  去除掉，指定范围内(两个容器的开始和起始迭代器 src_start_1、src_end_1、src_start_2、src_end_2) 的两个容器中，值重复的元素并进行合并，并把合并后的结果重新赋值给目标容器(迭代器 des_start 所指向的容器)当中，最后会返回目标容器的 结束迭代器(end())
+  
+  我尽量要保证原始的两个容器的数据源是有序序列，否则目标容器所获取到的结果将可能会出现乱序
+  
+  目标容器在合并前要保证其内部元素中是含有 有效元素 的，否则会调用失败
+
+  ```cpp
+  void foo_set_union(void) {
+    vector<int> v_src_1;
+    vector<int> v_src_2;
+    for (int i = 0; i < 10; i++) {
+      v_src_1.push_back(i);
+      v_src_2.push_back(i + 5);
+    }
+
+    vector<int> v_des;
+    v_des.resize(v_src_1.size() + v_src_2.size());
+
+    vector<int>::iterator i_end = set_union(v_src_1.begin(), v_src_1.end(), v_src_2.begin(), v_src_2.end(), v_des.begin());
+  }
+  ```
+
+- `iterator set_difference(iterator src_start_1, iterator src_end_1, iterator src_start_2, iterator src_end_2, iterator des_start)`
+                
+  
+  该算法提供查找差集的功能
+  
+  查找容器指定范围(迭代器 src_start_1 和 src_end_1 划分的范围)内相较于容器指定范围(迭代器 src_start_2 和 src_end_2 划分的范围)内，值不同的元素，并把结果重新赋值给目标容器(迭代器 des_start 所指向的容器)当中，最后会返回目标容器的 end 迭代器
+  
+  我尽量要保证原始的两个容器的数据源是有序序列，否则目标容器所获取到的结果将可能会出现乱序
+  
+  目标容器在赋值前要保证其内部元素中是含有 **有效元素** 的，否则会调用失败
+
+  ```cpp
+  void foo_set_difference(void) {
+    vector<int> v_src_1;
+    vector<int> v_src_2;
+
+    for (int i = 0; i < 10; i++) {
+      v_src_1.push_back(i);
+      v_src_2.push_back(i + 5);
+    }
+
+    vector<int> v_des;
+    v_des.resize(max(v_src_1.size(), v_src_2.size()));
+
+    vector<int>::iterator i_end = set_difference(v_src_1.begin(), v_src_1.end(), v_src_2.begin(), v_src_2.end(), v_des.begin());
+
+    /* vector<int>::iterator i_end = set_difference(v_src_2.begin(), v_src_2.end(), v_src_1.begin(), v_src_1.end(), v_des.begin()); */
+  }
+  ```
+
+
+<br/>
+
+<span id = "迭代器"></span>
+
+### 迭代器
+
+---
+
+> 迭代器 $(iterator)$ 提供一种方法，使之能够依序寻访某个容器所含的各个元素，而又无需暴露该容器的内部表示方式
+> 
+> 迭代器的设计思维-STL的关键所在，STL的中心思想在于将容器 $(container)$ 和算法 $(algorithms)$ 分开，彼此独立设计，最后再一贴胶着剂将他们撮合在一起
+> 
+> 每一种容器的每一种不同的模板类型都由其对应着的迭代器
+> 
+> 
+> |迭代器|权限|操作|
+> |:---|---:|:---:|
+> |输入迭代器|提供对数据的只读访问|++, ==, !=|
+> |输出迭代器|提供对数据的只写访问|++|
+> |前向迭代器|提供读写操作，并能向前推进迭代器|++, ==, !=|
+> |双向迭代器|提供读写操作，并能向前和向后操作|++, --|
+> |随机访问迭代器|提供读写操作，并能以跳跃的方式访问容器的任意数据，是功能最强的迭代器|++, --, [n], -n, <, <=, >, >=|
 
