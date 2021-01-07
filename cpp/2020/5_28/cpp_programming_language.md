@@ -122,6 +122,8 @@
     - [queue](#queue)
     - [list](#list)
     - [pair](#pair)
+    - [set](#set)
+    - [map](#map)
 
 <br/>
 
@@ -675,7 +677,7 @@ int main(void) {
 <span id = "左值引用"></span>
 ### 左值引用
 
---- 
+---
 
 左值引用的出现是为了解决 **_拷贝语义_** 的问题，当引用变量的类型被声明为 : `Type &` 时，那么这个引用变量就是一个左值引用
 
@@ -707,7 +709,7 @@ int main(void) {
 
 ### 右值引用
 
---- 
+---
 
 右值引用的出现是为了解决 **_移动语义_** 的问题，当引用变量的类型被声明为 : `Type &&` 时，那么这个引用变量就是一个右值引用
 
@@ -881,7 +883,7 @@ int main(void) {
 <span id="匿名对象"></span>
 ### 匿名对象
 
---- 
+---
 
 匿名对象的初始化通过语法 <font color = "red">type(value)</font> 来完成，其作为一个表达式中的右操作数存在
 
@@ -2594,7 +2596,7 @@ HYBIRD::$vbtable@CAT@:
 ```
 
 
-我们会发现，原本 `HYBIRD` 的内存首段信息本该出现的 `DOG` 和 `CAT` 的数据都替换为 **_vbptr_** 的形式了，而本该出现的两个 `SEX` 成员变成了只有一个(共享机制)并被放在派生类成员初始化的数据往后延生的内存段上(virtual base ANIMAL)，<font color = "red">当我们想访问 `BYBIRD` 的基类所继承下来的 `SEX` 数时，会依据指针 **_vbptr_** 所指向的 **_vbtable_**，在里头找到该 **_vbptr_** 指针在内存中的首地址到虚基类中的成员信息的偏移量，然后再依据这个偏移量从派生类的首地址开始偏移，以找到仅有的 SEX 成员</font>，保证调用不会存在二义性，我们可以简单的理解为 : <font color = "red">不管采用什么样的方式去调用(直接通过子类的实例亦或者通过 :: 去引用具体某个基类的作用域)基类中的成员信息，所获取到的始终都是同一个最上级虚基类的成员信息</font>
+我们会发现，原本 `HYBIRD` 的内存首段信息本该出现的 `DOG` 和 `CAT` 的数据都替换为 **_vbptr_** 的形式了，而本该出现的两个 `SEX` 成员变成了只有一个(共享机制)并被放在派生类成员��始化的数据往后延生的内存段上(virtual base ANIMAL)，<font color = "red">当我们想访问 `BYBIRD` 的基类所继承下来的 `SEX` 数时，会依据指针 **_vbptr_** 所指向的 **_vbtable_**，在里头找到该 **_vbptr_** 指针在内存中的首地址到虚基类中的成员信息的偏移量，然后再依据这个偏移量从派生类的首地址开始偏移，以找到仅有的 SEX 成员</font>，保证调用不会存在二义性，我们可以简单的理解为 : <font color = "red">不管采用什么样的方式去调用(直接通过子类的实例亦或者通过 :: 去引用具体某个基类的作用域)基类中的成员信息，所获取到的始终都是同一个最上级虚基类的成员信息</font>
 
 稍微扩展一下的是，`DOG` 和 `CAT` 都是采用的虚继承的方式去继承了 `ANIMAL`，也就是说放在他们各自的角度来看，`CAT` 和 `DOG` 的实例都各自维护了各自的 **_vbptr_** 的指针和各自的 **_vbtable_**，而同时派生自 `DOG` 和 `CAT` 的派生类 `HYBIRD` 来说，由于继承的传递性那么它就分别拥有了 `DOG` 和 `CAT` 各自维护的 `vbptr` 和 `vbtable`，也就是说 `HYBIRD` 的最终内存模型是拥有两个 **_vbptr_** 和 **_vbtable_** 的，但是由于该 **_vbptr_** 所维护的都是同属于一个虚基类中的成员信息，所以就算最下级派生类中出现了重复的 **_vbptr_** 和 **_vbtable_** 也不会造成二义性的调用，因为其最终的调用都会依据当前 **_vbptr_** 所在的地址和不同的偏移量去找到共同的最上级虚基类中的成员信息
 
@@ -3194,7 +3196,7 @@ int main(void) {
 
 ### 内联函数
 
---- 
+---
 
 在c语言中，我们通常会把一些短并且执行频繁的计算写成 **_宏函数_** 以此避免函数调用所存在的出入栈开销，宏函数能够在c语言中进行广泛的使用并不是说宏函数就一定是完美无缺的，而是在c语言中似乎找不到第二个相似的特性以代替宏函数的功能，而宏对于 cpp 这种面向对象的语言来说，其存在的本身还是会存在着一些问题，比如 : 
 
@@ -3389,7 +3391,7 @@ int main(void) {
 
 ### 什么是运算符重载函数
 
---- 
+---
 
 运算符重载函数的类别可以总体区分为以下两类
 
@@ -3453,7 +3455,7 @@ int main(void) {
 
 ### 运算符重载的使用事项
 
---- 
+---
 
 - 对于声明为 **_成员函数运算符重载_** 受复合结构中的访问修饰符的间接调用限制
 
@@ -3553,7 +3555,7 @@ int main(void) {
 
 ### 各运算符重载时的约束
 
---- 
+---
 
 - `+`
 
@@ -3906,7 +3908,7 @@ int main(void) {
   return EXIT_SUCCESS;
 }
 ```
-          
+
 - `*`
 
   - 返回值和形参没有特殊的条件限制
@@ -4374,7 +4376,7 @@ int main(void) {
 
 ### 模板机制
 
---- 
+---
 
 <span id = "函数模板"></span>
 
@@ -5988,7 +5990,7 @@ int main(void) {
 - `string &operator+=(const string &str)`
   
   将已有 string 实例 str 内部所管控的字符串追加到当前 string 实例内部所管控的字符串的末尾处
- 
+
 - `string &operator+=(const char *str)`
   
   将字符指针 str 追加到当前 string 实例内部所管控的字符串的末尾处
@@ -6340,7 +6342,7 @@ int main() {
 - `void assign(V begin, V end)`
                 
   该函数是一个存在虚拟类型为 V 的模板函数，V 的具现化于所接受的能够指示一段线性数组 $[ \: begin, \: end \: )$ 开闭区间的迭代器 ( 隶属于容器的 ) 亦或者地址所指示的类型，并使用它来完成当前 vector 容器实例内部所管控的动态数组的重新赋值的工作
-                
+  
 - `void assign(int n, element)`
   
   该函数使用 n 个 element 用于容器内部动态数组的重新赋值的工作
@@ -7701,28 +7703,6 @@ int main(void) {
 
 #### map / multimap / unorder_map
 
-
-set 是 STL 所提供的一种支持任意类型存储的 **_关联式容器_**，其内部采用 **_红黑树_** 作为实现，其拥有一个十分重要的特性即是，<font color = "red">set 内部维护的树所新增的节点，由于二叉树排序树的特性，它都会依据该节点的 键值 进行自动的排序(**_默认是正序排序，也可手动指定排序规则_**)</font>；这里需要扩充一下的是，set 中的节点内部所存有的数据既可作为 键 也可以作为 值，二者放在 set 中的节点元素而言并不是分开的一种概念
-
-<font color = "red"> set 不允许元素内部出现重复的键值，对于用户重复插入的键值，set 会保证此次的插入操作是一个无效操作，简而言之就是插入失败</font>
-
-set 内部所维护的这颗 红黑树 和其它容器一样，都是存储在 自由存储区 中的，并且由容器本身去负责管理这棵树在堆中所使用内存的申请和释放
-
-set 由于使用的是 红黑树 作为存储模型，故使用 set 去针对节点进行插入、删除、查找时所消耗的时间复杂度都接近 $O(logN)$，其中，$N$ 与树的高度相关
-
-<font color = "red">set 并不提供针对节点的键值进行修改的操作，具体体现则为其对外仅提供了 **只读性质的迭代器**</font>，需要 补充的是，set 所提供的并不是一种提供随机访问性的迭代器，其只能够完成单步自增/减的操作，那么我们不妨在总结一下，<font color = "red">set 所提供的迭代器是一种只读单步自增/减的迭代器</font>
-
-set 对于节点进行插入或者删除操作时，所操作的元素永远都是存在针对性的，即这些新增和删除的操作并不会引起整棵树的内存置换
-
-相对 set 而言还有另一种容器跟它相呼应，那就是 `multiset` 和 `unorder_set`
-
-- <font color = "red">作为 multiset 而言，它和 set 所存在的唯一的区别就是 multiset 允许节点的键值重复</font>，其余相较于 set 不管是功能性而言还是内置结构都是一模一样的
-
-- <font color = "red">而 unorder_set 虽然也能够保有不允许元素重复的特性</font>，但是其内部实现对比 set / multiset 而言可谓是大相径庭，unorder_set 其内部实现采用了 <font color = "red">**_哈希表_**</font>，既然采用了 哈希表，那么它该数据结构所耗费的时间复杂度就要高出红黑树许多，并且还<font color = "red">无法满足元素自动排序的特性</font>，但是相对的，<font color = "red">对于元素的查找、删除和新增所消耗的时间复杂度都能够在常数阶(最好 $O(1)$，最坏需要处理哈希冲突，即 $O(N)$)去完成</font>
-
-
-<br/><br/><br/>
-
 map 是 STL 所提供的一种支持任意类型存储的 **_关联式容器_**，和 set 一样，其内置的数据模型也是根据 **_红黑树_** 来进行实现的；虽然 map 和 set 的内置的数据模型的实现使用的都是红黑树，但是存在较大不同的是，对于<font color = "red"> map 来说是能够细分出来当前节点的 **键** 和 **值**，具体来说，每一个节点其实都是一个 $\:\:pair<const \: K, \:\: V>\:$ 类型，以 K 作为该节点的键$(First)$，以 V 作为该节点的实值$(Second)$，而红黑树的搜索依据就是根据 键$(K)$ 来完成</font>，并且我们每次为 map 内部所维护的树<font color = "red">新增的节点，都会遵循二叉排序树的特性，根据该节点的 键$(K)$ 进行自动的排序(**_默认是正序排序，也可认为的指定排序的规则_**)</font>
 
 <font color = "red">map 为了保证内部所维护的红黑树的完好，每个节点 $\:\:pair<const \: K, \:\: V>\:$ 中作为 键 而存在的模板虚拟类型 $k$ 都使用了 `const` 修饰符进行修饰，以保证我们无法修改每个节点中的键</font>，但是对于值而言，我们是可以进行任意修改的，因为它并不作为这颗二叉树的排序依据而存在
@@ -7731,8 +7711,229 @@ map 是 STL 所提供的一种支持任意类型存储的 **_关联式容器_**�
 
 map 内部所维护的这颗 红黑树 和其它容器一样，都是存储在 自由存储区 中的，并且由容器本身去负责管理这棵树在堆中所使用内存的申请和释放
 
-和 set 存在区别的是，map 所提供迭代器并不是一种存粹的只读访问迭代器，map 对于其 键 的只读体现仅在于每个节点的 键 类型使用了 const 关键字进行了修饰（pair<const K,V>），并且它也不是一种提供随机访问性的迭代器，其只能够完成单步自增/自减的操作
+和 set 存在区别的是，<font color ="red">map 所提供迭代器并不是一种存粹的只读访问迭代器，map 对于其 键 的只读体现仅在于每个节点的 键$(K)$ 类型使用了 `const` 关键字进行了修饰(pair<const K, V>)，并且它也不是一种提供随机访问性的迭代器，其只能够完成单步自增/自减的操作</font>
 
-由于一个棵本身也可以作为一张链表来看待，故 map 容器与 list 容器存在相同的一点是，当对容器中的节点进行插入操作或者删除操作的时候，所操作的元素永远都是存在针对性的，即这些新增和删除的操作并不会引起整棵树的内存置换
+当对 map 中的节点进行插入或者删除操作时，所操作的元素永远都是存在针对性的，即这些新增和删除的操作并不会引起整棵树的内存置换
 
-相对 map 而言还有另一种容器跟它相呼应，那就是 multimap，作为 multimap 而言，它和 map 所存在的唯一的区别就是 multimap 允许节点的键值重复，其余相较于 map 不管是功能性而言还是内置结构都是一模一样的
+相对 map 而言还有另一种容器跟它相呼应，那就是 `multimap` 和 `unorder_map`
+
+- <font color = "red">作为 multimap 而言，它和 map 所存在的唯一的区别就是 multimap 允许节点的键重复</font>，其余相较于 map 不管是功能性而言还是内置结构都是一模一样的
+
+- <font color = "red">而 unorder_map 虽然也能够保有不允许元素重复的特性</font>，但是其内部实现对比 map / multimap 而言可谓是大相径庭，unorder_map 其内部实现采用了 <font color = "red">**_哈希表_**</font>，既然采用了 哈希表，那么它该数据结构所耗费的时间复杂度就要高出红黑树许多，并且还<font color = "red">无法满足元素自动排序的特性</font>，但是相对的，<font color = "red">对于元素的查找、删除和新增所消耗的时间复杂度都能够在常数阶(最好 $O(1)$，最坏需要处理哈希冲突，即 $O(N)$)去完成</font>
+
+
+- `map<K, V, F = less<K>>()`
+  
+  默认构造，构建一个空的 map 容器；虚拟类型 $F$ 的默认值为一个提供了 **正序排序** 的功能的二元仿函数 `less<K>`，如有需要，我们可以显示的指定它
+
+- `map(const set &__m)`
+  
+  拷贝构造函数，将已有 map 容器实例内部所维护的红黑树的节点拷贝至当前 map 容器实例内部所维护的红黑树当中
+
+```cpp
+#include <iostream>
+#include <map>
+
+template<class _Ty>
+struct __DESC {
+  constexpr bool operator()(const _Ty &left, const _Ty &right) {
+    return left > right;
+  }
+};
+
+int main(void) {
+  /* map<K, V, F = less<K>>() */
+  std::map<std::string, int, __DESC<string>> __m_nor;
+      
+  /* set(const set &__s) */
+  std::map<std::string, int, __DESC<string>> __m_des(__m_nor);
+}
+```
+  
+**_ASSIGNMENT_**
+
+- `map &operator=(const map &__m)`
+
+  拷贝赋值运算符，依据已有 map 的实例内部所维护的红黑书的节点去重新构造当前 map 容器实例本身内部所维护的红黑树
+
+- `void swap(map &__m)`
+  
+  交换目标 map 容器与当前 map 容器内部指向着存在于堆中的红黑树的指针，并重新更新双方容器内部所维护的红黑树的 size
+
+```cpp
+#include <iostream>
+#include <map>
+
+template<class _Ty>
+struct __DESC {
+  constexpr bool operator()(const _Ty &left, const _Ty &right) {
+    return left > right;
+  }
+};
+
+int main(void) {
+  std::map<string, int> __m_src;
+  __m_src["C"] = 3;
+  __m_src.insert(std::make_pair("A", 1));
+  __m_src.insert(std::map<std::string, int>::value_type("B", 2));
+
+  std::map<string, int> __m_des;
+
+  /* void swap(set &__s) */
+  __m_src.swap(__m_des);
+
+  /* set &operator=(const set &__s) */
+  __m_src = __m_des;
+}
+```
+
+**_CAPACITY_**
+
+- `size_t size()`
+  
+  返回 map 容器内部所维护的红黑树的节点个数
+
+- `bool empty()`
+
+  判断是否是一个空容器(无任何节点的链接)
+
+```cpp
+#include <iostream>
+#include <map>
+
+int main(void) {
+  std::map<string, int> __m;
+                
+  /* size_t size() */
+  int cout = __m.size();
+                
+  /* bool empty() */
+  bool flag = __m.empty();
+}
+```
+
+**_INSERT_**
+
+- `pair<map<K,V>::iterator, bool> insert(pair<const K,V> __p)`
+
+  向 map 容器内部所维护的红黑树中新增一个节点，并赋予该节点的键为对组 __p 的第一元素，该节点的值为对组 __p 的第二元素，最后返回能够标识当前所插入的节点在整个数中的位置的迭代器和是否插入成功所结合而成的对组
+
+- `V &operator[](const K &_key)`
+  
+  向 map 容器内部所维护的红黑树中依据所指定的 键 _key 搜索是否存在该节点，如不存在，则依据 map 所指定的 值 的类型并调用其默认构造去创建一个默认的 值 并与键 _key 进行绑定，然后往树种新增一个节点，最后返回该 值 的引用
+
+```cpp
+#include <iostream>
+#include <map>
+
+int main(void) {
+  using namespace std;
+
+  map<string, int> __m;
+
+  /* pair<map<K,V>::iterator, bool> insert(pair<const K,V> __p) */
+  pair<map<string, int>::iterator, bool> result_01 = __m.insert(pair<string, int>("C", 3));
+  pair<map<string, int>::iterator, bool> result_02 = __m.insert(make_pair("A", 1));
+  pair<map<string, int>::iterator, bool> result_03 = __m.insert(map<string, int>::value_type("D", 4));
+
+  /* V &operator[](const K &_key) */
+  __m["B"] = 2;
+}
+```
+
+**_DELETE_**
+
+- `void clear()`
+
+  删除 map 容器内部所维护的红黑树的所有的节点
+
+- `map<K,V>::iterator erase(map<K,V>::iterator start, map<K,V>::iterator end)`
+
+  map 容器内部所维护的红黑树中删除迭代器 start 和 迭代器 end 所指向的下标之间的所有的节点，并返回下一个可用元素位置的迭代器
+
+- `map<K,V>::iterator erase(map<K,V>::iterator pos)`
+
+  map 容器内部所维护的红黑树中删除迭代器 pos 所指向的节点，并返回距离删除点下一个可用元素位置的迭代器
+
+- `size_type erase(T _key)`
+  
+  set 容器内部所维护的红黑树中删除对应键值 _key 的节点，并返回删除元素的个数
+
+```cpp
+#include <iostream>
+#include <map>
+
+int main(void) {
+  std::map<string, int> __m;
+  __m["C"] = 3;
+  __m["A"] = 1;
+  __m["D"] = 4;
+  __m["B"] = 2;
+
+  /* map<K,V>::iterator erase(map<K,V>::iterator pos) */
+  __m.erase(__m.begin(), ++(++__m.begin()));
+
+  /* map<K,V>::iterator erase(map<K,V>::iterator start, map<K,V>::iterator end) */
+  __m.erase(__m.begin());
+
+  /* void erase(K _key) */
+  __m.erase("C");
+
+  /* void clear() */
+  __m.clear();
+}
+```
+
+**_FIND_**
+
+- `map<K,V>::iterator find(K _key)`
+
+  在 map 内部所维护的红黑树中查找相符合键值 _key 的结点并返回第一次找到该结点所在下标的迭代器，若不存在匹配键值 _key 的节点，则返回指向最后一个元素的后一个位置的迭代器，即 map<K,V>.end() 的调用结果
+
+- `size_t count(K _key)`
+
+  在 map 内部所维护的红黑树中查找相符合键值 _key 的结点的个数
+
+- `map<K,V>::iterator lower_bound(K _key)`
+
+  在 map 内部所维护的红黑树中查找相符合 `目标节点键 >= _key` 的结点并返回该结点所在下标的迭代器，若不存在，则返回指向最后一个元素的后一个位置的迭代器，即 `map<K,V>.end()` 的调用结果
+
+- `map<K,V>::iterator upper_bound(K _key)`
+
+  在 map 内部所维护的红黑树中查找相符合 `目标节点键 > _key` 的结点并返回该结点所在下标的迭代器，若不存在，则返回指向最后一个元素的后一个位置的迭代器，即 `map<K,V>.end()` 的调用结果
+
+- `pair<map<K,V>::iterator, map<K,V>::iterator> equal_range(K _key)`
+
+  依据指定的键值 _key 返回 lower_bound 和 upper_bound 调用所获取到的迭代器对组 pair，其中 first 为 lower_bound 调用结果所获取到的迭代器，second 为 upper_bound 调用结果所获取到的迭代器
+
+```cpp
+#include <iostream>
+#include <string>
+#include <map>
+
+int main(void) {
+  using namespace std;
+
+  map<string, int> __m;
+  __m["C"] = 3;
+  __m["A"] = 1;
+  __m["D"] = 4;
+  __m["B"] = 2;
+                
+  /* map<K,V>::iterator find(K _key) */
+  map<string, int>::iterator it_find = __m.find("B");
+                
+  /* size_t count(K _key) */
+  size_t count = __m.count("A");
+                
+  /* map<K,V>::iterator lower_bound(K _key) */
+  map<string, int>::iterator it_lower = __m.lower_bound("C");
+                
+  /* map<K,V>::iterator upper_bound(T _key) */
+  map<string, int>::iterator it_uppler = __m.upper_bound("C");
+                
+  /* pair<map<K,V>::iterator, map<K,V>::iterator> equal_range(K _key) */
+  pair<map<string, int>::iterator, map<string, int>::iterator> _res = __m.equal_range("C");
+}
+```
+

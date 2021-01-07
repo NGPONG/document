@@ -45,8 +45,8 @@ __This text__ is italic
 
 <!-- OL -->
 1. Item 1
-1. Item 2
-1. Item 3
+2. Item 2
+3. Item 3
 
 <!-- Inline Code Block -->
 `<p>This is a paragraph</p>`
