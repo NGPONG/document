@@ -2284,13 +2284,14 @@ int fun_test(char *str){
 #### 函数指针
 <span id="函数指针"></span>
 
-一个函数在编译器进行编译后，它也有属于它的地址，这个地址就是属于该函数的一个入口，相对的，他也是有属于它的类型，比如说我们定义了一个函数
+<font color = "red">函数指针所指向的就是该函数机器代码表示中第一条指令的地址</font>
+
+函数有属于它的类型，比如说我们定义了一个函数
 
 ```c
 #include<stdio.h>
 
 void fun_test(int a) {
-
     printf("Hello,World!%d",a);
 }
 ```
@@ -2306,12 +2307,10 @@ void fun_test(int a) {
 #include<stdio.h>
 
 int fun_test(char a,short b){
-
     printf("Hello,World!%d",a + b);
 }
 
 int main(void){
-
     int (*invoker)(char,short) = fun_test;
     invoker('a',256);
 
@@ -2326,29 +2325,24 @@ int main(void){
 #include<stdio.h>
 
 int fun_test1(void){
-
     printf("Hello,World1!");
 }
 
 int fun_test2(void){
-
     printf("Hello,World2!");
 }
 
 int fun_test3(void){
-
     printf("Hello,World3!");
 }
 
 int main(void){
-
     int (*invokers[3])(char,short);
     invokers[0] = fun_test1;
     invokers[1] = fun_test2;
     invokers[2] = fun_test3;
 
     for (size_t i = 0; i < sizeof(invokers) / sizeof(int (*)()); i++) {
-
         (*(invokers + 1))();
     }
 }
@@ -2362,15 +2356,12 @@ int main(void){
 #include<stdio.h>
 
 __stdcall int fun_test(char a,short b){
-
     printf("Hello,World!%d",a + b);
 }
 
 int main(void){
-
     int (__stdcall *invoker)(char,short) = fun_test;
     invoker('a',256);
-
 }
 ```
 
