@@ -1567,6 +1567,8 @@ _*前序遍历*_
 
 规则是若二又树为空，用空操作返回，否则先访问根结点，然后前序遍历左子树，再前序遍历右子树，如下图所示，其遍历顺序则为：$ABDGHCEIF$
 
+前序遍历和 DFS 遍历的思想一致
+
 ```c
 int Preorder_Traverse_BinaryTree(Binary_Tree *tree) {
 	if (tree == 0x0)
@@ -1672,6 +1674,32 @@ int Preorder_Traverse_BinaryTree_WithoutRecursion(Binary_Tree *tree) {
   destory_stack(stack);
 
   return 0;
+}
+```
+
+<br/>
+
+_*层序遍历*_
+
+```cpp
+void travel_tree_by_level_order(binary_tree *root) {
+  std::queue<binary_node> queue;
+  queue.push(*root);
+
+  while (!queue.empty()) {
+    int n = queue.size();
+    for (size_t i = 0; i < n; ++i) {
+      auto node = queue.front();
+      printf("%d ", node.data);
+
+      if (node.left != NULL) {
+        queue.push(node);
+      } else if (node.right != NULL) {
+        queue.push(node);
+      }
+    }
+    printf("\n");
+  }
 }
 ```
 
@@ -2332,6 +2360,8 @@ _*路径*_
 
       注意有向图的回路的构建顺序，由于有向图中的边是作为有向的弧，故可能会出现形状是环状但是实际上却不是环的情景
 
+      ![2021-05-03-16-37-23](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2021-05-03-16-37-23.jpg)
+
 	![2020-10-21-11-40-34](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-21-11-40-34.png)
 
 
@@ -2433,18 +2463,18 @@ $
 > $
 arc[i][j] = \begin{cases}
    W_{i,j} &\text{if } \:\: (V_i,V_j) \in E &\text{or } <V_i,V_j> \in E \\
-   0 &\text{if } \:\: i = j \\
-	 \infty &\text{contrary}
+   0 &\text{else if } \:\: i = j \\
+	 \infty &\text{else}
 \end{cases}
 $
 
-在这里，$W_{i,j}$ 表示为 $(V_i,V_j)$ 或 $<V_i,V_j>$ 上的权值；$infty$ 是一个不可能的极限值，即代表着所对应下标的元素不存在两顶点间的依附边
+在这里，$W_{i,j}$ 表示为 $(V_i,V_j)$ 或 $<V_i,V_j>$ 上的权值；$\infty$ 是一个不可能的极限值，即代表着所对应下标的元素不存在两顶点间的依附边
 
 ![2020-10-24-20-25-26](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-10-24-20-25-26.png)
 
 
 当拥有了这副矩阵，我们就可以很容易地知道图中的一些信息
-- 我们要排查两顶点是否有边无边，即排查矩阵中对应顶点中的元是否值为 1
+- 我们要排查两顶点是否有边无边，即排查矩阵中对应顶点中的元素是否值为 1
 - 无向图中的邻接矩阵，我们通常研究的是顶点的度；顶点 $V_i$ 的度为矩阵中第 $V_i$ 行(或列)各元素之和
 - 有向图中的邻接矩阵，我们通常研究的是顶点的出度和入度；顶点 $V_i$ 的入度为矩阵中第 $V_i$ 列各元素之和；顶点 $V_i$ 的出度为矩阵中第 $V_i$ 行各元素之和
 - 求顶点 $V_i$ 的所有邻接点就是将矩阵中第 $i$ 行中的所有元素扫描一遍，当 $arc[i][j] = 1$ 时，所对应列的顶点就是作为 $V_i$ 的邻接点
@@ -3814,7 +3844,7 @@ _*小结*_
 > 
 > 平衡二叉树是一种高度平衡的二叉排序树，意思是说，要么它是一棵空树，要么它的左子树和右子树都是平衡二叉树，且左子树和右子树的深度之差的绝对值不超过 $1$
 >   
-> 我们将二叉树上结点的左子树深度减去右子树深度的值称为<font color = "red">平衡因子BF$(Balance Factor)$</font>，那么平衡二叉树上所有结点的平衡因子只可能是 $-1、0、1$，只要二叉树上有一个结点的平衡因子的绝对值大于 $1$，则该二叉树就是不平衡的
+> 我们将二叉树上结点的左子树深度减去右子树深度的值称为<font color = "red">平衡因子BF$(Balance \: Factor)$</font>，那么平衡二叉树上所有结点的平衡因子只可能是 $-1、0、1$，只要二叉树上有一个结点的平衡因子的绝对值大于 $1$，则该二叉树就是不平衡的
 > 
 > ![2020-11-17-01-50-57](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2020-11-17-01-50-57.png)
 

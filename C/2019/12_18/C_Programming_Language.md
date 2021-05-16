@@ -5130,18 +5130,71 @@ clean:
       }
       ```
 
-      - `#` : 可以将参数转换为字符串形式，即 `"x"`，需要注意的是，在使用该宏函数的时候，要保证使用了该特殊定义的参数录入不包含特殊字符 `','`
+      - `#` : 可以将参数转换为字符串形式，即 `"x"`
+  
+        - 直接字符的形式
+  
+          - 直接录入非字符串形式的字符作为宏函数调用的参数，需要注意的是，以这种方式去转换的字符串要保证录入的字符中不包含特殊字符 `,` 但是却可以包含 字符 `','` 或 字符串 `","`
 
-      ```c
-      #define DEBUG(msg) #msg
+          ```c
+          #define DEBUG(msg) #msg
+          #define value_helper(n) #n
 
-      int main(int argc, char *argv[]) {
-        /* const char *msg = "hello1024"; */
-        const char *msg = DEBUG(hello1024);
-        
-        return EXIT_SUCCESS;
-      }
-      ```
+          int main(int argc, char *argv[]) {
+            /* const char *msg = "hello1024"; */
+            const char *msg = DEBUG(hello1024);
+
+            printf("%s\n", value_helper(hello "," world)); /* hello "," world */
+            printf("%s\n", value_helper(hello , world));   /* error */
+
+            return EXIT_SUCCESS;
+          }
+          ```
+
+          - 以宏的方式作为参数指定，当我们以宏的方式去指定的时候，直接调用该宏函数所输出的是所指定宏名的字符串，而当 '再包装' 该宏函数的方式调用时，就能够直接输出指定宏所对应宏值的字符串
+
+          ```c
+          #include <stdio.h>
+          
+          #define value_helper(n) #n
+          #define value(n) value_helper(n)
+          #define NUM 0x400
+          
+          int main(int argc, char *argv[]) {
+            printf("%s\n", value(NUM));
+            printf("%s\n", value_helper(NUM));
+          
+            return -1;
+          }
+          ```
+
+        - 以变量或函数返回的作为参数指定时，仅会输出变量或函数名的字符串
+
+        ```c
+        #include <stdio.h>
+
+        #define value_helper(n) #n
+        #define value(n) value_helper(n)
+
+        int foo_helper() {
+          return 0x200;
+        }
+
+        int foo() {
+          return foo_helper();
+        }
+
+        int main(int argc, char *argv[]) {
+          int nums = 0x200;
+          printf("%s\n", value_helper(nums));
+          printf("%s\n", value(nums));
+
+          printf("%s\n", value_helper(foo()));
+          printf("%s\n", value(foo()));
+
+          return -1;
+        }
+        ```
 
       - `##` : 分隔连接的方式，可以将参数连接至表达式的某个地方
 
