@@ -504,7 +504,7 @@ $
 
 ```c
 int fibonacci(unsigned int n) {
-  if(n < 2) return n == 0 ? 0 : 1;
+  if(n <= 2) return n == 0 ? 0 : 1;
 
   return fibonacci(n - 1) + fibonacci(n - 2);
 }
@@ -518,6 +518,10 @@ int main(void) {
 	return EXIT_SUCCESS;
 }
 ```
+
+事实上，我们不难想象，斐波那契数列的递归实现最后面其实是构造了一颗二叉树，以输入 $fib(n), n = 6$ 为例，其构造的二叉树如下图所示: 
+
+![2021-05-26-23-20-10](https://raw.githubusercontent.com/NGPONG/Blog/master/img/2021-05-26-23-20-10.png)
 
 采用递归实现，在数据量大的时候，$f(n)$ 需要不断地进行往下的分割才能得出算式结果，这就造成了函数需要不断的执行入栈操作，而最上层的栈帧往往需要等到下层栈帧的释放才能释放，这就导致了内存消耗严重，故对于斐波那契数列求值其实我们还可以使用递推的方式来实现
 
