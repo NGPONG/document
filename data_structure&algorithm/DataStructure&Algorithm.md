@@ -60,6 +60,18 @@
     - [线性索引查找](#线性索引查找)
     - [二叉排序树](#二叉排序树)
     - [avl tree](#AVL树)
+  - [sort](#Sort)
+    - [十大排序算法性能一览](#十大排序算法性能一览)
+    - [关于排序算法的稳定性和不稳定性](#关于排序算法的稳定性和不稳定性)
+    - [冒泡排序](#冒泡排序)
+    - [选择排序](#选择排序)
+    - [插入排序](#插入排序)
+    - [希尔排序](#希尔排序)
+    - [合并排序](#合并排序)
+    - [堆排序](#堆排序)
+    - [快速排序](#快速排序)
+    - [计数排序](#计数排序)
+    - [桶排序](#桶排序)
   - [interview](#interview)
 
 
@@ -4153,3 +4165,293 @@ _*小结*_
 如果我们需要查找的集合本身没有顺序，在频繁查找的同时也需要经常的插入和删除操作，显然我们需要构建一棵二叉排序树，但是不平衡的二叉排序树，查找效率是非常低的，因此我们需要在构建时，就让这棵二叉排序树是平衡二叉树，此时我们的查找时间复杂度就为 $O(log_n)$，而插入和删除也为 $O(log_n)$，这显然是比较理想的一种<font color = "red">动态查找表算法</font>
 
 
+<br/>
+
+<span id = "Sort"></span>
+
+### Sort
+
+---
+
+#### 十大排序算法性能一览
+<span id = "十大排序算法性能一览"></span>
+
+| SORT | AVG | WORST | BEST | SPACE | STABLE |
+| - | - | - | - | - | - |
+| bubble sort | $O(n^2)$ | $O(n^2)$ | $O(n)$ | $O(1)$ | YES |
+| insert sort | $O(n^2)$ | $O(n^2)$ | $O(n)$ | $O(1)$ | YES |
+| merge sort | $O(nlog_n)$ | $O(nlog_n)$ | $O(nlog_n)$ | $O(1)$ | YES |
+| counting sort | $O(n+k)$ | $O(n+k)$ | $O(n+k)$ | $O(n+k)$ | YES |
+| quick sort | $O(nlog_n)$ | $O(n^2)$ | $O(nlog_n)$ | $O(nlog_n)$ | NO |
+| heap sort | $O(nlog_n)$ | $O(nlog_n)$ | $O(nlog_n)$ | $O(1)$ | NO |
+| shell sort | $O(nlog_n)$ | $O(ns)$ | $O(n)$ | $O(1)$ | NO |
+| select sort | $O(n^2)$ | $O(n^2)$ | $O(n)$ | $O(1)$ | NO |
+
+<br/>
+
+#### 关于排序算法的稳定性和不稳定性
+<span id = "关于排序算法的稳定性和不稳定性"></span>
+
+_*算法稳定性的定义*_
+
+假定在待排序的记录序列中，存在多个具有相同的关键字的记录，若经过排序，这些记录的相对次序保持不变，即，原序列中 x = y，且 x 的下标在 y 之前，在排序后的序列中，x 仍在 y 之前，则称这种排序算法是稳定的; 否则称为不稳定的
+
+稳定也可以理解为一切皆在掌握中，元素的位置处在你在控制中; 而不稳定算法有时就有点碰运气，随机的成分，当两元素相等时它们的位置在排序后可能仍然相同，但也可能不同，这是是未可知的
+
+_*区分算法稳定性的意义*_
+
+1. 如果只是简单的进行数字的排序，那么稳定性将毫 <font color = "red">无意义</font>
+
+2. 如果排序的内容仅仅是一个复杂对象的某一个属性，那么稳定性依旧将毫 <font color = "red">无意义</font>
+
+3. 如果要排序的内容是一个复杂对象的多个属性，但是 <font color = "red">其原本的初始顺序毫无意义</font>，那么稳定性依旧将毫 <font color = "red">无意义</font>
+
+4. 如果要排序的内容是一个复杂对象的多个属性，且 <font color = "red">其原本的初始顺序存在意义，那么我们需要在二次排序的基础上保持原有排序的意义</font>，那么稳定性依旧将存在 <font color = "red">有意义</font>
+
+例如存在以下复杂对象信息，他们是已经按照产品的价格执行了升序排序: 
+
+| PRODUCT | PRICE | ORDER |
+| - | - | - |
+| A | $1 | 30 |
+| B | $2 | 20 |
+| C | $3 | 20 |
+| D | $4 | 10 |
+
+假设我们现在需要在这个已经排好序的复杂对象的基础上，再按照销量执行降序排序，那么如果执行的是非稳定性算法，那么就有可能得到以下的结果: 
+
+| PRODUCT | PRICE | ORDER |
+| - | - | - |
+| D | $4 | 10 |
+| C | $3 | 20 |
+| B | $2 | 20 |
+| A | $1 | 30 |
+
+可见，原本的 B 和 C 产品原来是按照价格升序排序的序列就被改变了，这就和我们的需求逆反了，所以针对这种情景才有非稳定性算法是不合理的，因为需求中所体现的真正结果为以下形态: 
+
+| PRODUCT | PRICE | ORDER |
+| - | - | - |
+| D | $4 | 10 |
+| B | $2 | 20 |
+| C | $3 | 20 |
+| A | $1 | 30 |
+
+<br/>
+
+#### 冒泡排序
+<span id = "冒泡排序"></span>
+
+```cpp
+void bubble_sort(void) {
+  for (int i = 0; i < arrary.size(); ++i) 
+    for (int j = 0; j < arrary.size() - i - 1; ++j)
+      if (arrary[j + 1] < arrary[j]) 
+        SWAP(arrary[j + 1], arrary[j]);
+}
+```
+
+<br/>
+
+#### 选择排序
+<span id = "选择排序"></span>
+
+```cpp
+void select_sort(void) {
+  for (int i = 0; i < arrary.size(); ++i) {
+    int min = i;
+    for (int j = i + 1; j < arrary.size(); ++j) 
+      if (arrary[j] < arrary[min]) 
+        min = j;
+
+    if (min != i) 
+      SWAP(arrary[min], arrary[i]);
+  }
+}
+```
+
+<br/>
+
+#### 插入排序
+<span id = "插入排序"></span>
+
+```cpp
+void insert_sort(void) {
+  for (int i = 1; i < arrary.size(); ++i) {
+    int pivot = arrary[i];
+    int j = i - 1;
+    for (; j >= 0 && arrary[j] > pivot; --j) 
+      arrary[j + 1] = arrary[j];
+    
+    arrary[j + 1] = pivot;
+  }
+}
+```
+
+<br/>
+
+#### 希尔排序
+<span id = "希尔排序"></span>
+
+```cpp
+void shell_sort(void) {
+  for (int inc = arrary.size() / 2; inc > 0; inc /= 2) 
+    for (int i = inc; i < arrary.size(); ++i) {
+      int pivot = arrary[i];
+      int j = i;
+      for (; j >= inc && arrary[j - inc] > pivot; j -= inc) 
+        arrary[j] = arrary[j - inc];      
+      arrary[j] = pivot;
+    }
+}
+```
+
+<br/>
+
+#### 合并排序
+<span id = "合并排序"></span>
+
+```cpp
+void merge_sort(int L, int M, int R) {
+  int left_size = M - L;
+  vector<int> left(left_size);
+  for (int i = L; i < M; ++i) left[i - L] = arrary[i];
+  
+  int right_size = R - M + 1;
+  vector<int> right(right_size);
+  for (int i = M; i <= R; ++i) right[i - M] = arrary[i];
+  
+  int i = 0, j = 0, k = L;
+  while (i < left_size && j < right_size) {
+    if (left[i] < right[j]) 
+      arrary[k++] = left[i++];
+    else 
+      arrary[k++] = right[j++];
+  }
+
+  while (i < left_size) arrary[k++] = left[i++];
+  while (j < right_size) arrary[k++] = right[j++];
+}
+void merge_split(int low_idx, int high_idx) {
+  if (low_idx == high_idx) {
+    return;
+  } else {
+    int mid = (low_idx + high_idx) / 2;
+    merge_split(low_idx, mid);
+    merge_split(mid + 1, high_idx);
+    merge_sort(low_idx, mid + 1, high_idx);
+  }
+}
+```
+
+<br/>
+
+#### 堆排序
+<span id = "堆排序"></span>
+
+```cpp
+void heapify(int last_idx, int cur_node_idx) {
+  int max = cur_node_idx;
+
+  int c_1 = cur_node_idx * 2 + 1;
+  if (c_1 <= last_idx && arrary[c_1] > arrary[max]) max = c_1;
+
+  int c_2 = cur_node_idx * 2 + 2;
+  if (c_2 <= last_idx && arrary[c_2] > arrary[max]) max = c_2; 
+
+  if (max != cur_node_idx) {
+    SWAP(arrary[max], arrary[cur_node_idx]);
+    heapify(last_idx, max);
+  }
+}
+void built_heap() {
+  int last_idx = arrary.size() - 1;
+  int parent = (last_idx - 1) / 2;
+
+  for (; parent >= 0; --parent) heapify(last_idx, parent);
+}
+void heap_sort() {
+  built_heap();
+
+  int last_idx = arrary.size() - 1;
+  for (; last_idx > 0; --last_idx) {
+    SWAP(arrary[0], arrary[last_idx]);
+    heapify(last_idx - 1, 0);
+  }
+}
+```
+
+<br/>
+
+#### 快速排序
+<span id = "快速排序"></span>
+
+```cpp
+void quick_sort(int left, int right) {
+  if (left > right) return;
+
+  int i = left, j = right, pivot = arrary[left];
+  while (i != j) {
+    while (i < j && arrary[j] >= pivot) --j;
+    while (i < j && arrary[i] <= pivot) ++i;
+
+    if (i < j) SWAP(arrary[i], arrary[j]);
+  }
+
+  int mid = i;
+  arrary[left] = arrary[mid];
+  arrary[mid] = pivot;
+
+  quick_sort(left, mid - 1);
+  quick_sort(mid + 1, right);
+}
+```
+
+<br/>
+
+#### 计数排序
+<span id = "计数排序"></span>
+
+```cpp
+void counting_sort() {
+  int max_val = arrary[0];
+  for (int i = 1; i < arrary.size(); ++i) 
+    if (arrary[i] > max_val)
+      max_val = arrary[i];
+  max_val += 1;
+
+  vector<int> counting_arr(max_val, 0);
+  vector<int> sorted_arr(arrary.size(), 0);
+
+  for (int i = 0; i < arrary.size(); ++i) counting_arr[arrary[i]] += 1;
+  for (int i = 1; i < max_val; ++i) counting_arr[i] += counting_arr[i - 1];
+
+  for (int i = 0; i < arrary.size(); ++i) {
+    counting_arr[arrary[i]] -= 1;
+    sorted_arr[counting_arr[arrary[i]]] = arrary[i];
+  }
+
+  arrary.swap(sorted_arr);
+}
+```
+
+<br/>
+
+#### 桶排序
+<span id = "桶排序"></span>
+
+```cpp
+void bucket_sort() {
+  int max_val = arrary[0];
+  for (int i = 1; i < arrary.size(); ++i) 
+    if (arrary[i] > max_val)
+      max_val = arrary[i];
+  max_val += 1;
+
+  vector<int> counting_arr(max_val, 0);
+  for (int i = 0; i < arrary.size(); ++i) counting_arr[arrary[i]] += 1;
+
+  int idx = 0;
+  for (int i = 0; i < max_val; ++i) 
+    for (int j = counting_arr[i]; j > 0; --j) 
+      arrary[idx++] = i;
+}
+```
