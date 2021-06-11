@@ -1707,6 +1707,7 @@ void travel_tree_by_level_order(binary_tree *root) {
     for (size_t i = 0; i < n; ++i) {
       auto node = queue.front();
       printf("%d ", node.data);
+      queue.pop();
 
       if (node.left != NULL) {
         queue.push(node);
