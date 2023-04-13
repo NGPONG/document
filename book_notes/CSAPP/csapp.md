@@ -417,7 +417,42 @@ $$
 
 <br/>
 
-### 布尔代数 (2.1.6)
+### C语言中的位运算 (2.1.6, 2.1.7, 2.1.8, 2.1.9)
 
 ---
 
+#### 1. 布尔代数于位级运算符
+
+<u><font color = "red">**二进制值是计算机编码、 存储和操作信息的核心**</font></u>，所以围绕数值 $0$ 和 $1$ 的研究已经演化出了丰富的数学知识体系。这起源于 1850 年前后*乔治·布尔* ( $George\ Boole,\ 1815—1864$ ) 的工作，因此也 称为*布尔代数*( $Boolean\ algebra$ )。布尔注意到通过将逻辑值 $TRUE$ 和 $FALSE$ 编码为二进制值 $1$ 和 $0$，能够设计出一种代数，以研究逻辑推理的基本原则
+
+布尔运算 $\sim$ 对应于逻辑运算 $NOT$，在命题逻辑中用符号 $\neg$ 表示。也就是说，当 $P$ 不是真的时候，我们就说 $\neg P$ 是真的，反之亦然；相应地，当 $P$ 等于 $0$ 时，$\sim P$ 等于 $1$，反之亦然
+
+布尔运算 $\&$ 对应于逻辑运算 $AND$，在命题逻辑中用符号 $\bigwedge$ 表示。当 $P$ 和 $Q$ 都为真时，我们说 $P \bigwedge Q$ 为真；相应地，只有当 $p = 1$ 且 $q = 1$ 时，$p\ \& \ q$ 才等于 $1$
+
+布尔运算 $\mid$ 对应于逻辑运算 $OR$，在命题逻辑中用符号 $\bigvee$ 表示。当 $P$ 或者 $Q$ 为真时，我们说 $P \bigvee Q$成立；相应地，当 $p = 1$ 或者 $q = 1$ 时，$p \mid q$ 等于 $1$
+
+布尔运算 $\wedge$ 对应于逻辑运算异或，在命题逻辑中用符号 $\bigoplus$ 表示。当 $P$ 或者 $Q$ 为真但不同时为真时，我们说 $P \bigoplus Q$ 成立；相应地，当 $p = 1$ 且 $q = 0$，或者 $p = 0$ 且 $q = 1$ 时，$p \wedge q$ 等于 $1$
+
+<br/>
+
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="https://raw.githubusercontent.com/NGPONG/Blog/master/img/2023-04-14-01-27-00.png">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">Operations of Boolean algebra.</div>
+</center>
+
+<br/>
+
+我们可以将上述 4 个布尔运算扩展到位向量的运算，位向量就是固定长度为 $w$ 且仅由 $0$
+和 $1$ 组成的串
+
+假设 $a$ 和 $b$ 分别表示位向量 $[a_{w-1},a_{w-2},\ldots,a_1,a_0]$ 和 $[b_{w-1},b_{w-2},\ldots,b_1,b_0]$。例如当我们需要计算 $a\ \& \ b$ 时，则再定义一个也定义为一个长度为 $w$ 的位向量，其中第 $i$ 个元素等于 $a_{i} \  \& \  b_{i}$，$0\ll i \ll w$；这种方式同样可以应用于运算 $\mid$、 $\wedge$ 和 $\sim$ 身上
+
+希伯来文(Hebrew) | 希腊文(Greek) | 英语(English)
+ :-: | :-: | :-:
+弥赛亚(Messiah) | 基督(Christ) | 受膏者(the anointed one)
