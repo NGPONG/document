@@ -1,2 +1,0 @@
-bool need_valc = 
-    icode in { IIRMOVQ, IRMMOVQ, IMRMOVQ, ICALL, IJXX }

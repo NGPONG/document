@@ -1,1 +1,0 @@
-bool mem_write = icode in { IMRMOVEQ, IPOPQ, IRET }
