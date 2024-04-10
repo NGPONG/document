@@ -8,6 +8,10 @@
 }
 </style>
 
+## 原文
+
+https://www.akkadia.org/drepper/dsohowto.pdf
+
 ## Abstract
 
 Today, shared libraries are ubiquitous. Developers use them for multiple reasons and create them just as they would create application code. This is a problem, though, since on many platforms some additional techniques must be applied even to generate decent code. Even more knowledge is needed to generate optimized code. This paper introduces the required rules and techniques. In addition, it introduces the concept of ABI (Application Binary Interface) stability and shows how to manage it.
@@ -18,7 +22,7 @@ Today, shared libraries are ubiquitous. Developers use them for multiple reasons
 
 For a long time, programmers collected commonly used code in libraries so that code could be reused. This saves development time and reduces errors since reused code only has to be debugged once. With systems running dozens or hundreds of processes at the same time, reuse of the code at link-time solves only part of the problem. Many processes will use the same pieces of code which they import from libraries. With the memory management systems in modern operating systems, it is also possible to share the code at run-time. This is done by loading the code into physical memory only once and reusing it in multiple processes via virtual memory. Libraries of this kind are called shared libraries.
 
-长期以来，程序员们将常用的代码收集在库中，以便代码可以被重用。这节省了开发时间，并且由于重用的代码只需调试一次，因此减少了错误。在同时运行数十个或数百个进程的系统中，链接时的代码重用只解决了部分问题。许多进程将使用它们从库中导入的相同的代码片段。在现代操作系统的内存管理系统中，也可以在运行时共享代码。这是通过将代码仅加载一次到物理内存中，并通过虚拟内存在多个进程中重用它来完成的。这种类型的库被称为共享库。
+长期以来，程序员将常用代码收集到程序库中，以便重复使用。这样既节省了开发时间，又减少了错误，因为重复使用的代码只需调试一次。在系统同时运行数十或数百个进程的情况下，在链接时重复使用代码只能解决部分问题。许多进程会使用从库中导入的相同代码片段。借助现代操作系统中的内存管理系统，也可以在运行时共享代码。具体做法是只将代码加载到物理内存一次，然后通过虚拟内存在多个进程中重复使用。这种库被称为共享库。
 
 The concept is not very new. Operating system designers implemented extensions to their system using the infrastructure they used before. The extension to the OS could be done transparently for the user. But the parts the user directly has to deal with initially created problems.
 
@@ -30,9 +34,9 @@ The main aspect is the binary format. This is the format which is used to descri
 
 ### 1.1 A Little Bit of History
 
-The binary format used initially for Linux was an a.out variant. When introducing shared libraries certain design decisions had to be made to work in the limitations of a.out. The main accepted limitation was that no relocations are performed at the time of loading and afterward. The shared libraries have to exist in the form they are used at run-time on disk. This imposes a major restriction on the way shared libraries are built and used: every shared library must have a fixed load address; otherwise, it would not be possible to generate shared libraries which do not have to be relocated.
+The binary format used initially for Linux was an a.out variant. When introducing shared libraries certain design decisions had to be made to work in the limitations of a.out. The main accepted limitation was that no ***relocations*** are performed at the time of loading and afterward. The shared libraries have to exist in the form they are used at run-time on disk. This imposes a major restriction on the way shared libraries are built and used: every shared library must have a fixed load address; otherwise, it would not be possible to generate shared libraries which do not have to be relocated.
 
-Linux最初使用的二进制格式是a.out的一个变种。在引入共享库时，必须在a.out的限制条件下做出一些设计决策。主要接受的限制是，在加载和加载后不进行重定位。也就是说，共享库在磁盘上的存储形式必须与它在运行时被加载到内存中的形式完全一致(内存布局)。这对共享库的构建和使用方式施加了重大限制：每个共享库都必须有一个固定的加载地址；换句话说，如果没有这些固定的加载地址，就无法创建不需要在运行时进行地址重定位的共享库。
+Linux最初使用的二进制格式是a.out的一个变种。在引入共享库时，必须在a.out的限制条件下做出一些设计决策。主要接受的限制是，在加载和加载后不进行***重定位***。也就是说，共享库在磁盘上的存储形式必须与它在运行时被加载到内存中的形式完全一致(内存布局)。这对共享库的构建和使用方式施加了重大限制：每个共享库都必须有一个固定的加载地址；换句话说，如果没有这些固定的加载地址，就无法创建不需要在运行时进行地址重定位的共享库。
 
 The fixed load addresses had to be assigned and this has to happen without overlaps and conflicts and with some future safety by allowing growth of the shared library. It is therefore necessary to have a central authority for the assignment of address ranges which in itself is a major problem. But it gets worse: given a Linux system of today with many hundred of DSOs (Dynamic Shared Objects) the address space and the virtual memory available to the application gets severely fragmented. This would limit the size of memory blocks which can be dynamically allocated which would create unsurmountable problems for some applications. It would even have happened by today that the assignment authority ran out of address ranges to assign, at least on 32-bit machines.
 
@@ -40,7 +44,7 @@ The fixed load addresses had to be assigned and this has to happen without overl
 
 We still have not covered all the drawbacks of the a.out shared libraries. Since the applications using shared libraries should not have to be relinked after changing a shared library it uses, the entry points, i.e., the function and variable addresses, must not change. This can only be guaranteed if the entry points are kept separate from the actual code since otherwise limits on the size of a function would be hard-coded. A table of function stubs which call the actual implementation was the solution used on Linux. The static linker got the address of each function stub from a special file (with the filename extension .sa). At run-time a file ending in .so.X.Y.Z was used and it had to correspond to the used .sa file. This in turn requires that an allocated entry in the stub table always had to be used for the same function. The allocation of the table had to be carefully taken care of. Introducing a new interface meant appending to the table. It was never possible to retire a table entry. To avoid using an old shared library with a program linked with a newer version, some record had to be kept in the application: the X and Y parts of the name of the .so.X.Y.Z suffix was recorded and the dynamic linker made sure minimum requirements were met.
 
-在a.out格式的共享库中，我们还没有讨论到所有的缺点。由于使用共享库的应用程序在更换它使用的共享库后不应该需要重新链接，因此，入口点（$Entry\ Point$），即函数和变量地址，不应该发生变化。这只能通过将入口点与实际代码分开来保证，否则函数的大小（指的是字节码的长度）限制将被硬编码。Linux上使用的解决方案是调用实际实现的函数存根表($Function\ Stub$)。静态链接器从一个特殊的文件（文件名扩展为 `.sa`）中获取每个函数存根的地址。在运行时，会使用以 `.so.X.Y.Z` 结尾的文件，它必须与使用的 .sa 文件对应。这反过来要求存根表中分配的条目必须始终用于相同的函数。表的分配必须谨慎处理。引入新接口意味着要追加到表中。永远不可能取消表项。为了避免使用旧的共享库来连接新版本的程序，应用程序中必须保留一些记录：.so.X.Y.Z 后缀名的X和Y部分被记录下来，动态链接器确保满足最低要求。
+在a.out格式的共享库中，我们还没有讨论到所有的缺点。由于使用共享库的应用程序在更换它使用的共享库后不应该需要重新链接，因此，入口点（Entry Point），即函数和变量地址，不应该发生变化。这只能通过将入口点与实际代码分开来保证，否则函数的大小（指的是字节码的长度）限制将被硬编码。Linux上使用的解决方案是调用实际实现的函数存根表($Function\ Stub$)。静态链接器从一个特殊的文件（文件名扩展为 `.sa`）中获取每个函数存根的地址。在运行时，会使用以 `.so.X.Y.Z` 结尾的文件，它必须与使用的 .sa 文件对应。这反过来要求存根表中分配的条目必须始终用于相同的函数。表的分配必须谨慎处理。引入新接口意味着要追加到表中。永远不可能取消表项。为了避免使用旧的共享库来连接新版本的程序，应用程序中必须保留一些记录：`.so.X.Y.Z` 后缀名的 $X$ 和 $Y$ 部分被记录下来，动态链接器确保满足最低要求。
 
 The benefits of the scheme are that the resulting program runs very fast. Calling a function in such shared libraries is very efficient even for the first call. It can be implemented with only two absolute jumps: the first from the user code to the stub, and the second from the stub to the actual code of the function. This is probably faster than any other shared library implementation, but its speed comes at too high a price: 
 
@@ -91,9 +95,9 @@ The handling of a statically linked application is very simple. Such an applicat
 
 处理静态链接的应用程序非常简单。这样的应用程序有一个内核已知的固定加载地址（虽然ASLR技术会在程序实际启动的时候再次被动态分配，但是地址也是固定的）（虽然是固定的地址，但是由于内核使用虚拟地址空间技术管理内存，所以也就不存在冲突的说法）。加载过程简单到只需要将二进制文件放置在新创建的进程的适当地址空间内，并将控制权转移给应用程序的入口点。其他所有事情都是在创建可执行文件时由静态链接器完成的。
 
-Dynamically linked binaries, in contrast, are not complete when they are loaded from disk. It is therefore not possible for the kernel to immediately transfer control to the application. Instead some other helper program, which obviously has to be complete, is loaded as well. This helper program is the dynamic linker. The task of the dynamic linker is it, to complete the dynamically linked application by loading the DSOs it needs (the dependencies) and to perform the relocations. Then finally control can be transferred to the program.
+Dynamically linked binaries, in contrast, are not complete when they are loaded from disk. It is therefore not possible for the kernel to immediately transfer control to the application. Instead some other helper program, which obviously has to be complete, is loaded as well. This helper program is the ***dynamic linker***. The task of the dynamic linker is it, to complete the dynamically linked application by loading the DSOs it needs (the dependencies) and to perform the relocations. Then finally control can be transferred to the program.
 
-与之相反，动态链接的二进制文件在从磁盘加载时是不完整的。因此，内核不能立即将控制权交给应用程序。相反，必须加载另一个已经是完整状态的助手程序。这个助手程序就是动态链接器。动态链接器的任务是，通过加载应用程序所需的DSO（即依赖关系）并执行重定位作业，来完成动态链接应用程序的构建。之后，控制权才最终可以交给程序。
+与之相反，动态链接的二进制文件在从磁盘加载时是不完整的。因此，内核不能立即将控制权交给应用程序。相反，必须加载另一个已经是完整状态（即它包含了执行所需任务所必须的全部功能和资源）的辅助程序。这个辅助程序就是***动态链接器***。动态链接器的任务是，通过加载（动态链接）应用程序所需的DSO（即依赖关系）并执行重定位作业，来完成动态链接应用程序的构建。之后，控制权才最终可以交给程序。
 
 This is not the last task for the dynamic linker in most cases, though. ELF allows the relocations associated with a symbol to be delayed until the symbol is needed. This lazy relocation scheme is optional, and optimizations discussed below for relocations performed at startup immediately affect the lazy relocations as well. So we ignore in the following everything after the startup is finished.
 
@@ -103,7 +107,9 @@ This is not the last task for the dynamic linker in most cases, though. ELF allo
 
 Starting execution of a program begins in the kernel, normally in the execve system call. The currently executed code is replaced with a new program. This means the address space content is replaced by the content of the file containing the program. This does not happen by simply mapping (using mmap) the content of the file. ELF files are structured and there are normally at least three different kinds of regions in the file:
 
-程序的执行起始于内核，通常是在 `execve` 系统调用中。当前执行的代码会被新程序替换。这意味着地址空间的内容被包含程序的文件内容所替换。这一替换并非仅通过映射（使用 `mmap`）文件的内容来实现。ELF文件是有结构的，并且通常至少有三种不同类型的区域：
+程序的执行起始于内核，通常是在 `execve` 系统调用中。当前执行的代码会被新程序替换。这意味着地址空间的内容被包含程序的文件内容所替换。这一替换并非仅通过映射（使用 `mmap`）文件的内容来实现。
+
+ELF文件是有结构的，并且通常至少有三种不同类型的区域：
 
 - Code which is executed; this region is normally not writable;
 
@@ -120,11 +126,11 @@ Starting execution of a program begins in the kernel, normally in the execve sys
 
 Modern operating systems and processors can protect memory regions to allow and disallow reading, writing, and executing separately for each page of memory. It is preferable to mark as many pages as possible not writable since this means that the pages can be shared between processes which use the same application or DSO the page is from. Write protection also helps to detect and prevent unintentional or malignant modifications of data or even code.
 
-现代操作系统和处理器可以保护内存区域，分别允许和禁止对每个内存页的读取、写入和执行。最好将尽可能多的页面标记为不可写，因为这意味着这些页面可以在使用同一应用程序或DSO的进程之间共享。写保护也有助于检测和防止数据甚至代码的无意或恶意修改。
+现代操作系统和处理器可以保护内存区域，允许或禁止对每个内存页的读取、写入和执行。最好将尽可能多的页面标记为不可写，因为这意味着这些页面可以在使用同一应用程序或DSO的进程之间共享。写保护也有助于检测和防止数据甚至代码的无意或恶意修改。
 
 For the kernel to find the different regions, or segments in ELF-speak, and their access permissions, the ELF file format defines a table which contains just this information, among other things. The ELF Program Header table, as it is called, must be present in every executable and DSO. It is represented by the C types Elf32_Phdr and Elf64_Phdr which are defined as can be seen in figure 1.
 
-为了让内核找到不同的区域（或在ELF中称为 $segments$）及其访问权限，ELF文件格式定义了一个包含这些信息（以及其他信息）的表。这个表被称为ELF程序头部表($ELF\ Program\ Header\ table$)，它必须存在于每个可执行文件和DSO中。它由C类型 `Elf32_Phdr` 和 `Elf64_Phdr` 表示，这些类型的定义如图1所示。
+为了让内核找到不同的区域（或在ELF中称为segments）及其访问权限，ELF文件格式定义了一个包含这些信息（以及其他信息）的表。这个表被称为ELF程序头部表(ELF Program Header table)，它必须存在于每个可执行文件和DSO中。它由C类型 `Elf32_Phdr` 和 `Elf64_Phdr` 表示，这些类型的定义如图1所示。
 
 <div class="center">
 
@@ -154,7 +160,7 @@ typedef struct {
 
 To locate the program header data structure another data structure is needed, the ELF Header. The ELF header is the only data structure which has a fixed place in the file, starting at offset zero. Its C data structure can be seen in figure 2. The e_phoff field specifies where, counting from the beginning of the file, the program header table starts. The e_phnum field contains the number of entries in the program header table and the e_phentsize field contains the size of each entry. This last value is useful only as a run-time consistency check for the binary.
 
-为了定位程序头部数据结构，需要另一个数据结构，即ELF头部（$ELF\ Header$）。ELF头部是文件中唯一固定位置的数据结构，从偏移量0开始。其C数据结构如图2所示。`e_phoff`字段指定了程序头部表从文件开始的位置，`e_phnum`字段包含程序头部表中的条目数，`e_phentsize`字段包含每个条目的大小。这最后一个值只在运行时用于二进制文件的一致性检查。
+为了定位（初始化）程序头部条目，我们需要另一个数据结构，即ELF头部（ELF Header）。ELF头部是文件中唯一固定位置的数据结构，即从文件首部偏移量 0 处开始。其 C 数据结构如图 2 所示。`e_phoff`字段指定了程序头部表从文件开始的位置，`e_phnum`字段包含程序头部表中的条目数，`e_phentsize`字段包含每个条目的大小。这最后一个值只在运行时用于二进制文件的一致性检查。
 
 <div class="center">
 
@@ -188,13 +194,13 @@ typedef struct {
 
 <br/>
 
-The different segments are represented by the program header entries with the PT LOAD value in the p_type field. The p_offset and p_filesz fields specify where in the file the segment starts and how long it is. The p_vaddr and p_memsz fields specify where the segment is located in the process’ virtual address space and how large the memory region is. The value of the p_vaddr field itself is not necessarily required to be the final load address. DSOs can be loaded at arbitrary addresses in the virtual address space. But the relative position of the segments is important. For pre-linked DSOs the actual value of the p_vaddr field is meaningful: it specifies the address for which the DSO was pre-linked. But even this does not mean the dynamic linker cannot ignore this information if necessary.
+The different segments are represented by the program header entries with the PT LOAD value in the p_type field. The p_offset and p_filesz fields specify where in the file the segment starts and how long it is. The p_vaddr and p_memsz fields specify where the segment is located in the process’ virtual address space and how large the memory region is. The value of the p_vaddr field itself is not necessarily required to be the final load address. DSOs can be loaded at arbitrary addresses in the virtual address space. But the relative position of the segments is important. For ***prelinked*** DSOs the actual value of the p_vaddr field is meaningful: it specifies the address for which the DSO was prelinked. But even this does not mean the dynamic linker cannot ignore this information if necessary.
 
-不同的段在程序头部条目中由 `PT_LOAD` 值在 `p_type` 字段中表示。 `p_offset` 和 `p_filesz` 字段指定段在文件中的起始位置以及其长度。`p_vaddr` 和 `p_memsz` 字段指定了段在进程虚拟地址空间中的位置和内存区域的大小。`p_vaddr` 字段的值不必然是最终加载地址。DSO可以在虚拟地址空间的任意地址被加载。但段之间的相对位置是重要的。对于预链接的DSO，`p_vaddr` 字段的实际值是有意义的：它指定了DSO被预链接的地址。但即便如此，如果有必要，动态链接器也可以忽略这些信息。
+不同的段在程序头部条目中由 `PT_LOAD` 值在 `p_type` 字段中表示。`p_offset` 和 `p_filesz` 字段指定段在文件中的起始位置以及其长度。`p_vaddr` 和 `p_memsz` 字段指定了段在进程虚拟地址空间中的位置和内存区域的大小。因为DSO可以在虚拟地址空间的任意地址被加载，所以我们不应视 `p_vaddr` 字段的值为最终加载的地址，但它能很好的指示段与段之间的相对位置，这同样是一个很重要的信息。对于 ***预链接*** 的DSO，`p_vaddr` 字段的实际值是有意义的：它指定了DSO被预链接的地址。然而即便如此，如果有必要动态链接器也可以忽略这些信息。
 
 The size in the file can be smaller than the address space it takes up in memory. The first `p_filesz` bytes of the memory region are initialized from the data of the segment in the file, the difference is initialized with zero. This can be used to handle BSS sections, sections for uninitialized variables which are according to the C standard initialized with zero. Handling uninitialized variables this way has the advantage that the file size can be reduced since no initialization value has to be stored, no data has to be copied from disc to memory, and the memory provided by the OS via the mmap interface is already initialized with zero.
 
-在ELF文件中定义的段（如代码段或数据段）在文件中占用的实际字节大小可能比它们在程序运行时占用的内存大小要小。对于这些段的内存区域，它们开始的 `p_filesz` 字节将会从文件中读取数据来初始化。如果内存区域的大小（`p_memsz`）大于文件中的大小（`p_filesz`），那么剩下的部分将会用零来填充。这种方式特别适用于处理BSS段（$Block\ Started\ by\ Symbol$），即那些在程序启动时需要被初始化为零的未初始化变量。通过这种方式，文件的大小可以被减少，因为不需要在文件中存储这些变量的初始零值；当程序加载到内存时，操作系统会保证这部分内存被零填充。这不仅减少了文件大小，还省去了将初始零值从磁盘复制到内存的过程，因为操作系统通过`mmap`接口提供的内存页默认就是零初始化的。
+在ELF文件中定义的段（如代码段或数据段）在文件中占用的实际字节大小可能比它们在程序运行时占用的内存大小要小。对于这些段的内存区域，它们开始的 `p_filesz` 字节将会从文件中读取数据来初始化。如果内存区域的大小（`p_memsz`）大于文件中的大小（`p_filesz`），那么剩下的部分将会用零来填充。这种方式特别适用于处理BSS段（Block Started by Symbol），即那些在程序启动时需要被初始化为零的未初始化变量。通过这种方式，文件的大小可以被减少，因为不需要在文件中存储这些变量的初始零值；当程序加载到内存时，操作系统会保证这部分内存被零填充。这不仅减少了文件大小，还省去了将初始零值从磁盘复制到内存的过程，因为操作系统通过`mmap`接口提供的内存页默认就是零初始化的。
 
 The p_flags finally tells the kernel what permissions to use for the memory pages. This field is a bitmap with the bits given in the following table being defined. The flags are directly mapped to the flags mmap understands.
 
@@ -213,15 +219,15 @@ The p_flags finally tells the kernel what permissions to use for the memory page
 
 After mapping all the PT LOAD segments using the appropriate permissions and the specified address, or after freely allocating an address for dynamic objects which have no fixed load address, the next phase can start. The virtual address space of the dynamically linked executable itself is set up. But the binary is not complete. The kernel has to get the dynamic linker to do the rest and for this the dynamic linker has to be loaded in the same way as the executable itself (i.e., look for the loadable segments in the program header). The difference is that the dynamic linker itself must be complete and should
 
-在使用适当的权限和指定的地址映射完所有`PT_LOAD`段之后，或者为没有固定加载地址的动态对象自由分配地址之后，下一个阶段才可以开始。动态链接的可执行文件自身的虚拟地址空间就此建立。但是，二进制文件还不完整。内核必须让动态链接器来完成剩下的工作，为此动态链接器必须以与可执行文件本身相同的方式被加载（即，在程序头中查找可加载的段）。不同之处在于动态链接器本身必须是完整的，并且应该能够自由重定位。
+在使用适当的权限和指定的地址映射完所有`PT_LOAD`段之后，或者为没有固定加载地址的动态对象自由分配地址之后，下一个阶段才可以开始。使用动态链接的可执行文件自身的虚拟地址空间就此建立。但是其二进制文件还不完整（此时依赖于外部共享库还未准备好）。内核必须让动态链接器来完成剩下的工作，为此动态链接器必须以与可执行文件本身相同的方式被加载（即，在程序头中查找可加载的段）。不同之处在于动态链接器本身必须是完整的，并且应该能够自由重定位。
 
 Which binary implements the dynamic linker is not hardcoded in the kernel. Instead, the program header of the application contains an entry with the tag PT_INTERP. The p_offset field of this entry contains the offset of a NUL-terminated string which specifies the file name of this file. The only requirement on the named file is that its load address does not conflict with the load address of any possible executable it might be used with. In general, this means that the dynamic linker has no fixed load address and can be loaded anywhere; this is just what dynamic binaries allow.
 
 可执行文件并不直接包含动态链接器（如 `ld-linux.so`）的路径。相反，ELF文件的程序头中有一个特殊的条目，标记为 `PT_INTERP`。这个条目指向一个字符串，这个条目的 `p_offset` 字段包含一个NUL终止字符串的偏移量，该字符串是动态链接器文件的路径。当内核准备运行一个动态链接的可执行文件时，它会查看这个 `PT_INTERP` 条目，找到动态链接器的路径，并将其加载到内存中。动态链接器的加载地址不是硬编码的，意味着它可以被加载到进程的虚拟地址空间中的任意位置，这为动态链接器提供了灵活性，并允许它处理来自不同可执行文件的不同需求。
 
-Once the dynamic linker has also been mapped into the memory of the to-be-started process we can start the dynamic linker. Note it is not the entry point of the application to which control is transferred to. Only the dynamic linker is ready to run. Instead of calling the dynamic linker right away, one more step is performed. The dynamic linker somehow has to be told where the application can be found and where control has to be transferred to once the application is complete. For this a structured way exists. The kernel puts an array of tag-value pairs on the stack of the new process. This auxiliary vector contains beside the two aforementioned values several more values which allow the dynamic linker to avoid several system calls. The elf.h header file defines a number of constants with a AT prefix. These are the tags for the entries in the auxiliary vector.
+Once the dynamic linker has also been mapped into the memory of the to-be-started process we can start the dynamic linker. Note it is not the entry point of the application to which control is transferred to. Only the dynamic linker is ready to run. Instead of calling the dynamic linker right away, one more step is performed. The dynamic linker somehow has to be told where the application can be found and where control has to be transferred to once the application is complete. For this a structured way exists. The kernel puts an array of tag-value pairs on the stack of the new process. This ***auxiliary vector*** contains beside the two aforementioned values several more values which allow the dynamic linker to avoid several system calls. The elf.h header file defines a number of constants with a AT prefix. These are the tags for the entries in the auxiliary vector.
 
-一旦动态链接器被映射到即将启动的进程的内存中，接下来就可以启动动态链接器了。需要注意的是，此时程序的控制权并不是直接转移到应用程序的主入口点。而是，只有动态链接器处于就绪状态，准备开始其工作。另外，在开始动态链接器的调用之前还需要执行一个步骤。需要以某种方式告诉动态链接器应用程序在哪里可以找到，以及一旦应用程序准备完毕后控制权需要转移到哪里。为此，存在一种结构化的方式。内核在新进程的堆栈上放置一个标签 `tag-value pairs`。这个辅助向量除了上述两个值外，还包含几个其他值，这些值允许动态链接器避免多次系统调用。`elf.h`头文件定义了一系列带有`AT`前缀的常量，这些是辅助向量中条目的标签。
+一旦动态链接器被映射到即将启动的进程的内存中，接下来就可以启动动态链接器了。需要注意的是，此时程序的控制权并不是直接转移到应用程序的主入口点。而是，只有动态链接器处于就绪状态，准备开始其工作。另外，在开始动态链接器的调用之前还需要执行一个步骤。需要以某种方式告诉动态链接器应用程序在哪里可以找到，以及一旦应用程序准备完毕后控制权需要转移到哪里。为此，存在一种结构化的方式。内核在新进程的堆栈上放置一个标签 `tag-value pairs`。这个 ***辅助向量*** 除了上述两个值外，还包含几个其他值，这些值允许动态链接器避免多次系统调用。`elf.h`头文件定义了一系列带有`AT`前缀的常量，这些是辅助向量中条目的标签。
 
 After setting up the auxiliary vector, the kernel is finally ready to transfer control to the dynamic linker in user mode. The entry point is defined in the e_entry field of the ELF header of the dynamic linker.
 
@@ -249,9 +255,9 @@ In the following we will discuss in more detail only the relocation handling. Fo
 
 接下来，我们将更详细地讨论重定位处理。对于其他两点，提高性能的方法很明确：减少依赖项的数量。每个参与的对象文件都会被精确地初始化一次，但需要进行某种形式的拓扑排序。随着依赖项数量的增加，识别和加载过程也会相应扩大；在大多数（可能所有？）实现中，这种扩大不是线性的。
 
-The relocation process is normally the most expensive part of the dynamic linker’s work. It is a process which is asymptotically at least $O(R + n * r)$ where R is the number of relative relocations, r is the number of named relocations, and n is the number of participating DSOs (plus the main executable). Deficiencies in the ELF hash table function and various ELF extensions modifying the symbol lookup functionality may well increase the factor to $O(R + r * n * \log_2 s)$ where s is the number of symbols. This should make clear that for improved performance it is significant to reduce the number if relocations and symbols as much as possible. After explaining the relocation process we will do some estimates for actual numbers.
+The relocation process is normally the most expensive part of the dynamic linker’s work. It is a process which is asymptotically at least $O(R + n×r)$ where R is the number of relative relocations, r is the number of named relocations, and n is the number of participating DSOs (plus the main executable). Deficiencies in the ELF hash table function and various ELF extensions modifying the symbol lookup functionality may well increase the factor to $O(R + r×n×\log_2 s)$ where s is the number of symbols. This should make clear that for improved performance it is significant to reduce the number if relocations and symbols as much as possible. After explaining the relocation process we will do some estimates for actual numbers.
 
-重定位过程通常是动态链接器工作中最为昂贵的部分。从理论上讲，这一过程的时间复杂度至少为 $O(R + n * r)$，其中 $R$ 是相对重定位的数量，$r$ 是命名重定位的数量，$n$ 是参与的DSO数量（加上主执行文件）。ELF哈希表函数的不足以及对符号查找功能的各种ELF扩展可能会将这一因子提高到 $O(R + r * n * \log_2 s)$，其中 $s$ 是符号的数量。所以我们明确的是，为了提高性能，尽可能减少重定位和符号的数量是很重要的。在解释了重定位过程之后，我们将对实际的数字进行一些估算。
+重定位过程通常是动态链接器工作中最为昂贵的部分。从理论上讲，这一过程的时间复杂度至少为 $O(R + n×r)$，其中 $R$ 是相对重定位的数量，$r$ 是命名重定位的数量，$n$ 是参与的DSO数量（加上主执行文件）。ELF哈希表函数的不足以及对符号查找功能的各种ELF扩展可能会将这一因子提高到 $O(R + r×n×\log_2 s)$，其中 $s$ 是符号的数量。所以我们明确的是，为了提高性能，尽可能减少重定位和符号的数量是很重要的。在解释了重定位过程之后，我们将对实际的数字进行一些估算。
 
 ### 1.5.1 The Relocation Process
 
@@ -282,13 +288,13 @@ The result of any relocation will be stored somewhere in the object with the ref
 
 ### 1.5.2 Symbol Relocations
 
-The dynamic linker has to perform a relocation for all symbols which are used at run-time and which are not known at link-time to be defined in the same object as the reference. Due to the way code is generated on some architectures, it is possible to delay the processing of some relocations until the references in question are actually used. This is on many architectures the case for calls to functions. All other kinds of relocations always have to be processed before the object can be used. We will ignore the lazy relocation processing since this is just a method to delay the work. It eventually has to be done and so we will include it in our cost analysis. To actually perform all the relocations before using the object is used by setting the environment variable LD_BIND_NOW to a non-empty value. Lazy relocation can be disabled for an individual object by adding the -z now option to the linker command line. The linker will set the DF_BIND_NOW flag in the DT_FLAGS entry of the dynamic section to mark the DSO. This setting cannot be undone without relinking the DSOs or editing the binary, though, so this option should only be used if it is really wanted.
+The dynamic linker has to perform a relocation for all symbols which are used at run-time and which are not known at link-time to be defined in the same object as the reference. Due to the way code is generated on some architectures, it is possible to delay the processing of some relocations until the references in question are actually used. This is on many architectures the case for calls to functions. All other kinds of relocations always have to be processed before the object can be used. We will ignore the ***lazy relocation processing*** since this is just a method to delay the work. It eventually has to be done and so we will include it in our cost analysis. To actually perform all the relocations before using the object is used by setting the environment variable LD_BIND_NOW to a non-empty value. Lazy relocation can be disabled for an individual object by adding the -z now option to the linker command line. The linker will set the DF_BIND_NOW flag in the DT_FLAGS entry of the dynamic section to mark the DSO. This setting cannot be undone without relinking the DSOs or editing the binary, though, so this option should only be used if it is really wanted.
 
-动态链接器必须对所有在运行时被使用、并且在链接时不确定是否在引用同一对象文件内定义的符号进行重定位。由于某些架构生成代码的方式，一些重定位的处理可以延迟到实际使用相关引用时再进行。对于许多架构来说，函数调用就是这种情况。除此之外，所有类型的重定位都必须在对象文件被使用之前完成处理。我们将不讨论延迟重定位处理，因为那只是延迟工作的一种方式。这项工作最终是必须完成的，因此我们会把它计入我们的成本分析中。通过将环境变量 `LD_BIND_NOW` 设置为非空值，可以确保在使用对象文件之前完成所有重定位。为了禁用个别对象文件的延迟重定位，可以在链接命令行中添加 `-z now` 选项。链接器会在动态段的 `DT_FLAGS` 条目中设置 `DF_BIND_NOW` 标志来标记该DSO。不过，除非重新链接DSO或编辑二进制文件，否则无法取消这一设置，因此这个选项应该只在真正需要时使用。
+动态链接器必须对运行时使用的所有符号进行重定位，由于某些架构生成代码的方式，一些重定位的处理可以延迟到实际使用相关引用时再进行。对于许多架构来说，函数调用就是这种情况。除此之外，所有类型的重定位都必须在对象文件被使用之前完成处理。我们将不讨论 ***延迟重定位处理***，因为那只是延迟工作的一种方式。这项工作最终是必须完成的，因此我们会把它计入我们的成本分析中。通过将环境变量 `LD_BIND_NOW` 设置为非空值，可以确保在使用对象文件之前完成所有重定位。为了禁用个别对象文件的延迟重定位，可以在链接命令行中添加 `-z now` 选项。链接器会在动态段的 `DT_FLAGS` 条目中设置 `DF_BIND_NOW` 标志来标记该DSO。不过，除非重新链接DSO或编辑二进制文件，否则无法取消这一设置，因此这个选项应该只在真正需要时使用。
 
-The actual lookup process is repeated from start for each symbol relocation in each loaded object. Note that there can be many references to the same symbol in different objects. The result of the lookup can be different for each of the objects so there can be no short cuts except for caching results for a symbol in each object in case more than one relocation references the same symbol. The lookup scope mentioned in the steps below is an ordered list of a subset of the loaded objects which can be different for each object itself. The way the scope is computed is quite complex and not really relevant here so we refer the interested reader to the ELF specification and section 1.5.4. Important is that the length of the scope is normally directly dependent on the number of loaded objects. This is another factor where reducing the number of loaded objects is increasing performance.
+The actual lookup process is repeated from start for each symbol relocation in each loaded object. Note that there can be many references to the same symbol in different objects. The result of the lookup can be different for each of the objects so there can be no short cuts except for caching results for a symbol in each object in case more than one relocation references the same symbol. The ***lookup scope*** mentioned in the steps below is an ordered list of a subset of the loaded objects which can be different for each object itself. The way the scope is computed is quite complex and not really relevant here so we refer the interested reader to the ELF specification and section 1.5.4. Important is that the length of the scope is normally directly dependent on the number of loaded objects. This is another factor where reducing the number of loaded objects is increasing performance.
 
-实际的符号查找过程对于每个加载的对象中的每次符号重定位都需要重复进行。注意，由于不同对象可能引用相同的符号，而且每个对象对于同一符号的解析结果可能不同，导致动态链接器必须分别对每个引用进行处理，不能简单地跳过或假定它们是相同的。因此，除了对每个对象中相同符号的多次重定位结果进行缓存以外，没有捷径。查找范围是一个有序的、包含了一部分已加载对象的子集的列表，这个列表对每个对象自身可能不同。这个范围的计算方式相当复杂，这里不做深入讨论，有兴趣的读者可以参考ELF规范和1.5.4节。重要的是，查找范围的长度通常直接依赖于已加载对象的数量。这意味着，减少已加载对象的数量是提高性能的一个途径（减少程序运行时需要加载和处理的动态共享对象（DSO）或库的数量）。
+实际的符号查找过程对于每个加载的对象中的每次符号重定位都需要重复进行。注意，由于不同对象可能引用相同的符号，而且每个对象对于同一符号的解析结果可能不同，导致动态链接器必须分别对每个引用进行处理，不能简单地跳过或假定它们是相同的。因此，除了对每个对象中相同符号的多次重定位结果进行缓存以外，没有捷径。下面步骤中提到的 ***查找范围*** 是一个有序的、包含了一部分已加载对象的子集的列表，这个列表对每个对象自身可能不同。这个范围的计算方式相当复杂，这里不做深入讨论，有兴趣的读者可以参考ELF规范和1.5.4节。重要的是，查找范围的长度通常直接依赖于已加载对象的数量。这意味着，减少已加载对象的数量是提高性能的一个途径（减少程序运行时需要加载和处理的动态共享对象（DSO）或库的数量）。
 
 There are today two different methods for the lookup process for a symbol. The traditional ELF method proceeds in the following steps:
 
@@ -332,6 +338,33 @@ There are today two different methods for the lookup process for a symbol. The t
 
    如果查找范围中没有更多对象，则查找失败。
 
+Note that there is no problem if the scope contains more than one definition of the same symbol. The symbol lookup algorithm simply picks up the first definition it finds. Note that a definition in a DSO being ***weak*** has no effects. Weak definitions only play a role in static linking. Having multiple definitions has some perhaps surprising consequences. Assume DSO ‘A’ defines and references an interface and DSO ‘B’ defines the same interface. If now ‘B’ precedes ‘A’ in the scope, the reference in ‘A’ will be satisfied by the definition in ‘B’. It is said that the definition in ‘B’ interposes the definition in ‘A’. This concept is very powerful since it allows more specialized implementation of an interface to be used without replacing the general code. One example for this mechanism is the use of the LD_PRELOAD functionality of the dynamic linker where additional DSOs which were not present at link-time are introduced at run-time. But interposition can also lead to severe problems in ill-designed code. More in this in section 1.5.4.
+
+请注意，在动态链接中，如果查找范围内包含了同一个符号的多个定义，这实际上并不会引发问题，符号查找算法会简单地选择它找到的第一个定义。值得注意的是，在DSO中被标记为 ***弱*** 的定义不会产生任何效果。[弱定义](https://en.wikipedia.org/wiki/Weak_symbol)只在静态链接过程中起作用。拥有多个定义可能会带来一些可能令人意外的后果。比如，如果 DSO 'A' 定义并引用了一个接口，而DSO 'B' 也定义了同一个接口。如果现在 'B' 在范围中位于 'A' 之前，那么 'A' 中的引用将会被 'B' 中的定义满足。这种情况被称为 'B' 对 'A' 的定义进行了插入和替换（interpose）。这个概念非常有力，因为它允许在无需进行代码更换的前提条件下使用更特定化的接口实现来替代通用代码。一个应用此机制的例子是动态链接器的 LD_PRELOAD 功能，它允许在运行时引入在链接时不存在的额外 DSO。但是，这种插入机制也可能在设计不良的代码中导致严重问题。更多相关内容将在1.5.4节中讨论。
+
+Looking at the algorithm it can be seen that the performance of each lookup depends, among other factors, on the length of the hash chains and the number of objects in the lookup scope. These are the two loops described above. The lengths of the hash chains depend on the number of symbols and the choice of the hash table size. Since the hash function used in the initial step of the algorithm must never change these are the only two remaining variables. Many linkers do not put special emphasis on selecting an appropriate table size. The GNU linker tries to optimize the hash table size for minimal lengths of the chains if it gets passed the -O option (note: the linker, not the compiler, needs to get this option).
+
+通过分析算法，我们可以看出查找的性能除了其他因素外主要取决于哈希链的长度和查找范围内的对象数量，这也正是之前描述的两个循环过程。而哈希链的长度又受到符号数量和哈希表尺寸选择的影响，由于算法初始步骤中使用的哈希函数必须保持不变，因此这两个变量就成了关键性的因素。很多链接器没有特别重视选择适当的哈希表尺寸。（为哈希表太长的话会导致内存浪费，太小的话会导致哈希冲突的概率上升，所以必须要取得一个平衡）GNU 链接器尝试通过使用 `-O` 选项（注意，这是链接器而非编译器的选项）来优化哈希表的大小，以选择一个合适的链条长度。
+
+> A note on the current implementation of the hash table optimization. The GNU binutils linker has a simple minded heuristic which often favors small table sizes over short chain length. For large projects this might very well increase the startup costs. The overall memory consumption will be sometimes significantly reduced which might compensate sooner or later but it is still advised to check the effectiveness of the optimization. A new linker implementation is going to be developed and it contains a better algorithm.
+>
+> 关于哈希表优化当前实现的注记：GNU binutils 链接器采用了一种简单的启发式方法，这种方法经常偏向于小表格尺寸而不是链的短长度。对于大型项目，这可能实际上会增加启动成本。整体内存消耗有时会显著减少，这可能迟早得到补偿，但仍然建议检查优化的有效性。正在开发一个新的链接器实现，它包含了一个更好的算法。
+
+To measure the effectiveness of the hashing two numbers are important:
+
+要衡量哈希算法效率的有效性，有两个指标非常重要：
+
+- The average chain length for a successful lookup.
+
+    成功查找的平均链长度：这个指标衡量的是，在哈希表中成功找到目标时，平均需要遍历的哈希链的长度。较短的平均成功查找链长度通常意味着哈希表的性能较好，因为它表明大多数查找操作都能快速定位到目标元素。
+
+- The average chain length for an unsuccessful lookup.
+
+    失败查找的平均链长度：这个指标衡量的是，当哈希表中没有找到目标元素时，平均需要遍历的哈希链的长度。这个指标同样重要，因为在实际应用中，查找操作不总是成功的，一个高效的哈希表应该在查找失败时也尽可能减少查找路径的长度。
+
+It might be surprising to talk about unsuccessful lookups here but in fact they are the rule. Note that “unsuccessful” means only unsuccessful in the current objects. Only for objects which implement almost everything they get looked in for is the successful lookup number more important. In this category there are basically only two objects on a Linux system: the C library and the dynamic linker itself.
+
+这里提到查找失败的情况可能会让人感到意外。但事实在哈希表的使用中，查找失败并不罕见。这里的 "失败" 仅仅指的是在当前考察的对象中没有找到目标元素。需要特别注意的是，成功查找的频率只在那些实现了它们几乎所有查询需求的对象中（能够提供大多数或所有被查询符号的对象）才显得特别重要。在 Linux 系统中，能够满足这一条件的基本上只有两种对象：C标准库（libc）和动态链接器本身。
 
 <div class="center">
 
@@ -384,3 +417,263 @@ Histogram for bucket list length in section [ 2] ’.hash’ (total of 191 bucke
     color: #999;
     padding: 2px;">Figure 4: Example Output for eu-readelf -I libnss files.so</div>
 </center>
+
+<br/>
+
+Some versions of the readelf program compute the value directly and the output is similar to figures 3 and 4. The data in these examples shows us a number of things. Based on the number of symbols (2027 versus 106) the chosen table size is radically different. For the smaller table the linker can afford to "waste" $53.9\%$ of the hash table entries which contain no data. That’s only 412 bytes on a gABI-compliant system. If the same amount of overhead would be allowed for the libc.so binary the table would be 4 kilobytes or more larger. That is a big difference. The linker has a fixed cost function integrated which takes the table size into account.
+
+一些readelf程序的版本能够直接给出计算结果，这些结果与图3和图4展示的类似。这些数据揭示了基于符号数量差异选择的哈希表大小如何影响性能。例如，当符号数量较少时，链接器可以容忍较高比例的哈希表项为空，而对于符号数量较多的情况，需要更大的哈希表来减少冲突，从而影响内存使用。
+
+The increased relative table size means we have significantly shorter hash chains. This is especially true for the average chain length for an unsuccessful lookup. The average for the small table is only 28% of that of the large table.
+
+相对较大的哈希表尺寸意味着我们能拥有显著更短的哈希链。这对于失败查找的平均链长度尤其明显。小表的平均长度仅为大表的28%。
+
+What these numbers should show is the effect of reducing the number of symbols in the dynamic symbol table. With significantly fewer symbols the linker has a much better chance to counter the effects of the suboptimal hashing function.
+
+这些指标应该展示的是减少动态符号表中符号数量的效果。显著减少符号数量，链接器有更好的机会抵消次优哈希函数的影响。
+
+Another factor in the cost of the lookup algorithm is connected with the strings themselves. Simple string comparison is used on the symbol names which are stored in a string table associated with the symbol table data structures. Strings are stored in the C-format; they are terminated by a NUL byte and no initial length field is used. This means string comparisons has to proceed until a non-matching character is found or until the end of the string. This approach is susceptible to long strings with common prefixes. Unfortunately, this is not uncommon.
+
+查找算法成本的另一个因素与字符串本身有关。符号名称存储在与符号表数据结构相关联的字符串表中，并使用简单的字符串比较方法。字符串以C语言格式存储，以NUL字节结束，不使用初始长度字段。这意味着字符串比较必须继续进行，直到找到不匹配的字符或字符串结束。这种方法容易受到具有共同前缀的长字符串的影响，不幸的是，这种情况并不少见。（长字符串或具有共同前缀的字符串会使这一过程变得复杂，因为比较可能需要进行到字符串的末尾。）
+
+<div class="center">
+
+```c
+namespace some_namespace {
+  class some_longer_class_name {
+    int member_variable;
+  public:
+    some_longer_class_name (int p);
+    int the_getter_function (void);
+  };
+}
+```
+
+</div>
+
+The name mangling scheme used by the GNU C++ compiler before version 3.0 used a mangling scheme which put the name of a class member first along with a description of the parameter list and following it the other parts of the name such as namespaces and nested class names. The result is a name which distinguishable in the beginning if the member names are different. For the example above the mangled names for the two members functions look like this figure 5.
+
+在 3.0 版之前，GNU C++ 编译器使用的名称混淆（mangling）方案是将类成员的名称与参数列表的描述放在一起，然后将名称的其他部分（如名称空间和嵌套类名称）放在一起。这样，如果成员名称不同，名称一开始就能区分开来。在上例中，两个成员函数的混合名称如图 5 所示。
+
+<div class="center">
+
+```
+__Q214some_namespace22some_longer_class_namei
+the_getter_function__Q214some_namespace22some_longer_class_name
+```
+
+</div>
+
+<center>
+<div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">Figure 5: Mangled names using pre-gcc 3 scheme</div>
+</center>
+
+<br/>
+
+In the new mangling scheme used in today's gcc versions and all other compilers which are compatible with the common C++ ABI, the names start with the namespaces and class names and end with the member names. Figure 6 shows the result for the little example. The mangled names for the two member functions differs only after the 43rd character. This is really bad performance-wise if the two symbols should fall into the same hash bucket.
+
+然而，在今天的GCC版本和所有兼容通用 C++ ABI 的编译器中采用的新代码混淆方案中，名称是以命名空间和类名开始，以成员名结束。图6展示了一个简单示例的结果。这意味着，如果两个成员函数的混淆名称落入同一个哈希桶中，直到第 43 个字符之后它们才开始有所不同。这在性能上是非常不利的，因为相似的长字符串会导致哈希冲突和查找效率降低。
+
+<div class="center">
+
+```
+_ZN14some_namespace22some_longer_class_nameC1Ei
+_ZN14some_namespace22some_longer_class_name19the_getter_functionEv
+```
+
+</div>
+
+<center>
+<div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;
+    padding: 2px;">Figure 6: Mangled names using the common C++ ABI scheme</div>
+</center>
+
+<br/>
+
+Ada has similar problems. The standard Ada library for gcc has all symbols prefixed with "ada_", then the package and sub-package names, followed by the function name. Figure 7 shows a short excerpt of the list of symbols from the library. The first 23 characters are the same for all the names.
+
+Ada语言同样面临着代码混淆的问题。GCC的标准Ada库将所有符号都以 `ada_` 为前缀，然后是包和子包的名称，最后是函数名。这导致大量符号在前缀部分完全相同，增加了查找时的比较负担。
+
+The length of the strings in both mangling schemes is worrisome since each string has to be compared completely when the symbol itself is searched for. The names in the example are not extraordinarily long either. Looking through the standard C++ library one can find many names longer than 120 characters and even this is not the longest. Other system libraries feature names longer than 200 characters and complicated, “well designed” C++ projects with many namespaces, templates, and nested classes can feature names with more than 1,000 characters. One plus point for design, but minus 100 points for performance.
+
+这两种混淆方案中，字符串的长度尤其令人关注，因为在查找符号时，必须对每个字符串进行完整的比较。这不仅增加了查找的复杂度，也影响了性能。在标准C++库中，不难找到名称超过120个字符的例子，而且这还不是极限。一些复杂的、设计良好的C++项目可能包含超过1000个字符的名称，这虽然在设计上是一个加分点，但在性能上却大大减分。
+
+With the understanding of the hashing function and the specifics of string lookup, let's examine a real-world example: OpenOffice.org. The package comprises 144 separate Dynamic Shared Objects (DSOs). During startup, approximately 20,000 relocations are executed. Many relocations result from `dlopen` calls and hence cannot be optimized through prelinking. The number of string comparisons required during symbol resolution serves as a reasonable measure of the startup overhead. We will now calculate an approximation of this value.
+
+了解哈希函数和字符串查找的细节后，让我们来看一个实际例子：[OpenOffice.org](https://www.openoffice.org/)。这个软件包包含144个独立的动态共享对象（DSO）。在启动过程中，大约有 $20,000$ 次重定位操作被执行。许多重定位操作是由 `dlopen` 调用引起的，因此无法通过使用 prelink 来优化。在符号解析期间所需进行的字符串比较次数可以作为评估启动开销的一个合理标准。我们现在将对这个数值进行估算。
+
+The average chain length for an unsuccessful lookup across all DSOs of the OpenOffice.org 1.0 release on IA-32 is 1.1931. This implies that for each symbol lookup, the dynamic linker must perform an average of 72 × 1.1931 = 85.9032 string comparisons. For 20,000 symbols, this totals 1,718,064 string comparisons. The average length of an exported symbol defined in the DSOs of OpenOffice.org is 54.13 characters. Assuming that only 20% of the string is searched before a mismatch is found (which is optimistic since every symbol name is compared in full at least once to match itself), this equates to more than 18.5 million characters needing to be loaded from memory and compared. It's no surprise that startup is slow, especially since other costs have been disregarded.
+
+在所有 OpenOffice.org 1.0 版本的DSO中，失败查找的平均链长度为 $1.1931$。这意味着，对于每次符号查找，动态链接器平均需要执行 $72 × 1.1931 = 85.9032$ 次字符串比较。对于 $20,000$ 个符号，总共需要进行 $1,718,064$ 次字符串比较。在 OpenOffice.org 的DSO中定义的导出符号的平均长度为 $54.13$。即使我们假设在找到不匹配之前只搜索了前 $20\%$ 的字符串（这是一个乐观的猜测，因为每个符号名称至少被完整比较一次以匹配自身），这也意味着需要从内存中加载并比较超过 $18500000$ 个字符。难怪启动如此缓慢，特别是因为我们忽略了其他成本。
+
+To calculate the number of lookups the dynamic linker performs, one can enlist the help of the dynamic linker itself. If the environment variable `LD_DEBUG` is set to `symbols`, one simply counts the number of lines starting with `symbol=`. It's advisable to redirect the dynamic linker’s output to a file with `LD_DEBUG_OUTPUT`. The number of string comparisons can then be estimated by multiplying the count by the average hash chain length. Since the collected output includes the name of the file being examined, it would even be possible to obtain more accurate results by using the exact hash chain length for the object.
+
+要计算动态链接器执行的查找次数，可以借助动态链接器本身。如果环境变量 `LD_DEBUG` 设置为 `symbols`后则只用计算以 `symbol=` 开头的行数。建议使用 `LD_DEBUG_OUTPUT` 环境变量以将动态链接器的输出重定向到一个文件。然后就可以通过将这个计数乘以平均哈希链长度来估计字符串比较的次数。由于收集到的输出包含了正被查看的文件的名称，甚至可以通过乘以对象的确切哈希链长度来获得更准确的结果。
+
+Altering any of the factors—'number of exported symbols', 'length of the symbol strings', 'number and length of common prefixes', 'number of DSOs', and 'hash table size optimization'—can dramatically reduce costs. Generally, the percentage of time the dynamic linker spends on relocations during startup is around 50-70% if the binary is already in the file system cache, and about 20-30% if the file has to be loaded from disk. Therefore, it's worthwhile to focus on these issues, and the remainder of the text will introduce methods to address them. Remember to pass `-O1` to the linker to generate the final product.
+
+改变 "导出符号的数量"、"符号字符串的长度"、"常见前缀的数量和长度"、"DSO的数量" 和 "哈希表大小优化" 中的任何一个因素都可以显著降低成本。一般来说，如果二进制文件已经在文件系统缓存中，动态链接器在启动过程中花费在重定位上的时间大约是 $50-70\%$，如果文件需要从磁盘加载，则大约是 $20-30%$。因此，值得在这些问题上花时间，在文本的剩余部分，我们将介绍如何做到这一点，直至目前需要记住的是：向链接器传递 `-O1` 以生成最终产品。
+
+### 1.5.3 The GNU-style Hash Table
+
+All the optimizations proposed in the previous section still leave symbol lookup as a significant factor. A lot of data has to be examined and loading all this data in the CPU cache is expensive. As mentioned above, the original ELF hash table handling has no more flexibility so any solution would have to replace it. This is what the GNU-style hash table handling does. It can peacefully coexist with the old-style hash table handling by having its own dynamic section entry (`DT_GNU_HASH`). Updated dynamic linkers will use the new hash table instead of the old, therefore provided completely transparent backward compatibility support. The new hash table implementation, like the old, is self-contained in each executable and DSO so it is no problem to have binaries with the new and some with only the old format in the same process.
+
+上一节中提出的所有优化方案仍将符号查找作为一个重要因素。需要检查大量数据，而将所有这些数据加载到 CPU 缓存中的成本很高。如上所述，原始的（早期版本的ELF标准） ELF 哈希表处理没有更多的灵活性，因此任何解决方案都指示我们必须取代它。这就是 GNU 风格哈希表处理的作用。通过拥有自己的动态部分条目（`DT_GNU_HASH`），它可以与旧式哈希表处理方式和平共处。更新后的动态链接器将使用新的哈希表取代旧的哈希表，从而提供完全透明的向后兼容性支持。与旧版哈希表一样，新版哈希表的实现也自包含在每个可执行文件和 DSO 中，因此在同一进程中，有的二进制文件使用新版哈希表，有的只使用旧版哈希表，这都不成问题。
+
+The main cost for the lookup, especially for certain binaries, is the comparison of the symbol names. If the number of comparisons which actually have to be performed can be reduced we can gain big. A second possible optimization is the layout of the data. The old-style hash table with its linked list of symbol table entries is not necessarily good to the CPU cache. CPU caches work particularly well when the used memory locations are consecutive. A linked list can jump wildly around and render CPU cache loading and prefetching less effective.
+
+特别是对于某些二进制文件而言，查找的主要成本是符号名称的比较。如果能减少实际需要进行的比较次数，我们就能获得很大的收益。另第二个可能的优化是数据布局，带有符号表条目链表的旧式哈希表并不一定对CPU缓存友好。当使用的内存位置连续时，CPU缓存工作得特别好。链表可能会在内存中随意跳跃，使CPU缓存加载和预取效果变得不那么有效。
+
+The GNU-style hash tables set out to solve these problem and more. Since compatibility with existing runtime environments could be maintained by providing the old-style hash tables in parallel no restrictions of the changes were needed. The new lookup process is therefore slightly different:
+
+GNU 风格哈希表旨在解决这些以及其他更多问题。由于可以通过并行提供旧式哈希表来保持与现有运行环境的兼容性，因此不需要对修改进行限制。因此，新的查找过程略有不同：
+
+1. Determine the hash value for the symbol name.
+
+    确定符号名称的哈希值。
+
+2. In the first/next object in the lookup scope:
+
+    在查找范围内的第一个/下一个对象中：
+
+   2.a The hash value is used to determine whether an entry with the given hash value is present at all. This is done with a 2-bit Bloom filter. If the filter indicates there is no such definition the next object in the lookup scope is searched.
+
+    使用哈希值来确定是否根本存在具有给定哈希值的条目。这是通过2位布隆过滤器完成的。如果过滤器指示没有这样的定义，则搜索查找范围内的下一个对象。
+
+
+   2.b Determine the hash bucket for the symbol using the hash value and the hash table size in the object. The value is a symbol index.
+
+    使用哈希值和对象中的哈希表大小确定符号的哈希桶。该值是一个符号索引。
+
+   2.c Get the entry from the chain array corresponding to the symbol index. Compare the value with the hash value of the symbol we are trying to locate. Ignore bit 0.
+
+    从与符号索引对应的链数组中获取条目。将该值与我们试图定位的符号的哈希值进行比较。忽略第0位。
+
+   2.d If the hash value matches, get the name offset of the symbol and using it as the NUL-terminated name.
+
+    如果哈希值匹配，获取符号的名称偏移，并将其用作NUL终止的名称。
+
+   2.e Compare the symbol name with the relocation name.
+
+    将符号名称与重定位名称进行比较。
+
+   2.f If the names match, compare the version names as well. This only has to happen if both, the reference and the definition, are versioned. It requires a string comparison, too. If the version name matches or no such comparison is performed, we found the definition we are looking for.
+
+    如果名称匹配，也比较版本名称。只有在引用和定义都有版本时，才需要进行此操作。这也需要进行字符串比较。如果版本名称匹配或未执行此类比较，我们就找到了我们正在寻找的定义。
+
+   2.g If the definition does not match and the value loaded from the hash bucket does not have bit 0 set, continue with the next entry in the hash bucket array.
+
+    如果定义不匹配，并且从哈希桶加载的值没有设置第0位，继续在哈希桶数组中的下一个条目。
+
+   2.h If bit 0 is set there are no further entry in the hash chain we proceed with the next object in the lookup scope.
+
+    如果设置了第0位，哈希链中没有更多条目，我们将继续在查找范围内的下一个对象中进行。
+
+3. If there is no further object in the lookup scope the lookup failed.
+
+    如果查找范围内没有更多对象，查找失败。
+
+This new process seems more complicated. Not only is this not really the case, it is also much faster. The number of times we actually have to compare strings is reduced significantly. The Bloom filter alone usually filters out $80\%$ or more (in many cases $90+\%$) of all lookups. I.e., even in the case the hash chains are long no work is done since the Bloom filter helps to determine that there will be no match. This is done with one single memory access.
+
+这个新过程看起来更复杂。但事实并非如此，它实际上也更快。我们实际上需要进行字符串比较的次数显著减少。单独的布隆过滤器通常可以过滤掉 $80\%$ 以上（在许多情况下是 $90+\%$）的所有查找。也就是说，即使在哈希链很长的情况下，由于布鲁姆过滤器能帮助确定不会有匹配结果，因此也不会产生任何工作。这只需一次内存访问即可完成。
+
+Second, comparing the hash value with that of the symbol table entry prevents yet more string comparisons. Each hash chain can contain entries with different hash value and this simple word comparison can filter out a lot of duplicates. There are rarely two entries with the same hash value in a hash chain which means that an unsuccessful string comparison is rare. The probability for this is also increased by using a different hash function than the original ELF specification dictates. The new function is much better in spreading the values out over the value range of 32-bit values.
+
+其次，将哈希值与符号表条目的哈希值进行比较，可以进一步减少字符串比较的次数。每个哈希链可能包含具有不同哈希值的条目，这种简单的字比较能有效过滤掉许多重复项。同一哈希链中很少有两个条目具有相同的哈希值，这意味着不匹配的字符串比较非常少见。通过使用与原始ELF规范不同的哈希函数，这种情况的可能性也会增加。新的哈希函数在将值分布在32位值范围内方面表现更佳。
+
+The hash chain array is organized to have all entries for the same hash bucket follow each other. There is no linked list and therefore the cache utilization is much better.
+
+哈希链数组的组织方式是，相同哈希桶的所有条目彼此紧密跟随，没有采用链表结构，因此缓存的利用效率得到了显著提高。
+
+Only if the Bloom filter and the hash function test succeed do we access the symbol table itself. All symbol table entries for a hash chain are consecutive, too, so in case we need to access more than one entry the CPU cache prefetching will help here, too.
+
+只有当布隆过滤器和哈希函数测试都成功时，我们才会访问符号表本身。同一个哈希链上的所有符号表条目也是连续排列的，因此如果需要访问多个条目，CPU缓存的预取功能在这里也将发挥作用。
+
+One last change over the old format is that the hash table only contains a few, necessary records for undefined symbol. The majority of undefined symbols do not have to appear in the hash table. This in some cases significantly reduces the possibility of hash collisions and it certainly increases the Bloom filter success rate and reduces the average hash chain length. The result are significant speed-ups of 50% or more in code which cannot depend on pre-linking (prelinking is always faster).
+
+与旧格式相比，最后一个变化是哈希表只包含少数必要的未定义符号记录。大部分未定义的符号不必出现在哈希表中。这在某些情况下大大降低了哈希碰撞的可能性，当然也提高了布鲁姆过滤器的成功率，并减少了哈希链的平均长度。这样做的结果是，在不能依赖预链接（预链接总是更快）的代码中，速度明显提高 $50\%$，甚至更多。
+
+This does not mean, though, that the optimization techniques described in the previous section are irrelevant. They still should very much be applied. Using the new hash table implementation just means that not optimizing the exported and referenced symbols will not have a big effect on performance as it used to have.
+
+然而，这并不意味着上一节描述的优化技术就变得无关紧要了。这些优化措施仍然非常适用。采用新的哈希表实现意味着，我不就不需要关注导出和引用的符号的优化了，因为现在它们至少不会像以前那样对性能产生大影响。
+
+> The new hash table format was introduced in Fedora Core 6. The entire OS, with a few deliberate exceptions, is created without the compatibility hash table by using --hash-style=gnu. This means the binaries cannot be used on systems without support for the new hash table format in the dynamic linker. Since this is never a goal for any of the OS releases making this decision was a no-brainer. The result is that all binaries are smaller than with the second set of hash tables and in many cases even smaller than binaries using only the old format.
+> 
+> Fedora Core 6 引入了新的哈希表格式。通过使用 `--hash-style=gnu` 创建的整个操作系统，除少数特意设置的例外情况外，都不使用兼容哈希表（旧哈希表的实现）。这意味着二进制文件无法在动态链接器不支持新散列表格式的系统上使用。由于这从来都不是任何操作系统版本的目标，因此做出这个决定是轻而易举的。其结果是，所有二进制文件都比使用第二套哈希表时更小，在很多情况下甚至比只使用旧格式的二进制文件更小。
+
+Going back to the OpenOffice.org example, we can make some estimates about the speedup. If the Bloom filter is able to filter out a low 80% of all lookups and the probability of duplicates hash values is a high 15% we only have to actually compare on average 72 × 0.2 × 0.15 × 1.1931 = 2.58 strings. This is an improvement of a factor of 33. Adding to this improved memory handling and respect for the CPU cache we have even higher gains. In real world examples we can reduce the lookup costs so that programs start up 50% faster or more.
+
+回到OpenOffice.org的例子，我们可以对加速做一些估算。如果布隆过滤器能够过滤掉至少80%的所有查找，而重复哈希值的概率高达 $15\%$，我们只需要平均比较 $72 × 0.2 × 0.15 × 1.1931 = 2.58$ 个字符串。这是 $33$ 倍的改进。加上改进的内存处理和对CPU缓存的尊重，我们获得了更高的收益。在现实世界的例子中，我们可以减少查找成本，使得程序启动速度提升 $50\%$ 或更多。
+
+
+### 1.5.4 Lookup Scope
+
+The lookup scope has so far been described as an ordered list of most loaded object. While this is correct it has also been intentionally vague. It is now time to explain the lookup scope in more detail.
+
+到目前为止，查找范围被描述为已加载对象的有序列表。虽然这种描述是准确的，但它同时也故意保持了一定的不明确性。现在是时候更详细地阐释查找范围了。
+
+The lookup scope consists in fact of up to three parts. The main part is the global lookup scope. It initially consists of the executable itself and all its dependencies. The dependencies are added in breadth-first order. That means first the dependencies of the executable are added in the order of their `DT_NEEDED` entries in the executable’s dynamic section. Then the dependencies of the first dependency are added in the same fashion. DSOs already loaded are skipped; they do not appear more than once on the list. The process continues recursively and it will stop at some point since there are only a limited number of DSOs available. The exact number of DSOs loaded this way can vary widely. Some executables depend on only two DSOs, others on 200.
+
+查找范围实际上包含三个部分。其中最主要的部分是全局查找范围，它最初包括了可执行文件本身及其所有的依赖项。这些依赖项是以广度优先的顺序被添加的。也就是说，首先根据可执行文件的动态段中的 `DT_NEEDED` 条目的顺序添加可执行文件的依赖项。然后，按照相同的方式添加第一个依赖项的依赖项。已经加载的动态共享对象（DSO）会被忽略，它们在列表中不会重复出现。这个过程是递归进行的，并且由于可用的DSO数量有限，它最终会停止。通过这种方式加载的DSO数量可能有很大的差异，有些可执行文件可能只依赖于两个DSO，而其他的可能依赖于200个。
+
+If an executable has the DF_SYMBOLIC flag set (see section 2.2.7) the object with the reference is added in front of the global lookup scope. Note, only the object with the reference itself is added in front, not its dependencies. The effects and reasons for this will be explained later.
+
+作为第二部分的查找范，如果一个可执行文件设置了 `DF_SYMBOLIC` 标志（见2.2.7节），则引用对象会被添加到全局查找范围的前面（被优先考虑）。注意，只有引用对象本身被添加到前面，而不是它的依赖项。这个效果和原因将在后面解释。
+
+A more complicated modification of the lookup scope happens when DSOs are loaded dynamically using dlopen. If a DSO is dynamically loaded it brings in its own set of dependencies which might have to be searched. These objects, starting with the one which was requested in the dlopen call, are appended to the lookup scope if the object with the reference is among those objects which have been loaded by dlopen. That means, those objects are not added to the global lookup scope and they are not searched for normal lookups. This third part of the lookup scope, we will call it local lookup scope, is therefore dependent on the object which has the reference.
+
+当通过 `dlopen` 动态加载DSO时，查找范围会发生较为复杂的变化。动态加载的DSO会带来自己的一组依赖，这些依赖可能需要被搜索。如果通过 `dlopen` 加载的对象包含了符号引用，则这个对象和它引入的所有依赖项将被加入到一个专门的查找范围中。这意味着，这些对象不会被添加到全局查找范围，并且不会在正常查找中被搜索。因此，这第三部分的查找范围，我们将其称为局部查找范围，因此依赖于具有引用的对象。
+
+The behavior of dlopen can be changed, though. If the function gets passed the RTLD_GLOBAL flag, the loaded object and all the dependencies are added to the global scope. This is usually a very bad idea. The dynamically added objects can be removed and when this happens the lookups of all other objects is influenced. The entire global lookup scope is searched before the dynamically loaded object and its dependencies so that definitions would be found first in the global lookup scope object before definitions in the local lookup scope. If the dynamic linker does the lookup as part of a relocation this additional dependency is usually taken care of automatically, but this cannot be arranged if the user looks up symbols in the lookup scope with dlsym.
+
+尽管如此，`dlopen` 的行为是可以改变的。如果函数调用时传递了 `RTLD_GLOBAL` 标志，则加载的对象及其所有依赖都会被加入到全局范围中。这通常是个非常糟糕的主意。动态添加的对象可以被移除，当这发生时，会影响到所有其他对象的查找。即便如此，系统还是会先遍历整个全局查找范围，以确保在检索到局部查找范围中的定义之前，能够优先在全局查找范围中找到所需的定义。针对上述的情况，如果动态链接器作为重定位的一部分来处理这种查找，这种额外的依赖通常可以自动管理。然而，如果用户尝试通过 `dlsym` 在查找范围内手动查找符号，则无法保证自动处理这种情况，即可能无法找到相应的符号。
+
+And usually there is no reason to use RTLD_GLOBAL. For reasons explained later it is always highly advised to create dependencies with all the DSOs necessary to resolve all references. RTLD_GLOBAL is often used to provide implementations which are not available at link time of a DSO. Since this should be avoided the need for this flag should be minimal. Even if the programmer has to jump through some hoops to work around the issues which are solved by RTLD_GLOBAL it is worth it. The pain of debugging and working around problems introduced by adding objects to the global lookup scope is much bigger.
+
+我们不推荐使用 `RTLD_GLOBAL` 标志，因为它可能导致一些问题。`RTLD_GLOBAL` 标志使得通过 `dlopen` 加载的动态共享对象（DSO）及其符号在全局范围内可见，这可能会引入符号冲突或其他问题。相反，建议通过精心设计依赖关系来确保程序能够解析所有需要的引用，而不需要依赖于 `RTLD_GLOBAL`。虽然 `RTLD_GLOBAL` 可以用于解决特定情况下的问题，如在链接时某些实现不可用，但避免使用它可以减少潜在的问题。即使这意味着开发者需要采取额外的步骤来解决问题，这种做法长期看来更加稳妥，因为它可以避免向全局查找范围添加对象可能引起的复杂问题和调试困难。
+
+The dynamic linker in the GNU C library knows since September 2004 one more extension. This extension helps to deal with situations where multiple definitions of symbols with the same name are not compatible and therefore cannot be interposed and expected to work. This is usally a sign of design failures on the side of the people who wrote the DSOs with the conflicting definitions and also failure on the side of the application writer who depends on these incompatible DSOs. We assume here that an application `app` is linked with a DSO `libone.so` which defines a symbol `duplicate` and that it dynamically loads a DSO `libdynamic.so` which depends on another DSO `libtwo.so` which also defines a symbol `duplicate`. When the application starts it might have a global scope like this:
+
+自 2004 年 9 月以来，GNU C 库中的动态链接器又多了一个扩展。这个扩展有助于处理这样的情况：有多个具有相同名称的符号的定义不兼容，因此不能插入并期望工作。这通常是 DSO 的编写者在设计时出现失败的迹象，因为他们的定义相互冲突，也是应用程序编写者在依赖于这些不兼容 DSO 时出现失败的迹象。在这里，我们假设一个名为 `app` 的应用程序链接到一个名为 `libone.so` 的 DSO，它定义了一个名为 `duplicate` 的符号，并且动态加载了一个名为 `libdynamic.so` 的 DSO，该 DSO 依赖于另一个名为 `libtwo.so` 的 DSO，该 DSO 也定义了一个名为 `duplicate` 的符号。当应用程序启动时，它可能具有如下的全局范围：
+
+<div class="center">
+
+```
+app → libone.so → libdl.so → libc.so
+```
+
+</div>
+
+If now libtwo.so is loaded, the additional local scope could be like this:
+
+如果现在加载了 libtwo.so，那么额外（）的本地范围可能如下所示：
+
+<div class="center">
+
+```
+libdynamic.so → libtwo.so → libc.so
+```
+
+</div>
+
+This local scope is searched after the global scope, possibly with the exception of `libdynamic.so` which is searched first for lookups in this very same DSO if the `DF_DYNAMIC` flag is used. But what happens if the symbol duplicate is required in `libdynamic.so`? After all we said so far the result is always: the definition in `libone.so` is found since libtwo.so is only in the local scope which is searched after the global scope. If the two definitions are incompatible the program is in trouble.
+
+这个本地范围会在全局范围之后被搜索，除非使用了 `DF_DYNAMIC` 标志，这时 `libdynamic.so` 会首先被搜索以进行对这个 DSO 中的查找。但是如果 `libdynamic.so` 中需要符号 `duplicate`，会发生什么呢？根据我们迄今所说，结果总是：因为 `libtwo.so` 只存在于本地范围中，而本地范围是在全局范围之后被搜索的，所以 `libone.so` 中的定义会被找到。如果这两个定义不兼容，那么程序就会遇到问题。
+
+This can be changed with a recent enough GNU C library by ORing RTLD DEEPBIND to the flag word passed as the second parameter to dlopen. If this happens, the dynamic linker will search the local scope before the global scope for all objects which have been loaded by the call to dlopen. For our example this means the search order changes for all lookups in the newly loaded DSOs libdynamic.so and libtwo.so, but not for libc.so since this DSO has already been loaded. For the two affected DSOs a reference to duplicate will now find the definition in libtwo.so. In all other DSOs the definition in libone.so would be found.
+
+While this might sound like a good solution for handling compatibility problems this feature should only be used if it cannot be avoided. There are several reasons for this:
+
+• The change in the scope affects all symbols and all the DSOs which are loaded. Some symbols might have to be interposed by definitions in the global scope which now will not happen.
+• Already loaded DSOs are not affected which could cause unconsistent results depending on whether the DSO is already loaded (it might be dynamically loaded, so there is even a race condition).
+• LD PRELOAD is ineffective for lookups in the dynamically loaded objects since the preloaded objects are part of the global scope, having been added right after the executable. Therefore they are looked at only after the local scope.
+• Applications might expect that local definitions are always preferred over other definitions. This (and the previous point) is already partly already a problem with the use of DF SYMBOLIC but since this flag should not be used either, the arguments are still valid.
+• If any of the implicitly loaded DSOs is loaded explicitly afterward, its lookup scope will change.
+• Lastly, the flag is not portable.
+
+The RTLD DEEPBIND flag should really only be used as a last resort. Fixing the application to not depend on the flag’s functionality is the much better solution.
