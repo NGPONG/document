@@ -71,33 +71,33 @@ For all these reasons and more, Linux converted early on to using ELF (Executabl
 
 For programmers the main advantage of the switch to ELF was that creating ELF shared libraries, or in ELF-speak DSOs, becomes very easy. The only difference between generating an application and a DSO is in the final link command line. One additional option (--shared in the case of GNU ld) tells the linker to generate a DSO instead of an application, the latter being the default. In fact, DSOs are little more than a special kind of binary; the difference is that they have no fixed load address and hence require the dynamic linker to actually become executable. With Position Independent Executable (PIEs) the difference shrinks even more.
 
-对程序员来说，转向 ELF 格式的主要优势是制作 ELF 共享库（或ELF中的动态共享对象，DSO）变得非常简单。生成应用程序和DSO之间的唯一区别在于最终的链接命令行选项。一个额外的选项（对于 GNU ld 来说是 --shared）会指示链接器生成一个 DSO 而不是应用程序，后者是默认选项。实际上，DSO 只是一种特殊类型的二进制文件；它们之间的区别在于DSO没有固定的加载地址，因此需要动态链接器才能真正变为可执行的。随着位置无关可执行文件（PIE）的出现，这种差异（即 DSO 与早期普通的二进制可执行程序）变得更小。
+程序员转向ELF最大的好处，是制作ELF格式的共享库（即DSO）变得轻而易举。创建应用程序和DSO的差别，仅仅在于最终的链接命令行中多了一个选项（GNU ld中的--shared），这个选项会指示链接器生成DSO而非默认的应用程序。说到底，DSO其实就是一种特别的二进制文件，它们之所以与众不同，是因为 DSO 没有固定的加载地址，必须依赖动态链接器才能变为可执行的。随着位置无关执行文件（PIE）的出现，这种区别进一步缩小了。
 
 This, together with the introduction of GNU Libtool which will be described later, has led to the wide adoption of DSOs by programmers. Proper use of DSOs can help save large amounts of resources. But some rules must be followed to get any benefits, and some more rules have to be followed to get optimal results. Explaining these rules will be the topic of a large portion of this paper.
 
-这一转变，加上之后介绍的 GNU Libtool 的引入，促使程序员们广泛采用了DSO。适当地使用DSO可以帮助节约大量资源。但是，要想从中获益，必须遵循一些规则；而要获得最优结果，则需要遵循更多的规则。本文的很大一部分将用于解释这些规则。
+正是这些优势，加上GNU Libtool的引入——这个工具稍后将详细介绍，促使程序员广泛采用了DSO。正确地使用DSO可以显著节约资源。但是，要从中受益，必须遵循一些基本规则，想要达到最佳效果，则需要更多规则。本文将详细解释这些规则。
 
 Not all uses of DSOs are for the purpose of saving resources. DSOs are today also often used as a way to structure programs. Different parts of the program are put into separate DSOs. This can be a very powerful tool, especially in the development phase. Instead of relinking the entire program it is only necessary to relink the DSO(s) which changed. This is often much faster.
 
-并非所有使用DSO的目的都是为了节省资源。如今，DSO也经常被用作结构化程序的一种方式。程序的不同部分被放入不同的DSO中。这可以是一个非常强大的工具，特别是在开发阶段。不需要重新链接整个程序，只需要重新链接更改了的DSO(s)。这通常要快得多。
+使用DSO并不总是为了节约资源。如今，DSO还常被用于程序的结构化设计中，将程序的不同部分放入不同的DSO。这在开发阶段尤其有用，因为此时无需重新编译整个程序，只需重新链接有所更改的DSO，这通常更快。
 
 Some projects decide to keep many separate DSOs even in the deployment phase even though the DSOs are not reused in other programs. In many situations it is certainly a useful thing to do: DSOs can be updated individually, reducing the amount of data which has to be transported. But the number of DSOs must be kept to a reasonable level. Not all programs do this, though, and we will see later on why this can be a problem.
 
-即使在部署阶段，一些项目也决定保留许多独立的DSO，尽管这些DSO在其他程序中不被重用。在许多情况下，这无疑是一个有益的做法：DSO可以单独更新，从而减少了需要传输的数据量。但是，必须将DSO的数量保持在合理的水平。不是所有的程序都这么做，我们稍后将看到这为什么会成为一个问题。
+即便到了部署阶段，有些项目依然保留多个独立、分离的DSO，（而不是将它们合并成更少的几个或一个大的DSO），即使这些DSO不会在其他程序中重用。在许多情况下，这样做确实有益，因为可以单独更新各个DSO，减少传输数据的量。但DSO的数量还是需要控制在合理的范围内，并不是所有的程序都遵循这一原则，我们将在后文探讨为何过多的DSO可能会引发问题。
 
 Before we can start discussing all this some understanding of ELF and its implementation is needed.
 
-在我们开始讨论所有这些之前，需要对ELF及其实现有一定的了解。
+在我们深入讨论之前，我们需要先了解ELF及其背后的实现原理。
 
 ### 1.3 How Is ELF Implemented?
 
 The handling of a statically linked application is very simple. Such an application has a fixed load address which the kernel knows. The load process consists simply of making the binary available in the appropriate address space of a newly created process and transferring control to the entry point of the application. Everything else was done by the static linker when creating the executable.
 
-处理静态链接的应用程序非常简单。这样的应用程序有一个内核已知的固定加载地址（虽然ASLR技术会在程序实际启动的时候再次被动态分配，但是地址也是固定的）（虽然是固定的地址，但是由于内核使用虚拟地址空间技术管理内存，所以也就不存在冲突的说法）。加载过程简单到只需要将二进制文件放置在新创建的进程的适当地址空间内，并将控制权转移给应用程序的入口点。其他所有事情都是在创建可执行文件时由静态链接器完成的。
+处理静态链接的应用程序非常简单。这样的应用程序有一个内核已知的固定加载地址（虽然ASLR技术会在程序实际启动的时候再次被动态分配，但是基于基地址的偏移是固定的）（虽然是固定的地址，但是由于内核使用虚拟地址空间技术管理内存，所以也就不存在冲突的说法）。加载过程简单到只需要将二进制文件放置在新创建的进程的适当地址空间内，并将控制权转移给应用程序的入口点。其他所有事情都是在创建可执行文件时由静态链接器完成的。
 
 Dynamically linked binaries, in contrast, are not complete when they are loaded from disk. It is therefore not possible for the kernel to immediately transfer control to the application. Instead some other helper program, which obviously has to be complete, is loaded as well. This helper program is the ***dynamic linker***. The task of the dynamic linker is it, to complete the dynamically linked application by loading the DSOs it needs (the dependencies) and to perform the relocations. Then finally control can be transferred to the program.
 
-与之相反，动态链接的二进制文件在从磁盘加载时是不完整的。因此，内核不能立即将控制权交给应用程序。相反，必须加载另一个已经是完整状态（即它包含了执行所需任务所必须的全部功能和资源）的辅助程序。这个辅助程序就是***动态链接器***。动态链接器的任务是，通过加载（动态链接）应用程序所需的DSO（即依赖关系）并执行重定位作业，来完成动态链接应用程序的构建。之后，控制权才最终可以交给程序。
+与之相反，动态链接的二进制文件在从磁盘加载时是不完整的。因此，内核不能立即将控制权交给应用程序。相反，必须加载另一个已经是完整状态（即它包含了执行所需任务所必须的全部功能和资源）的辅助程序。这个辅助程序就是***动态链接器***。动态链接器的任务是，通过加载应用程序所需的DSO（即依赖关系）并执行重定位作业，来完成动态链接应用程序的构建。之后，控制权才最终可以交给程序。
 
 This is not the last task for the dynamic linker in most cases, though. ELF allows the relocations associated with a symbol to be delayed until the symbol is needed. This lazy relocation scheme is optional, and optimizations discussed below for relocations performed at startup immediately affect the lazy relocations as well. So we ignore in the following everything after the startup is finished.
 
@@ -107,22 +107,22 @@ This is not the last task for the dynamic linker in most cases, though. ELF allo
 
 Starting execution of a program begins in the kernel, normally in the execve system call. The currently executed code is replaced with a new program. This means the address space content is replaced by the content of the file containing the program. This does not happen by simply mapping (using mmap) the content of the file. ELF files are structured and there are normally at least three different kinds of regions in the file:
 
-程序的执行起始于内核，通常是在 `execve` 系统调用中。当前执行的代码会被新程序替换。这意味着地址空间的内容被包含程序的文件内容所替换。这一替换并非仅通过映射（使用 `mmap`）文件的内容来实现。
+程序的执行起始于内核，通常是在 `execve` 系统调用中。当前执行的代码会被新程序替换。这意味着地址空间的内容被包含程序的文件内容所替换。这并非使用 `mmap` 简单的映射文件内容到内存中就能实现。
 
 ELF文件是有结构的，并且通常至少有三种不同类型的区域：
 
 - Code which is executed; this region is normally not writable;
 
-    被执行的代码；这个区域通常是不可写的；
+    被执行的代码；这个区域通常是不可写的；例如 `.text`
 
 
 - Data which is modified; this region is normally not executable;
 
-    被修改的数据；这个区域通常是不可执行的；
+    被修改的数据；这个区域通常是不可执行的；例如 `.data` 和 `.bss`
 
 - Data which is not used at run-time; since not needed it should not be loaded at startup.
 
-    在运行时不被使用的数据；由于不需要，它不应该在启动时被加载
+    在运行时不被使用的数据；由于不需要，它不应该在启动时被加载；例如 `.debug`
 
 Modern operating systems and processors can protect memory regions to allow and disallow reading, writing, and executing separately for each page of memory. It is preferable to mark as many pages as possible not writable since this means that the pages can be shared between processes which use the same application or DSO the page is from. Write protection also helps to detect and prevent unintentional or malignant modifications of data or even code.
 
@@ -196,7 +196,7 @@ typedef struct {
 
 The different segments are represented by the program header entries with the PT LOAD value in the p_type field. The p_offset and p_filesz fields specify where in the file the segment starts and how long it is. The p_vaddr and p_memsz fields specify where the segment is located in the process’ virtual address space and how large the memory region is. The value of the p_vaddr field itself is not necessarily required to be the final load address. DSOs can be loaded at arbitrary addresses in the virtual address space. But the relative position of the segments is important. For ***prelinked*** DSOs the actual value of the p_vaddr field is meaningful: it specifies the address for which the DSO was prelinked. But even this does not mean the dynamic linker cannot ignore this information if necessary.
 
-不同的段在程序头部条目中由 `PT_LOAD` 值在 `p_type` 字段中表示。`p_offset` 和 `p_filesz` 字段指定段在文件中的起始位置以及其长度。`p_vaddr` 和 `p_memsz` 字段指定了段在进程虚拟地址空间中的位置和内存区域的大小。因为DSO可以在虚拟地址空间的任意地址被加载，所以我们不应视 `p_vaddr` 字段的值为最终加载的地址，但它能很好的指示段与段之间的相对位置，这同样是一个很重要的信息。对于 ***预链接*** 的DSO，`p_vaddr` 字段的实际值是有意义的：它指定了DSO被预链接的地址。然而即便如此，如果有必要动态链接器也可以忽略这些信息。
+程序中不同的段通过程序头部的条目来表示，其中 `p_type` 字段的值为 `PT_LOAD` 表示需要加载的段。`p_offset` 和 `p_filesz` 字段指定了段在文件中的起始位置及其长度。`p_vaddr` 和 `p_memsz` 字段则指定了该段在进程虚拟地址空间中的位置以及内存区域的大小。因为DSO可以在虚拟地址空间的任意地址被加载，所以我们不应视 `p_vaddr` 字段的值为最终加载的地址，但它能很好的指示段与段之间的相对位置，这同样是一个很重要的信息。特别地，对于预链接的DSO（动态共享对象），`p_vaddr` 字段的值是有具体意义的，因为它指定了DSO预链接时所基于的地址。这意味着预链接的DSO是为了在这个特定地址上运行而优化的。然而，即使DSO被预链接到一个特定地址，动态链接器在必要的情况下也可以选择忽略这个预链接地址，将DSO加载到内存的其他位置。
 
 The size in the file can be smaller than the address space it takes up in memory. The first `p_filesz` bytes of the memory region are initialized from the data of the segment in the file, the difference is initialized with zero. This can be used to handle BSS sections, sections for uninitialized variables which are according to the C standard initialized with zero. Handling uninitialized variables this way has the advantage that the file size can be reduced since no initialization value has to be stored, no data has to be copied from disc to memory, and the memory provided by the OS via the mmap interface is already initialized with zero.
 
@@ -217,27 +217,27 @@ The p_flags finally tells the kernel what permissions to use for the memory page
 
 </div>
 
-After mapping all the PT LOAD segments using the appropriate permissions and the specified address, or after freely allocating an address for dynamic objects which have no fixed load address, the next phase can start. The virtual address space of the dynamically linked executable itself is set up. But the binary is not complete. The kernel has to get the dynamic linker to do the rest and for this the dynamic linker has to be loaded in the same way as the executable itself (i.e., look for the loadable segments in the program header). The difference is that the dynamic linker itself must be complete and should
+After mapping all the PT LOAD segments using the appropriate permissions and the specified address, or after freely allocating an address for dynamic objects which have no fixed load address, the next phase can start. The virtual address space of the dynamically linked executable itself is set up. But the binary is not complete. The kernel has to get the dynamic linker to do the rest and for this the dynamic linker has to be loaded in the same way as the executable itself (i.e., look for the loadable segments in the program header). The difference is that the dynamic linker itself must be complete and should be freely relocatable.
 
-在使用适当的权限和指定的地址映射完所有`PT_LOAD`段之后，或者为没有固定加载地址的动态对象自由分配地址之后，下一个阶段才可以开始。使用动态链接的可执行文件自身的虚拟地址空间就此建立。但是其二进制文件还不完整（此时依赖于外部共享库还未准备好）。内核必须让动态链接器来完成剩下的工作，为此动态链接器必须以与可执行文件本身相同的方式被加载（即，在程序头中查找可加载的段）。不同之处在于动态链接器本身必须是完整的，并且应该能够自由重定位。
+在使用适当的权限和指定的地址映射完所有`PT_LOAD`段之后，或者为没有固定加载地址的动态对象自由分配地址之后，下一个阶段才可以开始。使用动态链接的可执行文件自身的虚拟地址空间就此建立，但是其二进制文件还不完整（此时依赖于外部共享库还未准备好）。内核必须让动态链接器来完成剩下的工作，为此，动态链接器必须像可执行文件本身一样被加载（即，检查程序头部中的可加载段）。不同之处在于动态链接器本身必须是完整的，并且应该能够自由重定位。
 
 Which binary implements the dynamic linker is not hardcoded in the kernel. Instead, the program header of the application contains an entry with the tag PT_INTERP. The p_offset field of this entry contains the offset of a NUL-terminated string which specifies the file name of this file. The only requirement on the named file is that its load address does not conflict with the load address of any possible executable it might be used with. In general, this means that the dynamic linker has no fixed load address and can be loaded anywhere; this is just what dynamic binaries allow.
 
-可执行文件并不直接包含动态链接器（如 `ld-linux.so`）的路径。相反，ELF文件的程序头中有一个特殊的条目，标记为 `PT_INTERP`。这个条目指向一个字符串，这个条目的 `p_offset` 字段包含一个NUL终止字符串的偏移量，该字符串是动态链接器文件的路径。当内核准备运行一个动态链接的可执行文件时，它会查看这个 `PT_INTERP` 条目，找到动态链接器的路径，并将其加载到内存中。动态链接器的加载地址不是硬编码的，意味着它可以被加载到进程的虚拟地址空间中的任意位置，这为动态链接器提供了灵活性，并允许它处理来自不同可执行文件的不同需求。
+动态链接器（如 `ld-linux.so`）的具体实现并未在内核中硬编码。而是通过应用程序的程序头中一个标记为 `PT_INTERP` 的特殊条目来指定，该条目的 `p_offset` 字段包含一个指向一个以 NUL 结尾的字符串的偏移，该字符串指定了动态链接器文件的路径。对命名文件的唯一要求是它的加载地址不能与可能使用它的任何可执行文件的加载地址发生冲突。通常，这意味着动态链接器没有固定的加载地址，可以被加载到任何位置；这正是动态二进制文件所允许的。
 
 Once the dynamic linker has also been mapped into the memory of the to-be-started process we can start the dynamic linker. Note it is not the entry point of the application to which control is transferred to. Only the dynamic linker is ready to run. Instead of calling the dynamic linker right away, one more step is performed. The dynamic linker somehow has to be told where the application can be found and where control has to be transferred to once the application is complete. For this a structured way exists. The kernel puts an array of tag-value pairs on the stack of the new process. This ***auxiliary vector*** contains beside the two aforementioned values several more values which allow the dynamic linker to avoid several system calls. The elf.h header file defines a number of constants with a AT prefix. These are the tags for the entries in the auxiliary vector.
 
-一旦动态链接器被映射到即将启动的进程的内存中，接下来就可以启动动态链接器了。需要注意的是，此时程序的控制权并不是直接转移到应用程序的主入口点。而是，只有动态链接器处于就绪状态，准备开始其工作。另外，在开始动态链接器的调用之前还需要执行一个步骤。需要以某种方式告诉动态链接器应用程序在哪里可以找到，以及一旦应用程序准备完毕后控制权需要转移到哪里。为此，存在一种结构化的方式。内核在新进程的堆栈上放置一个标签 `tag-value pairs`。这个 ***辅助向量*** 除了上述两个值外，还包含几个其他值，这些值允许动态链接器避免多次系统调用。`elf.h`头文件定义了一系列带有`AT`前缀的常量，这些是辅助向量中条目的标签。
+当动态链接器同样被映射到待启动进程的内存中后，我们便可以启动动态链接器。需要注意的是，此时并非将控制权直接转交给应用程序的入口点，而是首先启动动态链接器。在直接激活动态链接器之前，我们还需要完成一个额外的步骤。这一步骤涉及到告知动态链接器应用程序所在的位置以及在应用程序完全加载后应该将控制权转移至何处。为了实现这一点，内核使用了一种结构化的方法：在新进程的栈上放置一个标签-值对数组，称为***辅助向量***。这个辅助向量不仅包括之前提到的两个值，还包含其他几个值，这些额外的信息可以帮助动态链接器省去多次系统调用。`elf.h` 头文件定义了许多以 `AT` 为前缀的常量，这些都是辅助向量中的标签。
 
 After setting up the auxiliary vector, the kernel is finally ready to transfer control to the dynamic linker in user mode. The entry point is defined in the e_entry field of the ELF header of the dynamic linker.
 
-在设置好辅助向量之后，内核最终准备好将控制权以用户模式转移给动态链接器。入口点在动态链接器的ELF头的 `e_entry` 字段中定义。
+在设置好辅助向量后，内核最终准备好将控制权以用户模式转移给动态链接器。动态链接器的入口点是在其ELF头部的`e_entry`字段中定义的。
 
 ### 1.5 Startup in the Dynamic Linker
 
 The second phase of the program startup happens in the dynamic linker. Its tasks include:
 
-程序启动的第二阶段发生在动态链接器中。其任务包括：
+在动态链接器中，程序启动的第二阶段开始进行。这一阶段的任务包括：
 
 - Determine and load dependencies;
 
@@ -253,11 +253,11 @@ The second phase of the program startup happens in the dynamic linker. Its tasks
 
 In the following we will discuss in more detail only the relocation handling. For the other two points the way for better performance is clear: have fewer dependencies. Each participating object is initialized exactly once but some topological sorting has to happen. The identify and load process also scales with the number dependencies; in most (all?) implementations this does not scale linearly.
 
-接下来，我们将更详细地讨论重定位处理。对于其他两点，提高性能的方法很明确：减少依赖项的数量。每个参与的对象文件都会被精确地初始化一次，但需要进行某种形式的拓扑排序。随着依赖项数量的增加，识别和加载过程也会相应扩大；在大多数（可能所有？）实现中，这种扩大不是线性的。
+在接下来的内容中，我们将更详细地讨论重定位处理。对于其他两点，提高性能的方法很明确：减少依赖项的数量。每个参与的对象仅被初始化一次，但这一过程需要进行拓扑排序来确定初始化的顺序。识别和加载依赖的过程也随着依赖数量的增加而变得更加复杂；在大多数（或全部）实现中，这种增加并不呈线性，而是随着依赖数量的增加显著增长。
 
 The relocation process is normally the most expensive part of the dynamic linker’s work. It is a process which is asymptotically at least $O(R + n×r)$ where R is the number of relative relocations, r is the number of named relocations, and n is the number of participating DSOs (plus the main executable). Deficiencies in the ELF hash table function and various ELF extensions modifying the symbol lookup functionality may well increase the factor to $O(R + r×n×\log_2 s)$ where s is the number of symbols. This should make clear that for improved performance it is significant to reduce the number if relocations and symbols as much as possible. After explaining the relocation process we will do some estimates for actual numbers.
 
-重定位过程通常是动态链接器工作中最为昂贵的部分。从理论上讲，这一过程的时间复杂度至少为 $O(R + n×r)$，其中 $R$ 是相对重定位的数量，$r$ 是命名重定位的数量，$n$ 是参与的DSO数量（加上主执行文件）。ELF哈希表函数的不足以及对符号查找功能的各种ELF扩展可能会将这一因子提高到 $O(R + r×n×\log_2 s)$，其中 $s$ 是符号的数量。所以我们明确的是，为了提高性能，尽可能减少重定位和符号的数量是很重要的。在解释了重定位过程之后，我们将对实际的数字进行一些估算。
+重定位过程通常是动态链接器工作中最为昂贵的部分。从理论上讲，这一过程的时间复杂度至少为 $O(R + n×r)$，其中 $R$ 是相对重定位的数量，$r$ 是命名重定位的数量，$n$ 是参与的DSO数量（加上主执行文件）。ELF哈希表函数的不足以及对符号查找功能的各种ELF扩展可能会将这一因子提高到 $O(R + r×n×\log_2 s)$，其中 $s$ 是符号的数量。所以我们明确的是，为了提高性能，尽可能减少重定位和符号的数量是很重要的。在解释了重定位过程之后，我们再对实际的数字进行一些估算。
 
 ### 1.5.1 The Relocation Process
 
@@ -267,15 +267,15 @@ Relocation in this context means adjusting the application and the DSOs, which a
 
 - Dependencies to locations which are known to be in the own object. These are not associated with a specific symbol since the linker knows the relative position of the location in the object. Note that applications do not have relative relocations since the load address of the code is known at link-time and therefore the static linker is able to perform the relocation.
 
-    依赖于已知位于本对象文件（指的是程序中的一个组件或编译单元，即编译后的中间文件 .o 或 .obj）内的位置。这些依赖不关联特定的符号，因为链接器知道这个位置在对象文件内的相对位置（同一个编译单元或代码库内的地址引用，这些地址在链接时相对于对象文件自身已知）。需要注意的是，应用程序没有相对位置的重定位，因为代码的加载地址在链接时已经确定（指的是链接的对象文件，也就是说对象文件已经通过相对重定位实现了地址的确定，所以也就意味着应用程序本身也就不需要相对重定位），因此静态链接器能够执行这种重定位。
+    依赖于已知位于本对象文件（指的是程序中的一个组件或编译单元，即编译后的中间文件 .o 或 .obj）内的位置。这些依赖不关联特定的符号，因为链接器已经知道这些位置在可执行文件中的相对位置。静态链接的应用程序在链接时已确定代码的加载地址，因此不需要在运行时进行相对重定位，链接器可以直接完成所有必要的重定位工作。
 
 - Dependencies based on symbols. The reference of the definition is generally, but not necessarily, in a different object than the definition.
 
-    基于符号的依赖。这种依赖的引用通常（但不总是）位于定义所在的不同对象中；这涉及到跨DSO的引用，例如一个DSO中的函数调用另一个DSO中的函数。这种重定位比较复杂，因为它要处理不同对象之间的关系，需要在运行时确定符号的最终地址。
+    当一个程序依赖某个符号时，这个符号通常位于不同的编译单元或代码对象中，尽管也有例外情况；这涉及到跨DSO的引用，例如一个DSO中的函数调用另一个DSO中的函数。这种重定位比较复杂，因为它要处理不同对象之间的关系，需要在运行时确定符号的最终地址。
 
 The implementation of relative relocations is easy. The linker can compute the offset of the target destination in the object file at link-time. To this value the dynamic linker only has to add the load address of the object and store the result in the place indicated by the relocation. At runtime the dynamic linker has to spend only a very small and constant amount of time which does not increase if more DSOs are used.
 
-相对重定位的实施相对简单。链接器可以在链接时计算目标位置在对象文件中的偏移量。动态链接器只需将这个偏移量加上对象文件的加载地址，并将结果存储在重定位指示的位置。在运行时，动态链接器只需要花费很少且固定的时间来处理，这个时间不会因为使用更多的DSO而增加。
+相对重定位的实现比较简单。链接器在链接时可以计算出目标位置在对象文件中的偏移量。动态链接器只需将此偏移量加上对象的加载地址，并将计算结果存储在重定位指示的内存位置（也就是说我们具体需要被更新的位置）。在运行时，动态链接器仅需花费很少且恒定的时间来完成这一过程，这个时间不会因为使用了更多的动态共享对象（DSO）而增加。
 
 The relocation based on a symbol is much more complicated. The ELF symbol resolution process was designed very powerful so that it can handle many different problems. All this powerful functionality adds to the complexity and run-time costs, though. Readers of the following description might question the decisions which led to this process. We cannot argue about this here; readers are referred to discussions of ELF. Fact is that symbol relocation is a costly process and the more DSOs participate or the more symbols are defined in the DSOs, the longer the symbol lookup takes.
 
