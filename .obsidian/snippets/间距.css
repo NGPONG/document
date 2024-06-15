@@ -1,0 +1,27 @@
+/* 调整下 header 之间的间距 */
+body .markdown-rendered :is(h1,h2,h3,h4,h5,h6) {
+  margin-top: 0px !important;
+}
+
+/* table 居中 */
+.markdown-preview-view, .markdown-rendered table {
+  margin-left: auto;
+  margin-right: auto;
+}
+.table-wrapper {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 列表 */
+.markdown-reading-view ul > li {
+  margin-top: 20px;
+}
+.markdown-reading-view ol > li {
+  margin-top: 20px;
+}
+
+/* tag 标签 */
+a.tag {
+  margin-top: 100px;
+}

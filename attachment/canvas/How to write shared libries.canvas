@@ -1,0 +1,39 @@
+{
+	"nodes":[
+		{"id":"564e7966d38d39ae","type":"text","text":"查找范围","x":-207,"y":242,"width":157,"height":50},
+		{"id":"c28d9769c2080d18","type":"text","text":"全局范围：可执行文件本身及其所有的依赖项","x":120,"y":74,"width":487,"height":50},
+		{"id":"5cbc172ec974df20","type":"text","text":"DF_SYMBOLIC：如果设置对象设置了该 flag，则引用符号的对象将被添加到全局查找范围的最前面","x":122,"y":244,"width":996,"height":50},
+		{"id":"4d8a9fe1fc6e40eb","type":"text","text":"  本地范围：使用 dlopen 打开的对象则会加载至局部查找范围","x":127,"y":414,"width":648,"height":50},
+		{"id":"825ba15a19e413ce","type":"text","text":"依赖项是按照广度优先顺序添加的","x":732,"y":-63,"width":382,"height":50},
+		{"id":"227de69946fcef55","type":"text","text":"LD_PRELOAD","x":732,"y":133,"width":205,"height":50},
+		{"id":"edc18f54533dd364","type":"text","text":"每个对象的范围由于依赖关系不同而不同","x":734,"y":43,"width":443,"height":50},
+		{"id":"0ac716489c8e5421","type":"text","text":"`RTLD_GLOBAL` 标志会改变这一默认行为\n\n会将加载的对象及其所有依赖项添加到全局查找范围中","x":886,"y":331,"width":583,"height":100},
+		{"id":"92847ad26aa38725","type":"text","text":"`RTLD_DEEPBIND`：动态链接器会优先在本地范围内搜索由 dlopen 加载的所有对象，然后再搜索全局范围。\n\n不建议[[How to write shared libries#^f5069c|使用]] ","x":887,"y":613,"width":1058,"height":115},
+		{"id":"f0ff535eb976d75c","type":"text","text":"并不是一个好的[[How to write shared libries#^118818|方法]]","x":890,"y":480,"width":252,"height":50},
+		{"id":"9dc8f30cd1c08e4f","type":"text","text":"共享库（DSO）","x":-523,"y":-396,"width":216,"height":59},
+		{"id":"9ee0297ec6fbf1a3","type":"text","text":"加载和加载后不进行***重定位***：每个共享库都必须有一个固定的加载地址","x":146,"y":-344,"width":730,"height":50},
+		{"id":"4768d9a5d794f115","type":"text","text":"  早期使用 a.out 和 COFF","x":-229,"y":-344,"width":293,"height":50},
+		{"id":"7070d847418f5c42","type":"text","text":"[[How to write shared libries#^4b1c2e|为什么出现？]]","x":-220,"y":-476,"width":191,"height":55},
+		{"id":"06d1b22a3abff949","type":"text","text":"优化 DSO","x":-286,"y":1041,"width":170,"height":54},
+		{"id":"cbb19c4e3a5151ce","type":"text","text":"始终使用 -fpic 或 -fPIC","x":79,"y":1037,"width":304,"height":60},
+		{"id":"77221d1baeb32bc2","type":"text","text":"不会生成 [[How to write shared libries#^855784|文本重定位]]","x":576,"y":910,"width":277,"height":50},
+		{"id":"f7a60ace4d1c2ece","type":"text","text":"一些适用于可执行文件的优化不能用于 DSO","x":581,"y":1055,"width":498,"height":50}
+	],
+	"edges":[
+		{"id":"2e95f1c6cc9df459","fromNode":"564e7966d38d39ae","fromSide":"right","toNode":"5cbc172ec974df20","toSide":"left"},
+		{"id":"770643f0bd6e6029","fromNode":"564e7966d38d39ae","fromSide":"right","toNode":"4d8a9fe1fc6e40eb","toSide":"left"},
+		{"id":"26c5a3e4d4fb89f7","fromNode":"4d8a9fe1fc6e40eb","fromSide":"right","toNode":"0ac716489c8e5421","toSide":"left"},
+		{"id":"f29ced8ebec172ae","fromNode":"564e7966d38d39ae","fromSide":"right","toNode":"c28d9769c2080d18","toSide":"left"},
+		{"id":"945b0f676f7cb381","fromNode":"c28d9769c2080d18","fromSide":"right","toNode":"825ba15a19e413ce","toSide":"left"},
+		{"id":"a1b5ba5a57cf3c5c","fromNode":"c28d9769c2080d18","fromSide":"right","toNode":"edc18f54533dd364","toSide":"left"},
+		{"id":"1edab04d50dcdaf3","fromNode":"4d8a9fe1fc6e40eb","fromSide":"right","toNode":"f0ff535eb976d75c","toSide":"left"},
+		{"id":"db534feeef7b6d4b","fromNode":"c28d9769c2080d18","fromSide":"right","toNode":"227de69946fcef55","toSide":"left"},
+		{"id":"079785aad4b3fb06","fromNode":"4d8a9fe1fc6e40eb","fromSide":"right","toNode":"92847ad26aa38725","toSide":"left"},
+		{"id":"e05a184d3e2eb421","fromNode":"9dc8f30cd1c08e4f","fromSide":"right","toNode":"7070d847418f5c42","toSide":"left"},
+		{"id":"b15daa8807e6b5c5","fromNode":"4768d9a5d794f115","fromSide":"right","toNode":"9ee0297ec6fbf1a3","toSide":"left"},
+		{"id":"41e9cd22c1f03ea3","fromNode":"4768d9a5d794f115","fromSide":"left","toNode":"9dc8f30cd1c08e4f","toSide":"right"},
+		{"id":"b45ba72b89bc91d9","fromNode":"06d1b22a3abff949","fromSide":"right","toNode":"cbb19c4e3a5151ce","toSide":"left"},
+		{"id":"11e8f5b627a4ba43","fromNode":"cbb19c4e3a5151ce","fromSide":"right","toNode":"77221d1baeb32bc2","toSide":"left"},
+		{"id":"ff2dec59094a42fb","fromNode":"cbb19c4e3a5151ce","fromSide":"right","toNode":"f7a60ace4d1c2ece","toSide":"left"}
+	]
+}

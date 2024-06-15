@@ -1,0 +1,27 @@
+body {
+  --shadow-color: var(--color-base-10);
+  text-shadow: transparent 0px 0px 0px, rgba(0,0,0,0.28) 0px 0px 0px !important
+}
+.cm-sizer, .markdown-preview-sizer {
+  box-shadow: 0 0 4mm 0 var(--shadow-color);
+  padding-left: 20mm;
+  padding-right: 20mm;
+  padding-top: 9.3mm;
+}
+.markdown-preview-sizer {
+  padding-top: 11.2mm;
+}
+.markdown-preview-view {
+  padding-top: 32px;
+}
+
+/* canvas 重置css，并增加居中的选项 */
+.canvas-node .markdown-preview-sizer,
+.canvas-node .markdown-preview-view,
+.node-insert-event.mod-inside-iframe .cm-sizer /* 这里可能会有 bug，是处理编辑模式下的情况 */
+{
+  box-shadow: none;
+  padding-left: 0mm;
+  padding-right: 0;
+  padding-top: 0;
+}

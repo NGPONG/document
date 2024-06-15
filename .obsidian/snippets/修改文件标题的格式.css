@@ -1,0 +1,14 @@
+.tree-item-self.nav-folder-title[data-path="/"] {
+  font-style: italic;
+  font-family: 'LocalFont';
+  font-size: 17px;
+  justify-content: center;
+  color: #6F6E69;
+}
+
+.nav-folder-title {
+  --nav-item-weight-hover: bold;
+  --nav-item-weight-active: bold;
+  --vault-name-font-weight: bold;
+  --nav-item-weight: bold;
+}

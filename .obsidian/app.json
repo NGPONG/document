@@ -1,0 +1,30 @@
+{
+  "focusNewTab": true,
+  "showInlineTitle": false,
+  "promptDelete": false,
+  "showLineNumber": false,
+  "rightToLeft": false,
+  "spellcheck": false,
+  "vimMode": false,
+  "readableLineLength": true,
+  "foldHeading": false,
+  "autoPairMarkdown": true,
+  "autoPairBrackets": false,
+  "useTab": false,
+  "tabSize": 2,
+  "strictLineBreaks": false,
+  "foldIndent": false,
+  "showIndentGuide": false,
+  "pdfExportSettings": {
+    "includeName": true,
+    "pageSize": "Letter",
+    "landscape": false,
+    "margin": "0",
+    "downscalePercent": 68
+  },
+  "propertiesInDocument": "hidden",
+  "smartIndentList": true,
+  "newFileLocation": "root",
+  "attachmentFolderPath": "attachment",
+  "showUnsupportedFiles": false
+}

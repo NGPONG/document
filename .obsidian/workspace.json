@@ -1,0 +1,228 @@
+{
+  "main": {
+    "id": "15d3d224655d68a3",
+    "type": "split",
+    "children": [
+      {
+        "id": "f47437be9388d11a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "198b7dff7ffc4784",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "data_structure&algorithm/Sort algorithm -- All in one.md",
+                "mode": "source",
+                "backlinks": false,
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "4400c1c7011a2b78",
+    "type": "split",
+    "children": [
+      {
+        "id": "80e0efb7d8f05df9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "7b75eb3da224f3e1",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "b5f4eacffcd3c4f2",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "data_structure&algorithm/Sort algorithm -- All in one.md"
+              }
+            }
+          },
+          {
+            "id": "4ffcbcabc297bc3b",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "tag:#𝑛−1",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "a5d93a9053d262cd",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "horizontal",
+    "width": 306.5110321044922
+  },
+  "right": {
+    "id": "3ca9cd71ea6552bb",
+    "type": "split",
+    "children": [
+      {
+        "id": "ee833a2ed533ccae",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ff76b77a517ea845",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "data_structure&algorithm/Sort algorithm -- All in one.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "20eed1b196faf505",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "data_structure&algorithm/Sort algorithm -- All in one.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "9362746cda6a1b35",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "353bc885cd853f32",
+            "type": "leaf",
+            "state": {
+              "type": "file-properties",
+              "state": {
+                "file": "data_structure&algorithm/Sort algorithm -- All in one.md"
+              }
+            }
+          },
+          {
+            "id": "58494dde93417ead",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              }
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 387.5,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": true,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "command-palette:Open command palette": true,
+      "workspaces:Manage workspace layouts": false
+    }
+  },
+  "active": "b5f4eacffcd3c4f2",
+  "lastOpenFiles": [
+    "c_Sharp/2019/8_6/迭代器模式.md",
+    "c_Sharp/2019/8_6/Linq.md",
+    "c_Sharp/2019/8_4/扩展方法.md",
+    "c_Sharp/2019/7_14/邮件发送.md",
+    "data_structure&algorithm/Sort algorithm -- All in one.md",
+    "MarkDown/markdown.md",
+    "cpp/2020/5_28/cpp_programming_language.md",
+    "book_notes/Multiplayer Game Programming.md",
+    "tools/gdb.md",
+    "tools",
+    "book_notes/How to write shared libries.md",
+    "data_structure&algorithm/DataStructure&Algorithm.md",
+    "Linux commands ALL IN ONE.md",
+    "C/2019/12_18/C_Programming_Language.md",
+    "attachment/canvas/How to write shared libries.canvas",
+    "book_notes/书单",
+    "book_notes/Untitled.md",
+    "attachment/canvas/Untitled 1.canvas",
+    "Untitled 2.md",
+    "Untitled 1.md",
+    "Media Note - Obsidian 1.5版本新功能探秘：高效管理表格和编辑文本！.md",
+    "Untitled 3.md",
+    "attachment/canvas/Untitled 11.canvas",
+    "attachment/canvas/asdqwd.canvas",
+    "attachment/excalidraw/Drawing 2024-05-13 18.22.39.excalidraw.md",
+    "attachment/excalidraw/Drawing 2024-05-13 18.20.47.excalidraw.md",
+    "attachment/excalidraw/Drawing 2024-05-13 18.21.34.excalidraw.md",
+    "Media Note - 也许是B站最好的Obsidian新手教程！爆肝30天，一站式入门双向链接笔记软件｜黑曜石.md",
+    "attachment/canvas/Untitled 10.canvas",
+    "attachment/canvas/Untitled 9.canvas",
+    "attachment/canvas/Untitled 8.canvas",
+    "How To Write Shared Libraries.pdf",
+    "book_notes/How To Write Shared Libraries.pdf",
+    "How To Write Shared Libraries 1.pdf",
+    "book_notes/csapp.md",
+    "asdasd.md",
+    "C_Programming_Language 1.md",
+    "attachment/excalidraw/Drawing 2024-05-13 23.48.53.excalidraw.md",
+    "attachment/excalidraw/Drawing 2024-05-13 22.46.57.excalidraw.png",
+    "attachment/excalidraw/Drawing 2024-05-13 22.46.57.excalidraw 1.png",
+    "c_Sharp/2017/12_22/focus焦点的使用.png",
+    "attachment/canvas/Untitled 7.canvas",
+    "attachment/canvas/Untitled 6.canvas",
+    "attachment/canvas/Untitled 5.canvas",
+    "C/2019/12_18/C_Programming_Language.html",
+    "attachment/excalidraw/Muyao-Softbrush-2.ttf",
+    "attachment/excalidraw",
+    "attachment/canvas",
+    "attachment",
+    "c_Sharp/664ba37eeee9f4623c06c066867f1d38_r.jpg",
+    "c_Sharp/微信图片_20171122120534.jpg"
+  ]
+}

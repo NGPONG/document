@@ -1,0 +1,8 @@
+{
+  "snapToObjects": false,
+  "snapToGrid": false,
+  "newFileLocation": "folder",
+  "newFileFolderPath": "attachment/canvas",
+  "cardLabelVisibility": "hover",
+  "defaultWheelBehavior": "pan"
+}

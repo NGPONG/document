@@ -4177,16 +4177,16 @@ _*小结*_
 #### 十大排序算法性能一览
 <span id = "十大排序算法性能一览"></span>
 
-| SORT | AVG | WORST | BEST | SPACE | STABLE |
-| - | - | - | - | - | - |
-| bubble sort | $O(n^2)$ | $O(n^2)$ | $O(n)$ | $O(1)$ | YES |
-| insert sort | $O(n^2)$ | $O(n^2)$ | $O(n)$ | $O(1)$ | YES |
-| merge sort | $O(nlog_n)$ | $O(nlog_n)$ | $O(nlog_n)$ | $O(1)$ | YES |
-| counting sort | $O(n+k)$ | $O(n+k)$ | $O(n+k)$ | $O(n+k)$ | YES |
-| quick sort | $O(nlog_n)$ | $O(n^2)$ | $O(nlog_n)$ | $O(nlog_n)$ | NO |
-| heap sort | $O(nlog_n)$ | $O(nlog_n)$ | $O(nlog_n)$ | $O(1)$ | NO |
-| shell sort | $O(nlog_n)$ | $O(ns)$ | $O(n)$ | $O(1)$ | NO |
-| select sort | $O(n^2)$ | $O(n^2)$ | $O(n)$ | $O(1)$ | NO |
+| SORT          | AVG         | WORST       | BEST        | SPACE       | STABLE |
+| ------------- | ----------- | ----------- | ----------- | ----------- | ------ |
+| bubble sort   | $O(n^2)$    | $O(n^2)$    | $O(n)$      | $O(1)$      | YES    |
+| insert sort   | $O(n^2)$    | $O(n^2)$    | $O(n)$      | $O(1)$      | YES    |
+| merge sort    | $O(nlog_n)$ | $O(nlog_n)$ | $O(nlog_n)$ | $O(1)$      | YES    |
+| counting sort | $O(n+k)$    | $O(n+k)$    | $O(n+k)$    | $O(n+k)$    | YES    |
+| quick sort    | $O(nlog_n)$ | $O(n^2)$    | $O(nlog_n)$ | $O(nlog_n)$ | NO     |
+| heap sort     | $O(nlog_n)$ | $O(nlog_n)$ | $O(nlog_n)$ | $O(1)$      | NO     |
+| shell sort    | $O(nlog_n)$ | $O(ns)$     | $O(n)$      | $O(1)$      | NO     |
+| select sort   | $O(n^2)$    | $O(n^2)$    | $O(n)$      | $O(1)$      | NO     |
 
 <br/>
 
@@ -4230,11 +4230,11 @@ _*区分算法稳定性的意义*_
 可见，原本的 B 和 C 产品原来是按照价格升序排序的序列就被改变了，这就和我们的需求逆反了，所以针对这种情景才有非稳定性算法是不合理的，因为需求中所体现的真正结果为以下形态: 
 
 | PRODUCT | PRICE | ORDER |
-| - | - | - |
-| D | $4 | 10 |
-| B | $2 | 20 |
-| C | $3 | 20 |
-| A | $1 | 30 |
+| ------- | ----- | ----- |
+| D       | $4    | 10    |
+| B       | $2    | 20    |
+| C       | $3    | 20    |
+| A       | $1    | 30    |
 
 <br/>
 

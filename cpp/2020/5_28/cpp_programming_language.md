@@ -1,18 +1,3 @@
-<style>
-.center 
-{
-  width: auto;
-  display: table;
-  margin-left: auto;
-  margin-right: auto;
-}
-</style>
-
-# *Cpp Programming language*
-
-
-<br/>
-
 
 ## 目录
 
@@ -153,22 +138,22 @@
     - [集合算法](#集合算法)
   - [迭代器](#迭代器)
 
+
+
+
+
 <br/>
 
-!!!
-    <font color = "red">cpp 是对于 c 语言的一项扩展工作</font>，故其基本特性是直接沿用 c 语言而进行扩展的，这也就意味着，在 cpp 项目中，我们是可以书写 c 语言的代码(需要经过特殊的声明处理) ; 但是反过来却不行，在 c 语言的源文件中是无法使用 cpp 中的特性
-    
-    本篇文档主要是针对 cpp 所额外衍生出来的特性进行讲解，关于一些基本概念可以参考 [C-Programming-language](#https://github.com/NGPONG/document/blob/master/C/2019/12_18/C_Programming_Language.md)
-
+> [!Tip]  
+> <font color = "red">cpp 是对于 c 语言的一项扩展工作</font>，故其基本特性是直接沿用 c 语言而进行扩展的，这也就意味着，在 cpp 项目中，我们是可以书写 c 语言的代码(需要经过特殊的声明处理) ; 但是反过来却不行，在 c 语言的源文件中是无法使用 cpp 中的特性
+> 
+> 本篇文档主要是针对 cpp 所额外衍生出来的特性进行讲解，关于一些基本概念可以参考 [[C_Programming_Language]]
 
 <br/>
 
 ## Namespace
-
 <span id="Namespace"></span>
-
 <span id="命名空间的定义"></span>
-
 ### 命名空间的定义
 
 ---
@@ -426,7 +411,7 @@ int c = 64;
   - class:: : 该方式用于对类中的某个成员的声明亦或者某个特殊声明的成员进行定义亦或者使用它来访问一个类中具有公共权限静态类型成员
 
   ```cpp
-
+  
   ```
 
   - :: : 引用到全局空间下的作用域
@@ -436,21 +421,21 @@ int c = 64;
   ```cpp
   #include <iostream>
   using namespace std;
-
+  
   namespace {
     void fun_test_anonymous(void) {
       cout << "anonymous scope" << endl;
     }
   }
-
+  
   void fun_test_global(void) {
     cout << "global scope" << endl;
   }
-
+  
   int main(void) {
     ::fun_test_global();
     ::fun_test_anonymous();
-
+  
     return EXIT_SUCCESS;
   }
   ```
@@ -483,6 +468,7 @@ int main(void) {
 <br/>
 
 ## 表达式和值类别
+
 
 <span id="表达式和值类别"></span>
 
@@ -804,7 +790,7 @@ int main(void){
       arrary_ref[i] = 10 + i;
   }
 
-  for (size_t i = 0; i < sizeof(arrary) / sizeof(*arrary); i++) {
+  for (size_t i = 0; i < sizeof(arrary) / sizeof(*arrary); i++) {ssssssssssssssssssssssssss
       cout << arrary[i] << endl;
   }
 
@@ -857,16 +843,16 @@ int main(void) {
   ```cpp
   #include <iostream>
   using namespace std;
-
+  
   int main(void) {
     const int a = 10;
-
+  
     int *p = (int *)&a;
     *p = 1024;
-
+  
     cout << a << endl;  // 没有被修改，因为指针所指向的地址并不是 a 真正的地址
     cout << *p << endl; // 被修改了，但是被修改的是编译器所临时分配的变量，我们看不见，但是它的确在编译后会存在
-
+  
     return 0;
   }
   ```
@@ -1218,7 +1204,7 @@ namespace std {
 
 #### 无异常 new (nothrow-new)
 
-[默认行为下的 new 语义](#new) 在遇到无法无法满足的需求时 ( 内存空间不足 ) 会抛出一个异常以供上层进行捕获，而另一个版本的 new 语义则能够避免这一行为，<font color = "red">在任何无法满足需求的情况发生时仅会返回一个空指针以指示异常行为的发生，这种 new 语义则为 `nothorw-new`，其依赖于头文件 `<new>` 并用作为 **_new (std::nothrow) 类型声明方式_**</font>
+[默认行为下的 new 语义](#new) 在遇到无法无法满足的需求时 ( 内存空间不足 ) 会抛出一个异常以供上层进行捕获，而另一个版本的 new 语义则能够避免这一行为，在任何无法满足需求的情况发生时仅会返回一个空指针以指示异常行为的发生，这种 new 语义则为 `nothorw-new`，其依赖于头文件 `<new>` 并用作为 new (std::nothrow) 类型声明方式
 
 ```cpp
 #include <iostream>
@@ -1927,7 +1913,7 @@ int main(void) {
     #include <iostream>
     #include <cstdint>
     #include <cstddef>
-
+    
     class Animal {
     public:
       Animal() {
@@ -1935,19 +1921,19 @@ int main(void) {
       }
       virtual ~Animal() {
         val = -10;
-
+    
         // 由于前 8 byte 是 vfptr，所以我们要避免索引到它
-
+    
         // 输出基类中的 val
         std::cout << *(std::int32_t *)(((std::byte *)this) + 8 + 0) << std::endl;
         // 输出派生类中的 val
         std::cout << *(std::int32_t *)(((std::byte *)this) + 8 + 4) << std::endl;
       }
-
+    
     private:
       std::int32_t val;
     };
-
+    
     class Cat : public Animal {
     public:
       Cat() : Animal() {
@@ -1956,15 +1942,15 @@ int main(void) {
       ~Cat() override {
         val = -20;
       }
-
+    
     private:
       std::int32_t val;
     };
-
+    
     int main (int argc, char *argv[]) {
       Animal *ani = new Cat();
       delete ani;
-
+    
       return 0;
     }
     ```
@@ -2241,8 +2227,6 @@ c++ 的继承方式和其余的 OOP 语言一致，其语法包含为：
 
 一个存在继承链的类，编译器会在其构造/析构函数的内部中插入一段转发自直接基类的构造/析构的调用指令，确保一整个继承链中每个类的构造和析构能够按照正确的层次顺序被执行。下面给出源码还有反汇编后的结果以解释这一过程：
 
-<div class = "center">
-
 ```cpp
 #include <cstdint>
 
@@ -2371,17 +2355,11 @@ Disassembly of section .text:
 ;; ----------------------------------------------------------
 ```
 
-</div>
-
-<br/>
-
 <span id = "继承的内存模型"></span>
 
 #### 继承的内存模型
 
 继承链中这样的构造顺序往往也决定了该对象（派生）的内存模型，下面的代码很好的展示了这一点。
-
-<div class = "center">
 
 ```cpp
 class person_base {
@@ -2439,7 +2417,6 @@ class student   size(12):
   +---
 ```
 
-</div>
 
 值得一提的是，原本存在于根基类中的成员 `m_gender` 类型为 `char` 却占用了四个字节的内存空间。究其原因是因为[内存对齐](#https://github.com/NGPONG/document/blob/master/C/2019/12_18/C_Programming_Language.md#%E5%85%B3%E4%BA%8E%E7%BB%93%E6%9E%84%E4%BD%93%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90%E7%9A%84%E9%97%AE%E9%A2%98)在作祟，这是一份篇幅更长的展开所以我们不会在这里进行额外的探讨。但是需要额外说明的是，在计算基类中成员的偏移量所需的 **_对齐单位_** 参考并不是使用派生类去计算，而是使用基类本身。这里要和直接声明在类中为复合类型的成员不同，在这种情况之下，类中所有成员（包括声明在类中复合类型的所有成员）在计算偏移量时参考的对其单位是使用当前复合类型本身所计算出来的。
 
@@ -2712,7 +2689,6 @@ class HYBIRD   size(2):
     color: #999;
     padding: 2px;">菱形继承下的内存模型示意图（1）</div>
 </center>
-
 <br/>
 
 ```test
@@ -2751,6 +2727,7 @@ class HYBIRD   size(2):
     color: #999;
     padding: 2px;">菱形继承下的内存模型示意图（2）</div>
 </center>
+
 
 </div>
 
@@ -2964,7 +2941,6 @@ public:
 
 下面的继承层次的结构是基于上例所输出的内存模型图，在这里我们能够直观的看到 vfptr 的存在以进一步验证了前面的说法。
 
-<div class="center">
 
 ```
 class Cat size(12):
@@ -2989,7 +2965,6 @@ Cat::$vftable@:
     padding: 2px;">虚析构的使用案例</div>
 </center>
 
-</div>
 
 **_虚析构_**
 
@@ -3691,28 +3666,28 @@ int main(void) {
   ```cpp
   #include <iostream>
   using namespace std;
-
+  
   struct Person {
     friend Person &operator+(Person &per, int age) {
       per.m_age += age;
       return per;
     };
-
+  
   public:
     Person(int age)
       : m_age(age) {}
     Person(const Person &per) {
       this->m_age = per.m_age;
     }
-
+  
   public:
     int m_age;
   };
-
+  
   int main(void) {
     Person per(0);
     per + 1 + 2 + 3;
-
+  
     system("pause");
     return EXIT_SUCCESS;
   }
@@ -4326,21 +4301,21 @@ int main(void) {
     cout << "Execute by foo_automatch_function_pointer" << endl;
     invoker(0x400);
   }
-
+  
   template<typename T>
   void foo(T val) {
     cout << val << endl;
   }
-
+  
   bool fun(int _val) {
     cout << _val << endl;
     return false;
   }
-
+  
   int main(void) {
     foo_automatch_function_pointer(fun); /* _Func: [bool (*)(int)] */
     foo("hello,world");                    /*     T: [const char *] */
-
+  
     return EXIT_SUCCESS;
   }
   ```
@@ -4354,7 +4329,7 @@ int main(void) {
     cout << var1 << endl;
     cout << var2 << endl;
   }
-
+  
   int main(void) {
     foo(0x400, 'G');
     return EXIT_SUCCESS;
@@ -4366,22 +4341,22 @@ int main(void) {
   ```cpp
   #include <iostream>
   using namespace std;
-
+  
   template<typename _Arg, typename _Result>
   void foo(_Result (*_invoker)(_Arg)) {
     cout << "function result type = : " << typeid(_Result).name() << endl;
     cout << "function arg type = : " << typeid(_Arg).name() << endl;
     cout << "function type = : " << typeid(_invoker).name() << endl;
   }
-
+  
   bool fun(int _val) {
     cout << _val << endl;
     return false;
   }
-
+  
   int main(void) {
     foo(fun);
-
+  
     return EXIT_SUCCESS;
   }
   ```
@@ -5463,20 +5438,20 @@ int main(void) {
   ```cpp
   #include <iostream>
   using namespace std;
-
+  
   int main(void) {
     int a = 10;
     printf("0x%p\n", &a);
-
+  
     int &b = a;
     printf("0x%p\n", &b);
-
+  
     auto c = b;   /* c -> int */
     printf("0x%p\n", &c);
-
+  
     auto &d = b;  /* d -> int & */
     printf("0x%p\n", &d);
-
+  
     return EXIT_SUCCESS;
   }
   ```
@@ -5486,14 +5461,14 @@ int main(void) {
   ```cpp
   #include <iostream>
   using namespace std;
-
+  
   int main(void) {
     const int a = 10;
     auto b = a;        /* b -> int */
     const auto c = a;  /* c -> const int */
     b = 100;           //合法
     c = 100;           //非法
-
+  
     return EXIT_SUCCESS;
   }
   ```
@@ -5503,11 +5478,11 @@ int main(void) {
   ```cpp
   #include <iostream>
   using namespace std;
-
+  
   int main(void) {
     const int a = 10;
     auto &b = a; /* b -> const int & */
-
+  
     return EXIT_SUCCESS;
   }
   ```
@@ -5517,12 +5492,12 @@ int main(void) {
   ```cpp
   #include <iostream>
   using namespace std;
-
+  
   int main(void) {
     int a[3] = { 1, 2, 3 };
     auto b = a; /* b -> int * */
     cout << typeid(b).name() << endl;
-
+  
     return EXIT_SUCCESS;
   }
   ```
@@ -5532,12 +5507,12 @@ int main(void) {
   ```cpp
   #include <iostream>
   using namespace std;
-
+  
   int main(void) {
     int a[3] = { 1, 2, 3 };
     auto &b = a; /* b -> int[3] */
     cout << typeid(b).name() << endl;
-
+  
     return EXIT_SUCCESS;
   }
   ```
@@ -7923,7 +7898,7 @@ int main(void) {
   std::map<std::string, int, DESC<string>> m_des(m_nor);
 }
 ```
-  
+
 **_ASSIGNMENT_**
 
 - `map &operator=(const map &m)`
@@ -8509,13 +8484,13 @@ int main(void) {
   int f_transform(int &_val) {
     return _val + 1;
   }
-
+  
   void foo_transform(void) {
     vector<int> v_src;
     for (size_t i = 0; i < 10; ++i) {
       v_src.push_back(i + 1);
     }
-
+  
     vector<int> v_des;
     v_des.resize(v_src.size());
     transform(v_src.begin(), v_src.end(), v_des.begin(), f_transform);
@@ -8538,7 +8513,7 @@ int main(void) {
     for (size_t i = 0; i < 10; ++i) {
       v.push_back(i);
     }
-
+  
     vector<int>::iterator _pos = find(v.begin(), v.end(), 4);
     if (_pos != v.end()) cout << *_pos << endl;
   }
@@ -8574,7 +8549,7 @@ int main(void) {
     v.push_back(3);
     v.push_back(3);
     v.push_back(4);
-
+  
     vector<int>::iterator _result = adjacent_find(v.begin(), v.end());
     if (_result != v.end()) cout << *_result << endl;
   }
@@ -8625,7 +8600,7 @@ int main(void) {
     for (size_t i = 0; i < 10; ++i) {
       v.push_back(i);
     }
-
+  
     int _count = count_if(v.begin(), v.end(), [](int &_val) { 
       return _val > 5; 
     });
@@ -8666,9 +8641,9 @@ int main(void) {
     for (size_t i = 0; i < 5; ++i) {
       v.push_back(i);
     }
-
+  
     random_shuffle(v.begin(), v.end());
-
+  
     for_each(v.begin(), v.end(), [](int &_val) { cout << _val << endl; });
   }
   ```
@@ -8683,7 +8658,7 @@ int main(void) {
     for (size_t i = 0; i < 5; ++i) {
       v.push_back(i);
     }
-
+  
     reverse(v.begin(), v.end());
   }
   ```
@@ -8789,12 +8764,12 @@ int main(void) {
     for (size_t i = 0; i < 5; ++i) {
       v_1.push_back(i);
     }
-
+  
     vector<int> v_2;
     for (size_t i = 5; i < 10; ++i) {
       v_2.push_back(i);
     }
-
+  
     swap(v_1, v_2);
   }
   ```
@@ -8816,7 +8791,7 @@ int main(void) {
     for (size_t i = 0; i < 5; ++i) {
       v.push_back(i);
     }
-
+  
     int num = accumulate(v.begin(), v.end(), 100);
     cout << num << endl;
   }
@@ -8832,7 +8807,7 @@ int main(void) {
     for (size_t i = 0; i < 5; ++i) {
       v.push_back(i);
     }
-
+  
     fill(v.begin(), v.begin() + 2, 0x400);
   }
   ```
@@ -8887,10 +8862,10 @@ int main(void) {
       v_src_1.push_back(i);
       v_src_2.push_back(i + 5);
     }
-
+  
     vector<int> v_des;
     v_des.resize(v_src_1.size() + v_src_2.size());
-
+  
     vector<int>::iterator i_end = set_union(v_src_1.begin(), v_src_1.end(), v_src_2.begin(), v_src_2.end(), v_des.begin());
   }
   ```
@@ -8910,17 +8885,17 @@ int main(void) {
   void foo_set_difference(void) {
     vector<int> v_src_1;
     vector<int> v_src_2;
-
+  
     for (int i = 0; i < 10; i++) {
       v_src_1.push_back(i);
       v_src_2.push_back(i + 5);
     }
-
+  
     vector<int> v_des;
     v_des.resize(max(v_src_1.size(), v_src_2.size()));
-
+  
     vector<int>::iterator i_end = set_difference(v_src_1.begin(), v_src_1.end(), v_src_2.begin(), v_src_2.end(), v_des.begin());
-
+  
     /* vector<int>::iterator i_end = set_difference(v_src_2.begin(), v_src_2.end(), v_src_1.begin(), v_src_1.end(), v_des.begin()); */
   }
   ```

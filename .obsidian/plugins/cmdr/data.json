@@ -1,0 +1,42 @@
+{
+  "confirmDeletion": false,
+  "showAddCommand": false,
+  "debug": false,
+  "editorMenu": [],
+  "fileMenu": [],
+  "leftRibbon": [],
+  "rightRibbon": [],
+  "titleBar": [],
+  "statusBar": [],
+  "pageHeader": [
+    {
+      "id": "heycalmdown-navigate-cursor-history:cursor-position-backward",
+      "icon": "arrow-left-circle",
+      "name": "Navigate Cursor History: Go back",
+      "mode": "370192c64680f2c7"
+    },
+    {
+      "id": "heycalmdown-navigate-cursor-history:cursor-position-forward",
+      "icon": "arrow-right-circle",
+      "name": "Navigate Cursor History: Go forward",
+      "mode": "370192c64680f2c7"
+    }
+  ],
+  "macros": [],
+  "explorer": [],
+  "hide": {
+    "statusbar": [],
+    "leftRibbon": []
+  },
+  "spacing": "8",
+  "advancedToolbar": {
+    "rowHeight": 48,
+    "rowCount": 1,
+    "spacing": 0,
+    "buttonWidth": 48,
+    "columnLayout": false,
+    "mappedIcons": [],
+    "tooltips": false,
+    "heightOffset": 0
+  }
+}

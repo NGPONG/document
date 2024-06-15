@@ -1,0 +1,27 @@
+{
+  "accentColor": "",
+  "cssTheme": "Flexoki",
+  "theme": "moonstone",
+  "nativeMenus": false,
+  "baseFontSizeAction": true,
+  "interfaceFontFamily": "Microsoft YaHei UI",
+  "baseFontSize": 21,
+  "showViewHeader": true,
+  "enabledCssSnippets": [
+    "obsidian-default-theme.css",
+    "tag-pills",
+    "111",
+    "header",
+    "header_margin",
+    "letter",
+    "列表间距",
+    "间距",
+    "头部美化",
+    "修改文件数标题的格式",
+    "信纸格式",
+    "修改文件标题的格式",
+    "html-tabs"
+  ],
+  "monospaceFontFamily": "Cascadia Code,FZQiTi-S14S",
+  "textFontFamily": "Times New Roman,FZSongKeBenXiuKaiS-R-GB"
+}

@@ -1,0 +1,143 @@
+{
+  "app:go-back": [],
+  "app:go-forward": [],
+  "command-palette:open": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "P"
+    }
+  ],
+  "obsidian-excalidraw-plugin:insert-link-to-element": [],
+  "obsidian-excalidraw-plugin:save": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "S"
+    }
+  ],
+  "switcher:open": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "O"
+    }
+  ],
+  "file-explorer:new-file": [],
+  "file-explorer:new-file-in-new-pane": [],
+  "obsidian-editor-shortcuts:deleteLine": [],
+  "obsidian-editor-shortcuts:copyLineUp": [],
+  "obsidian-editor-shortcuts:copyLineDown": [],
+  "obsidian-editor-shortcuts:addCursorsToSelectionEnds": [],
+  "obsidian-editor-shortcuts:duplicateLine": [],
+  "obsidian-editor-shortcuts:insertLineAbove": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "Enter"
+    }
+  ],
+  "obsidian-editor-shortcuts:selectAllOccurrences": [],
+  "obsidian-editor-shortcuts:selectLine": [],
+  "editor:delete-paragraph": [],
+  "workspace:undo-close-pane": [],
+  "markdown:toggle-preview": [],
+  "editor:toggle-italics": [],
+  "editor:toggle-comments": [],
+  "editor:toggle-checklist-status": [],
+  "editor:toggle-bold": [],
+  "workspace:edit-file-title": [],
+  "editor:open-link-in-new-split": [],
+  "editor:open-link-in-new-window": [],
+  "editor:open-link-in-new-leaf": [],
+  "app:open-help": [
+    {
+      "modifiers": [],
+      "key": "F12"
+    }
+  ],
+  "workspace:new-tab": [],
+  "editor:insert-link": [],
+  "graph:open": [],
+  "workspace:goto-tab-8": [],
+  "workspace:goto-tab-7": [],
+  "workspace:goto-tab-6": [],
+  "workspace:goto-tab-5": [],
+  "workspace:goto-tab-4": [],
+  "workspace:goto-tab-3": [],
+  "workspace:goto-tab-1": [],
+  "workspace:goto-tab-2": [],
+  "workspace:previous-tab": [
+    {
+      "modifiers": [
+        "Ctrl",
+        "Shift"
+      ],
+      "key": "Tab"
+    }
+  ],
+  "workspace:next-tab": [
+    {
+      "modifiers": [
+        "Ctrl"
+      ],
+      "key": "Tab"
+    }
+  ],
+  "workspace:goto-last-tab": [],
+  "workspace:close-window": [],
+  "obsidian-excalidraw-plugin:insert-link": [],
+  "obsidian-excalidraw-plugin:toggle-lock": [],
+  "editor:follow-link": [],
+  "workspace:close": [],
+  "markdown:add-metadata-property": [],
+  "editor:add-cursor-above": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "ArrowUp"
+    }
+  ],
+  "editor:add-cursor-below": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "ArrowDown"
+    }
+  ],
+  "obsidian-editor-shortcuts:transformToLowercase": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "U"
+    }
+  ],
+  "obsidian-editor-shortcuts:transformToUppercase": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "U"
+    }
+  ],
+  "obsidian-editor-shortcuts:joinLines": [],
+  "obsidian-editor-shortcuts:insertLineBelow": [],
+  "obsidian-editor-shortcuts:undo": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "Z"
+    }
+  ]
+}
