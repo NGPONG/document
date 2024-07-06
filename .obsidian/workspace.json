@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "f47437be9388d11a",
+        "id": "6b6a26b10befdb71",
         "type": "tabs",
         "children": [
           {
-            "id": "198b7dff7ffc4784",
+            "id": "e4cb2ddd3714c363",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -59,7 +59,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "tag:#𝑛−1",
+                "query": "完全二叉树",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -81,7 +81,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 306.5110321044922
+    "width": 323.5,
+    "collapsed": true
   },
   "right": {
     "id": "3ca9cd71ea6552bb",
@@ -152,9 +153,16 @@
                 "searchQuery": ""
               }
             }
+          },
+          {
+            "id": "ac7356e927ec67ab",
+            "type": "leaf",
+            "state": {
+              "type": "git-history-view",
+              "state": {}
+            }
           }
-        ],
-        "currentTab": 3
+        ]
       }
     ],
     "direction": "horizontal",
@@ -171,20 +179,20 @@
       "workspaces:Manage workspace layouts": false
     }
   },
-  "active": "b5f4eacffcd3c4f2",
+  "active": "e4cb2ddd3714c363",
   "lastOpenFiles": [
+    "MarkDown/markdown.md",
+    "data_structure&algorithm/DataStructure&Algorithm.md",
+    "data_structure&algorithm/Sort algorithm -- All in one.md",
+    "book_notes/Multiplayer Game Programming.md",
+    "book_notes/How to write shared libries.md",
+    "cpp/2020/5_28/cpp_programming_language.md",
     "c_Sharp/2019/8_6/迭代器模式.md",
     "c_Sharp/2019/8_6/Linq.md",
     "c_Sharp/2019/8_4/扩展方法.md",
     "c_Sharp/2019/7_14/邮件发送.md",
-    "data_structure&algorithm/Sort algorithm -- All in one.md",
-    "MarkDown/markdown.md",
-    "cpp/2020/5_28/cpp_programming_language.md",
-    "book_notes/Multiplayer Game Programming.md",
     "tools/gdb.md",
     "tools",
-    "book_notes/How to write shared libries.md",
-    "data_structure&algorithm/DataStructure&Algorithm.md",
     "Linux commands ALL IN ONE.md",
     "C/2019/12_18/C_Programming_Language.md",
     "attachment/canvas/How to write shared libries.canvas",

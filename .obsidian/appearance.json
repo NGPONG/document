@@ -5,7 +5,7 @@
   "nativeMenus": false,
   "baseFontSizeAction": true,
   "interfaceFontFamily": "Microsoft YaHei UI",
-  "baseFontSize": 21,
+  "baseFontSize": 22,
   "showViewHeader": true,
   "enabledCssSnippets": [
     "obsidian-default-theme.css",
