@@ -19,8 +19,22 @@
                 "source": false
               }
             }
+          },
+          {
+            "id": "3ae22d30bc2d0500",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Linux commands ALL IN ONE.md",
+                "mode": "source",
+                "backlinks": false,
+                "source": false
+              }
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -49,7 +63,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "data_structure&algorithm/Sort algorithm -- All in one.md"
+                "file": "Linux commands ALL IN ONE.md"
               }
             }
           },
@@ -81,8 +95,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 323.5,
-    "collapsed": true
+    "width": 323.5
   },
   "right": {
     "id": "3ca9cd71ea6552bb",
@@ -98,7 +111,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "data_structure&algorithm/Sort algorithm -- All in one.md",
+                "file": "Linux commands ALL IN ONE.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -110,7 +123,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "data_structure&algorithm/Sort algorithm -- All in one.md",
+                "file": "Linux commands ALL IN ONE.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -138,7 +151,7 @@
             "state": {
               "type": "file-properties",
               "state": {
-                "file": "data_structure&algorithm/Sort algorithm -- All in one.md"
+                "file": "Linux commands ALL IN ONE.md"
               }
             }
           },
@@ -179,13 +192,14 @@
       "workspaces:Manage workspace layouts": false
     }
   },
-  "active": "e4cb2ddd3714c363",
+  "active": "b5f4eacffcd3c4f2",
   "lastOpenFiles": [
-    "MarkDown/markdown.md",
-    "data_structure&algorithm/DataStructure&Algorithm.md",
+    "book_notes/csapp.md",
     "data_structure&algorithm/Sort algorithm -- All in one.md",
-    "book_notes/Multiplayer Game Programming.md",
     "book_notes/How to write shared libries.md",
+    "book_notes/Multiplayer Game Programming.md",
+    "data_structure&algorithm/DataStructure&Algorithm.md",
+    "MarkDown/markdown.md",
     "cpp/2020/5_28/cpp_programming_language.md",
     "c_Sharp/2019/8_6/迭代器模式.md",
     "c_Sharp/2019/8_6/Linq.md",
@@ -215,7 +229,6 @@
     "How To Write Shared Libraries.pdf",
     "book_notes/How To Write Shared Libraries.pdf",
     "How To Write Shared Libraries 1.pdf",
-    "book_notes/csapp.md",
     "asdasd.md",
     "C_Programming_Language 1.md",
     "attachment/excalidraw/Drawing 2024-05-13 23.48.53.excalidraw.md",
